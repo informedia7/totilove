@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Test</title>
+</head>
+<body>
+    <h1>Testing Chat API</h1>
+    <div id="result"></div>
+
+    <script>
+        async function testChat() {
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                // First login as test1
+                console.log('🔐 Logging in...');
+                const loginResponse = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'test1@hot.com',
+                        password: 'test1' // Assuming this is the password
+                    })
+                });
+                
+                if (!loginResponse.ok) {
+                    throw new Error(`Login failed: ${loginResponse.status}`);
+                }
+                
+                const loginData = await loginResponse.json();
+                console.log('✅ Login successful:', loginData);
+                
+                // Store session data
+                if (loginData.sessionToken) {
+                    localStorage.setItem('sessionToken', loginData.sessionToken);
+                    localStorage.setItem('currentUser', JSON.stringify(loginData.user));
+                }
+                
+                // Test conversations API 
+                console.log('📱 Testing conversations API...');
+                const convResponse = await fetch('/api/conversations', {
+                    headers: {
+                        'Authorization': `Bearer ${loginData.sessionToken}`
+                    }
+                });
+                
+                if (convResponse.ok) {
+                    const convData = await convResponse.json();
+                    console.log('✅ Conversations loaded:', convData);
+                    resultDiv.innerHTML = `
+                        <h2>✅ Success!</h2>
+                        <p>Login: OK</p>
+                        <p>Conversations API: ${convData.success ? 'SUCCESS' : 'FAILED'}</p>
+                        <p>Conversations Count: ${convData.conversations ? convData.conversations.length : 0}</p>
+                        <pre>${JSON.stringify(convData, null, 2)}</pre>
+                    `;
+                } else {
+                    throw new Error(`Conversations failed: ${convResponse.status}`);
+                }
+                
+            } catch (error) {
+                console.error('❌ Test failed:', error);
+                resultDiv.innerHTML = `
+                    <h2>❌ Error</h2>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+        
+        // Run test on page load
+        testChat();
+    </script>
+</body>
+</html>

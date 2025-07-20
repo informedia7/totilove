@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Page Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .loading { color: blue; }
+        .error { color: red; }
+        .success { color: green; }
+        .info { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        #profile-content { display: none; }
+        #loading { display: block; }
+        #error-container { display: none; }
+    </style>
+</head>
+<body>
+    <h1>Profile Page Debug Test</h1>
+    
+    <div id="debug-info">
+        <h3>Debug Information:</h3>
+        <div id="sessionManager-status" class="info">Checking sessionManager...</div>
+        <div id="script-loading" class="info">Checking script loading...</div>
+        <div id="dom-ready" class="info">Waiting for DOM...</div>
+    </div>
+    
+    <div id="loading" class="loading">
+        <p>Loading profile...</p>
+    </div>
+
+    <div id="error-container" style="display: none;">
+        <div class="error">
+            <p id="error-text">Error loading profile</p>
+        </div>
+    </div>
+
+    <div id="profile-content" style="display: none;">
+        <h2>Profile Information</h2>
+        <p>Username: <span id="username">--</span></p>
+        <p>Email: <span id="email">--</span></p>
+        <p>User ID: <span id="user-id">--</span></p>
+    </div>
+
+    <!-- Load session.js first -->
+    <script src="/js/session.js"></script>
+    <script>
+        // Debug helper functions
+        function updateDebugInfo(id, message, status = 'info') {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = message;
+                element.className = `info ${status}`;
+            }
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('profile-content').style.display = 'none';
+            document.getElementById('error-container').style.display = 'none';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('profile-content').style.display = 'block';
+        }
+
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error-text').textContent = message;
+            document.getElementById('error-container').style.display = 'block';
+        }
+
+        // Test basic profile loading functionality
+        async function testProfileLoading() {
+            console.log('🧪 Starting profile loading test...');
+            
+            try {
+                // Check if sessionManager is available
+                if (typeof sessionManager === 'undefined') {
+                    updateDebugInfo('sessionManager-status', 'SessionManager not found!', 'error');
+                    throw new Error('SessionManager not available');
+                } else {
+                    updateDebugInfo('sessionManager-status', 'SessionManager found ✓', 'success');
+                }
+
+                // Initialize session manager
+                await sessionManager.init();
+                updateDebugInfo('sessionManager-status', 'SessionManager initialized ✓', 'success');
+
+                // Check authentication
+                const isLoggedIn = sessionManager.isLoggedIn();
+                if (!isLoggedIn) {
+                    updateDebugInfo('sessionManager-status', 'No valid session - creating test session', 'error');
+                    
+                    // Set test session data
+                    localStorage.setItem('sessionToken', '167aa7bf78892bf64add423624ace79c83b8d1ebfe52560844899b87c31d060d');
+                    localStorage.setItem('currentUser', '{"id":3,"username":"test1234","email":"ezy4@hotmail.com"}');
+                    
+                    // Reinitialize session manager
+                    await sessionManager.init();
+                }
+
+                // Get current user
+                const currentUser = sessionManager.getCurrentUser();
+                if (!currentUser) {
+                    throw new Error('No user data available');
+                }
+
+                // Load user profile from API
+                const response = await fetch(`/api/user/${currentUser.id}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    // Display user profile
+                    document.getElementById('username').textContent = data.user.username || 'Unknown';
+                    document.getElementById('email').textContent = data.user.email || 'Not provided';
+                    document.getElementById('user-id').textContent = data.user.id || '--';
+                    
+                    hideLoading();
+                    updateDebugInfo('sessionManager-status', 'Profile loaded successfully ✓', 'success');
+                } else {
+                    throw new Error(data.error || 'Failed to load profile');
+                }
+
+            } catch (error) {
+                console.error('Profile loading error:', error);
+                showError(error.message);
+                updateDebugInfo('sessionManager-status', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDebugInfo('dom-ready', 'DOM ready ✓', 'success');
+            
+            // Wait a moment for sessionManager to be fully loaded
+            setTimeout(() => {
+                updateDebugInfo('script-loading', 'Scripts loaded ✓', 'success');
+                testProfileLoading();
+            }, 100);
+        });
+
+        console.log('🚀 Debug script loaded');
+    </script>
+</body>
+</html>

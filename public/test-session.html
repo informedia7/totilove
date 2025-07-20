@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Session Test</title>
+</head>
+<body>
+    <h1>Session Test Page</h1>
+    <div id="results"></div>
+    
+    <script src="/js/session.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const results = document.getElementById('results');
+            
+            results.innerHTML = '<p>Testing session...</p>';
+            
+            // Initialize session manager
+            await sessionManager.init();
+            
+            results.innerHTML += `
+                <p>Session Token: ${sessionManager.sessionToken || 'None'}</p>
+                <p>Is Authenticated: ${sessionManager.isAuthenticated}</p>
+                <p>Current User: ${JSON.stringify(sessionManager.currentUser) || 'None'}</p>
+            `;
+            
+            // Test localStorage directly
+            const storedToken = localStorage.getItem('sessionToken');
+            const storedUser = localStorage.getItem('currentUser');
+            
+            results.innerHTML += `
+                <h3>LocalStorage:</h3>
+                <p>Stored Token: ${storedToken || 'None'}</p>
+                <p>Stored User: ${storedUser || 'None'}</p>
+            `;
+        });
+    </script>
+</body>
+</html>

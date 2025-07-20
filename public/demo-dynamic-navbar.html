@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Navbar Example - Totilove</title>
+    
+    <!-- Include session manager for authentication -->
+    <script src="/js/session.js"></script>
+    
+    <!-- Include navbar loader and functionality -->
+    <script src="/components/navbar-loader.js"></script>
+    <script src="/components/navbar.js"></script>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+        }
+        
+        .main-content {
+            padding-top: 80px; /* Account for navbar height */
+            padding: 100px 20px 20px;
+            text-align: center;
+            color: white;
+        }
+        
+        .demo-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .demo-buttons {
+            margin-top: 20px;
+        }
+        
+        .demo-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .demo-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar will be dynamically loaded here -->
+    
+    <main class="main-content">
+        <div class="demo-card">
+            <h1>🎉 Dynamic Navbar Demo</h1>
+            <p>This page demonstrates the new dynamic navbar loading system!</p>
+            
+            <h3>✨ Features:</h3>
+            <ul style="text-align: left; max-width: 400px; margin: 0 auto;">
+                <li>✅ Navbar loaded dynamically via JavaScript</li>
+                <li>✅ No hardcoded HTML in this page</li>
+                <li>✅ Automatic authentication detection</li>
+                <li>✅ Consistent styling across all pages</li>
+                <li>✅ Mobile responsive design</li>
+                <li>✅ Fast navigation with loading indicators</li>
+            </ul>
+            
+            <div class="demo-buttons">
+                <button class="demo-btn" onclick="testNavbarRefresh()">🔄 Refresh Navbar</button>
+                <button class="demo-btn" onclick="testAuthToggle()">🔐 Toggle Auth State</button>
+                <button class="demo-btn" onclick="showNavbarInfo()">ℹ️ Navbar Info</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Demo functions
+        function testNavbarRefresh() {
+            console.log('🔄 Refreshing navbar authentication state...');
+            if (window.navbarLoader) {
+                window.navbarLoader.refreshAuthState();
+                alert('✅ Navbar authentication state refreshed!');
+            }
+        }
+        
+        function testAuthToggle() {
+            // Simulate authentication toggle for demo
+            const isAuth = localStorage.getItem('demo-auth') === 'true';
+            localStorage.setItem('demo-auth', !isAuth);
+            
+            // Mock session manager for demo
+            if (!window.sessionManager) {
+                window.sessionManager = {
+                    isAuthenticated: () => localStorage.getItem('demo-auth') === 'true'
+                };
+            }
+            
+            // Refresh navbar to show change
+            if (window.navbarLoader) {
+                window.navbarLoader.refreshAuthState();
+            }
+            
+            alert(`🔐 Demo auth state: ${!isAuth ? 'Authenticated' : 'Public'}`);
+        }
+        
+        function showNavbarInfo() {
+            const navbar = document.querySelector('.navbar');
+            const info = {
+                loaded: !!navbar,
+                links: navbar ? navbar.querySelectorAll('a').length : 0,
+                authState: window.sessionManager ? window.sessionManager.isAuthenticated() : 'Unknown'
+            };
+            
+            alert(`ℹ️ Navbar Info:\n✅ Loaded: ${info.loaded}\n🔗 Links: ${info.links}\n🔐 Auth: ${info.authState}`);
+        }
+        
+        // Demo setup
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎯 Demo page loaded - navbar should load automatically');
+            
+            // Setup demo session manager if it doesn't exist
+            if (!window.sessionManager) {
+                window.sessionManager = {
+                    isAuthenticated: () => localStorage.getItem('demo-auth') === 'true'
+                };
+            }
+        });
+    </script>
+</body>
+</html>

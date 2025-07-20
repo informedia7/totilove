@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Chat Test - Totilove</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .chat-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .messages {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #fafafa;
+        }
+        
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            max-width: 70%;
+        }
+        
+        .message.sent {
+            background: #007bff;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+        
+        .message.received {
+            background: #e9ecef;
+            color: #333;
+        }
+        
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background: #0056b3;
+        }
+        
+        .status {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #d4edda;
+            border-radius: 5px;
+            color: #155724;
+        }
+        
+        .login-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .login-section h3 {
+            margin-bottom: 15px;
+            color: #495057;
+        }
+        
+        input[type="email"], input[type="password"] {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h1>Simple Chat Test</h1>
+        <div id="status" class="status">Please log in first to send messages...</div>
+        
+        <!-- Login Section -->
+        <div id="loginSection" class="login-section">
+            <h3>Login Required</h3>
+            <div class="input-area">
+                <input type="email" id="emailInput" placeholder="Email" style="margin-bottom: 10px;">
+                <input type="password" id="passwordInput" placeholder="Password" style="margin-bottom: 10px;">
+                <button onclick="login()">Login</button>
+            </div>
+            <p><small>Try: <strong>2@hotmail.co</strong> / <strong>123456A</strong></small></p>
+        </div>
+        
+        <!-- Chat Section (hidden initially) -->
+        <div id="chatSection" style="display: none;">
+            <div class="messages" id="messages"></div>
+            
+            <div class="input-area">
+                <input type="text" id="messageInput" placeholder="Type your message..." disabled>
+                <button id="sendBtn" onclick="sendMessage()" disabled>Send</button>
+                <button onclick="logout()" style="background: #dc3545;">Logout</button>
+            </div>
+        </div>
+        
+        <div id="userInfo" style="display: none;">
+            <p><strong>Logged in as:</strong> <span id="currentUserInfo"></span></p>
+            <p><strong>Chat with:</strong> User 109 (ssssdddd22)</p>
+        </div>
+    </div>
+
+    <script>
+        let currentUserId = null;
+        let sessionToken = null;
+        const partnerId = 109;
+        let socket;
+        
+        const statusEl = document.getElementById('status');
+        const messagesEl = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const loginSection = document.getElementById('loginSection');
+        const chatSection = document.getElementById('chatSection');
+        const userInfo = document.getElementById('userInfo');
+        const currentUserInfo = document.getElementById('currentUserInfo');
+        
+        // Login function
+        async function login() {
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+            
+            if (!email || !password) {
+                alert('Please enter both email and password');
+                return;
+            }
+            
+            try {
+                statusEl.textContent = 'Logging in...';
+                
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentUserId = data.user.id;
+                    sessionToken = data.sessionToken;
+                    
+                    // Update UI
+                    loginSection.style.display = 'none';
+                    chatSection.style.display = 'block';
+                    userInfo.style.display = 'block';
+                    currentUserInfo.textContent = `${data.user.username} (${data.user.email})`;
+                    
+                    statusEl.textContent = 'Successfully logged in! You can now send messages.';
+                    statusEl.classList.remove('error');
+                    
+                    messageInput.disabled = false;
+                    sendBtn.disabled = false;
+                    
+                    // Initialize chat
+                    initializeChat();
+                    loadMessages();
+                } else {
+                    statusEl.textContent = `Login failed: ${data.error}`;
+                    statusEl.classList.add('error');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                statusEl.textContent = 'Login failed: Network error';
+                statusEl.classList.add('error');
+            }
+        }
+        
+        // Logout function
+        function logout() {
+            currentUserId = null;
+            sessionToken = null;
+            
+            loginSection.style.display = 'block';
+            chatSection.style.display = 'none';
+            userInfo.style.display = 'none';
+            
+            messagesEl.innerHTML = '';
+            document.getElementById('emailInput').value = '';
+            document.getElementById('passwordInput').value = '';
+            
+            statusEl.textContent = 'Please log in first to send messages...';
+            statusEl.classList.remove('error');
+            
+            if (socket) {
+                socket.disconnect();
+            }
+        }
+        
+        // Initialize WebSocket connection
+        function initializeChat() {
+            if (!sessionToken) return;
+            
+            try {
+                socket = io();
+                
+                socket.on('connect', () => {
+                    console.log('Connected to server');
+                    
+                    // Authenticate user
+                    socket.emit('authenticate', { 
+                        userId: currentUserId, 
+                        username: currentUserInfo.textContent 
+                    });
+                });
+                
+                socket.on('disconnect', () => {
+                    console.log('Disconnected from server');
+                });
+                
+                socket.on('message', (data) => {
+                    console.log('Received message:', data);
+                    displayMessage(data, false);
+                });
+                
+                socket.on('error', (error) => {
+                    console.error('Socket error:', error);
+                });
+                
+            } catch (error) {
+                console.error('Failed to initialize chat:', error);
+            }
+        }
+        
+        // Load existing messages
+        async function loadMessages() {
+            if (!sessionToken || !currentUserId) return;
+            
+            try {
+                const response = await fetch(`/api/messages/${currentUserId}/${partnerId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${sessionToken}`
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.success && data.messages) {
+                    messagesEl.innerHTML = '';
+                    data.messages.forEach(msg => {
+                        displayMessage({
+                            content: msg.content || msg.message,
+                            senderId: msg.sender_id,
+                            timestamp: msg.timestamp
+                        }, msg.sender_id === currentUserId);
+                    });
+                    scrollToBottom();
+                } else if (data.error && data.error.includes('Authentication')) {
+                    alert('Session expired. Please log in again.');
+                    logout();
+                }
+            } catch (error) {
+                console.error('Error loading messages:', error);
+            }
+        }
+        
+        // Send message
+        async function sendMessage() {
+            if (!sessionToken || !currentUserId) {
+                alert('Please log in first');
+                return;
+            }
+            
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            try {
+                const response = await fetch('/api/messages/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${sessionToken}`
+                    },
+                    body: JSON.stringify({
+                        senderId: currentUserId,
+                        receiverId: partnerId,
+                        content: message
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayMessage({
+                        content: message,
+                        senderId: currentUserId,
+                        timestamp: Date.now()
+                    }, true);
+                    
+                    messageInput.value = '';
+                    
+                    // Also send via WebSocket for real-time delivery
+                    if (socket) {
+                        socket.emit('message', {
+                            receiverId: partnerId,
+                            content: message
+                        });
+                    }
+                } else {
+                    if (data.error && data.error.includes('Authentication')) {
+                        alert('Session expired. Please log in again.');
+                        logout();
+                    } else {
+                        alert('Failed to send message: ' + (data.error || 'Unknown error'));
+                    }
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Failed to send message');
+            }
+        }
+        
+        // Display message in chat
+        function displayMessage(messageData, isSent) {
+            const messageEl = document.createElement('div');
+            messageEl.className = `message ${isSent ? 'sent' : 'received'}`;
+            
+            const time = new Date(messageData.timestamp).toLocaleTimeString();
+            messageEl.innerHTML = `
+                <div>${messageData.content}</div>
+                <small style="opacity: 0.7; font-size: 0.8em;">${time}</small>
+            `;
+            
+            messagesEl.appendChild(messageEl);
+            scrollToBottom();
+        }
+        
+        function scrollToBottom() {
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+        
+        // Handle Enter key for login and messages
+        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+        
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+    
+    <!-- Socket.IO client -->
+    <script src="/socket.io/socket.io.js"></script>
+</body>
+</html>

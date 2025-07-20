@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Login - Totilove</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .btn {
+            background: #6c5ce7;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            min-width: 200px;
+        }
+        .btn:hover {
+            background: #5a4fcf;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .credentials {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #6c5ce7;
+        }
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #6c5ce7;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🚀 Auto Login Helper</h2>
+        <p>This page will automatically log you in using the demo account.</p>
+        
+        <div class="credentials">
+            <h3>Demo Account Credentials:</h3>
+            <p><strong>Email:</strong> demo@totilove.com</p>
+            <p><strong>Password:</strong> demo123</p>
+        </div>
+        
+        <button onclick="autoLogin()" class="btn" id="loginBtn">
+            Auto Login & Go to Profile
+        </button>
+        
+        <button onclick="manualLogin()" class="btn">
+            Go to Login Page
+        </button>
+        
+        <div id="status"></div>
+    </div>
+
+    <script>
+        async function autoLogin() {
+            const statusDiv = document.getElementById('status');
+            const loginBtn = document.getElementById('loginBtn');
+            
+            // Show loading state
+            loginBtn.innerHTML = '<div class="spinner"></div>Logging in...';
+            loginBtn.disabled = true;
+            statusDiv.innerHTML = '<div class="loading">🔄 Attempting to log in with demo account...</div>';
+            
+            try {
+                // Attempt to log in using the API
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'demo@totilove.com',
+                        password: 'demo123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    statusDiv.innerHTML = '<div class="success">✅ Login successful! Redirecting to profile...</div>';
+                    
+                    // Store session data
+                    localStorage.setItem('sessionToken', data.sessionToken);
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                    
+                    // Redirect to profile page
+                    setTimeout(() => {
+                        window.location.href = '/users/profile.html';
+                    }, 1500);
+                } else {
+                    throw new Error(data.error || 'Login failed');
+                }
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                statusDiv.innerHTML = '<div class="error">❌ Login failed: ' + error.message + '</div>';
+                loginBtn.innerHTML = 'Auto Login & Go to Profile';
+                loginBtn.disabled = false;
+            }
+        }
+        
+        function manualLogin() {
+            window.location.href = '/login';
+        }
+        
+        // Check if user is already logged in
+        window.addEventListener('load', function() {
+            const sessionToken = localStorage.getItem('sessionToken');
+            const currentUser = localStorage.getItem('currentUser');
+            
+            if (sessionToken && currentUser) {
+                document.getElementById('status').innerHTML = 
+                    '<div class="success">✅ You are already logged in! <a href="/users/profile.html" style="color: #155724; text-decoration: underline;">Go to Profile</a></div>';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Real-Time Chat - Totilove</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="/assets/css/loading-animations.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="/js/fast-navigation.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            height: 90vh;
+        }
+        
+        .sidebar {
+            width: 300px;
+            background: #f8f9fa;
+            border-right: 1px solid #e1e8ed;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            background: #1da1f2;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .sidebar-header h2 {
+            margin-bottom: 10px;
+        }
+        
+        .user-status {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+        
+        .conversations-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .conversation-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .conversation-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .conversation-item.active {
+            border-color: #1da1f2;
+            background: #e3f2fd;
+        }
+        
+        .conversation-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .conversation-preview {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .online-indicator {
+            width: 10px;
+            height: 10px;
+            background: #4caf50;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            background: white;
+            border-bottom: 1px solid #e1e8ed;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .chat-partner-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .partner-avatar {
+            width: 50px;
+            height: 50px;
+            background: #1da1f2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .partner-details h3 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .partner-status {
+            color: #4caf50;
+            font-size: 0.9em;
+        }
+        
+        .typing-indicator {
+            color: #999;
+            font-style: italic;
+            font-size: 0.9em;
+        }
+        
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-end;
+        }
+        
+        .message.own {
+            flex-direction: row-reverse;
+        }
+        
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            position: relative;
+            animation: messageSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message.own .message-bubble {
+            background: #1da1f2;
+            color: white;
+            margin-left: 20px;
+        }
+        
+        .message:not(.own) .message-bubble {
+            background: white;
+            color: #333;
+            margin-right: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .message-timestamp {
+            font-size: 0.8em;
+            color: #999;
+            margin: 5px 15px 0;
+        }
+        
+        .message.own .message-timestamp {
+            text-align: right;
+        }
+        
+        .input-area {
+            background: white;
+            border-top: 1px solid #e1e8ed;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .message-input {
+            flex: 1;
+            border: 2px solid #e1e8ed;
+            border-radius: 25px;
+            padding: 12px 20px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .message-input:focus {
+            border-color: #1da1f2;
+        }
+        
+        .send-btn {
+            background: #1da1f2;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .send-btn:hover {
+            background: #0d8bd9;
+            transform: scale(1.05);
+        }
+        
+        .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .login-section {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .login-form {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 400px;
+            text-align: center;
+        }
+        
+        .login-form h2 {
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .login-form input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+        }
+        
+        .login-form input:focus {
+            border-color: #1da1f2;
+        }
+        
+        .login-btn {
+            width: 100%;
+            background: #1da1f2;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .login-btn:hover {
+            background: #0d8bd9;
+        }
+        
+        .status-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .status-message.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .status-message.success {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        
+        .online-users {
+            background: white;
+            margin: 10px;
+            padding: 15px;
+            border-radius: 12px;
+        }
+        
+        .online-users h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .online-user {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .online-user:last-child {
+            border-bottom: none;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .connection-status {
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        
+        .connection-status.connected {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        
+        .connection-status.disconnected {
+            background: #ffebee;
+            color: #c62828;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Section -->
+    <div id="loginSection" class="login-section">
+        <div class="login-form">
+            <h2>🚀 Welcome to Totilove</h2>
+            <input type="email" id="emailInput" placeholder="Email" value="2@hotmail.co">
+            <input type="password" id="passwordInput" placeholder="Password" value="123456A">
+            <button class="login-btn" onclick="login()">Login to Chat</button>
+            <button class="login-btn" onclick="goToHomePage()" style="background: #4caf50; margin-top: 10px;">Skip to Home Page</button>
+            <div id="loginStatus" class="status-message hidden"></div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="appContainer" class="app-container hidden">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>💬 Totilove Chat</h2>
+                <div class="user-status">
+                    <div id="currentUserInfo">Loading...</div>
+                    <div id="connectionStatus" class="connection-status">Connecting...</div>
+                </div>
+            </div>
+            
+            <div class="conversations-list">
+                <h4 style="margin-bottom: 15px; color: #666;">Conversations</h4>
+                <div id="conversationsList">
+                    <!-- Conversations will be loaded here -->
+                </div>
+                
+                <div class="online-users">
+                    <h4>🟢 Online Users</h4>
+                    <div id="onlineUsersList">
+                        <!-- Online users will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <div class="chat-header">
+                <div class="chat-partner-info">
+                    <div class="partner-avatar" id="partnerAvatar">U</div>
+                    <div class="partner-details">
+                        <h3 id="partnerName">Select a conversation</h3>
+                        <div id="partnerStatus" class="partner-status">Offline</div>
+                        <div id="typingIndicator" class="typing-indicator hidden">Typing...</div>
+                    </div>
+                </div>
+                <div>
+                    <button onclick="goHome()" style="background: #4caf50; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-right: 10px;">Home</button>
+                    <button onclick="logout()" style="background: #f44336; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Logout</button>
+                </div>
+            </div>
+            
+            <div id="messagesContainer" class="messages-container">
+                <div style="text-align: center; color: #999; margin-top: 50px;">
+                    Select a conversation to start chatting
+                </div>
+            </div>
+            
+            <div class="input-area">
+                <input type="text" id="messageInput" class="message-input" placeholder="Type your message..." disabled>
+                <button id="sendBtn" class="send-btn" onclick="sendMessage()" disabled>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let socket = null;
+        let currentUserId = null;
+        let currentUsername = null;
+        let sessionToken = null;
+        let currentConversationId = null;
+        let currentPartnerId = 109; // Default partner for testing
+        let typingTimeout = null;
+        let onlineUsers = new Set();
+
+        // DOM Elements
+        const loginSection = document.getElementById('loginSection');
+        const appContainer = document.getElementById('appContainer');
+        const emailInput = document.getElementById('emailInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const loginStatus = document.getElementById('loginStatus');
+        const currentUserInfo = document.getElementById('currentUserInfo');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const conversationsList = document.getElementById('conversationsList');
+        const onlineUsersList = document.getElementById('onlineUsersList');
+        const partnerAvatar = document.getElementById('partnerAvatar');
+        const partnerName = document.getElementById('partnerName');
+        const partnerStatus = document.getElementById('partnerStatus');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        // Instant navigation to home page from login
+        function goToHomePage() {
+            // Show immediate feedback
+            const homeBtn = document.querySelector('button[onclick="goToHomePage()"]');
+            if (homeBtn) {
+                homeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Going to Home...';
+                homeBtn.disabled = true;
+                homeBtn.style.opacity = '0.6';
+            }
+            
+            // Immediate redirect
+            window.location.href = '/';
+        }
+
+        // Login function with instant redirection
+        async function login() {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            if (!email || !password) {
+                showLoginStatus('Please enter both email and password', 'error');
+                return;
+            }
+            
+            // Show immediate loading feedback
+            const loginBtn = document.querySelector('.login-btn');
+            const originalText = loginBtn.textContent;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+            loginBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Store session data
+                    currentUserId = data.user.id;
+                    currentUsername = data.user.username;
+                    sessionToken = data.sessionToken;
+                    
+                    // Store in localStorage for persistence
+                    localStorage.setItem('sessionToken', sessionToken);
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                    
+                    showLoginStatus('Login successful! Redirecting...', 'success');
+                    
+                    // Immediate redirect to home page - no delay
+                    window.location.href = '/';
+                    
+                } else {
+                    showLoginStatus(`Login failed: ${data.error}`, 'error');
+                    loginBtn.innerHTML = originalText;
+                    loginBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showLoginStatus('Login failed: Network error', 'error');
+                loginBtn.innerHTML = originalText;
+                loginBtn.disabled = false;
+            }
+        }
+
+        // Show login status
+        function showLoginStatus(message, type) {
+            loginStatus.textContent = message;
+            loginStatus.className = `status-message ${type}`;
+            loginStatus.classList.remove('hidden');
+        }
+
+        // Initialize app after login
+        function initializeApp() {
+            currentUserInfo.textContent = `Welcome! (User ID: ${currentUserId})`;
+            
+            // Initialize Socket.IO
+            initializeSocket();
+            
+            // Load conversations
+            loadConversations();
+            
+            // Enable message input
+            messageInput.disabled = false;
+            sendBtn.disabled = false;
+            
+            // Add enter key listener
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // Add typing indicator
+            messageInput.addEventListener('input', () => {
+                if (currentPartnerId && socket) {
+                    socket.emit('typing', {
+                        userId: currentUserId,
+                        partnerId: currentPartnerId,
+                        isTyping: true
+                    });
+                    
+                    clearTimeout(typingTimeout);
+                    typingTimeout = setTimeout(() => {
+                        socket.emit('typing', {
+                            userId: currentUserId,
+                            partnerId: currentPartnerId,
+                            isTyping: false
+                        });
+                    }, 1000);
+                }
+            });
+        }
+
+        // Initialize Socket.IO connection
+        function initializeSocket() {
+            socket = io();
+
+            socket.on('connect', () => {
+                console.log('Connected to server');
+                connectionStatus.textContent = '🟢 Connected';
+                connectionStatus.className = 'connection-status connected';
+                
+                // Authenticate the socket connection
+                socket.emit('authenticate', {
+                    userId: currentUserId,
+                    username: currentUsername || `User ${currentUserId}`
+                });
+            });
+
+            socket.on('disconnect', () => {
+                console.log('Disconnected from server');
+                connectionStatus.textContent = '🔴 Disconnected';
+                connectionStatus.className = 'connection-status disconnected';
+            });
+
+            socket.on('message', (data) => {
+                console.log('Received message:', data);
+                if (data.senderId == currentPartnerId || data.senderId == currentUserId) {
+                    displayMessage(data);
+                }
+            });
+
+            socket.on('userOnline', (data) => {
+                console.log('User came online:', data);
+                onlineUsers.add(data.userId);
+                updateOnlineUsers();
+            });
+
+            socket.on('userOffline', (data) => {
+                console.log('User went offline:', data);
+                onlineUsers.delete(data.userId);
+                updateOnlineUsers();
+            });
+
+            socket.on('typing', (data) => {
+                if (data.userId == currentPartnerId) {
+                    if (data.isTyping) {
+                        typingIndicator.classList.remove('hidden');
+                    } else {
+                        typingIndicator.classList.add('hidden');
+                    }
+                }
+            });
+
+            socket.on('error', (error) => {
+                console.error('Socket error:', error);
+            });
+        }
+
+        // Load conversations
+        async function loadConversations() {
+            try {
+                const response = await fetch(`/api/conversations/${currentUserId}`, {
+                    headers: { 'Authorization': `Bearer ${sessionToken}` }
+                });
+                const data = await response.json();
+                
+                if (data.success && data.conversations) {
+                    displayConversations(data.conversations);
+                } else {
+                    // Create a default conversation for testing
+                    conversationsList.innerHTML = `
+                        <div class="conversation-item active" onclick="selectConversation(109, 'Test User')">
+                            <div class="conversation-name">
+                                <span class="online-indicator"></span>
+                                Test User (109)
+                            </div>
+                            <div class="conversation-preview">Click to start chatting</div>
+                        </div>
+                    `;
+                    selectConversation(109, 'Test User');
+                }
+            } catch (error) {
+                console.error('Failed to load conversations:', error);
+            }
+        }
+
+        // Display conversations
+        function displayConversations(conversations) {
+            conversationsList.innerHTML = conversations.map(conv => `
+                <div class="conversation-item" onclick="selectConversation(${conv.partnerId}, '${conv.partnerName}')">
+                    <div class="conversation-name">
+                        <span class="online-indicator" style="background: ${onlineUsers.has(conv.partnerId) ? '#4caf50' : '#ccc'}"></span>
+                        ${conv.partnerName || `User ${conv.partnerId}`}
+                    </div>
+                    <div class="conversation-preview">${conv.lastMessage || 'No messages yet'}</div>
+                </div>
+            `).join('');
+            
+            // Auto-select first conversation if available
+            if (conversations.length > 0) {
+                selectConversation(conversations[0].partnerId, conversations[0].partnerName);
+                // Manually add active class to first item
+                const firstItem = conversationsList.querySelector('.conversation-item');
+                if (firstItem) {
+                    firstItem.classList.add('active');
+                }
+            }
+        }
+
+        // Select conversation
+        function selectConversation(partnerId, partnerNameText) {
+            currentPartnerId = partnerId;
+            
+            // Update UI
+            partnerAvatar.textContent = partnerNameText.charAt(0).toUpperCase();
+            partnerName.textContent = partnerNameText;
+            partnerStatus.textContent = onlineUsers.has(partnerId) ? 'Online' : 'Offline';
+            
+            // Update conversation selection
+            document.querySelectorAll('.conversation-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            if (event && event.target) {
+                event.target.closest('.conversation-item').classList.add('active');
+            }
+            
+            // Load messages
+            loadMessages();
+        }
+
+        // Load messages
+        async function loadMessages() {
+            if (!currentPartnerId) return;
+            
+            try {
+                const response = await fetch(`/api/messages/${currentUserId}/${currentPartnerId}`, {
+                    headers: { 'Authorization': `Bearer ${sessionToken}` }
+                });
+                const data = await response.json();
+                
+                if (data.success && data.messages) {
+                    messagesContainer.innerHTML = '';
+                    data.messages.forEach(msg => {
+                        displayMessage({
+                            content: msg.content || msg.message,
+                            senderId: msg.sender_id,
+                            timestamp: msg.timestamp
+                        });
+                    });
+                    scrollToBottom();
+                }
+            } catch (error) {
+                console.error('Failed to load messages:', error);
+            }
+        }
+
+        // Send message
+        async function sendMessage() {
+            const content = messageInput.value.trim();
+            if (!content || !currentPartnerId) return;
+            
+            try {
+                const response = await fetch('/api/messages/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${sessionToken}`
+                    },
+                    body: JSON.stringify({
+                        receiverId: currentPartnerId,
+                        content: content
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    messageInput.value = '';
+                    // Message will be displayed via socket event
+                } else {
+                    console.error('Failed to send message:', data.error);
+                }
+            } catch (error) {
+                console.error('Failed to send message:', error);
+            }
+        }
+
+        // Format timestamp safely
+        function formatTimestamp(timestamp) {
+            try {
+                if (!timestamp) return 'Unknown time';
+                
+                // Handle different timestamp formats
+                let date;
+                if (typeof timestamp === 'string') {
+                    // If it's a string, try to parse it as a number first
+                    const numericTimestamp = parseFloat(timestamp);
+                    if (!isNaN(numericTimestamp)) {
+                        // If less than 13 digits, it's probably seconds
+                        date = new Date(numericTimestamp < 10000000000 ? numericTimestamp * 1000 : numericTimestamp);
+                    } else {
+                        // Try to parse as ISO string
+                        date = new Date(timestamp);
+                    }
+                } else if (typeof timestamp === 'number') {
+                    // If it's a number, it could be seconds or milliseconds
+                    // If less than 13 digits, it's probably seconds
+                    date = new Date(timestamp < 10000000000 ? timestamp * 1000 : timestamp);
+                } else {
+                    date = new Date(timestamp);
+                }
+                
+                // Check if date is valid
+                if (isNaN(date.getTime())) {
+                    console.warn('Invalid timestamp:', timestamp);
+                    return 'Invalid time';
+                }
+                
+                return date.toLocaleTimeString();
+            } catch (error) {
+                console.error('Error formatting timestamp:', error, 'for timestamp:', timestamp);
+                return 'Unknown time';
+            }
+        }
+
+        // Display message
+        function displayMessage(messageData) {
+            const isOwn = messageData.senderId == currentUserId;
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isOwn ? 'own' : ''}`;
+            
+            const timestamp = formatTimestamp(messageData.timestamp);
+            
+            messageDiv.innerHTML = `
+                <div class="message-bubble">
+                    ${messageData.content}
+                </div>
+                <div class="message-timestamp">${timestamp}</div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        // Update online users
+        function updateOnlineUsers() {
+            const onlineUsersArray = Array.from(onlineUsers);
+            onlineUsersList.innerHTML = onlineUsersArray.map(userId => `
+                <div class="online-user">
+                    <span class="online-indicator"></span>
+                    User ${userId}
+                </div>
+            `).join('') || '<div style="color: #999;">No users online</div>';
+        }
+
+        // Scroll to bottom
+        function scrollToBottom() {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Fast navigation to home page
+        function goHome() {
+            // Show immediate feedback
+            const homeBtn = document.querySelector('button[onclick="goHome()"]');
+            if (homeBtn) {
+                homeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                homeBtn.disabled = true;
+                homeBtn.style.opacity = '0.6';
+            }
+            
+            // Immediate redirect
+            window.location.href = '/';
+        }
+
+        // Logout function with immediate feedback
+        async function logout() {
+            // Show immediate feedback
+            const logoutBtn = document.querySelector('button[onclick="logout()"]');
+            if (logoutBtn) {
+                logoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging out...';
+                logoutBtn.disabled = true;
+                logoutBtn.style.opacity = '0.6';
+            }
+            
+            try {
+                // Don't wait for server response - log out immediately
+                fetch('/api/logout', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${sessionToken}` }
+                }).catch(() => {}); // Ignore errors
+            } catch (error) {
+                // Ignore errors - we're logging out anyway
+            }
+            
+            // Disconnect socket immediately
+            if (socket) {
+                socket.disconnect();
+            }
+            
+            // Reset state and redirect immediately
+            currentUserId = null;
+            sessionToken = null;
+            currentPartnerId = null;
+            onlineUsers.clear();
+            
+            // Immediate redirect
+            window.location.href = '/';
+        }
+
+        // Handle enter key in login form - optimized for fast navigation
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !loginSection.classList.contains('hidden')) {
+                // Check if user wants to skip login (no credentials entered)
+                const email = emailInput.value.trim();
+                const password = passwordInput.value.trim();
+                
+                if (!email && !password) {
+                    // If no credentials, go straight to home
+                    goToHomePage();
+                } else {
+                    // Otherwise attempt login
+                    login();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

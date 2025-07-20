@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick Login & Chat Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .step { background: #f5f5f5; padding: 20px; margin: 10px 0; border-radius: 8px; }
+        .step h3 { margin-top: 0; color: #333; }
+        .btn { background: #667eea; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        .btn:hover { background: #5a6cd8; }
+        .success { color: #28a745; font-weight: bold; }
+        .error { color: #dc3545; font-weight: bold; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .status.success { background: #d4edda; border: 1px solid #c3e6cb; }
+        .status.error { background: #f8d7da; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Totilove Chat Testing Suite</h1>
+    <p>This page will test the complete flow: login → chat access → username/timestamp fixes</p>
+
+    <div class="step">
+        <h3>Step 1: Test Server Connection</h3>
+        <button class="btn" onclick="testServer()">Test Server</button>
+        <div id="server-status"></div>
+    </div>
+
+    <div class="step">
+        <h3>Step 2: Login with Test Account</h3>
+        <button class="btn" onclick="testLogin()">Login as 2@hotmail.co</button>
+        <div id="login-status"></div>
+    </div>
+
+    <div class="step">
+        <h3>Step 3: Test Chat API</h3>
+        <button class="btn" onclick="testChatAPI()">Test Conversations API</button>
+        <div id="chat-status"></div>
+    </div>
+
+    <div class="step">
+        <h3>Step 4: Open Working Chat</h3>
+        <button class="btn" onclick="openChat()">Open Chat Page</button>
+        <p><strong>Expected Result:</strong> Chat page should now load conversations with:</p>
+        <ul>
+            <li>✅ Correct user initials (H for honey, not U)</li>
+            <li>✅ Proper timestamps (3h ago instead of just now)</li>
+            <li>✅ Working conversation list</li>
+        </ul>
+    </div>
+
+    <script>
+        async function testServer() {
+            const statusDiv = document.getElementById('server-status');
+            statusDiv.innerHTML = '🔄 Testing server...';
+            
+            try {
+                const response = await fetch('/');
+                if (response.ok) {
+                    statusDiv.innerHTML = '<div class="status success">✅ Server is running correctly</div>';
+                } else {
+                    statusDiv.innerHTML = '<div class="status error">❌ Server responded with status: ' + response.status + '</div>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="status error">❌ Cannot connect to server: ' + error.message + '</div>';
+            }
+        }
+
+        async function testLogin() {
+            const statusDiv = document.getElementById('login-status');
+            statusDiv.innerHTML = '🔄 Logging in...';
+            
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: '2@hotmail.co',
+                        password: '123456A'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        // Store session data
+                        localStorage.setItem('sessionToken', data.sessionToken);
+                        localStorage.setItem('currentUser', JSON.stringify(data.user));
+                        
+                        statusDiv.innerHTML = '<div class="status success">✅ Login successful! User ID: ' + data.user.id + ', Username: ' + data.user.username + '</div>';
+                    } else {
+                        statusDiv.innerHTML = '<div class="status error">❌ Login failed: ' + (data.error || 'Unknown error') + '</div>';
+                    }
+                } else {
+                    statusDiv.innerHTML = '<div class="status error">❌ Login request failed: ' + response.status + '</div>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="status error">❌ Login error: ' + error.message + '</div>';
+            }
+        }
+
+        async function testChatAPI() {
+            const statusDiv = document.getElementById('chat-status');
+            statusDiv.innerHTML = '🔄 Testing chat API...';
+            
+            const token = localStorage.getItem('sessionToken');
+            const currentUser = localStorage.getItem('currentUser');
+            
+            if (!token || !currentUser) {
+                statusDiv.innerHTML = '<div class="status error">❌ Not logged in. Please complete Step 2 first.</div>';
+                return;
+            }
+            
+            try {
+                const userData = JSON.parse(currentUser);
+                const response = await fetch(`/api/conversations/${userData.id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    statusDiv.innerHTML = '<div class="status success">✅ Chat API working! Response: ' + JSON.stringify(data, null, 2) + '</div>';
+                } else {
+                    const errorText = await response.text();
+                    statusDiv.innerHTML = '<div class="status error">❌ Chat API failed (' + response.status + '): ' + errorText + '</div>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="status error">❌ Chat API error: ' + error.message + '</div>';
+            }
+        }
+
+        function openChat() {
+            const token = localStorage.getItem('sessionToken');
+            const currentUser = localStorage.getItem('currentUser');
+            
+            if (!token || !currentUser) {
+                alert('❌ Please complete login first (Step 2)');
+                return;
+            }
+            
+            alert('✅ Opening chat page with active session...');
+            window.open('/pages/chat.html', '_blank');
+        }
+
+        // Auto-test server on page load
+        document.addEventListener('DOMContentLoaded', testServer);
+    </script>
+</body>
+</html>
