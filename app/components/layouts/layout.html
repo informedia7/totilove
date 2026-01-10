@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{pageTitle}} - Totilove</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#764ba2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Totilove">
+    
     <link rel="stylesheet" href="/assets/css/vendor/font-awesome.min.css">
     
     <!-- Online Activity Tracker -->
@@ -1304,6 +1312,9 @@
         };
     </script>
     <script src="/assets/js/new/asset-loader.js"></script>
+    
+    <!-- PWA Initialization -->
+    <script src="/assets/js/new/pwa-init.js"></script>
 </head>
 <body data-user-id="{{userId}}" 
       data-user-real-name="{{real_name}}" 
