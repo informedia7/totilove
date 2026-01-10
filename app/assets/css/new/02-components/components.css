@@ -8,8 +8,10 @@
 /* Import UserCard component */
 @import url('./_user-card.css');
 
+/* Import Modals component */
+@import url('./_modals.css');
+
 /* More components will be imported here as we extract them:
-   @import url('./_modals.css');
    @import url('./_forms.css');
    @import url('./_buttons.css');
    @import url('./_cards.css');
