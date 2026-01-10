@@ -23,6 +23,6 @@
 /* Step 4: Layout (grids, containers, utilities) */
 @import url('./03-layout.css');
 
-/* Step 5: Responsive (desktop enhancements - when ready) */
-/* @import url('./04-responsive.css'); */
+/* Step 5: Responsive (desktop enhancements) */
+@import url('./04-responsive.css');
 
