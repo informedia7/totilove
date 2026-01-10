@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lifestyle Filters Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #f5f6fa;
+        }
+        .test-container {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2d3436;
+            margin-bottom: 1rem;
+        }
+        .instructions {
+            background: #e8f4f8;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #3498db;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .instructions ol {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+        .instructions li {
+            margin: 0.5rem 0;
+        }
+        button {
+            background: linear-gradient(135deg, #6c5ce7, #00b894);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin: 0.5rem;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+        }
+        #testResults {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .status {
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            border-radius: 5px;
+        }
+        .status.passed {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        .status.failed {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Lifestyle Filters Test Suite</h1>
+        
+        <div class="instructions">
+            <h3>How to use this test:</h3>
+            <ol>
+                <li>Open the search page in another tab: <code>/search</code></li>
+                <li>Make sure you're logged in</li>
+                <li>Click "Run Test" button below</li>
+                <li>The test will check:
+                    <ul>
+                        <li>All dropdowns exist and are populated from database</li>
+                        <li>Filter values are collected correctly</li>
+                        <li>URL parameters are preserved</li>
+                        <li>Filters are restored from URL</li>
+                        <li>API search works with lifestyle filters</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+        
+        <div>
+            <button onclick="runTest()">▶️ Run Test</button>
+            <button onclick="clearResults()">🗑️ Clear Results</button>
+            <button onclick="openSearchPage()">🔍 Open Search Page</button>
+        </div>
+        
+        <div id="testResults"></div>
+    </div>
+
+    <script>
+        // Load the test script
+        const script = document.createElement('script');
+        script.src = 'test-lifestyle-filters.js';
+        document.head.appendChild(script);
+        
+        function clearResults() {
+            document.getElementById('testResults').innerHTML = '';
+        }
+        
+        function openSearchPage() {
+            window.open('/search', '_blank');
+        }
+        
+        async function runTest() {
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = '<p>🔄 Running test... Please wait...</p>';
+            
+            // Override console.log to capture output
+            const originalLog = console.log;
+            const originalError = console.error;
+            const originalWarn = console.warn;
+            
+            let output = '';
+            
+            console.log = function(...args) {
+                originalLog.apply(console, args);
+                output += args.join(' ') + '\n';
+                resultsDiv.innerHTML = '<pre>' + output + '</pre>';
+            };
+            
+            console.error = function(...args) {
+                originalError.apply(console, args);
+                output += '❌ ERROR: ' + args.join(' ') + '\n';
+                resultsDiv.innerHTML = '<pre>' + output + '</pre>';
+            };
+            
+            console.warn = function(...args) {
+                originalWarn.apply(console, args);
+                output += '⚠️ WARNING: ' + args.join(' ') + '\n';
+                resultsDiv.innerHTML = '<pre>' + output + '</pre>';
+            };
+            
+            try {
+                // Check if we're on the search page
+                if (window.location.pathname.includes('/search')) {
+                    if (typeof testLifestyleFilters === 'function') {
+                        const results = await testLifestyleFilters();
+                        displayResults(results);
+                    } else {
+                        resultsDiv.innerHTML = '<p style="color: red;">❌ Test function not loaded. Make sure test-lifestyle-filters.js is accessible.</p>';
+                    }
+                } else {
+                    resultsDiv.innerHTML = `
+                        <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; border-left: 4px solid #ffc107;">
+                            <h3>⚠️ Not on search page</h3>
+                            <p>This test needs to run on the search page. Please:</p>
+                            <ol>
+                                <li>Navigate to <code>/search</code> page</li>
+                                <li>Open browser console (F12)</li>
+                                <li>Paste and run: <code>testLifestyleFilters()</code></li>
+                            </ol>
+                            <p>Or click "Open Search Page" button above and run the test from there.</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML += '\n\n❌ Test execution error: ' + error.message;
+                console.error('Test error:', error);
+            } finally {
+                // Restore original console functions
+                console.log = originalLog;
+                console.error = originalError;
+                console.warn = originalWarn;
+            }
+        }
+        
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('testResults');
+            let html = '<div style="margin-top: 1rem;">';
+            
+            html += `<h3>📊 Test Summary</h3>`;
+            html += `<div class="status passed">✅ Passed: ${results.passed.length}</div>`;
+            html += `<div class="status failed">❌ Failed: ${results.failed.length}</div>`;
+            html += `<div class="status warning">⚠️ Warnings: ${results.warnings.length}</div>`;
+            
+            if (results.passed.length > 0) {
+                html += '<h4 style="margin-top: 1rem;">✅ Passed Tests:</h4>';
+                results.passed.forEach(test => {
+                    html += `<div class="status passed">${test}</div>`;
+                });
+            }
+            
+            if (results.warnings.length > 0) {
+                html += '<h4 style="margin-top: 1rem;">⚠️ Warnings:</h4>';
+                results.warnings.forEach(warning => {
+                    html += `<div class="status warning">${warning}</div>`;
+                });
+            }
+            
+            if (results.failed.length > 0) {
+                html += '<h4 style="margin-top: 1rem;">❌ Failed Tests:</h4>';
+                results.failed.forEach(test => {
+                    html += `<div class="status failed">${test}</div>`;
+                });
+            }
+            
+            html += '</div>';
+            resultsDiv.innerHTML += html;
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+

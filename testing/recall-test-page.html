@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Message Recall Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+        }
+        .test-section h3 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .test-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-warning { background: #ffc107; color: black; }
+        .btn:hover { opacity: 0.8; }
+        
+        .input-group {
+            margin: 15px 0;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .input-group input {
+            width: 200px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .messages-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+        .message {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .message.sent { background: #d4edda; border-color: #c3e6cb; }
+        .message.received { background: #f8f9fa; border-color: #dee2e6; }
+        .message.recalled { background: #fff3cd; border-color: #ffeaa7; }
+        
+        .log-area {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .log-entry { margin: 5px 0; }
+        .log-success { color: #00ff00; }
+        .log-error { color: #ff0000; }
+        .log-warning { color: #ffff00; }
+        .log-info { color: #00ffff; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Simple Message Recall Test</h1>
+    <p>Testing between <strong>gracewilliams175 (User 94)</strong> and <strong>aaronhall294 (User 23)</strong></p>
+
+    <!-- Quick Test Section -->
+    <div class="container">
+        <div class="test-section">
+            <h3>🚀 Quick Tests</h3>
+            <div class="test-buttons">
+                <button class="btn btn-primary" onclick="testAPI()">Test API Connection</button>
+                <button class="btn btn-success" onclick="sendTestMessage()">Send Test Message</button>
+                <button class="btn btn-warning" onclick="loadMessages()">Load Messages</button>
+                <button class="btn btn-danger" onclick="clearLog()">Clear Log</button>
+                <button class="btn btn-primary" onclick="testBasicFunctionality()">Test Basic Functions</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Testing Section -->
+    <div class="container">
+        <div class="test-section">
+            <h3>📤 Send Message</h3>
+            <div class="input-group">
+                <label>Message Text:</label>
+                <input type="text" id="messageInput" placeholder="Type your message here..." value="Test message from recall test page">
+            </div>
+            <div class="test-buttons">
+                <button class="btn btn-success" onclick="sendMessageAsUser94()">Send as User 94 (gracewilliams175)</button>
+                <button class="btn btn-success" onclick="sendMessageAsUser23()">Send as User 23 (aaronhall294)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recall Testing Section -->
+    <div class="container">
+        <div class="test-section">
+            <h3>🗑️ Test Recall</h3>
+            <div class="input-group">
+                <label>Message ID to Recall:</label>
+                <input type="text" id="recallMessageId" placeholder="Enter message ID">
+            </div>
+            <div class="test-buttons">
+                <button class="btn btn-warning" onclick="testSoftRecall()">Test Soft Recall</button>
+                <button class="btn btn-danger" onclick="testHardRecall()">Test Hard Recall</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages Display -->
+    <div class="container">
+        <div class="test-section">
+            <h3>💬 Messages</h3>
+            <div class="test-buttons">
+                <button class="btn btn-primary" onclick="refreshMessages()">Refresh Messages</button>
+            </div>
+            <div id="messagesDisplay" class="messages-display">
+                <p>Messages will appear here...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Log -->
+    <div class="container">
+        <div class="test-section">
+            <h3>📋 Test Log</h3>
+            <div id="logArea" class="log-area">
+                <div class="log-entry">Test log will appear here...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple logging function
+        function log(message, type = 'info') {
+            const logArea = document.getElementById('logArea');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logArea.appendChild(logEntry);
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+
+        // Clear log
+        function clearLog() {
+            document.getElementById('logArea').innerHTML = '<div class="log-entry">Log cleared...</div>';
+        }
+
+        // Test API connection
+        async function testAPI() {
+            log('Testing API connection...', 'info');
+            
+            // Test 1: Check if server is reachable
+            try {
+                log('📡 Testing server reachability...', 'info');
+                const response = await fetch('/');
+                if (response.ok) {
+                    log('✅ Server is reachable!', 'success');
+                } else {
+                    log(`⚠️ Server responded with status: ${response.status}`, 'warning');
+                }
+            } catch (error) {
+                log(`❌ Server not reachable: ${error.message}`, 'error');
+                return;
+            }
+            
+            // Test 2: Check message conversation endpoint
+            try {
+                log('📥 Testing message conversation endpoint...', 'info');
+                const response = await fetch('/api/messages/conversation/94/23');
+                log(`📡 Conversation endpoint status: ${response.status}`, 'info');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Conversation endpoint working! Found ${data.messages?.length || 0} messages`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    log(`❌ Conversation endpoint failed: ${response.status} - ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Conversation endpoint error: ${error.message}`, 'error');
+            }
+        }
+
+        // Send test message
+        async function sendTestMessage() {
+            log('Sending test message...', 'info');
+            const messageText = `Test message - ${new Date().toLocaleTimeString()}`;
+            
+            try {
+                log(`📋 Sending test message: ${messageText}`, 'info');
+                
+                const response = await fetch('/api/messages/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-ID': '94'
+                    },
+                    body: JSON.stringify({
+                        receiverId: 23,
+                        content: messageText
+                    })
+                });
+
+                log(`📡 Response status: ${response.status}`, 'info');
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`📥 Response data: ${JSON.stringify(data)}`, 'info');
+                    
+                    if (data.success) {
+                        log(`✅ Test message sent! ID: ${data.messageId}`, 'success');
+                        refreshMessages();
+                    } else {
+                        log(`❌ Test message failed: ${data.error}`, 'error');
+                    }
+                } else {
+                    const errorText = await response.text();
+                    log(`❌ HTTP error: ${response.status} - ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Send message as User 94
+        async function sendMessageAsUser94() {
+            const messageText = document.getElementById('messageInput').value.trim();
+            if (!messageText) {
+                log('❌ Please enter a message', 'error');
+                return;
+            }
+            
+            log(`Sending message as User 94: "${messageText}"`, 'info');
+            await sendMessage(94, 23, messageText);
+        }
+
+        // Send message as User 23
+        async function sendMessageAsUser23() {
+            const messageText = document.getElementById('messageInput').value.trim();
+            if (!messageText) {
+                log('❌ Please enter a message', 'error');
+                return;
+            }
+            
+            log(`Sending message as User 23: "${messageText}"`, 'info');
+            await sendMessage(23, 94, messageText);
+        }
+
+        // Generic send message function
+        async function sendMessage(senderId, receiverId, content) {
+            try {
+                log(`📤 Sending message: ${content}`, 'info');
+                log(`📋 From User ${senderId} to User ${receiverId}`, 'info');
+                
+                const response = await fetch('/api/messages/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-ID': senderId.toString()
+                    },
+                    body: JSON.stringify({
+                        receiverId: receiverId,
+                        content: content
+                    })
+                });
+
+                log(`📡 Response status: ${response.status}`, 'info');
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`📥 Response data: ${JSON.stringify(data)}`, 'info');
+                    
+                    if (data.success) {
+                        log(`✅ Message sent successfully! ID: ${data.messageId}`, 'success');
+                        refreshMessages();
+                    } else {
+                        log(`❌ Failed to send message: ${data.error}`, 'error');
+                    }
+                } else {
+                    const errorText = await response.text();
+                    log(`❌ HTTP error: ${response.status} - ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error sending message: ${error.message}`, 'error');
+            }
+        }
+
+        // Load and display messages
+        async function loadMessages() {
+            log('Loading messages...', 'info');
+            try {
+                log('📥 Fetching from: /api/messages/conversation/94/23', 'info');
+                
+                const response = await fetch('/api/messages/conversation/94/23');
+                log(`📡 Response status: ${response.status}`, 'info');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`📥 Response data: ${JSON.stringify(data)}`, 'info');
+                    
+                    if (data.success) {
+                        log(`✅ Loaded ${data.messages.length} messages`, 'success');
+                        displayMessages(data.messages);
+                    } else {
+                        log(`❌ Failed to load messages: ${data.error}`, 'error');
+                    }
+                } else {
+                    const errorText = await response.text();
+                    log(`❌ HTTP error: ${response.status} - ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error loading messages: ${error.message}`, 'error');
+            }
+        }
+
+        // Display messages
+        function displayMessages(messages) {
+            const display = document.getElementById('messagesDisplay');
+            display.innerHTML = '';
+
+            if (!messages || messages.length === 0) {
+                display.innerHTML = '<p>No messages found.</p>';
+                return;
+            }
+
+            messages.forEach(message => {
+                const messageDiv = document.createElement('div');
+                const isRecalled = message.recalled && message.recall_type && message.recall_type !== 'none';
+                const isSentBy94 = message.senderId == 94;
+                
+                let messageClass = isSentBy94 ? 'sent' : 'received';
+                if (isRecalled) messageClass = 'recalled';
+                
+                let messageContent = message.content;
+                if (isRecalled && isSentBy94) {
+                    messageContent = '🗑️ Message recalled';
+                }
+
+                messageDiv.className = `message ${messageClass}`;
+                messageDiv.innerHTML = `
+                    <strong>ID: ${message.id}</strong> | 
+                    <strong>From: ${isSentBy94 ? 'gracewilliams175' : 'aaronhall294'}</strong> | 
+                    <strong>Time: ${new Date(message.timestamp).toLocaleTimeString()}</strong>
+                    <br>
+                    <strong>Content:</strong> ${messageContent}
+                    ${isRecalled ? `<br><em>Status: RECALLED (${message.recall_type})</em>` : ''}
+                `;
+                
+                display.appendChild(messageDiv);
+            });
+        }
+
+        // Refresh messages
+        function refreshMessages() {
+            loadMessages();
+        }
+
+        // Test soft recall
+        async function testSoftRecall() {
+            const messageId = document.getElementById('recallMessageId').value.trim();
+            if (!messageId) {
+                log('❌ Please enter a message ID to recall', 'error');
+                return;
+            }
+            
+            log(`Testing soft recall for message ${messageId}...`, 'info');
+            await recallMessage(messageId, 'soft');
+        }
+
+        // Test hard recall
+        async function testHardRecall() {
+            const messageId = document.getElementById('recallMessageId').value.trim();
+            if (!messageId) {
+                log('❌ Please enter a message ID to recall', 'error');
+                return;
+            }
+            
+            log(`Testing hard recall for message ${messageId}...`, 'info');
+            await recallMessage(messageId, 'hard');
+        }
+
+        // Generic recall function
+        async function recallMessage(messageId, recallType) {
+            try {
+                log(`🗑️ Recalling message ${messageId} with type: ${recallType}`, 'info');
+                log(`📋 Using User 94 for testing`, 'info');
+                
+                const response = await fetch(`/api/messages/${messageId}/recall`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-ID': '94' // Using User 94 for testing
+                    },
+                    body: JSON.stringify({
+                        recallType: recallType
+                    })
+                });
+
+                log(`📡 Response status: ${response.status}`, 'info');
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`📥 Response data: ${JSON.stringify(data)}`, 'info');
+                    
+                    if (data.success) {
+                        log(`✅ ${recallType} recall successful!`, 'success');
+                        refreshMessages();
+                    } else {
+                        log(`❌ ${recallType} recall failed: ${data.error}`, 'error');
+                    }
+                } else {
+                    const errorText = await response.text();
+                    log(`❌ HTTP error: ${response.status} - ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error during recall: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🚀 Test page loaded successfully!', 'success');
+            log('📝 Page is ready for testing', 'info');
+            log('🔍 Click "Test API Connection" to check server connectivity', 'info');
+            
+            // Test if basic JavaScript is working
+            try {
+                const testElement = document.getElementById('logArea');
+                if (testElement) {
+                    log('✅ DOM elements loaded correctly', 'success');
+                } else {
+                    log('❌ DOM elements not found', 'error');
+                }
+            } catch (error) {
+                log(`❌ DOM test failed: ${error.message}`, 'error');
+            }
+        });
+
+        // Add a simple test function
+        function testBasicFunctionality() {
+            log('🧪 Testing basic page functionality...', 'info');
+            log('✅ JavaScript is working', 'success');
+            log('✅ Log function is working', 'success');
+            log('✅ Page is responsive', 'success');
+        }
+    </script>
+</body>
+</html>

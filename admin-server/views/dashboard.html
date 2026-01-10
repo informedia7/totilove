@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Totilove</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .header-info {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .nav-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        
+    </style>
+    <script src="/js/admin-dashboard.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <div class="user-info">
+                    Logged in as: <strong><%= admin.username %></strong> (<%= admin.role %>)
+                </div>
+                <form method="POST" action="/logout" class="logout-form">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+            <h1>Totilove Admin Dashboard</h1>
+            <p>Manage users, statistics, and system configuration</p>
+        </div>
+        
+        <div class="content">
+        <div class="welcome-card">
+            <h2>Welcome to Admin Dashboard</h2>
+            <p>This is the standalone admin server for managing Totilove users, statistics, and system configuration. Use the navigation cards below to access different sections.</p>
+        </div>
+
+        <!-- Password Change Section -->
+        <div class="welcome-card" id="password-change-section" style="display: none;">
+            <h2>🔐 Change Password</h2>
+            <form id="password-change-form" style="margin-top: 20px;">
+                <div style="margin-bottom: 16px;">
+                    <label for="current-password" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500;">Current Password</label>
+                    <input type="password" id="current-password" name="currentPassword" required 
+                           style="width: 100%; max-width: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label for="new-password" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500;">New Password</label>
+                    <input type="password" id="new-password" name="newPassword" required 
+                           style="width: 100%; max-width: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label for="confirm-password" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500;">Confirm New Password</label>
+                    <input type="password" id="confirm-password" name="confirmPassword" required 
+                           style="width: 100%; max-width: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                </div>
+                <div id="password-message" style="margin-bottom: 16px; display: none;"></div>
+                <div style="display: flex; gap: 12px;">
+                    <button type="submit" id="change-password-btn" 
+                            style="padding: 10px 24px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                        Change Password
+                    </button>
+                    <button type="button" id="cancel-password-change" 
+                            style="padding: 10px 24px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="welcome-card" style="margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="margin-bottom: 8px;">Account Settings</h2>
+                    <p style="color: #666; margin: 0;">Manage your admin account settings</p>
+                </div>
+                <button id="toggle-password-change" 
+                        style="padding: 10px 24px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                    Change Password
+                </button>
+            </div>
+        </div>
+        
+        <div class="nav-cards">
+            <a href="/users" class="nav-card">
+                <h3>👥 User Management</h3>
+                <p>View, search, edit, ban, and manage all users in the system.</p>
+            </a>
+            
+            <a href="/messages" class="nav-card">
+                <h3>💬 Message Management</h3>
+                <p>View, edit, delete, and manage all messages between users.</p>
+            </a>
+            
+            <a href="/statistics" class="nav-card">
+                <h3>📊 Statistics & Analytics</h3>
+                <p>View comprehensive statistics, growth metrics, and activity analytics.</p>
+            </a>
+            
+            <a href="/configuration" class="nav-card">
+                <h3>⚙️ System Configuration</h3>
+                <p>Manage system settings, user preferences, and platform configuration.</p>
+            </a>
+            
+            <a href="/payments" class="nav-card">
+                <h3>💳 Payment Management</h3>
+                <p>View payments, manage subscriptions, and track revenue.</p>
+            </a>
+            
+            <a href="/subscription-control" class="nav-card">
+                <h3>🔒 Subscription Control</h3>
+                <p>Configure free join settings and contact restrictions.</p>
+            </a>
+            
+            <a href="/blocked-reported" class="nav-card">
+                <h3>🚫 Blocked & Reported Users</h3>
+                <p>Manage blocked users, reported users, and view related messages.</p>
+            </a>
+            
+            <a href="/image-approval" class="nav-card">
+                <h3>🖼️ Image Approval</h3>
+                <p>Review and approve/reject user uploaded images.</p>
+            </a>
+            
+            <a href="/export-import" class="nav-card">
+                <h3>📥 Export/Import</h3>
+                <p>Export user data and import users in bulk.</p>
+            </a>
+            
+            <a href="/backup-restore" class="nav-card">
+                <h3>💾 Database Backup & Restore</h3>
+                <p>Create backups and restore your database. Essential for testing user deletion.</p>
+            </a>
+            
+            <a href="/database-management" class="nav-card">
+                <h3>🗄️ Database Management</h3>
+                <p>Check database integrity, fix corruption issues, and manage database health.</p>
+            </a>
+        </div>
+
+        <!-- Page Analysis Section -->
+        <div class="welcome-card" style="margin-top: 32px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div>
+                    <h2 style="margin-bottom: 8px;">📋 Page Analysis & Testing</h2>
+                    <p style="color: #666; margin: 0;">Comprehensive analysis of all pages, functions, and API calls</p>
+                </div>
+                <button id="run-analysis-btn" 
+                        style="padding: 10px 24px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                    🔍 Run Analysis
+                </button>
+            </div>
+
+            <div id="analysis-loading" style="display: none; text-align: center; padding: 20px;">
+                <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <p style="margin-top: 10px; color: #666;">Analyzing pages... This may take a minute.</p>
+            </div>
+
+            <div id="analysis-results" style="display: none;">
+                <!-- Summary Stats -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                    <div style="background: #f8f9fa; padding: 16px; border-radius: 8px; border-left: 4px solid #667eea;">
+                        <div style="font-size: 24px; font-weight: bold; color: #667eea;" id="stat-total-pages">0</div>
+                        <div style="color: #666; font-size: 14px;">Total Pages</div>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 16px; border-radius: 8px; border-left: 4px solid #28a745;">
+                        <div style="font-size: 24px; font-weight: bold; color: #28a745;" id="stat-total-functions">0</div>
+                        <div style="color: #666; font-size: 14px;">Total Functions</div>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 16px; border-radius: 8px; border-left: 4px solid #17a2b8;">
+                        <div style="font-size: 24px; font-weight: bold; color: #17a2b8;" id="stat-total-api-calls">0</div>
+                        <div style="color: #666; font-size: 14px;">API Calls</div>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 16px; border-radius: 8px; border-left: 4px solid #ffc107;">
+                        <div style="font-size: 24px; font-weight: bold; color: #ffc107;" id="stat-total-issues">0</div>
+                        <div style="color: #666; font-size: 14px;">Issues Found</div>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 16px; border-radius: 8px; border-left: 4px solid #dc3545;">
+                        <div style="font-size: 24px; font-weight: bold; color: #dc3545;" id="stat-pages-with-errors">0</div>
+                        <div style="color: #666; font-size: 14px;">Pages with Errors</div>
+                    </div>
+                </div>
+
+                <!-- Issues Section -->
+                <div style="margin-bottom: 24px;">
+                    <h3 style="margin-bottom: 16px;">⚠️ Issues by Severity</h3>
+                    <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                        <button class="issue-filter-btn active" data-severity="all" style="padding: 8px 16px; border: 1px solid #ddd; background: #667eea; color: white; border-radius: 6px; cursor: pointer;">All</button>
+                        <button class="issue-filter-btn" data-severity="error" style="padding: 8px 16px; border: 1px solid #dc3545; background: white; color: #dc3545; border-radius: 6px; cursor: pointer;">Errors</button>
+                        <button class="issue-filter-btn" data-severity="warning" style="padding: 8px 16px; border: 1px solid #ffc107; background: white; color: #ffc107; border-radius: 6px; cursor: pointer;">Warnings</button>
+                    </div>
+                    <div id="issues-list" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; padding: 16px;"></div>
+                </div>
+
+                <!-- Pages List -->
+                <div>
+                    <h3 style="margin-bottom: 16px;">📄 Pages Analysis</h3>
+                    <div style="margin-bottom: 12px;">
+                        <input type="text" id="page-search" placeholder="Search pages..." 
+                               style="width: 100%; max-width: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                    </div>
+                    <div id="pages-list" style="max-height: 600px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; padding: 16px;"></div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .page-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .page-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+        .page-item.expanded {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+        .issue-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border-left: 4px solid;
+        }
+        .issue-item.error {
+            background: #fee;
+            border-left-color: #dc3545;
+        }
+        .issue-item.warning {
+            background: #fffbf0;
+            border-left-color: #ffc107;
+        }
+        .issue-item.info {
+            background: #f0f8ff;
+            border-left-color: #17a2b8;
+        }
+    </style>
+
+    <script src="/js/page-analysis.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

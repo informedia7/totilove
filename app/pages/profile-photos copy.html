@@ -1,0 +1,1086 @@
+<!-- Profile tabs with sub-navigation -->
+<div class="profile-tabs">
+    <a href="/profile-basic?token={{sessionToken}}" class="tab-btn" id="tab-basic">Basic Info</a>
+    <a href="/profile-full?token={{sessionToken}}" class="tab-btn" id="tab-full">Full Info</a>
+    <a href="/profile-photos?token={{sessionToken}}" class="tab-btn active" id="tab-photos">My Photos</a>
+    <a href="/profile-edit?token={{sessionToken}}" class="tab-btn" id="tab-edit">Edit Profile</a>
+</div>
+
+<!-- Hidden data for JavaScript -->
+<script type="application/json" id="profile-data">
+{
+    "userId": "{{userId}}",
+    "sessionToken": "{{sessionToken}}"
+}
+</script>
+
+<div id="tab-panel-photos" class="photos-panel">
+    <div class="photos-container">
+        <div class="photos-header">
+            <h2 class="photos-title">
+                <i class="fas fa-images"></i>
+                My Photos
+            </h2>
+            <p class="photos-subtitle">Manage your profile photos</p>
+        </div>
+
+        <!-- Upload Area -->
+        <div class="upload-section">
+            <div class="upload-area" id="upload-area">
+                <div class="upload-content">
+                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                    <p class="upload-text">Drag and drop photos here</p>
+                    <p class="upload-hint">or click to browse</p>
+                    <input type="file" id="file-input" multiple accept="image/*" style="display: none;">
+                    <button class="upload-btn" id="upload-btn">
+                        <i class="fas fa-plus"></i>
+                        Choose Photos
+                    </button>
+                </div>
+                <div class="upload-progress" id="upload-progress" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <p class="progress-text" id="progress-text">Uploading...</p>
+                </div>
+            </div>
+            <div class="upload-info">
+                <p><i class="fas fa-info-circle"></i> You can upload up to 6 photos. Supported formats: JPG, PNG, GIF. Max size: 5MB per image.</p>
+            </div>
+        </div>
+
+        <!-- Image Gallery -->
+        <div class="gallery-section">
+            <div class="gallery-header">
+                <h3 class="gallery-title">Your Photos (<span id="photo-count">0</span>)</h3>
+                <button class="refresh-btn" id="refresh-btn" onclick="window.refreshPhotos()" title="Refresh photos">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+            <div class="gallery-grid" id="gallery-grid">
+                <div class="empty-state" id="empty-state">
+                    <i class="fas fa-images"></i>
+                    <p>No photos yet. Upload your first photo to get started!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.photos-panel {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.photos-container {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.photos-header {
+    padding: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-align: center;
+}
+
+.photos-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.photos-title i {
+    font-size: 1.75rem;
+}
+
+.photos-subtitle {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1rem;
+}
+
+/* Upload Section */
+.upload-section {
+    padding: 2rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.upload-area {
+    border: 2px dashed #667eea;
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    text-align: center;
+    background: #f8f9ff;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.upload-area:hover {
+    border-color: #764ba2;
+    background: #f0f2ff;
+}
+
+.upload-area.dragover {
+    border-color: #764ba2;
+    background: #e8ebff;
+    transform: scale(1.02);
+}
+
+.upload-content {
+    pointer-events: none;
+}
+
+.upload-area.active .upload-content {
+    display: none;
+}
+
+.upload-icon {
+    font-size: 4rem;
+    color: #667eea;
+    margin-bottom: 1rem;
+}
+
+.upload-text {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 0.5rem 0;
+}
+
+.upload-hint {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0 0 1.5rem 0;
+}
+
+.upload-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    pointer-events: all;
+}
+
+.upload-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.upload-progress {
+    padding: 1rem 0;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0;
+}
+
+.upload-info {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.upload-info i {
+    color: #667eea;
+    margin-right: 0.5rem;
+}
+
+/* Gallery Section */
+.gallery-section {
+    padding: 2rem;
+}
+
+.gallery-header {
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.gallery-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.refresh-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.refresh-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.refresh-btn:active {
+    transform: translateY(0);
+}
+
+.refresh-btn i {
+    font-size: 0.9rem;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #999;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.photo-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f0f0f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.photo-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.photo-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, transparent 40%, transparent 60%, rgba(0, 0, 0, 0.6) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1rem;
+}
+
+.photo-item:hover .photo-overlay {
+    opacity: 1;
+}
+
+.photo-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.photo-badge {
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.photo-badge.profile {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.photo-badge.featured {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.photo-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.photo-action-btn {
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: #333;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.photo-action-btn:hover {
+    background: white;
+    transform: scale(1.05);
+}
+
+.photo-action-btn.set-profile {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.photo-action-btn.set-featured {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.photo-action-btn.delete {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    color: white;
+}
+
+.photo-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .photos-panel {
+        padding: 1rem;
+    }
+
+    .photos-header {
+        padding: 1.5rem;
+    }
+
+    .photos-title {
+        font-size: 1.5rem;
+    }
+
+    .upload-section,
+    .gallery-section {
+        padding: 1.5rem;
+    }
+
+    .gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+
+    .photo-overlay {
+        padding: 0.75rem;
+    }
+
+    .photo-action-btn {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .upload-area {
+        padding: 2rem 1rem;
+    }
+
+    .upload-icon {
+        font-size: 3rem;
+    }
+}
+</style>
+
+<script>
+(function() {
+    // Get session token and user ID
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionToken = urlParams.get('token');
+    let currentUserId = null;
+
+    // Initialize on DOM ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+
+    async function init() {
+        console.log('Initializing profile photos page...');
+        
+        // Try to get userId from embedded JSON data first
+        try {
+            const profileDataEl = document.getElementById('profile-data');
+            if (profileDataEl) {
+                const profileData = JSON.parse(profileDataEl.textContent);
+                if (profileData.userId && profileData.userId !== '{{userId}}') {
+                    currentUserId = parseInt(profileData.userId);
+                    console.log('Got user ID from profile-data element:', currentUserId);
+                }
+                if (profileData.sessionToken && profileData.sessionToken !== '{{sessionToken}}') {
+                    sessionToken = profileData.sessionToken;
+                }
+            }
+        } catch (e) {
+            console.warn('Could not parse profile-data:', e);
+        }
+        
+        // Get current user info from sessionManager
+        if (!currentUserId && window.sessionManager && window.sessionManager.getSession) {
+            const session = window.sessionManager.getSession();
+            console.log('Session from sessionManager:', session);
+            if (session && session.user) {
+                currentUserId = session.user.id;
+                console.log('Got user ID from session:', currentUserId);
+            }
+        }
+
+        // If no user ID from session, try to get from URL or other sources
+        if (!currentUserId && window.currentUser) {
+            currentUserId = window.currentUser.id;
+            console.log('Got user ID from window.currentUser:', currentUserId);
+        }
+        
+        // Try to get from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const userIdParam = urlParams.get('userId');
+        if (!currentUserId && userIdParam) {
+            currentUserId = parseInt(userIdParam);
+            console.log('Got user ID from URL parameter:', currentUserId);
+        }
+
+        if (!currentUserId) {
+            console.error('User ID not found. Available:', {
+                sessionManager: !!window.sessionManager,
+                currentUser: !!window.currentUser,
+                sessionToken: sessionToken,
+                urlParams: window.location.search
+            });
+            showNotification('Unable to identify user. Please refresh the page.', 'error');
+            return;
+        }
+
+        console.log('Final user ID:', currentUserId);
+        setupUploadArea();
+        loadUserImages();
+    }
+
+    // Setup upload area
+    function setupUploadArea() {
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file-input');
+        const uploadBtn = document.getElementById('upload-btn');
+
+        // Click to browse
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fileInput.click();
+        });
+
+        // File input change
+        fileInput.addEventListener('change', handleFileSelect);
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
+            if (files.length > 0) {
+                uploadImages(files);
+            }
+        });
+    }
+
+    // Handle file selection
+    function handleFileSelect(e) {
+        const files = Array.from(e.target.files).filter(file => file.type.startsWith('image/'));
+        if (files.length > 0) {
+            uploadImages(files);
+        }
+        // Reset input
+        e.target.value = '';
+    }
+
+    // Upload images
+    async function uploadImages(files) {
+        const uploadArea = document.getElementById('upload-area');
+        const uploadProgress = document.getElementById('upload-progress');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+
+        // Show progress
+        uploadArea.classList.add('active');
+        uploadProgress.style.display = 'block';
+        progressFill.style.width = '0%';
+
+        try {
+            const formData = new FormData();
+            files.forEach(file => {
+                // Check file size (5MB limit)
+                if (file.size > 5 * 1024 * 1024) {
+                    throw new Error(`File ${file.name} exceeds 5MB limit`);
+                }
+                formData.append('images', file);
+            });
+
+            formData.append('userId', currentUserId);
+
+            // Use sessionManager if available, otherwise fetch directly
+            let response;
+            if (window.sessionManager && window.sessionManager.apiRequest) {
+                // Use FormData with sessionManager
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/api/profile/upload-images');
+                
+                // Add session token to headers
+                if (sessionToken) {
+                    xhr.setRequestHeader('Authorization', `Bearer ${sessionToken}`);
+                    xhr.setRequestHeader('X-Session-Token', sessionToken);
+                }
+
+                // Track upload progress
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        progressFill.style.width = percentComplete + '%';
+                        progressText.textContent = `Uploading... ${Math.round(percentComplete)}%`;
+                    }
+                });
+
+                await new Promise((resolve, reject) => {
+                    xhr.onload = () => {
+                        if (xhr.status === 200) {
+                            try {
+                                response = { ok: true, json: () => Promise.resolve(JSON.parse(xhr.responseText)) };
+                                resolve();
+                            } catch (e) {
+                                reject(new Error('Invalid response'));
+                            }
+                        } else {
+                            reject(new Error(`Upload failed: ${xhr.statusText}`));
+                        }
+                    };
+                    xhr.onerror = () => reject(new Error('Upload failed'));
+                    xhr.send(formData);
+                });
+            } else {
+                response = await fetch('/api/profile/upload-images', {
+                    method: 'POST',
+                    headers: sessionToken ? {
+                        'Authorization': `Bearer ${sessionToken}`,
+                        'X-Session-Token': sessionToken
+                    } : {},
+                    body: formData
+                });
+            }
+
+            const result = await response.json();
+            console.log('Upload result:', result);
+
+            if (result.success) {
+                progressFill.style.width = '100%';
+                progressText.textContent = 'Upload complete!';
+                const uploadedCount = result.uploaded?.length || result.count || 0;
+                console.log(`✅ Upload successful! ${uploadedCount} image(s) uploaded`);
+                
+                // Check for errors even on success
+                if (result.errors && result.errors.length > 0) {
+                    console.error('⚠️ Upload had errors:', result.errors);
+                    console.error('⚠️ Error details:', JSON.stringify(result.errors, null, 2));
+                    result.errors.forEach((err, index) => {
+                        console.error(`Error ${index + 1}: File="${err.filename}", Error="${err.error}"`);
+                    });
+                    const errorMessages = result.errors.map(e => `${e.filename}: ${e.error}`).join('\n');
+                    showNotification(`Upload completed with errors:\n${errorMessages}`, 'error');
+                } else if (uploadedCount > 0) {
+                    showNotification(`Photos uploaded successfully! (${uploadedCount} image(s))`, 'success');
+                } else {
+                    showNotification('No photos were uploaded', 'error');
+                }
+                
+                // Reload images immediately, then again after a short delay to ensure they're in the database
+                console.log('Reloading images after upload...');
+                loadUserImages();
+                
+                // Also reload after a short delay in case of database replication delay
+                setTimeout(() => {
+                    console.log('Second reload of images after upload...');
+                    loadUserImages();
+                    uploadArea.classList.remove('active');
+                    uploadProgress.style.display = 'none';
+                    progressFill.style.width = '0%';
+                }, 1500);
+            } else {
+                console.error('Upload failed:', result);
+                throw new Error(result.error || 'Upload failed');
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+            showNotification(`Upload failed: ${error.message}`, 'error');
+            uploadArea.classList.remove('active');
+            uploadProgress.style.display = 'none';
+            progressFill.style.width = '0%';
+        }
+    }
+
+    // Load user images
+    window.refreshPhotos = function() {
+        console.log('Refresh button clicked');
+        loadUserImages();
+    };
+    
+    async function loadUserImages() {
+        try {
+            const url = `/api/user/${currentUserId}/images`;
+            console.log('Loading images from:', url, 'for user:', currentUserId);
+            
+            let result;
+            
+            // Always use fetch directly to get raw response
+            const response = await fetch(url, {
+                headers: sessionToken ? {
+                    'Authorization': `Bearer ${sessionToken}`,
+                    'X-Session-Token': sessionToken
+                } : {}
+            });
+            
+            console.log('Fetch response:', response);
+            console.log('Response status:', response.status, 'ok:', response.ok);
+            console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('HTTP error response:', errorText);
+                throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+            }
+            
+            // Get response as text first to see what we're actually getting
+            const responseText = await response.text();
+            console.log('Raw response text:', responseText);
+            console.log('Response text length:', responseText.length);
+            console.log('Response text type:', typeof responseText);
+            
+            // Try to parse as JSON
+            try {
+                result = JSON.parse(responseText);
+                console.log('✅ Successfully parsed JSON result:', result);
+                console.log('Result keys:', result ? Object.keys(result) : 'null');
+            } catch (parseError) {
+                console.error('❌ Failed to parse JSON:', parseError);
+                console.error('Response text that failed to parse:', responseText);
+                throw new Error('Invalid JSON response from server: ' + parseError.message);
+            }
+            
+            console.log('Final result:', result);
+            console.log('Result type:', typeof result);
+            console.log('Result === null?', result === null);
+            console.log('Result === undefined?', result === undefined);
+            console.log('Result.success:', result?.success, 'Type:', typeof result?.success, 'Value:', result?.success);
+            console.log('Result.images:', result?.images, 'Is array?', Array.isArray(result?.images));
+            console.log('Result.count:', result?.count);
+            
+            // Always try to display images if they exist, regardless of success flag
+            if (result && result.images && Array.isArray(result.images)) {
+                const images = result.images;
+                console.log('✅ Found images array with', images.length, 'items:', images);
+                displayImages(images);
+            } else if (result && result.success === true) {
+                // If success is true but no images array, use empty array
+                const images = result.images || [];
+                console.log('✅ Success true, displaying', images.length, 'images');
+                displayImages(images);
+            } else {
+                console.error('❌ API returned success:false or invalid response');
+                console.error('Full result object:', JSON.stringify(result, null, 2));
+                const errorMsg = result?.error || result?.message || 'Failed to load photos';
+                console.error('Error message:', errorMsg);
+                
+                // Even on error, try to display what we have
+                if (result && result.images) {
+                    console.log('Attempting to display images from error response');
+                    displayImages(result.images);
+                } else {
+                    showNotification(errorMsg, 'error');
+                    displayImages([]);
+                }
+            }
+        } catch (error) {
+            console.error('Error loading images:', error);
+            console.error('Error stack:', error.stack);
+            showNotification('Failed to load photos: ' + error.message, 'error');
+            // Display empty state on error
+            displayImages([]);
+        }
+    }
+
+    // Display images
+    function displayImages(images) {
+        const galleryGrid = document.getElementById('gallery-grid');
+        let emptyState = document.getElementById('empty-state');
+        const photoCount = document.getElementById('photo-count');
+
+        console.log('Displaying images:', images);
+        photoCount.textContent = images.length;
+
+        if (!images || images.length === 0) {
+            // Recreate empty state if it doesn't exist
+            if (!emptyState) {
+                emptyState = document.createElement('div');
+                emptyState.id = 'empty-state';
+                emptyState.className = 'empty-state';
+                emptyState.innerHTML = `
+                    <i class="fas fa-images"></i>
+                    <p>No photos yet. Upload your first photo to get started!</p>
+                `;
+            }
+            emptyState.style.display = 'block';
+            galleryGrid.innerHTML = '';
+            galleryGrid.appendChild(emptyState);
+            return;
+        }
+
+        if (emptyState) {
+            emptyState.style.display = 'none';
+        }
+        
+        galleryGrid.innerHTML = images.map(image => {
+            // Handle boolean conversion (PostgreSQL might return 1/0 or true/false)
+            const isProfile = image.is_profile === true || image.is_profile === 1 || image.is_profile === '1' || image.is_profile === 'true';
+            const isFeatured = image.featured === true || image.featured === 1 || image.featured === '1' || image.featured === 'true';
+            
+            console.log('Processing image:', image, 'is_profile:', isProfile, 'featured:', isFeatured);
+            
+            const badges = [];
+            if (isProfile) {
+                badges.push('<span class="photo-badge profile"><i class="fas fa-star"></i> Profile Photo</span>');
+            }
+            if (isFeatured) {
+                badges.push('<span class="photo-badge featured"><i class="fas fa-heart"></i> Featured</span>');
+            }
+
+            const imageSrc = `/uploads/profile_images/${image.file_name}`;
+            console.log('Image src:', imageSrc);
+            
+            return `
+                <div class="photo-item" data-image-id="${image.id}">
+                    <img src="${imageSrc}" 
+                         alt="Profile photo" 
+                         onerror="if(!this.src.includes('default_profile_')){const gender=window.currentUser?.gender||'';this.src=(gender&&gender.toString().toLowerCase()==='f')?'/assets/images/default_profile_female.svg':'/assets/images/default_profile_male.svg';}"
+                         onload="console.log('Image loaded successfully:', this.src)">
+                    <div class="photo-overlay">
+                        <div class="photo-badges">
+                            ${badges.join('')}
+                        </div>
+                        <div class="photo-actions">
+                            ${!isProfile ? `<button class="photo-action-btn set-profile" onclick="setProfileImage(${image.id})">
+                                <i class="fas fa-star"></i> Set as Profile
+                            </button>` : ''}
+                            ${!isFeatured ? `<button class="photo-action-btn set-featured" onclick="setFeaturedImage(${image.id})">
+                                <i class="fas fa-heart"></i> Feature
+                            </button>` : ''}
+                            ${isFeatured ? `<button class="photo-action-btn set-featured" onclick="unsetFeaturedImage(${image.id})">
+                                <i class="fas fa-heart-broken"></i> Unfeature
+                            </button>` : ''}
+                            <button class="photo-action-btn delete" onclick="deleteImage(${image.id}, '${image.file_name.replace(/'/g, "\\'")}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Set profile image
+    window.setProfileImage = async function(imageId) {
+        try {
+            console.log('Setting profile image:', imageId);
+            const url = `/api/profile/set-profile-image`;
+            
+            const fetchResponse = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(sessionToken ? {
+                        'Authorization': `Bearer ${sessionToken}`,
+                        'X-Session-Token': sessionToken
+                    } : {})
+                },
+                body: JSON.stringify({ imageId })
+            });
+            
+            console.log('Fetch response status:', fetchResponse.status);
+            const responseText = await fetchResponse.text();
+            console.log('Response text:', responseText);
+            const response = JSON.parse(responseText);
+            console.log('Set profile image response:', response);
+
+            if (response.success) {
+                showNotification('Profile photo updated!', 'success');
+                loadUserImages();
+            } else {
+                console.error('Set profile failed:', response);
+                throw new Error(response.error || response.message || 'Failed to set profile image');
+            }
+        } catch (error) {
+            console.error('Error setting profile image:', error);
+            showNotification(`Failed to set profile image: ${error.message}`, 'error');
+        }
+    };
+
+    // Set featured image
+    window.setFeaturedImage = async function(imageId) {
+        try {
+            const url = `/api/profile/set-featured-image`;
+            const response = await window.sessionManager?.apiRequest 
+                ? await window.sessionManager.apiRequest(url, {
+                    method: 'POST',
+                    body: JSON.stringify({ imageId, featured: true })
+                })
+                : await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(sessionToken ? {
+                            'Authorization': `Bearer ${sessionToken}`,
+                            'X-Session-Token': sessionToken
+                        } : {})
+                    },
+                    body: JSON.stringify({ imageId, featured: true })
+                }).then(r => r.json());
+
+            if (response.success) {
+                showNotification('Photo featured!', 'success');
+                loadUserImages();
+            } else {
+                throw new Error(response.error || 'Failed to feature image');
+            }
+        } catch (error) {
+            console.error('Error featuring image:', error);
+            showNotification(`Failed to feature image: ${error.message}`, 'error');
+        }
+    };
+
+    // Unset featured image
+    window.unsetFeaturedImage = async function(imageId) {
+        try {
+            const url = `/api/profile/set-featured-image`;
+            const response = await window.sessionManager?.apiRequest 
+                ? await window.sessionManager.apiRequest(url, {
+                    method: 'POST',
+                    body: JSON.stringify({ imageId, featured: false })
+                })
+                : await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(sessionToken ? {
+                            'Authorization': `Bearer ${sessionToken}`,
+                            'X-Session-Token': sessionToken
+                        } : {})
+                    },
+                    body: JSON.stringify({ imageId, featured: false })
+                }).then(r => r.json());
+
+            if (response.success) {
+                showNotification('Photo unfeatured', 'success');
+                loadUserImages();
+            } else {
+                throw new Error(response.error || 'Failed to unfeature image');
+            }
+        } catch (error) {
+            console.error('Error unfeaturing image:', error);
+            showNotification(`Failed to unfeature image: ${error.message}`, 'error');
+        }
+    };
+
+    // Delete image
+    window.deleteImage = async function(imageId, fileName) {
+        if (!confirm('Are you sure you want to delete this photo? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            console.log('Deleting image:', { imageId, fileName });
+            const url = `/api/profile/delete-image`;
+            
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(sessionToken ? {
+                        'Authorization': `Bearer ${sessionToken}`,
+                        'X-Session-Token': sessionToken
+                    } : {})
+                },
+                body: JSON.stringify({ imageId, fileName })
+            });
+
+            console.log('Delete response:', response);
+            console.log('Delete response status:', response.status);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Delete HTTP error:', errorText);
+                let errorData;
+                try {
+                    errorData = JSON.parse(errorText);
+                } catch (e) {
+                    errorData = { error: errorText || 'Failed to delete image' };
+                }
+                throw new Error(errorData.error || errorData.message || `HTTP error: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log('Delete result:', result);
+
+            if (result && result.success) {
+                showNotification('Photo deleted successfully', 'success');
+                loadUserImages();
+            } else {
+                throw new Error(result?.error || result?.message || 'Failed to delete image');
+            }
+        } catch (error) {
+            console.error('Error deleting image:', error);
+            console.error('Error stack:', error.stack);
+            showNotification(`Failed to delete image: ${error.message}`, 'error');
+        }
+    };
+
+    // Show notification
+    function showNotification(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#667eea'};
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+        `;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+    // Add animation styles
+    if (!document.getElementById('photo-notification-styles')) {
+        const style = document.createElement('style');
+        style.id = 'photo-notification-styles';
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+})();
+</script>

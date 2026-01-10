@@ -44,15 +44,17 @@
     let deferredPrompt;
     
     window.addEventListener('beforeinstallprompt', (e) => {
-        // Prevent the mini-infobar from appearing
-        e.preventDefault();
-        
         // Store the event for later use
         deferredPrompt = e;
         
-        // Show custom install button (if you have one)
+        // Check if we should show custom install button or let browser handle it
+        // Only prevent default if we have a custom install button
         const installButton = document.getElementById('pwa-install-button');
         if (installButton) {
+            // Prevent the mini-infobar from appearing if we have custom button
+            e.preventDefault();
+            
+            // Show custom install button
             installButton.style.display = 'block';
             installButton.addEventListener('click', () => {
                 // Show the install prompt
@@ -72,6 +74,10 @@
                     }
                 });
             });
+        } else {
+            // No custom button - let browser show its own install banner
+            // Don't prevent default, browser will handle it
+            console.log('[PWA] Install prompt available - browser will show install banner');
         }
     });
     
@@ -100,4 +106,5 @@
         }
     };
 })();
+
 

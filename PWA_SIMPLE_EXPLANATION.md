@@ -169,3 +169,4 @@ User taps app icon → App opens instantly
 
 Both features make your website feel more like a mobile app! 📱✨
 
+

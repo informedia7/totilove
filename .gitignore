@@ -1,9 +1,88 @@
+# Dependencies
 node_modules/
-*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
 .env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Logs
+logs/
+*.log
+
+# OS files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build outputs
 dist/
 build/
+*.tsbuildinfo
+
+# Temporary files
+tmp/
+temp/
 *.tmp
-*.temp
+
+# Database
+*.sqlite
+*.db
+
+# Uploads (if you want to exclude)
+# app/uploads/
+# public/uploads/
+
+# Backup files
+*.backup
+*.bak
+database-backups/
+
+# Coverage
+coverage/
+.nyc_output/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

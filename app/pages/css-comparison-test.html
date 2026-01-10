@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Comparison Test</title>
+  
+  <!-- OLD CSS (existing styles) -->
+  <link rel="stylesheet" href="/assets/css/vendor/font-awesome.min.css">
+  
+  <!-- NEW CSS (scoped architecture) -->
+  <link rel="stylesheet" href="/assets/css/00-tokens.css" id="new-css-tokens">
+  <link rel="stylesheet" href="/assets/css/01-base.css" id="new-css-base">
+  <link rel="stylesheet" href="/assets/css/02-components.css" id="new-css-components">
+  <link rel="stylesheet" href="/assets/css/03-layout.css" id="new-css-layout">
+  <link rel="stylesheet" href="/assets/css/04-responsive.css" id="new-css-responsive">
+  
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    
+    .comparison-container {
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    
+    .old-version, .new-version {
+      flex: 1;
+      border: 2px solid #ccc;
+      padding: 20px;
+      position: relative;
+      background: white;
+      overflow-y: auto;
+    }
+    
+    .old-version { border-color: #e74c3c; }
+    .new-version { border-color: #2ecc71; }
+    
+    .version-label {
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: white;
+      padding: 0 10px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    
+    .old-version .version-label { color: #e74c3c; }
+    .new-version .version-label { color: #2ecc71; }
+    
+    .toggle-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      padding: 10px 20px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .toggle-btn:hover {
+      background: #2980b9;
+    }
+    
+    .test-section {
+      margin-bottom: 30px;
+      padding: 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+    }
+    
+    .test-section h3 {
+      margin-top: 0;
+      color: #333;
+    }
+    
+    .measurement {
+      margin-top: 10px;
+      font-family: monospace;
+      font-size: 12px;
+      padding: 5px;
+      background: #f5f5f5;
+      border-radius: 3px;
+    }
+    
+    .pass { color: #2ecc71; }
+    .fail { color: #e74c3c; }
+  </style>
+</head>
+<body>
+  <button class="toggle-btn" onclick="toggleCSS()">Switch to New CSS</button>
+  
+  <div class="comparison-container">
+    <!-- OLD VERSION -->
+    <div class="old-version" id="old-container">
+      <div class="version-label">OLD CSS</div>
+      
+      <div class="test-section">
+        <h3>Buttons</h3>
+        <button class="button">Old Button</button>
+        <button class="button button-primary">Primary Button</button>
+        <button class="button button-secondary">Secondary Button</button>
+        <div class="measurement" data-selector=".button" data-min-height="44"></div>
+      </div>
+      
+      <div class="test-section">
+        <h3>Forms</h3>
+        <input type="text" placeholder="Text input" style="margin-bottom: 10px; display: block; width: 100%; padding: 8px;">
+        <input type="email" placeholder="Email input" style="margin-bottom: 10px; display: block; width: 100%; padding: 8px;">
+        <select style="margin-bottom: 10px; display: block; width: 100%; padding: 8px;">
+          <option>Select option</option>
+        </select>
+        <div class="measurement" data-selector="input" data-min-height="44"></div>
+      </div>
+      
+      <div class="test-section">
+        <h3>Cards</h3>
+        <div class="card" style="padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 10px;">
+          <h4>Card Title</h4>
+          <p>Card content goes here. This is a test card to compare styling.</p>
+        </div>
+      </div>
+      
+      <div class="test-section">
+        <h3>Container</h3>
+        <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px; background: #f5f5f5;">
+          <div style="background: #ddd; height: 100px; border-radius: 4px;"></div>
+        </div>
+        <div class="measurement" data-selector=".container" data-max-width="1200"></div>
+      </div>
+    </div>
+    
+    <!-- NEW VERSION -->
+    <div class="new-version" id="new-container">
+      <div class="version-label">NEW CSS</div>
+      
+      <div class="test-section">
+        <h3>Buttons</h3>
+        <button class="button">New Button</button>
+        <button class="button button-primary">Primary Button</button>
+        <button class="button button-secondary">Secondary Button</button>
+        <div class="measurement" data-selector=".button" data-min-height="44"></div>
+      </div>
+      
+      <div class="test-section">
+        <h3>Forms</h3>
+        <input type="text" placeholder="Text input" style="margin-bottom: 10px; display: block; width: 100%; padding: 8px;">
+        <input type="email" placeholder="Email input" style="margin-bottom: 10px; display: block; width: 100%; padding: 8px;">
+        <select style="margin-bottom: 10px; display: block; width: 100%; padding: 8px;">
+          <option>Select option</option>
+        </select>
+        <div class="measurement" data-selector="input" data-min-height="44"></div>
+      </div>
+      
+      <div class="test-section">
+        <h3>Cards</h3>
+        <div class="card" style="padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 10px;">
+          <h4>Card Title</h4>
+          <p>Card content goes here. This is a test card to compare styling.</p>
+        </div>
+      </div>
+      
+      <div class="test-section">
+        <h3>Container</h3>
+        <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px; background: #f5f5f5;">
+          <div style="background: #ddd; height: 100px; border-radius: 4px;"></div>
+        </div>
+        <div class="measurement" data-selector=".container" data-max-width="1200"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let newCSSEnabled = false;
+    const newCSSFiles = ['new-css-tokens', 'new-css-base', 'new-css-components', 'new-css-layout', 'new-css-responsive'];
+    
+    function toggleCSS() {
+      newCSSEnabled = !newCSSEnabled;
+      const btn = document.querySelector('.toggle-btn');
+      
+      newCSSFiles.forEach(id => {
+        const link = document.getElementById(id);
+        if (link) {
+          link.disabled = !newCSSEnabled;
+        }
+      });
+      
+      if (newCSSEnabled) {
+        btn.textContent = 'Switch to Old CSS';
+        btn.style.background = '#2ecc71';
+      } else {
+        btn.textContent = 'Switch to New CSS';
+        btn.style.background = '#3498db';
+      }
+      
+      setTimeout(runMeasurements, 100);
+    }
+    
+    function runMeasurements() {
+      document.querySelectorAll('.measurement').forEach(measure => {
+        const selector = measure.dataset.selector;
+        const container = measure.closest('.old-version, .new-version');
+        const element = container.querySelector(selector);
+        
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          const height = rect.height;
+          const width = rect.width;
+          
+          let result = '';
+          let status = '';
+          
+          if (measure.dataset.minHeight) {
+            const minHeight = parseInt(measure.dataset.minHeight);
+            if (height >= minHeight) {
+              result = `✅ Height: ${Math.round(height)}px (min: ${minHeight}px)`;
+              status = 'pass';
+            } else {
+              result = `❌ Height: ${Math.round(height)}px (min: ${minHeight}px)`;
+              status = 'fail';
+            }
+          } else if (measure.dataset.maxWidth) {
+            const maxWidth = parseInt(measure.dataset.maxWidth);
+            if (width <= maxWidth) {
+              result = `✅ Width: ${Math.round(width)}px (max: ${maxWidth}px)`;
+              status = 'pass';
+            } else {
+              result = `❌ Width: ${Math.round(width)}px (max: ${maxWidth}px)`;
+              status = 'fail';
+            }
+          } else {
+            result = `Height: ${Math.round(height)}px, Width: ${Math.round(width)}px`;
+          }
+          
+          measure.textContent = result;
+          measure.className = 'measurement ' + status;
+        }
+      });
+    }
+    
+    // Initial measurement
+    setTimeout(runMeasurements, 500);
+  </script>
+</body>
+</html>
+
+
+

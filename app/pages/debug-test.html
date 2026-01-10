@@ -1,0 +1,1774 @@
+<!-- Include User Profile Modal -->
+{{include:modals/user-profile-modal}}
+
+<!-- Include User Report Modal -->
+{{include:modals/user-report-modal}}
+
+<!-- Include Universal Message Modal -->
+{{include:modals/universal-message-modal}}
+
+<!-- Block Confirmation Modal -->
+<div id="blockConfirmModal" class="block-confirm-modal" style="display: none;">
+    <div class="block-confirm-overlay"></div>
+    <div class="block-confirm-content">
+        <div class="block-confirm-icon">
+            <i class="fas fa-ban"></i>
+        </div>
+        <h3 class="block-confirm-title">Block User?</h3>
+        <p class="block-confirm-message">Are you sure you want to block <strong id="blockUsername">this user</strong>? They will no longer be able to contact you or see your profile in search results.</p>
+        <div class="block-confirm-actions">
+            <button class="block-confirm-cancel" onclick="closeBlockConfirm()">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+            <button class="block-confirm-yes" onclick="confirmBlock()">
+                <i class="fas fa-ban"></i> Block User
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.block-confirm-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.block-confirm-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+}
+
+.block-confirm-content {
+    position: relative;
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+    text-align: center;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.block-confirm-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, #d63031, #e74c3c);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+}
+
+.block-confirm-title {
+    font-size: 1.5rem;
+    color: #2d3436;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.block-confirm-message {
+    color: #636e72;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+}
+
+.block-confirm-message strong {
+    color: #2d3436;
+    font-weight: 600;
+}
+
+.block-confirm-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.block-confirm-cancel,
+.block-confirm-yes {
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.block-confirm-cancel {
+    background: #dfe6e9;
+    color: #2d3436;
+}
+
+.block-confirm-cancel:hover {
+    background: #b2bec3;
+}
+
+.block-confirm-yes {
+    background: linear-gradient(135deg, #d63031, #e74c3c);
+    color: white;
+}
+
+.block-confirm-yes:hover {
+    background: linear-gradient(135deg, #c0392b, #d63031);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(214, 48, 49, 0.3);
+}
+    </style>
+
+    <style>
+        /* CSS variables and body styles are controlled by layout.html */
+
+        .search-wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 80px);
+            padding: 2rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .search-container {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 3rem;
+            min-height: 600px;
+            box-sizing: border-box;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: var(--light-color);
+            border-radius: var(--border-radius);
+        }
+
+        .results-count {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .sort-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sort-controls label {
+            color: var(--muted-color);
+            font-weight: 500;
+        }
+
+        .sort-controls select {
+            padding: 0.5rem;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            background: var(--white);
+        }
+
+        /* Online status animations */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 184, 148, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(0, 184, 148, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 184, 148, 0);
+            }
+        }
+
+        @keyframes online-blink {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 2px #fff, 0 0 4px 1px #00b894;
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.07);
+                box-shadow: 0 0 0 2.7px #fff, 0 0 7px 1.7px #00b894;
+                opacity: 0.90;
+            }
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            width: 100%;
+            margin: 0 auto 2rem;
+            box-sizing: border-box;
+        }
+
+        .online-user-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            min-height: 400px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 100%;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .online-user-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .user-avatar {
+            width: 100%;
+            max-width: 100%;
+            height: 250px;
+            object-fit: contain;
+            object-position: center;
+            background: #f0f0f0;
+            display: block;
+            transition: opacity 0.3s ease;
+            border-radius: 15px 15px 0 0;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        .user-info {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex-grow: 1;
+            justify-content: space-between;
+        }
+
+        .user-info h4 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+        }
+
+        .gender-icon {
+            font-size: 0.9rem;
+        }
+
+        .gender-icon.male {
+            color: #3498db;
+        }
+
+        .gender-icon.female {
+            color: #e91e63;
+        }
+
+        .age-badge {
+            margin-left: 0.5rem;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            background: #f5f6fa;
+            color: #636e72;
+            cursor: default;
+        }
+
+        .user-interests {
+            margin-bottom: 0.5rem;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .user-interests span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.2rem 0.5rem;
+            background: #f5f6fa;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: #636e72;
+        }
+
+        .user-about {
+            font-size: 0.9rem;
+            color: #636e72;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 4.5em;
+            line-height: 1.4;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: auto;
+        }
+
+        .icon-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: color 0.18s, transform 0.18s;
+            padding: 0.5rem;
+            border-radius: 50%;
+            background: rgba(108, 92, 231, 0.1);
+        }
+
+        .icon-action:hover {
+            color: var(--danger-color);
+            transform: scale(1.1);
+            background: rgba(214, 48, 49, 0.1);
+        }
+
+        .icon-like i {
+            color: #f39c12;
+        }
+
+        .icon-message i {
+            color: var(--primary-color);
+        }
+
+        .icon-favourite i {
+            color: var(--danger-color);
+        }
+
+        .icon-block i {
+            color: #e74c3c;
+        }
+
+        .icon-report i {
+            color: #f39c12;
+        }
+
+        .online-dot-results {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 12px;
+            height: 12px;
+            background: #00b894;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(0,184,148,0.3);
+            z-index: 2;
+            animation: online-blink 3s infinite;
+        }
+
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--light-color);
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 3rem;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            padding: 1rem;
+            background: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-btn {
+            padding: 0.8rem 1.2rem;
+            border: 1px solid #e9ecef;
+            background: var(--white);
+            color: var(--dark-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            min-width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: var(--primary-color);
+            color: var(--white);
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
+        .page-btn.active {
+            background: var(--primary-color);
+            color: var(--white);
+            border-color: var(--primary-color);
+            box-shadow: 0 2px 8px rgba(108, 92, 231, 0.3);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-ellipsis {
+            padding: 0.5rem;
+            color: var(--muted-color);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-to-search {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .back-to-search:hover {
+            color: var(--secondary-color);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--muted-color);
+        }
+
+        .no-results i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .no-results h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .search-wrapper {
+                padding: 1rem;
+            }
+
+            .search-container {
+                padding: 2rem;
+            }
+
+            .results-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .user-actions {
+                gap: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .search-wrapper {
+                padding: 0.5rem;
+            }
+
+            .search-container {
+                padding: 1rem;
+            }
+
+            .user-info h4 {
+                flex-direction: column;
+                gap: 0.2rem;
+            }
+
+            .age-badge {
+                margin-left: 0;
+            }
+        }
+    </style>
+    <!-- Profile Modal and Report Modal styles are inline in their HTML components -->
+    <!-- Email Verification Check Utility -->
+    <script src="/assets/js/email-verification-check.js"></script>
+</head>
+<body>
+    <div class="search-wrapper">
+        <div class="search-container">
+            <a href="/search" class="back-to-search">
+                <i class="fas fa-arrow-left"></i>
+                Back to Search
+            </a>
+
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="card-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <span>Search Results</span>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingContainer" class="loading-container">
+                <div class="spinner"></div>
+                <p>Searching for your perfect matches...</p>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" style="display: none;">
+                <div class="results-header">
+                    <div class="results-count">
+                        <span id="resultsCount">0 matches found</span>
+                    </div>
+                    <div class="sort-controls">
+                        <label for="sortBy">Sort by:</label>
+                        <select id="sortBy" name="sortBy">
+                            <option value="relevance">Relevance</option>
+                            <option value="distance">Distance</option>
+                            <option value="age">Age</option>
+                            <option value="last_active">Last Active</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="results-grid" id="resultsGrid">
+                    <!-- Results will be populated here -->
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="paginationContainer" style="display: none;">
+                    <button onclick="changePage(-1)" id="prevPage" class="page-btn">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <div id="pageNumbers"></div>
+                    <button onclick="changePage(1)" id="nextPage" class="page-btn">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize user data
+        if (typeof window.currentUser === 'undefined') {
+            window.currentUser = {
+                id: parseInt(document.body.getAttribute('data-user-id')) || null,
+                real_name: document.body.getAttribute('data-real_name') || '',
+                email: document.body.getAttribute('data-user-email') || '',
+                age: parseInt(document.body.getAttribute('data-user-age')) || null,
+                gender: document.body.getAttribute('data-user-gender') || '',
+                location: document.body.getAttribute('data-user-location') || '',
+                memberSince: document.body.getAttribute('data-member-since') || '',
+                lastActive: document.body.getAttribute('data-last-active') || ''
+            };
+            
+            window.isAuthenticated = window.currentUser.id && window.currentUser.id !== 'null' && window.currentUser.id !== '';
+            console.log('🔍 Results page: User data initialized:', window.currentUser);
+        }
+        
+        // Load required scripts
+        function loadScript(src, onLoad, onError) {
+            const script = document.createElement('script');
+            script.src = src;
+            if (onLoad) script.onload = onLoad;
+            if (onError) script.onerror = onError;
+            document.head.appendChild(script);
+        }
+
+        // Load OnlineActivityTracker
+        if (typeof window.OnlineActivityTracker === 'undefined') {
+            loadScript('/assets/online-tracker.js', 
+                function() {
+                    console.log('✅ OnlineActivityTracker loaded for results page');
+                    setTimeout(() => {
+                        if (window.onlineTracker && window.currentUser?.id) {
+                            if (!window.onlineTracker.getStatus().isRunning) {
+                                window.onlineTracker.start();
+                            }
+                        }
+                    }, 100);
+                },
+                function() {
+                    console.warn('⚠️ Failed to load OnlineActivityTracker');
+                }
+            );
+        }
+
+        // Load OnlineCheck module
+        if (typeof window.OnlineCheck === 'undefined') {
+            loadScript('/assets/js/online-check.js',
+                function() {
+                    console.log('✅ OnlineCheck module loaded for results page');
+                },
+                function() {
+                    console.warn('⚠️ Failed to load OnlineCheck module');
+                }
+            );
+        }
+
+        // Load UserStatus module
+        if (typeof window.UserStatus === 'undefined') {
+            loadScript('/assets/js/user-status.js',
+                function() {
+                    console.log('✅ UserStatus module loaded for results page');
+                },
+                function() {
+                    console.warn('⚠️ Failed to load UserStatus module');
+                }
+            );
+        }
+
+        // Load ProfileModalActions module
+        if (typeof window.ProfileModalActions === 'undefined') {
+            loadScript('/components/modals/profile-modal-actions.js',
+                function() {
+                    console.log('✅ ProfileModalActions module loaded for results page');
+                    // Initialize with page-specific configuration
+                    if (window.ProfileModalActions) {
+                        window.ProfileModalActions.init({
+                            getCurrentUserId: getCurrentUserId,
+                            getCurrentProfileUserId: () => window.getCurrentProfileUserId ? window.getCurrentProfileUserId() : null,
+                            getSessionToken: getSessionToken,
+                            showNotification: showNotification
+                        });
+                    }
+                },
+                function() {
+                    console.warn('⚠️ Failed to load ProfileModalActions module');
+                }
+            );
+        }
+
+        let currentPage = 1;
+        let searchResults = [];
+        const resultsPerPage = 20;
+
+        // Get search parameters from URL
+        function getSearchParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const params = {};
+            
+            for (const [key, value] of urlParams.entries()) {
+                if (value !== '' && value !== 'undefined') {
+                    // Handle comma-separated arrays (country, interests)
+                    if (key === 'country' || key === 'interests') {
+                        params[key] = value.split(',').filter(v => v.trim() !== '');
+                    } else {
+                        params[key] = value;
+                    }
+                }
+            }
+            
+            return params;
+        }
+
+        // Get session token from URL
+        function getSessionToken() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('token') || '';
+        }
+
+        // Get current user ID
+        function getCurrentUserId() {
+            // Try session manager first
+            if (window.sessionManager && window.sessionManager.getCurrentUser) {
+                const user = window.sessionManager.getCurrentUser();
+                if (user && user.id) return user.id;
+            }
+            
+            // Try URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentUserId = urlParams.get('currentUser');
+            if (currentUserId) return parseInt(currentUserId);
+            
+            // No localStorage fallback
+            
+            return 2; // Fallback
+        }
+
+        // Update back to search links
+        function updateBackToSearchLinks() {
+            const sessionToken = getSessionToken();
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Preserve all search parameters except system ones
+            const searchParams = new URLSearchParams();
+            searchParams.set('token', sessionToken);
+            
+            // Copy all search filter parameters from current URL
+            const excludeParams = ['token', 'currentUser', 'userId', 'page', 'timestamp'];
+            for (const [key, value] of urlParams.entries()) {
+                if (!excludeParams.includes(key) && value && value !== 'undefined') {
+                    searchParams.set(key, value);
+                }
+            }
+            
+            // Add hash to open correct tab (from sessionStorage, referrer, or default to lifestyle)
+            let tab = sessionStorage.getItem('searchActiveTab') || 'lifestyle';
+            try {
+                if (!tab || tab === 'lifestyle') {
+                    if (document.referrer) {
+                        const h = new URL(document.referrer).hash;
+                        if (h) tab = h.substring(1);
+                    }
+                }
+            } catch(e) {}
+            const backUrl = `/search?${searchParams.toString()}#${tab}`;
+            const backLinks = document.querySelectorAll('a[href="/search"], a.back-to-search');
+            
+            backLinks.forEach(link => {
+                link.href = backUrl;
+            });
+        }
+
+        // Wait for WebSocket initialization
+        function waitForWebSocketInitialization() {
+            return new Promise((resolve, reject) => {
+                const maxWaitTime = 5000;
+                const checkInterval = 100;
+                let elapsed = 0;
+                
+                const checkWebSocket = () => {
+                    if (window.instantStatusManager?.isInitialized || 
+                        window.OnlineCheck || 
+                        window.UserStatus || 
+                        (window.io && window.socket?.connected)) {
+                        resolve();
+                        return;
+                    }
+                    
+                    elapsed += checkInterval;
+                    if (elapsed >= maxWaitTime) {
+                        reject(new Error('WebSocket initialization timeout'));
+                        return;
+                    }
+                    
+                    setTimeout(checkWebSocket, checkInterval);
+                };
+                
+                checkWebSocket();
+            });
+        }
+
+        // Perform search
+        async function performSearch(params) {
+            try {
+                document.getElementById('loadingContainer').style.display = 'flex';
+                document.getElementById('resultsSection').style.display = 'none';
+                
+                let userId = getCurrentUserId();
+                
+                const searchParams = new URLSearchParams();
+                searchParams.append('userId', userId);
+                
+                // Add all filter parameters
+                const filterKeys = [
+                    'ageMin', 'ageMax', 'gender', 'location', 'country', 'distance',
+                    'onlineNow', 'recentlyActive', 'onlineStatus',
+                    'withImages', 'verified', 'usePreferredCountries',
+                    'education', 'occupation', 'income', 'lifestyle', 'smoking', 'drinking', 'children',
+                    'heightMin', 'heightMax', 'bodyType', 'ethnicity',
+                    'interests', 'relationshipType', 'sortBy'
+                ];
+                
+                filterKeys.forEach(key => {
+                    if (params[key] !== undefined && params[key] !== '') {
+                        // Handle arrays (country, interests) - join with comma
+                        if (Array.isArray(params[key])) {
+                            if (params[key].length > 0) {
+                                searchParams.append(key, params[key].join(','));
+                            }
+                        } else {
+                            searchParams.append(key, params[key]);
+                        }
+                    }
+                });
+                
+                searchParams.append('page', '1');
+                
+                console.log('🔍 Fetching search results from API...');
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+                
+                const response = await fetch(`/api/search?${searchParams.toString()}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-ID': userId
+                    },
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    throw new Error(`Search API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Normalize results data structure to handle different API response formats
+                    const normalizedResults = (data.results || []).map(result => {
+                        // Normalize data structure - handle both API formats
+                        return {
+                            id: result.id || result.user_id || 0,
+                            name: result.real_name || result.name || `User${result.id || result.user_id || 'Unknown'}`,
+                            real_name: result.real_name || result.name || `User${result.id || result.user_id || 'Unknown'}`,
+                            age: result.age || 0,
+                            gender: result.gender || null,
+                            location: result.location || null,
+                            city_name: result.city_name || null,
+                            state_name: result.state_name || null,
+                            country_name: result.country_name || null,
+                            country_emoji: result.country_emoji || null,
+                            profile_image: result.profile_image || null,
+                            interests: result.interests || [],
+                            about: result.about || null,
+                            is_online: result.is_online !== undefined ? result.is_online : (result.online !== undefined ? result.online : false),
+                            online: result.online !== undefined ? result.online : (result.is_online !== undefined ? result.is_online : false),
+                            has_received_messages: result.has_received_messages || false,
+                            // Preserve any other fields
+                            ...result
+                        };
+                    });
+                    
+                    searchResults = normalizedResults;
+                    
+                    document.getElementById('loadingContainer').style.display = 'none';
+                    document.getElementById('resultsSection').style.display = 'block';
+                    
+                    displayResults(normalizedResults);
+                    
+                    if ((data.results || []).length > resultsPerPage) {
+                        showPagination((data.results || []).length);
+                    }
+                    
+                    console.log(`✅ Search completed: ${(data.results || []).length} results found`);
+                } else {
+                    throw new Error(data.error || 'Search failed');
+                }
+                
+            } catch (error) {
+                console.error('❌ Search error:', error);
+                
+                document.getElementById('loadingContainer').style.display = 'none';
+                document.getElementById('resultsSection').style.display = 'block';
+                
+                const grid = document.getElementById('resultsGrid');
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; color: var(--muted-color); padding: 4rem 2rem;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 4rem; margin-bottom: 1rem; color: var(--danger-color);"></i>
+                        <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--dark-color);">Search Error</h3>
+                        <p>${error.message}</p>
+                        <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--primary-color); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            Try Again
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Display results
+        function displayResults(results) {
+            const grid = document.getElementById('resultsGrid');
+            const countEl = document.getElementById('resultsCount');
+            
+            // Safety check for undefined or null results
+            if (!results || !Array.isArray(results)) {
+                console.warn('⚠️ displayResults: Invalid results data:', results);
+                results = [];
+            }
+            
+            countEl.textContent = `${results.length} matches found`;
+
+            if (results.length === 0) {
+                const sessionToken = getSessionToken();
+                grid.innerHTML = `
+                    <div class="no-results" style="grid-column: 1 / -1;">
+                        <i class="fas fa-search"></i>
+                        <h3>No matches found</h3>
+                        <p>Try adjusting your search criteria to find more people.</p>
+                        <a href="#" class="back-to-search" style="margin-top: 1rem;" onclick="event.preventDefault(); updateBackToSearchLinks(); const link = this; window.location.href = link.href;">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Search
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            const totalPages = Math.ceil(results.length / resultsPerPage);
+            const startIndex = (currentPage - 1) * resultsPerPage;
+            const endIndex = startIndex + resultsPerPage;
+            const currentPageResults = results.slice(startIndex, endIndex);
+
+            // Validate and filter out invalid profiles
+            const validProfiles = currentPageResults.filter(profile => {
+                return profile && typeof profile === 'object' && profile.id;
+            });
+            
+            if (validProfiles.length === 0 && currentPageResults.length > 0) {
+                console.error('❌ All profiles are invalid:', currentPageResults);
+                grid.innerHTML = `
+                    <div class="no-results" style="grid-column: 1 / -1;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Unable to display results</h3>
+                        <p>Please try refreshing the page.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = validProfiles.map(profile => {
+                try {
+                    // Ensure all required fields have fallbacks
+                    const profileId = profile.id || 0;
+                    const profileName = profile.real_name || profile.name || ('User' + profileId);
+                    const profileUsername = profile.real_name || profile.name || ('User' + profileId);
+                    const profileAge = profile.age || 0;
+                    const profileGender = profile.gender || null;
+                    
+                    // Get gender-specific default image
+                    const getDefaultImage = (gender) => {
+                        if (!gender) return '/assets/images/default_profile_male.svg';
+                        const genderLower = gender.toString().toLowerCase();
+                        if (genderLower === 'f' || genderLower === 'female') {
+                            return '/assets/images/default_profile_female.svg';
+                        } else if (genderLower === 'm' || genderLower === 'male') {
+                            return '/assets/images/default_profile_male.svg';
+                        }
+                        return '/assets/images/default_profile_male.svg';
+                    };
+                    
+                    const profileImage = profile.profile_image
+                        ? (profile.profile_image.startsWith('/uploads/profile_images/') 
+                            ? profile.profile_image 
+                            : `/uploads/profile_images/${profile.profile_image}`)
+                        : getDefaultImage(profileGender);
+                    
+                    const interestIconMap = {
+                        'travel': 'fa-plane', 'music': 'fa-music', 'yoga': 'fa-child',
+                        'photography': 'fa-camera', 'art': 'fa-palette', 'reading': 'fa-book',
+                        'dancing': 'fa-music', 'sports': 'fa-futbol', 'gaming': 'fa-gamepad',
+                        'movies': 'fa-film', 'nature': 'fa-leaf', 'fitness': 'fa-dumbbell',
+                        'cooking': 'fa-utensils', 'hiking': 'fa-hiking', 'technology': 'fa-laptop',
+                        'cycling': 'fa-bicycle', 'skiing': 'fa-skiing', 'coffee': 'fa-coffee',
+                        'books': 'fa-book', 'food': 'fa-hamburger'
+                    };
+                    
+                    let interestsHtml = '';
+                    if (profile.interests && Array.isArray(profile.interests) && profile.interests.length > 0) {
+                        interestsHtml = `<div class="user-interests">` +
+                            profile.interests.slice(0, 3).map(interest => {
+                                const icon = interest.icon || interestIconMap[interest.name?.toLowerCase()] || 'fa-star';
+                                const interestName = interest.name || 'Interest';
+                                return `<span><i class="fas ${icon}"></i>${interestName}</span>`;
+                            }).join('') + `</div>`;
+                    }
+                    
+                    const aboutHtml = profile.about ? `<p class="user-about">${profile.about}</p>` : '';
+                    
+                    // Construct location from individual fields (no state, no emoji)
+                    // Always use individual fields to exclude state
+                    const locationParts = [];
+                    if (profile.city_name) locationParts.push(profile.city_name);
+                    if (profile.country_name) locationParts.push(profile.country_name);
+                    
+                    let locationDisplay = locationParts.length > 0 
+                        ? locationParts.join(', ')
+                        : 'Location not specified';
+                    
+                    // Build safe real_name for onclick handlers
+                    const safeUsername = profileUsername.replace(/'/g, "\\'");
+                    
+                    // Build gender icon HTML
+                    let genderIconHtml = '';
+                    if (profileGender) {
+                        const profileGenderLower = (profileGender || '').toLowerCase().trim();
+                        const genderIcon = (profileGenderLower === 'male' || profileGenderLower === 'm') ? 'fa-mars' : 'fa-venus';
+                        const genderClass = (profileGenderLower === 'male' || profileGenderLower === 'm') ? 'male' : 'female';
+                        genderIconHtml = `<i class="fas ${genderIcon} gender-icon ${genderClass}"></i>`;
+                    }
+                    
+                    // Build age badge HTML
+                    const ageBadgeHtml = profileAge ? `<span class="age-badge">${profileAge}</span>` : '';
+                    
+                    // Build block/report buttons HTML
+                    let blockReportButtonsHtml = '';
+                    if (profile.has_received_messages) {
+                        blockReportButtonsHtml = 
+                            '<span class="icon-action icon-block" title="Block User" onclick="event.stopPropagation(); blockProfileFromCard(' + profileId + ', \'' + safeUsername + '\')">' +
+                                '<i class="fas fa-ban"></i>' +
+                            '</span>' +
+                            '<span class="icon-action icon-report" title="Report User" onclick="event.stopPropagation(); reportProfileFromCard(' + profileId + ', \'' + safeUsername + '\')">' +
+                                '<i class="fas fa-flag"></i>' +
+                            '</span>';
+                    }
+                    
+                    return `
+                    <div class="online-user-card" data-profile-card onclick="viewProfile(${profileId})" style="cursor: pointer;">
+                        <div style="position: relative; width: 100%; overflow: hidden; box-sizing: border-box; margin: 0; padding: 0;">
+                            <img src="${profileImage}"
+                                 class="user-avatar"
+                                 onerror="this.src='${getDefaultImage(profileGender)}'"
+                                 loading="lazy"
+                                 style="width: 100%; max-width: 100%; height: 250px; object-fit: contain; object-position: center; box-sizing: border-box; margin: 0; padding: 0;">
+                            <div class="online-dot-results" data-user-id="${profileId}" style="display: ${profile.is_online ? 'block' : 'none'};"></div>
+                        </div>
+                        <div class="user-info">
+                            <h4>
+                                ${profileName}
+                                ${genderIconHtml}
+                                ${ageBadgeHtml}
+                            </h4>
+                            <p class="user-location">
+                                <i class="fas fa-map-marker-alt"></i> ${locationDisplay}
+                            </p>
+                            ${interestsHtml}
+                            ${aboutHtml}
+                            <div class="user-actions">
+                                <span class="icon-action icon-message" title="Message" onclick="event.stopPropagation(); messageProfile('${safeUsername}')">
+                                    <i class="fas fa-envelope"></i>
+                                </span>
+                                <span class="icon-action icon-like" title="Like" onclick="event.stopPropagation(); likeProfile(${profileId}, '${safeUsername}')">
+                                    <i class="fas fa-thumbs-up"></i>
+                                </span>
+                                <span class="icon-action icon-favourite" title="Add to Favourite" onclick="event.stopPropagation(); addToFavourite(${profileId})">
+                                    <i class="fas fa-heart"></i>
+                                </span>
+                                ${blockReportButtonsHtml}
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                } catch (error) {
+                    console.error('❌ Error rendering profile card:', error, profile);
+                    // Return a minimal card with error indication
+                    return `
+                    <div class="online-user-card" style="border: 2px dashed #ccc;">
+                        <div class="user-info">
+                            <h4>Error loading profile</h4>
+                            <p>User ID: ${profile.id || 'Unknown'}</p>
+                        </div>
+                    </div>
+                    `;
+                }
+            }).join('');
+
+            if (totalPages > 1) {
+                showPagination(results.length);
+            } else {
+                document.getElementById('paginationContainer').style.display = 'none';
+            }
+
+            registerStatusElements();
+        }
+
+        // Register status elements
+        function registerStatusElements() {
+            const maxRetries = 5;
+            let retryCount = 0;
+            
+            function attemptRegistration() {
+                if (window.instantStatusManager?.isInitialized) {
+                    const statusElements = document.querySelectorAll('.online-dot-results[data-user-id]');
+                    statusElements.forEach(element => {
+                        const userId = element.dataset.userId;
+                        if (userId) {
+                            window.instantStatusManager.registerStatusElement(element, userId);
+                        }
+                    });
+                    
+                    console.log(`✅ Registered ${statusElements.length} visual dots`);
+                } else if (retryCount < maxRetries) {
+                    retryCount++;
+                    setTimeout(attemptRegistration, 200);
+                } else {
+                    // Only show warning if there are actually elements to register
+                    const statusElements = document.querySelectorAll('.online-dot-results[data-user-id]');
+                    if (statusElements.length > 0) {
+                        console.warn('⚠️ instantStatusManager not available, falling back to manual updates');
+                        updateStatusElementsManually();
+                    }
+                }
+            }
+            
+            attemptRegistration();
+        }
+
+        // Manual status update fallback
+        function updateStatusElementsManually() {
+            const statusElements = document.querySelectorAll('.online-dot-results[data-user-id]');
+            
+            statusElements.forEach(element => {
+                const userId = element.dataset.userId;
+                if (userId) {
+                    // For dot elements, only update visibility (show/hide), not innerHTML
+                    // OnlineCheck.updateUserStatus modifies innerHTML which breaks dot elements
+                    if (window.OnlineCheck && window.OnlineCheck.isUserOnline) {
+                        window.OnlineCheck.isUserOnline(userId).then(isOnline => {
+                            // Only update display, don't modify innerHTML
+                            element.style.display = isOnline ? 'block' : 'none';
+                            // Ensure dot styling is preserved
+                            if (isOnline && !element.style.width) {
+                                element.style.width = '12px';
+                                element.style.height = '12px';
+                                element.style.borderRadius = '50%';
+                                element.style.background = '#00b894';
+                            }
+                        }).catch(error => {
+                            console.warn(`Failed to check status for user ${userId}:`, error);
+                        });
+                    } else if (window.UserStatus) {
+                        window.UserStatus.updateUserStatus(element, userId, { showLastSeen: true });
+                    } else {
+                        // Direct API call fallback
+                        fetch(`/api/user-status/${userId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                element.style.display = data.isOnline ? 'block' : 'none';
+                            })
+                            .catch(error => console.warn(`Failed to fetch status for user ${userId}:`, error));
+                    }
+                }
+            });
+        }
+
+        // Pagination
+        function showPagination(totalResults) {
+            const totalPages = Math.ceil(totalResults / resultsPerPage);
+            const paginationContainer = document.getElementById('paginationContainer');
+            const pageNumbers = document.getElementById('pageNumbers');
+            
+            if (totalPages <= 1) {
+                paginationContainer.style.display = 'none';
+                return;
+            }
+
+            paginationContainer.style.display = 'flex';
+
+            let pagesHTML = '';
+            const maxVisiblePages = 7;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            
+            if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+
+            if (startPage > 1) {
+                pagesHTML += `<button class="page-btn" onclick="goToPage(1)">1</button>`;
+                if (startPage > 2) {
+                    pagesHTML += `<span class="page-ellipsis">...</span>`;
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const isActive = i === currentPage;
+                pagesHTML += `<button class="page-btn ${isActive ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    pagesHTML += `<span class="page-ellipsis">...</span>`;
+                }
+                pagesHTML += `<button class="page-btn" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+            }
+
+            pageNumbers.innerHTML = pagesHTML;
+
+            const prevButton = document.getElementById('prevPage');
+            const nextButton = document.getElementById('nextPage');
+            
+            prevButton.disabled = currentPage === 1;
+            nextButton.disabled = currentPage === totalPages;
+        }
+
+        // Page navigation
+        function changePage(direction) {
+            const totalPages = Math.ceil(searchResults.length / resultsPerPage);
+            const newPage = currentPage + direction;
+            
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                displayResults(searchResults);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function goToPage(page) {
+            const totalPages = Math.ceil(searchResults.length / resultsPerPage);
+            
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                displayResults(searchResults);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Profile actions
+        function viewProfile(profileId) {
+            openProfileModal(profileId);
+        }
+        
+        // Modal functions are now in external file: /components/modals/user-profile-modal.js
+        // Override getCurrentUserId for this page if needed
+        if (window.UserProfileModal) {
+            window.UserProfileModal.setGetCurrentUserId(getCurrentUserId);
+            window.UserProfileModal.setGetSessionToken(getSessionToken);
+        }
+        
+        function showNotification(message, type = 'info') {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#00b894' : type === 'error' ? '#e74c3c' : '#667eea'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                max-width: 300px;
+                animation: slideInRight 0.3s ease-out;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            `;
+            
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 5000);
+        }
+        
+        function likeProfileInModal() {
+            if (window.ProfileModalActions) {
+                window.ProfileModalActions.likeProfileInModal();
+            } else {
+                console.error('ProfileModalActions not loaded');
+            }
+        }
+        
+        function favouriteProfileInModal() {
+            if (window.ProfileModalActions) {
+                window.ProfileModalActions.favouriteProfileInModal();
+            } else {
+                console.error('ProfileModalActions not loaded');
+            }
+        }
+        
+        function messageProfileInModal() {
+            const currentProfileUserId = window.getCurrentProfileUserId ? window.getCurrentProfileUserId() : null;
+            if (!currentProfileUserId) {
+                console.log('No profile user ID');
+                return;
+            }
+            
+            // Get profile real_name from the modal
+            const real_name = document.getElementById('modal-profile-real_name').textContent.trim();
+            
+            // Close modal and open message modal
+            closeProfileModal();
+            messageProfile(real_name);
+        }
+        
+        async function blockProfileInModal() {
+            const currentProfileUserId = window.getCurrentProfileUserId ? window.getCurrentProfileUserId() : null;
+            if (!currentProfileUserId) {
+                console.log('No profile user ID');
+                return;
+            }
+            
+            // Check email verification before blocking
+            const isVerified = await window.checkEmailVerificationStatus();
+            if (!isVerified) {
+                window.showVerificationMessage();
+                return; // Don't proceed with block action
+            }
+            
+            const real_nameElement = document.getElementById('modal-profile-real_name');
+            const real_name = real_nameElement ? real_nameElement.textContent.trim().split(' ')[0] : 'this user';
+            
+            // Show custom confirmation dialog
+            document.getElementById('blockUsername').textContent = real_name;
+            document.getElementById('blockConfirmModal').style.display = 'flex';
+            
+            // Store context for confirmBlock function
+            window.pendingBlockUserId = currentProfileUserId;
+            window.pendingBlockContext = 'results';
+        }
+        
+        window.closeBlockConfirm = function() {
+            document.getElementById('blockConfirmModal').style.display = 'none';
+            window.pendingBlockUserId = null;
+            window.pendingBlockContext = null;
+        };
+        
+        window.confirmBlock = function() {
+            if (window.pendingBlockUserId) {
+                const currentUserId = getCurrentUserId();
+                const userIdToBlock = window.pendingBlockUserId;
+                const context = window.pendingBlockContext;
+                
+                fetch(`/api/users/${userIdToBlock}/block`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-ID': currentUserId,
+                        'Authorization': `Bearer ${getSessionToken()}`
+                    },
+                    body: JSON.stringify({
+                        reason: context === 'card' ? 'Blocked from search results' : 'Blocked from results page'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('User blocked successfully', 'success');
+                        
+                        if (context === 'results') {
+                            closeProfileModal();
+                        }
+                        
+                        // Remove blocked user from results
+                        const userCard = document.querySelector(`[data-user-id="${userIdToBlock}"]`);
+                        if (userCard) {
+                            userCard.remove();
+                        }
+                        
+                        // Update results count
+                        const resultsCount = document.querySelector('.results-count');
+                        if (resultsCount) {
+                            const currentCount = parseInt(resultsCount.textContent.match(/\d+/)?.[0] || 0);
+                            if (currentCount > 0) {
+                                resultsCount.textContent = `${currentCount - 1} matches found`;
+                            }
+                        }
+                    } else {
+                        showNotification('Failed to block user', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error blocking user:', error);
+                    showNotification('Failed to block user', 'error');
+                });
+            }
+            closeBlockConfirm();
+        };
+        
+        async function reportProfileInModal() {
+            const currentProfileUserId = window.getCurrentProfileUserId ? window.getCurrentProfileUserId() : null;
+            if (!currentProfileUserId) {
+                console.log('No profile user ID');
+                return;
+            }
+            
+            // Check email verification before reporting
+            const isVerified = await window.checkEmailVerificationStatus();
+            if (!isVerified) {
+                window.showVerificationMessage();
+                return; // Don't proceed with report action
+            }
+            
+            // Get real_name from modal
+            const real_nameElement = document.getElementById('modal-profile-real_name');
+            const real_name = real_nameElement ? real_nameElement.textContent.trim().split(' ')[0] : `User ${currentProfileUserId}`;
+            
+            // Open report modal
+            if (typeof openReportModal === 'function') {
+                openReportModal(currentProfileUserId, real_name);
+            } else {
+                console.error('openReportModal function not found. Make sure user-report-modal is included.');
+                alert('Report functionality is not available. Please refresh the page.');
+            }
+        }
+        
+        async function likeProfile(profileId, real_name) {
+            console.log('Liked profile:', profileId);
+
+            // Check email verification before allowing like action
+            if (window.checkEmailVerificationStatus) {
+                const isVerified = await window.checkEmailVerificationStatus();
+                if (!isVerified) {
+                    window.showVerificationMessage();
+                    return; // Don't proceed with like action
+                }
+            }
+
+            const currentUserId = getCurrentUserId();
+            
+            try {
+                const response = await fetch('/api/likes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-ID': currentUserId
+                    },
+                    body: JSON.stringify({ userId: profileId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Show success notification
+                    const notification = document.createElement('div');
+                    notification.innerHTML = '<i class="fas fa-thumbs-up"></i> Like sent!';
+                    notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: var(--success-color); color: white; padding: 1rem; border-radius: 10px; z-index: 1000; animation: slideIn 0.3s ease;';
+                    document.body.appendChild(notification);
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 3000);
+                } else if (data.alreadyExists || data.message?.toLowerCase().includes('already')) {
+                    // Show info notification for duplicate like
+                    const displayUsername = real_name || 'this user';
+                    const notification = document.createElement('div');
+                    notification.innerHTML = `<i class="fas fa-info-circle"></i> You already liked ${displayUsername}`;
+                    notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #3498db; color: white; padding: 1rem; border-radius: 10px; z-index: 1000; animation: slideIn 0.3s ease;';
+                    document.body.appendChild(notification);
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 3000);
+                } else {
+                    throw new Error(data.error || 'Failed to like profile');
+                }
+            } catch (error) {
+                console.error('Error liking profile:', error);
+                const notification = document.createElement('div');
+                notification.innerHTML = '<i class="fas fa-exclamation-circle"></i> Failed to like profile';
+                notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: var(--danger-color); color: white; padding: 1rem; border-radius: 10px; z-index: 1000; animation: slideIn 0.3s ease;';
+                document.body.appendChild(notification);
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+        }
+
+        function messageProfile(real_name) {
+            if (!real_name) {
+                console.warn('No real_name provided for messaging');
+                return;
+            }
+            if (typeof openUniversalMessageModal === 'function') {
+                openUniversalMessageModal(real_name, false, null);
+            } else {
+                console.warn('Message modal not available');
+            }
+        }
+
+        async function addToFavourite(profileId) {
+            console.log('Adding to favourites:', profileId);
+
+            // Check email verification before allowing favourite action
+            if (window.checkEmailVerificationStatus) {
+                const isVerified = await window.checkEmailVerificationStatus();
+                if (!isVerified) {
+                    window.showVerificationMessage();
+                    return; // Don't proceed with favourite action
+                }
+            }
+            const currentUserId = getCurrentUserId();
+            
+            try {
+                const response = await fetch('/api/favorites', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-ID': currentUserId
+                    },
+                    body: JSON.stringify({ userId: profileId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Show success notification
+                    const notification = document.createElement('div');
+                    notification.innerHTML = '<i class="fas fa-heart"></i> Added to favourites!';
+                    notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: var(--danger-color); color: white; padding: 1rem; border-radius: 10px; z-index: 1000; animation: slideIn 0.3s ease;';
+                    document.body.appendChild(notification);
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 3000);
+                } else if (data.alreadyExists) {
+                    // Show info notification for duplicate
+                    const notification = document.createElement('div');
+                    notification.innerHTML = `<i class="fas fa-info-circle"></i> ${data.message || 'Already in your favourites'}`;
+                    notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #3498db; color: white; padding: 1rem; border-radius: 10px; z-index: 1000; animation: slideIn 0.3s ease;';
+                    document.body.appendChild(notification);
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 3000);
+                } else {
+                    throw new Error(data.message || data.error || 'Failed to add to favourites');
+                }
+            } catch (error) {
+                console.error('Error adding to favourites:', error);
+                const notification = document.createElement('div');
+                notification.innerHTML = '<i class="fas fa-exclamation-circle"></i> Failed to add to favourites';
+                notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: var(--danger-color); color: white; padding: 1rem; border-radius: 10px; z-index: 1000; animation: slideIn 0.3s ease;';
+                document.body.appendChild(notification);
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+        }
+
+        // Block profile from card
+        async function blockProfileFromCard(profileId, real_name) {
+            // Check email verification before blocking
+            const isVerified = await window.checkEmailVerificationStatus();
+            if (!isVerified) {
+                window.showVerificationMessage();
+                return; // Don't proceed with block action
+            }
+            
+            // Show custom confirmation dialog
+            document.getElementById('blockUsername').textContent = real_name;
+            document.getElementById('blockConfirmModal').style.display = 'flex';
+            
+            // Store context for confirmBlock function
+            window.pendingBlockUserId = profileId;
+            window.pendingBlockContext = 'card';
+        }
+
+        // Report profile from card
+        async function reportProfileFromCard(profileId, real_name) {
+            // Check email verification before reporting
+            const isVerified = await window.checkEmailVerificationStatus();
+            if (!isVerified) {
+                window.showVerificationMessage();
+                return; // Don't proceed with report action
+            }
+            
+            // Open report modal
+            if (typeof openReportModal === 'function') {
+                openReportModal(profileId, real_name);
+            } else {
+                console.error('openReportModal function not found. Make sure user-report-modal is included.');
+                alert('Report functionality is not available. Please refresh the page.');
+            }
+        }
+
+        // Periodic status refresh
+        function setupPeriodicStatusRefresh() {
+            setInterval(() => {
+                if (searchResults.length > 0) {
+                    updateStatusElementsManually();
+                }
+            }, 30000);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            const searchParams = getSearchParams();
+            
+            // Ensure currentUser is in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentUser = urlParams.get('currentUser');
+            if (!currentUser) {
+                const currentUserId = getCurrentUserId();
+                urlParams.set('currentUser', currentUserId);
+                const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
+                window.history.replaceState({}, '', newUrl);
+            }
+            
+            updateBackToSearchLinks();
+            
+            try {
+                await waitForWebSocketInitialization();
+                performSearch(searchParams);
+                setTimeout(() => {
+                    registerStatusElements();
+                }, 100);
+            } catch (error) {
+                console.warn('⚠️ WebSocket initialization failed, performing search anyway...');
+                performSearch(searchParams);
+            }
+            
+            setupPeriodicStatusRefresh();
+            
+            // Modal event listeners and action buttons are handled by the external modal JS
+            // Modal action buttons
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.modal-like-btn')) {
+                    e.preventDefault();
+                    likeProfileInModal();
+                }
+                
+                if (e.target.closest('.modal-favourite-btn')) {
+                    e.preventDefault();
+                    favouriteProfileInModal();
+                }
+                
+                if (e.target.closest('.modal-message-btn')) {
+                    e.preventDefault();
+                    messageProfileInModal();
+                }
+                
+                if (e.target.closest('.modal-block-btn')) {
+                    e.preventDefault();
+                    blockProfileInModal();
+                }
+                
+                if (e.target.closest('.modal-report-btn')) {
+                    e.preventDefault();
+                    reportProfileInModal();
+                }
+            });
+            
+            // Event delegation for user card clicks
+            document.addEventListener('click', (e) => {
+                const card = e.target.closest('[data-profile-card]');
+                if (card) {
+                    // Don't open modal if clicking on action buttons
+                    if (e.target.closest('.icon-action')) {
+                        return;
+                    }
+                    
+                    const userId = card.dataset.userId;
+                    if (userId) {
+                        viewProfile(parseInt(userId));
+                    }
+                }
+            });
+            
+            // Sort functionality
+            const sortSelect = document.getElementById('sortBy');
+            if (sortSelect) {
+                sortSelect.addEventListener('change', function() {
+                    const params = getSearchParams();
+                    params.sortBy = this.value;
+                    performSearch(params);
+                });
+            }
+        });
+    </script>
+    
+    <!-- Notification animations -->
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+
+    <!-- Include Global Error Handler -->
+    {{include:global-error-handler}}
+    
+    <!-- Session Manager -->

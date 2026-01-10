@@ -26,3 +26,4 @@ if (typeof window !== 'undefined') {
     console.log('[New Architecture] Main entry point loaded');
 }
 
+

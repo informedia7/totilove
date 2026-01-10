@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Management - Totilove Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none;">← Back to Dashboard</a>
+                <form method="POST" action="/logout" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+            <h1>💳 Payment Management</h1>
+            <p>View payments, manage subscriptions, and track revenue</p>
+        </div>
+        
+        <div class="content">
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('payments', event)">Payments</button>
+                <button class="tab-btn" onclick="showTab('subscriptions', event)">Subscriptions</button>
+                <button class="tab-btn" onclick="showTab('plans', event)">Plans & Discounts</button>
+                <button class="tab-btn" onclick="showTab('stats', event)">Statistics</button>
+            </div>
+
+            <!-- Payments Tab -->
+            <div id="paymentsTab" class="tab-content active">
+                <!-- Filters -->
+                <div class="filters-panel">
+                    <div class="filters-header">
+                        <h2>Payment Filters</h2>
+                        <button id="clearPaymentFilters" class="btn btn-link">Clear All</button>
+                    </div>
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label>Search</label>
+                            <input type="text" id="paymentSearch" placeholder="Payment ID or User ID">
+                        </div>
+                        <div class="filter-group">
+                            <label>Status</label>
+                            <select id="paymentStatusFilter">
+                                <option value="">All</option>
+                                <option value="completed">Completed</option>
+                                <option value="pending">Pending</option>
+                                <option value="failed">Failed</option>
+                                <option value="refunded">Refunded</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Payment Method</label>
+                            <select id="paymentMethodFilter">
+                                <option value="">All</option>
+                                <option value="credit_card">Credit Card</option>
+                                <option value="paypal">PayPal</option>
+                                <option value="stripe">Stripe</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Amount Min</label>
+                            <input type="number" id="amountMin" step="0.01" min="0">
+                        </div>
+                        <div class="filter-group">
+                            <label>Amount Max</label>
+                            <input type="number" id="amountMax" step="0.01" min="0">
+                        </div>
+                        <div class="filter-group">
+                            <label>Date From</label>
+                            <input type="date" id="paymentDateFrom">
+                        </div>
+                        <div class="filter-group">
+                            <label>Date To</label>
+                            <input type="date" id="paymentDateTo">
+                        </div>
+                    </div>
+                    <button id="applyPaymentFilters" class="btn btn-primary">Apply Filters</button>
+                </div>
+
+                <!-- Payments Table -->
+                <div class="table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentsTableBody">
+                            <tr><td colspan="7" class="loading">Loading payments...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="paymentsPagination"></div>
+            </div>
+
+            <!-- Subscriptions Tab -->
+            <div id="subscriptionsTab" class="tab-content" style="display: none;">
+                <!-- Filters -->
+                <div class="filters-panel">
+                    <div class="filters-header">
+                        <h2>Subscription Filters</h2>
+                        <button id="clearSubscriptionFilters" class="btn btn-link">Clear All</button>
+                    </div>
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label>Search</label>
+                            <input type="text" id="subscriptionSearch" placeholder="Subscription ID or User ID">
+                        </div>
+                        <div class="filter-group">
+                            <label>Type</label>
+                            <select id="subscriptionTypeFilter">
+                                <option value="">All</option>
+                                <option value="premium">Premium</option>
+                                <option value="basic">Basic</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Status</label>
+                            <select id="subscriptionStatusFilter">
+                                <option value="">All</option>
+                                <option value="active">Active</option>
+                                <option value="expired">Expired</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Payment Status</label>
+                            <select id="subscriptionPaymentStatusFilter">
+                                <option value="">All</option>
+                                <option value="paid">Paid</option>
+                                <option value="pending">Pending</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="applySubscriptionFilters" class="btn btn-primary">Apply Filters</button>
+                </div>
+
+                <!-- Subscriptions Table -->
+                <div class="table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subscriptionsTableBody">
+                            <tr><td colspan="7" class="loading">Loading subscriptions...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="subscriptionsPagination"></div>
+            </div>
+
+            <!-- Plans & Discounts Tab -->
+            <div id="plansTab" class="tab-content" style="display: none;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <!-- Billing Plans Section -->
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h2>Billing Plans</h2>
+                            <button class="btn btn-primary" onclick="showPlanModal()">+ Add New Plan</button>
+                        </div>
+                        <div class="table-container">
+                            <table class="users-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Monthly</th>
+                                        <th>Yearly</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="plansTableBody">
+                                    <tr><td colspan="6" class="loading">Loading plans...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Discount Codes Section -->
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h2>Discount Codes</h2>
+                            <button class="btn btn-primary" onclick="showDiscountModal()">+ Add New Discount</button>
+                        </div>
+                        <div class="table-container">
+                            <table class="users-table">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Type</th>
+                                        <th>Value</th>
+                                        <th>Usage</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="discountsTableBody">
+                                    <tr><td colspan="6" class="loading">Loading discounts...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Tab -->
+            <div id="statsTab" class="tab-content" style="display: none;">
+                <div class="stats-grid" id="paymentStatsGrid">
+                    <div class="stat-card">
+                        <h3>Total Revenue</h3>
+                        <p class="stat-value" id="totalRevenue">$0.00</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Payments</h3>
+                        <p class="stat-value" id="totalPayments">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Active Subscriptions</h3>
+                        <p class="stat-value" id="activeSubscriptions">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Average Transaction</h3>
+                        <p class="stat-value" id="avgTransaction">$0.00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Plan Modal -->
+    <div id="planModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 2rem; border-radius: 8px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto;">
+            <h2 id="planModalTitle">Add New Plan</h2>
+            <form id="planForm" onsubmit="savePlan(event)">
+                <input type="hidden" id="planId" name="id">
+                <div style="margin-bottom: 1rem;">
+                    <label>Plan Name *</label>
+                    <input type="text" id="planName" name="name" required style="width: 100%; padding: 0.5rem;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label>Description</label>
+                    <textarea id="planDescription" name="description" style="width: 100%; padding: 0.5rem; min-height: 80px;"></textarea>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label>Plan Type *</label>
+                    <select id="planType" name="plan_type" required style="width: 100%; padding: 0.5rem;">
+                        <option value="free">Free</option>
+                        <option value="basic">Basic</option>
+                        <option value="premium">Premium</option>
+                        <option value="vip">VIP</option>
+                    </select>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label>Monthly Price ($) *</label>
+                        <input type="number" id="planPriceMonthly" name="price_monthly" step="0.01" min="0" required style="width: 100%; padding: 0.5rem;">
+                    </div>
+                    <div>
+                        <label>Yearly Price ($) *</label>
+                        <input type="number" id="planPriceYearly" name="price_yearly" step="0.01" min="0" required style="width: 100%; padding: 0.5rem;">
+                    </div>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label>Duration (days, leave empty for unlimited)</label>
+                    <input type="number" id="planDuration" name="duration_days" min="1" style="width: 100%; padding: 0.5rem;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label>Display Order</label>
+                    <input type="number" id="planDisplayOrder" name="display_order" value="0" style="width: 100%; padding: 0.5rem;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label>
+                        <input type="checkbox" id="planIsActive" name="is_active" checked> Active
+                    </label>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closePlanModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Plan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Discount Modal -->
+    <div id="discountModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 2rem; border-radius: 8px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto;">
+            <h2 id="discountModalTitle">Add New Discount Code</h2>
+            <form id="discountForm" onsubmit="saveDiscount(event)">
+                <input type="hidden" id="discountId" name="id">
+                <div style="margin-bottom: 1rem;">
+                    <label>Discount Code *</label>
+                    <input type="text" id="discountCode" name="code" required style="width: 100%; padding: 0.5rem; text-transform: uppercase;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label>Description</label>
+                    <textarea id="discountDescription" name="description" style="width: 100%; padding: 0.5rem; min-height: 80px;"></textarea>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label>Discount Type *</label>
+                    <select id="discountType" name="discount_type" required style="width: 100%; padding: 0.5rem;" onchange="updateDiscountFields()">
+                        <option value="percentage">Percentage (%)</option>
+                        <option value="fixed">Fixed Amount ($)</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label id="discountValueLabel">Discount Value *</label>
+                    <input type="number" id="discountValue" name="discount_value" step="0.01" min="0" required style="width: 100%; padding: 0.5rem;">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label>Min Purchase Amount ($)</label>
+                        <input type="number" id="discountMinAmount" name="min_purchase_amount" step="0.01" min="0" value="0" style="width: 100%; padding: 0.5rem;">
+                    </div>
+                    <div>
+                        <label>Max Discount Amount ($)</label>
+                        <input type="number" id="discountMaxAmount" name="max_discount_amount" step="0.01" min="0" style="width: 100%; padding: 0.5rem;">
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label>Valid From *</label>
+                        <input type="datetime-local" id="discountValidFrom" name="valid_from" required style="width: 100%; padding: 0.5rem;">
+                    </div>
+                    <div>
+                        <label>Valid Until</label>
+                        <input type="datetime-local" id="discountValidUntil" name="valid_until" style="width: 100%; padding: 0.5rem;">
+                    </div>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label>Usage Limit (leave empty for unlimited)</label>
+                    <input type="number" id="discountUsageLimit" name="usage_limit" min="1" style="width: 100%; padding: 0.5rem;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label>
+                        <input type="checkbox" id="discountIsActive" name="is_active" checked> Active
+                    </label>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeDiscountModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Discount</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/notifications.js"></script>
+    <script src="/js/admin-payments.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

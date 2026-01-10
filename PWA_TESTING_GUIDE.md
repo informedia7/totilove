@@ -349,3 +349,4 @@ You'll know PWA is working when:
 
 **Need Help?** Check browser console for errors and DevTools → Application tab for service worker status.
 
+

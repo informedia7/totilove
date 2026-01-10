@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Comparison & Error Detection - Old vs New</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: system-ui, -apple-system, sans-serif; 
+            padding: 20px; 
+            background: #f5f5f5;
+        }
+        
+        .controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .controls button {
+            padding: 8px 16px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        
+        .controls button:hover {
+            background: #2980b9;
+        }
+        
+        .controls button.active {
+            background: #2ecc71;
+        }
+        
+        .controls select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            margin-top: 60px;
+        }
+        
+        .header h1 {
+            margin-bottom: 10px;
+        }
+        
+        .comparison-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .version {
+            flex: 1;
+            border: 2px solid;
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+            min-height: 500px;
+            background: white;
+        }
+        
+        #old-version {
+            border-color: #e74c3c;
+            background: #fff5f5;
+        }
+        
+        #new-version {
+            border-color: #2ecc71;
+            background: #f5fff5;
+        }
+        
+        .version-label {
+            position: absolute;
+            top: -12px;
+            left: 15px;
+            background: white;
+            padding: 0 10px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        #old-version .version-label {
+            color: #e74c3c;
+        }
+        
+        #new-version .version-label {
+            color: #2ecc71;
+        }
+        
+        .error-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .error-panel.hidden {
+            display: none;
+        }
+        
+        .error-panel h3 {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .error-panel .close-btn {
+            background: #e74c3c;
+            border: none;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .error-item {
+            background: #34495e;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .error-critical { border-left: 4px solid #e74c3c; }
+        .error-warning { border-left: 4px solid #f39c12; }
+        .error-info { border-left: 4px solid #3498db; }
+        
+        .test-component {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            background: white;
+        }
+        
+        .visual-diff {
+            position: absolute;
+            outline: 2px dashed #9b59b6;
+            background: rgba(155, 89, 182, 0.1);
+            pointer-events: none;
+            z-index: 500;
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .summary-card.critical { border-left: 4px solid #e74c3c; }
+        .summary-card.warning { border-left: 4px solid #f39c12; }
+        .summary-card.success { border-left: 4px solid #2ecc71; }
+        
+        .summary-card .value {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .summary-card .label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <button onclick="toggleCSS()" id="toggle-btn">Toggle New CSS</button>
+        <button onclick="runComparison()" id="compare-btn">Run Full Comparison</button>
+        <select onchange="loadTestPage(this.value)" id="page-select">
+            <option value="">Select Page to Test...</option>
+            <option value="index">index.html</option>
+            <option value="results">results.html</option>
+            <option value="matches">matches.html</option>
+            <option value="search">search.html</option>
+            <option value="account">account.html</option>
+            <option value="talk">talk.html</option>
+            <option value="activity">activity.html</option>
+        </select>
+        <button onclick="exportResults()">Export Results</button>
+        <button onclick="toggleErrorPanel()">Toggle Errors</button>
+    </div>
+    
+    <div class="header">
+        <h1>🔍 CSS Comparison & Error Detection System</h1>
+        <p>Compare OLD vs NEW CSS architecture side-by-side</p>
+    </div>
+    
+    <div class="summary-cards" id="summary-cards">
+        <div class="summary-card success">
+            <div class="label">Status</div>
+            <div class="value">Ready</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Total Issues</div>
+            <div class="value" id="total-issues">0</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Critical</div>
+            <div class="value" id="critical-count" style="color: #e74c3c;">0</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Warnings</div>
+            <div class="value" id="warning-count" style="color: #f39c12;">0</div>
+        </div>
+    </div>
+    
+    <div class="comparison-container">
+        <div class="version" id="old-version">
+            <div class="version-label">OLD CSS VERSION</div>
+            <div id="old-content" class="loading">Select a page to test...</div>
+        </div>
+        
+        <div class="version" id="new-version">
+            <div class="version-label">NEW CSS VERSION</div>
+            <div id="new-content" class="loading">Select a page to test...</div>
+        </div>
+    </div>
+    
+    <div class="error-panel hidden" id="error-panel">
+        <h3>
+            CSS Comparison Errors & Warnings
+            <button class="close-btn" onclick="toggleErrorPanel()">Close</button>
+        </h3>
+        <div id="error-list"></div>
+    </div>
+    
+    <script>
+        // Configuration - CSS file paths
+        const CSS_PATHS = {
+            old: [
+                '/assets/css/style.css',
+                '/assets/css/talk.css',
+                '/assets/css/profile-edit.css',
+                '/assets/css/messages.css',
+                '/assets/css/talk_components.css',
+                '/assets/css/imageMessaging.css'
+            ],
+            new: [
+                '/assets/css/00-tokens.css',
+                '/assets/css/01-base.css',
+                '/assets/css/02-components.css',
+                '/assets/css/03-layout.css',
+                '/assets/css/04-responsive.css'
+            ]
+        };
+        
+        const TEST_PAGES = {
+            'index': { url: '/index.html', name: 'Home Page' },
+            'results': { url: '/results.html', name: 'Search Results' },
+            'matches': { url: '/matches.html', name: 'Matches' },
+            'search': { url: '/search.html', name: 'Search' },
+            'account': { url: '/account.html', name: 'Account Settings' },
+            'talk': { url: '/talk.html', name: 'Chat Interface' },
+            'activity': { url: '/activity.html', name: 'Activity Feed' }
+        };
+        
+        let currentPage = null;
+        let errors = [];
+        let visualDiffs = [];
+        let newCSSEnabled = false;
+        
+        // Initialize
+        function init() {
+            console.log('🔍 CSS Comparison Tool Loaded');
+            console.log('Protocol:', window.location.protocol);
+            console.log('File protocol?', isFileProtocol());
+            updateSummary();
+        }
+        
+        // Check if we're on a server or file://
+        function isFileProtocol() {
+            return window.location.protocol === 'file:';
+        }
+        
+        // Get base URL for pages
+        function getBaseURL() {
+            if (isFileProtocol()) {
+                // For file://, we need to use absolute paths or server
+                return 'http://localhost:3000';
+            }
+            return window.location.origin;
+        }
+        
+        // Load a test page - CSS-only comparison (no server needed)
+        async function loadTestPage(pageKey) {
+            if (!TEST_PAGES[pageKey]) {
+                alert('Please select a valid page');
+                return;
+            }
+            
+            currentPage = pageKey;
+            errors = [];
+            visualDiffs = [];
+            
+            const pageInfo = TEST_PAGES[pageKey];
+            document.title = `CSS Compare - ${pageInfo.name}`;
+            
+            // Clear previous content
+            document.getElementById('old-content').innerHTML = '<div class="loading">Loading OLD CSS test components...</div>';
+            document.getElementById('new-content').innerHTML = '<div class="loading">Loading NEW CSS test components...</div>';
+            
+            try {
+                // Load CSS and create test components (no iframe needed)
+                loadCSSTestComponents('old');
+                setTimeout(() => {
+                    loadCSSTestComponents('new');
+                    // Wait longer for CSS to load before running tests
+                    setTimeout(() => {
+                        // Verify CSS loaded before testing
+                        const newCSSLoaded = Array.from(document.styleSheets).some(sheet => {
+                            try {
+                                return sheet.href && sheet.href.includes('00-tokens.css');
+                            } catch (e) {
+                                return false;
+                            }
+                        });
+                        
+                        if (newCSSLoaded) {
+                            runQuickComparison();
+                        } else {
+                            addError('warning', 'New CSS files may still be loading. Please wait and try again.');
+                            displayErrors();
+                        }
+                    }, 1000);
+                }, 200);
+                
+                // Clear errors
+                document.getElementById('error-list').innerHTML = '';
+                document.getElementById('error-panel').classList.add('hidden');
+                
+            } catch (error) {
+                addError('critical', `Failed to load test: ${error.message}`);
+                displayErrors();
+            }
+        }
+        
+        // Load CSS and create test components
+        function loadCSSTestComponents(version) {
+            const container = document.getElementById(`${version}-content`);
+            
+            // Clear existing CSS for this version
+            document.querySelectorAll(`.css-${version}`).forEach(link => link.remove());
+            
+            // Load CSS files
+            const cssFiles = CSS_PATHS[version];
+            
+            cssFiles.forEach(cssPath => {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                
+                // Fix path for file:// protocol
+                if (isFileProtocol()) {
+                    // For file://, use relative path from tool location
+                    // css-comparison-tool.html is in root, so app/assets/css/... is correct
+                    link.href = 'app' + cssPath;
+                } else {
+                    // For server, use absolute path
+                    link.href = cssPath;
+                }
+                
+                link.className = `css-${version}`;
+                link.onload = () => {
+                    console.log(`✅ Loaded CSS: ${link.href}`);
+                };
+                link.onerror = () => {
+                    const errorMsg = `CSS file not found: ${link.href}`;
+                    addError('critical', errorMsg);
+                    console.error(`❌ ${errorMsg}`);
+                    // Try alternative path
+                    if (isFileProtocol() && cssPath.startsWith('/')) {
+                        const altPath = cssPath.substring(1); // Remove leading /
+                        console.log(`Trying alternative path: ${altPath}`);
+                    }
+                };
+                document.head.appendChild(link);
+            });
+            
+            // Wait a bit for CSS to load, then create components
+            // Check if CSS actually loaded
+            setTimeout(() => {
+                const loadedCount = Array.from(document.styleSheets).filter(sheet => {
+                    try {
+                        const href = sheet.href || '';
+                        return href.includes('assets/css') && 
+                               (version === 'old' ? !href.includes('0') : href.includes('0'));
+                    } catch (e) {
+                        return false;
+                    }
+                }).length;
+                
+                console.log(`${version.toUpperCase()} CSS: ${loadedCount} files loaded`);
+                
+                const testHTML = createTestComponents(version);
+                container.innerHTML = testHTML;
+                
+                // Add a note if CSS didn't load
+                if (version === 'new' && loadedCount === 0) {
+                    container.innerHTML += `
+                        <div style="padding: 20px; background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; margin-top: 20px;">
+                            <h4>⚠️ CSS Files Not Loading</h4>
+                            <p>If you're using file:// protocol, make sure:</p>
+                            <ul style="text-align: left;">
+                                <li>The tool is in the project root</li>
+                                <li>CSS files exist at: <code>app/assets/css/00-tokens.css</code></li>
+                                <li>Check browser console for CORS errors</li>
+                            </ul>
+                            <p>Try accessing via server: <code>http://localhost:3000/css-comparison-tool.html</code></p>
+                        </div>
+                    `;
+                }
+            }, 500);
+        }
+        
+        // Create test components for comparison
+        function createTestComponents(version) {
+            const scope = version === 'new' ? '#app-root' : '';
+            
+            return `
+                <div ${version === 'new' ? 'id="app-root"' : ''} style="padding: 20px;">
+                    <h2>CSS Test Components - ${version.toUpperCase()} Version</h2>
+                    
+                    <div class="test-component">
+                        <h3>Buttons</h3>
+                        <button class="action-btn">Action Button</button>
+                        <button class="like-btn">Like Button</button>
+                        <button class="message-btn">Message Button</button>
+                        <button class="report-btn">Report Button</button>
+                        <button class="page-btn">Page Button</button>
+                        <button class="tab-btn">Tab Button</button>
+                    </div>
+                    
+                    <div class="test-component">
+                        <h3>Form Inputs</h3>
+                        <input type="text" placeholder="Text Input">
+                        <input type="email" placeholder="Email Input">
+                        <textarea placeholder="Textarea"></textarea>
+                        <select>
+                            <option>Select Option</option>
+                            <option>Option 1</option>
+                        </select>
+                    </div>
+                    
+                    <div class="test-component">
+                        <h3>Cards</h3>
+                        <div class="card">
+                            <h4>Card Title</h4>
+                            <p>Card content goes here</p>
+                        </div>
+                        <div class="user-card">
+                            <h4>User Card</h4>
+                            <p>User information</p>
+                        </div>
+                    </div>
+                    
+                    <div class="test-component">
+                        <h3>Modals</h3>
+                        <div class="message-modal" style="display: block; position: relative; background: white; padding: 20px; border-radius: 8px;">
+                            <div class="modal-content">Modal Content</div>
+                        </div>
+                    </div>
+                    
+                    <div class="test-component">
+                        <h3>Navigation</h3>
+                        <nav class="navbar">
+                            <a href="#" class="nav-link">Home</a>
+                            <a href="#" class="nav-link">About</a>
+                            <a href="#" class="nav-link">Contact</a>
+                        </nav>
+                    </div>
+                    
+                    <div class="test-component">
+                        <h3>Badges & Tags</h3>
+                        <span class="badge">Badge</span>
+                        <span class="tag">Tag</span>
+                        <span class="age-badge">25</span>
+                    </div>
+                    
+                    <div class="test-component">
+                        <h3>Pagination</h3>
+                        <div class="pagination">
+                            <button class="page-btn">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Toggle between old and new CSS
+        function toggleCSS() {
+            const newCSSLinks = document.querySelectorAll('.css-new');
+            if (newCSSLinks.length === 0) {
+                alert('Please load a test page first');
+                return;
+            }
+            
+            newCSSEnabled = !newCSSEnabled;
+            
+            newCSSLinks.forEach(link => {
+                link.disabled = !newCSSEnabled;
+            });
+            
+            const btn = document.getElementById('toggle-btn');
+            btn.textContent = newCSSEnabled ? 'Disable New CSS' : 'Enable New CSS';
+            btn.className = newCSSEnabled ? 'active' : '';
+            
+            if (newCSSEnabled) {
+                setTimeout(() => runQuickComparison(null), 300);
+            }
+        }
+        
+        // Run comprehensive comparison
+        function runComparison() {
+            errors = [];
+            visualDiffs = [];
+            
+            const oldContainer = document.getElementById('old-content');
+            const newContainer = document.getElementById('new-content');
+            
+            if (!oldContainer.querySelector('.test-component') || !newContainer.querySelector('.test-component')) {
+                alert('Please load a test page first');
+                return;
+            }
+            
+            try {
+                // Run all comparison tests (using current document)
+                testCSSLoading();
+                testLayoutDifferences();
+                testComponentDimensions();
+                testResponsiveBehavior();
+                testColorConsistency();
+                testTypography();
+                findVisualDiffs();
+                
+                // Display results
+                displayErrors();
+                updateSummary();
+                
+                // Show error panel
+                document.getElementById('error-panel').classList.remove('hidden');
+                
+            } catch (e) {
+                console.error('Error running comparison:', e);
+                addError('critical', `Comparison failed: ${e.message}`);
+                displayErrors();
+            }
+        }
+        
+        // Quick comparison
+        function runQuickComparison() {
+            try {
+                testComponentDimensions();
+                findVisualDiffs();
+                displayErrors();
+                updateSummary();
+            } catch (e) {
+                console.error('Quick comparison error:', e);
+            }
+        }
+        
+        // Test 1: CSS Loading Errors
+        function testCSSLoading() {
+            // Check all loaded stylesheets
+            const loadedSheets = Array.from(document.styleSheets).map(sheet => {
+                try {
+                    return sheet.href || '';
+                } catch (e) {
+                    return '';
+                }
+            });
+            
+            CSS_PATHS.old.forEach(path => {
+                const expectedPath = isFileProtocol() ? 'app' + path : path;
+                const isLoaded = loadedSheets.some(href => 
+                    href && (href.includes(path.replace('/assets/css/', '')) || 
+                            href.includes(path) ||
+                            href.endsWith(path) ||
+                            href.includes('app' + path))
+                );
+                if (!isLoaded) {
+                    addError('warning', `Old CSS file may not be loaded: ${path}`);
+                }
+            });
+            
+            CSS_PATHS.new.forEach(path => {
+                const expectedPath = isFileProtocol() ? 'app' + path : path;
+                const isLoaded = loadedSheets.some(href => 
+                    href && (href.includes(path) || 
+                            href.endsWith(path) ||
+                            href.includes('app' + path) ||
+                            href.includes(path.replace('/assets/css/', '')))
+                );
+                if (!isLoaded) {
+                    addError('critical', `New CSS file not loaded: ${path} (checked: ${expectedPath})`);
+                }
+            });
+        }
+        
+        // Test 2: Layout Differences
+        function testLayoutDifferences() {
+            const oldContainer = document.getElementById('old-content');
+            const newContainer = document.getElementById('new-content');
+            
+            if (!oldContainer || !newContainer) return;
+            
+            const selectors = ['.test-component', '.card', '.navbar'];
+            
+            selectors.forEach(selector => {
+                const oldEl = oldContainer.querySelector(selector);
+                const newEl = newContainer.querySelector(selector);
+                
+                if (oldEl && newEl) {
+                    const oldRect = oldEl.getBoundingClientRect();
+                    const newRect = newEl.getBoundingClientRect();
+                    
+                    const widthDiff = Math.abs(oldRect.width - newRect.width);
+                    const heightDiff = Math.abs(oldRect.height - newRect.height);
+                    
+                    if (widthDiff > 10 || heightDiff > 10) {
+                        addError('warning', 
+                            `Layout difference in ${selector}: ` +
+                            `Old: ${oldRect.width.toFixed(0)}x${oldRect.height.toFixed(0)}, ` +
+                            `New: ${newRect.width.toFixed(0)}x${newRect.height.toFixed(0)}`
+                        );
+                    }
+                }
+            });
+        }
+        
+        // Test 3: Component Dimensions
+        function testComponentDimensions() {
+            const newContainer = document.getElementById('new-content');
+            if (!newContainer) return;
+            
+            const components = [
+                { selector: 'button.action-btn, button.like-btn, button.message-btn, button.report-btn, button.page-btn, button.tab-btn', minHeight: 44, name: 'Buttons (New CSS)' },
+                { selector: 'a.nav-link', minHeight: 44, name: 'Navigation Links' }
+            ];
+            
+            components.forEach(comp => {
+                const elements = newContainer.querySelectorAll(comp.selector);
+                
+                elements.forEach((el, index) => {
+                    const rect = el.getBoundingClientRect();
+                    
+                    if (comp.minHeight && rect.height < comp.minHeight) {
+                        addError('critical',
+                            `${comp.name} #${index + 1}: Height ${rect.height.toFixed(1)}px < ${comp.minHeight}px (touch target)`
+                        );
+                    }
+                });
+            });
+        }
+        
+        // Test 4: Responsive Behavior
+        function testResponsiveBehavior() {
+            const styleSheets = Array.from(document.styleSheets).filter(sheet => 
+                sheet.href && sheet.href.includes('/assets/css/0')
+            );
+            
+            styleSheets.forEach(sheet => {
+                try {
+                    const rules = sheet.cssRules || sheet.rules;
+                    if (rules) {
+                        for (let rule of rules) {
+                            if (rule.media && rule.media.mediaText.includes('max-width')) {
+                                addError('warning',
+                                    `Desktop-first media query found: ${rule.media.mediaText}`
+                                );
+                            }
+                        }
+                    }
+                } catch (e) {
+                    // Cross-origin stylesheet, skip
+                }
+            });
+        }
+        
+        // Test 5: Color Consistency
+        function testColorConsistency() {
+            const computed = getComputedStyle(document.documentElement);
+            const requiredTokens = [
+                '--primary', '--secondary', '--danger', '--success',
+                '--md', '--lg', '--r-md', '--touch'
+            ];
+            
+            requiredTokens.forEach(token => {
+                const value = computed.getPropertyValue(token);
+                if (!value || value.trim() === '') {
+                    addError('critical', `Missing CSS token: ${token}`);
+                }
+            });
+        }
+        
+        // Test 6: Typography
+        function testTypography() {
+            const oldContainer = document.getElementById('old-content');
+            const newContainer = document.getElementById('new-content');
+            
+            if (!oldContainer || !newContainer) return;
+            
+            const elements = ['h1', 'h2', 'h3', 'p', 'button'];
+            
+            elements.forEach(tag => {
+                const oldEl = oldContainer.querySelector(tag);
+                const newEl = newContainer.querySelector(tag);
+                
+                if (oldEl && newEl) {
+                    const oldStyle = window.getComputedStyle(oldEl);
+                    const newStyle = window.getComputedStyle(newEl);
+                    
+                    const props = ['fontSize', 'lineHeight', 'fontWeight'];
+                    
+                    props.forEach(prop => {
+                        if (oldStyle[prop] !== newStyle[prop]) {
+                            addError('info',
+                                `Typography change in ${tag}: ${prop}: ` +
+                                `Old: ${oldStyle[prop]}, New: ${newStyle[prop]}`
+                            );
+                        }
+                    });
+                }
+            });
+        }
+        
+        // Test 7: Find Visual Differences
+        function findVisualDiffs() {
+            const newContainer = document.getElementById('new-content');
+            if (!newContainer) return;
+            
+            // Clear previous diffs
+            document.querySelectorAll('.visual-diff').forEach(el => el.remove());
+            
+            const commonSelectors = [
+                'button', '.card', '.test-component',
+                'input', 'select', 'textarea'
+            ];
+            
+            commonSelectors.forEach(selector => {
+                const newEls = newContainer.querySelectorAll(selector);
+                
+                newEls.forEach((newEl, i) => {
+                    const rect = newEl.getBoundingClientRect();
+                    
+                    // Check for obvious issues
+                    if (rect.width === 0 || rect.height === 0) {
+                        addError('warning', `${selector}[${i}] has zero dimensions`);
+                    }
+                });
+            });
+        }
+        
+        // Helper: Add error to list
+        function addError(level, message) {
+            errors.push({
+                level,
+                message,
+                timestamp: new Date().toISOString(),
+                page: currentPage
+            });
+            
+            console.log(`[${level.toUpperCase()}] ${message}`);
+        }
+        
+        // Display errors
+        function displayErrors() {
+            const errorList = document.getElementById('error-list');
+            errorList.innerHTML = '';
+            
+            if (errors.length === 0) {
+                errorList.innerHTML = '<div class="error-item error-info">✅ No errors found!</div>';
+                return;
+            }
+            
+            const critical = errors.filter(e => e.level === 'critical');
+            const warning = errors.filter(e => e.level === 'warning');
+            const info = errors.filter(e => e.level === 'info');
+            
+            // Show summary
+            const summary = document.createElement('div');
+            summary.className = 'error-item error-info';
+            summary.innerHTML = `
+                <strong>Summary:</strong> 
+                ${errors.length} total issues • 
+                <span style="color: #e74c3c">${critical.length} critical</span> • 
+                <span style="color: #f39c12">${warning.length} warnings</span> • 
+                <span style="color: #3498db">${info.length} info</span>
+            `;
+            errorList.appendChild(summary);
+            
+            // Show errors by level
+            [...critical, ...warning, ...info].forEach(error => {
+                const div = document.createElement('div');
+                div.className = `error-item error-${error.level}`;
+                div.innerHTML = `<strong>[${error.level.toUpperCase()}]</strong> ${error.message}`;
+                errorList.appendChild(div);
+            });
+        }
+        
+        // Update summary cards
+        function updateSummary() {
+            const critical = errors.filter(e => e.level === 'critical').length;
+            const warning = errors.filter(e => e.level === 'warning').length;
+            
+            document.getElementById('total-issues').textContent = errors.length;
+            document.getElementById('critical-count').textContent = critical;
+            document.getElementById('warning-count').textContent = warning;
+        }
+        
+        // Toggle error panel
+        function toggleErrorPanel() {
+            const panel = document.getElementById('error-panel');
+            panel.classList.toggle('hidden');
+        }
+        
+        // Export results
+        function exportResults() {
+            const report = {
+                timestamp: new Date().toISOString(),
+                page: currentPage,
+                pageName: TEST_PAGES[currentPage]?.name || 'Unknown',
+                errors: errors,
+                summary: {
+                    total: errors.length,
+                    critical: errors.filter(e => e.level === 'critical').length,
+                    warning: errors.filter(e => e.level === 'warning').length,
+                    info: errors.filter(e => e.level === 'info').length
+                },
+                visualDiffs: visualDiffs
+            };
+            
+            const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `css-comparison-${currentPage || 'report'}-${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert(`✅ Exported ${errors.length} issues to JSON file`);
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
+

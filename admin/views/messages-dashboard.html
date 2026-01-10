@@ -1,0 +1,2038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Messages Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 90%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .controls.hidden {
+            max-height: 0;
+            padding: 0 20px;
+            overflow: hidden;
+            opacity: 0;
+        }
+
+        .controls-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .controls-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .controls-toggle.hidden {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .control-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .control-group input, .control-group select {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        #real_nameSearchInput {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-color: #6c757d;
+        }
+
+        #real_nameSearchInput:focus {
+            background: white;
+            border-color: #007bff;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: #212529; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-info { background: #17a2b8; color: white; }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .real_name-display {
+            font-weight: 600;
+            color: #007bff;
+            background: #e3f2fd;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .user-id {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .stats {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            background: white;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .stats.hidden {
+            max-height: 0;
+            padding: 0 20px;
+            overflow: hidden;
+            opacity: 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .table-container {
+            padding: 0px !important;
+            margin: 0px !important;
+            overflow-x: auto;
+        }
+
+        .messages-table {
+            width: auto !important;
+            border-collapse: collapse !important;
+            border-spacing: 0 !important;
+            background: white;
+            font-size: 10px;
+            table-layout: auto !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .messages-table th {
+            background: #343a40;
+            color: white;
+            padding: 1px !important;
+            margin: 0 !important;
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+            white-space: nowrap;
+            border: 1px solid #495057;
+            width: auto !important;
+            min-width: 0 !important;
+            max-width: none !important;
+        }
+
+        .messages-table td {
+            padding: 1px !important;
+            margin: 0 !important;
+            border: 1px solid #dee2e6;
+            font-size: 16px;
+            text-align: center;
+            vertical-align: middle;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+            width: auto !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+
+        
+        .actions {
+            display: flex;
+            gap: 1px;
+            justify-content: center;
+            flex-wrap: nowrap;
+        }
+
+        .btn-sm {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+            margin: 0 2px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-sm:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .status-badge {
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .status-sent { background: #d4edda; color: #155724; }
+        .status-delivered { background: #cce5ff; color: #004085; }
+        .status-read { background: #d1ecf1; color: #0c5460; }
+
+        .recall-badge {
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .recall-soft { background: #fff3cd !important; color: #856404 !important; }
+        .recall-hard { background: #f8d7da !important; color: #721c24 !important; }
+        .recall-none { background: #e2e3e5 !important; color: #383d41 !important; }
+
+        .message-content {
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .message-content.expandable:hover {
+            white-space: normal;
+            word-wrap: break-word;
+            position: absolute;
+            background: white;
+            border: 1px solid #ddd;
+            padding: 5px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+          
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover { color: #000; }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .pagination button {
+            padding: 8px 16px;
+            border: 1px solid #dee2e6;
+            background: white;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .pagination button:hover { background: #e9ecef; }
+        .pagination button.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .success, .error {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .search-highlight {
+            background: #fff3cd;
+            padding: 1px 2px;
+            border-radius: 2px;
+        }
+
+        /* User Info Styling */
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: flex-start;
+        }
+
+        .user-id-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+            min-width: 40px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .real_name-display {
+            color: #495057;
+            font-weight: 600;
+            font-size: 13px;
+            padding: 2px 0;
+            border-bottom: 1px solid #e9ecef;
+            width: 100%;
+        }
+
+        .real_name-display:hover {
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
+
+        /* Message Content Styling */
+        .message-content {
+            max-width: 150px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .message-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #495057;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .expand-hint {
+            font-size: 10px;
+            color: #6c757d;
+            font-style: italic;
+            margin-top: 2px;
+            text-align: center;
+            background: #f8f9fa;
+            padding: 1px 4px;
+            border-radius: 3px;
+        }
+
+        .message-content.expandable:hover {
+            background: white;
+            border: 1px solid #dee2e6;
+            padding: 8px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            position: absolute;
+            min-width: 200px;
+            max-width: 300px;
+        }
+
+        .message-content.expandable:hover .message-text {
+            white-space: normal;
+            word-wrap: break-word;
+            overflow: visible;
+        }
+
+        .message-content.expandable:hover .expand-hint {
+            display: none;
+        }
+
+        /* Badge Styling */
+        .boolean-badge {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .boolean-badge.true {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .boolean-badge.false {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .type-badge {
+            background: #e2e3e5;
+            color: #383d41;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .attachment-badge {
+            background: #fff3cd;
+            color: #856404;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid #ffeaa7;
+        }
+
+        .no-attachments {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        /* Improved Status Badges */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-sent { 
+            background: #d4edda; 
+            color: #155724; 
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-delivered { 
+            background: #cce5ff; 
+            color: #004085; 
+            border: 1px solid #b3d7ff;
+        }
+        
+        .status-read { 
+            background: #d1ecf1; 
+            color: #0c5460; 
+            border: 1px solid #bee5eb;
+        }
+
+        .status-unknown {
+            background: #e2e3e5;
+            color: #383d41;
+            border: 1px solid #d6d8db;
+        }
+
+        /* Read Status Badge */
+        .read-status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            min-width: 80px;
+            justify-content: center;
+        }
+
+        .read-status-badge.read {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .read-status-badge.unread {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        /* Message Type Badge */
+        .message-type-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .message-type-badge.text {
+            background: #e2e3e5;
+            color: #383d41;
+            border: 1px solid #d6d8db;
+        }
+
+        .message-type-badge.image {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message-type-badge.video {
+            background: #cce5ff;
+            color: #004085;
+            border: 1px solid #b3d7ff;
+        }
+
+        .message-type-badge.audio {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Attachment Badge */
+        .attachment-badge {
+            background: #fff3cd;
+            color: #856404;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid #ffeaa7;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .no-attachments {
+            color: #6c757d;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Reply Badges */
+        .reply-badge {
+            background: #e2e3e5;
+            color: #383d41;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid #d6d8db;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .reply-text {
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: pointer;
+            color: #495057;
+            font-size: 12px;
+        }
+
+        .reply-text:hover {
+            color: #007bff;
+            text-decoration: underline;
+        }
+
+        .reply-sender-badge {
+            background: #f8f9fa;
+            color: #495057;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid #dee2e6;
+        }
+
+        .no-reply {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        /* Recall Badges */
+        .recall-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            min-width: 80px;
+            justify-content: center;
+        }
+
+        .recall-badge.recall-soft {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .recall-badge.recall-hard {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .recall-badge.recall-none {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        /* Recall Type Badge */
+        .recall-type-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .recall-type-badge.none {
+            background: #e2e3e5;
+            color: #383d41;
+            border: 1px solid #d6d8db;
+        }
+
+        .recall-type-badge.soft {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .recall-type-badge.hard {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Saved Badges */
+        .saved-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            min-width: 90px;
+            justify-content: center;
+        }
+
+        .saved-badge.saved {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .saved-badge.not-saved {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        /* Changed vs Default Value Styling */
+        .recall-type-value, .saved-value {
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .recall-type-value.default, .saved-value.default {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .recall-type-value.changed, .saved-value.changed {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffc107;
+            font-weight: 700;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .recall-type-value.changed {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-color: #17a2b8;
+        }
+        
+        /* Force ultra-compact table layout - ZERO SPACING */
+        .messages-table * {
+            box-sizing: border-box !important;
+        }
+        
+        /* Remove any default spacing */
+        .messages-table th,
+        .messages-table td {
+            margin: 0 !important;
+            padding: 1px !important;
+            border-spacing: 0 !important;
+            border-collapse: collapse !important;
+        }
+        
+        /* Force table to be ultra-compact */
+        .messages-table {
+            cell-spacing: 0 !important;
+            cell-padding: 0 !important;
+            border-spacing: 0 !important;
+            border-collapse: collapse !important;
+        }
+        
+        /* Ensure no gaps between columns */
+        .messages-table th + th,
+        .messages-table td + td {
+            border-left: none !important;
+        }
+        
+        /* Force exact column widths */
+        .messages-table th,
+        .messages-table td {
+            width: auto !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
+            white-space: normal !important;
+        }
+
+        /* Recalled Value Styling */
+        .recalled-value {
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .recalled-value.default {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .recalled-value.changed {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+            font-weight: 700;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Read Status Value Styling */
+        .read-status-value {
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .read-status-value.default {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .read-status-value.changed {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+            font-weight: 700;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Deleted Value Styling */
+        .deleted-value {
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .deleted-value.default {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .deleted-value.changed {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+            font-weight: 700;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Highlight for changed values */
+        .highlight-changed {
+            background-color: #fff3cd; /* Light yellow background */
+            font-weight: 600; /* Bold text */
+            padding: 2px 4px; /* Padding */
+            border-radius: 4px; /* Rounded corners */
+            color: #856404; /* Darker yellow text */
+            border: 1px solid #ffeeba; /* Subtle border */
+        }
+
+        /* New styles for deleted status badges */
+        .deleted-status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .deleted-status-badge.deleted {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .deleted-status-badge.not-deleted {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        /* Saved Status Badges */
+        .saved-status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .saved-status-badge.saved {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .saved-status-badge.not-saved {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        /* Recalled Status Badge */
+        .recalled-status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .recalled-status-badge.recalled {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .recalled-status-badge.active {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        /* Table styles */
+        .messages-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+        }
+
+        /* Table container for scrolling */
+        .table-container {
+            max-height: 70vh;
+            min-height: 400px;
+            overflow-y: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: white;
+            position: relative;
+            border: 2px solid #007bff;
+            transition: all 0.3s ease;
+        }
+
+        .table-container.hidden {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+        }
+
+        /* Debug: Make sure table has content */
+        .table-container .messages-table {
+            min-height: 600px;
+        }
+
+        /* Debug: Ensure sticky positioning works */
+        .table-container .messages-table thead {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Custom scrollbar for table container */
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .table-container .messages-table thead tr {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .table-container .messages-table th {
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 2px solid #e1e5e9;
+            white-space: nowrap;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .table-container .messages-table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s ease;
+        }
+
+        .table-container .messages-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .table-container .messages-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: top;
+        }
+
+        /* Sticky header indicator */
+        .table-container .messages-table thead::before {
+            content: '📌 Sticky Header';
+            position: absolute;
+            top: -25px;
+            left: 10px;
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        /* Custom column widths */
+        .table-container .messages-table th:nth-child(11),
+        .table-container .messages-table td:nth-child(11) {
+            width: 20%;
+            min-width: 120px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Ensure "Is Read" column content stays on one row */
+        .table-container .messages-table td:nth-child(11) {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+            word-wrap: normal;
+            word-break: keep-all;
+        }
+
+        /* Ensure "Is Read" column header also doesn't wrap */
+        .table-container .messages-table th:nth-child(11) {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-wrap: normal;
+            word-break: keep-all;
+        }
+
+        /* Prevent any content inside "Is Read" column from wrapping */
+        .table-container .messages-table td:nth-child(11) * {
+            white-space: nowrap;
+            display: inline-block;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .table-container {
+                max-height: 60vh;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .table-container {
+                max-height: 50vh;
+            }
+            
+            .table-container .messages-table th,
+            .table-container .messages-table td {
+                padding: 8px 6px;
+                font-size: 12px;
+            }
+        }
+
+        /* Smooth scrolling */
+        .table-container {
+            scroll-behavior: smooth;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="controls-toggle" onclick="toggleControlsAndStats()" title="Toggle Controls and Stats">
+            🔽 Hide Controls & Stats
+        </button>
+        
+        <div class="controls">
+            
+            <div class="control-group">
+                <label>Message ID:</label>
+                <input type="number" id="messageIdFilter" placeholder="Search by message ID">
+            </div>
+            
+            <div class="control-group">
+                <label>Search:</label>
+                <input type="text" id="searchInput" placeholder="Search messages...">
+            </div>
+            
+            <div class="control-group">
+                <label>Username Search:</label>
+                <input type="text" id="real_nameSearchInput" placeholder="Search by real_name">
+            </div>
+            
+                            <div class="control-group">
+                    <label>Sender ID:</label>
+                    <input type="number" id="senderFilter" placeholder="Filter by sender ID">
+                </div>
+                
+                <div class="control-group">
+                    <label>Receiver ID:</label>
+                    <input type="number" id="receiverFilter" placeholder="Filter by receiver ID">
+                </div>
+            
+            <div class="control-group">
+                <label>Status:</label>
+                <select id="statusFilter">
+                    <option value="">All Statuses</option>
+                    <option value="sent">Sent</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="read">Read</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label>Recalled:</label>
+                <select id="recallFilter">
+                    <option value="">All Messages</option>
+                    <option value="true">Recalled Only</option>
+                    <option value="false">Not Recalled</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-primary" onclick="loadMessages()">🔍 Search</button>
+            <button class="btn btn-info" onclick="clearFilters()">🔄 Clear Filters</button>
+            <button class="btn btn-success" onclick="showAddMessageModal()">➕ Add Message</button>
+            <button class="btn btn-warning" onclick="exportToCSV()">📊 Export CSV</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalMessages">-</div>
+                <div class="stat-label">Total Messages</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="recalledMessages">-</div>
+                <div class="stat-label">Recalled Messages</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="unreadMessages">-</div>
+                <div class="stat-label">Unread Messages</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="savedMessages">-</div>
+                <div class="stat-label">Saved Messages</div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="messages-table">
+                <thead>
+                    <tr>
+                        <th>Message ID</th>
+                        <th>From User</th>
+                        <th>To User</th>
+                        <th>Message Content</th>
+                        <th>Sent At</th>
+                        <th>Status</th>
+                        <th>Deleted by Sender</th>
+                        <th>Deleted by Receiver</th>
+                        <th>Deleted At</th>
+                        <th>Read At</th>
+                        <th>Is Read</th>
+                        <th>Message Type</th>
+                        <th>Attachments</th>
+                        <th>Reply To ID</th>
+                        <th>Reply To Text</th>
+                        <th>Reply From</th>
+                        <th>Recalled by Sender</th>
+                        <th>Recalled At</th>
+                        <th>Recall Type</th>
+                        <th>Saved by Sender</th>
+                        <th>Saved by Receiver</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="messagesTableBody">
+                    <tr>
+                        <td colspan="21" class="loading">Loading messages...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination" id="pagination">
+            <!-- Pagination will be generated here -->
+        </div>
+    </div>
+
+    <!-- Edit Message Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Edit Message</h2>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+                         <form id="editForm">
+                 <input type="hidden" id="editMessageId">
+                 
+                 <div class="form-group">
+                     <label>Sender ID:</label>
+                     <input type="number" id="editSenderId" required>
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Receiver ID:</label>
+                     <input type="number" id="editReceiverId" required>
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Message Content:</label>
+                     <textarea id="editContent" required></textarea>
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Status:</label>
+                     <select id="editStatus" required>
+                         <option value="sent">Sent</option>
+                         <option value="delivered">Delivered</option>
+                         <option value="read">Read</option>
+                     </select>
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Deleted by Sender:</label>
+                     <select id="editDeletedBySender">
+                         <option value="false">No</option>
+                         <option value="true">Yes</option>
+                     </select>
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Deleted by Receiver:</label>
+                     <select id="editDeletedByReceiver">
+                         <option value="false">No</option>
+                         <option value="true">Yes</option>
+                     </select>
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Deleted At:</label>
+                     <input type="datetime-local" id="editDeletedAt">
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Read At:</label>
+                     <input type="datetime-local" id="editReadAt">
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Is Read:</label>
+                     <select id="editIsRead">
+                         <option value="false">No</option>
+                         <option value="true">Yes</option>
+                     </select>
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Message Type:</label>
+                     <select id="editMessageType">
+                         <option value="text">Text</option>
+                         <option value="image">Image</option>
+                         <option value="video">Video</option>
+                         <option value="audio">Audio</option>
+                         <option value="file">File</option>
+                     </select>
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Attachment Count:</label>
+                     <input type="number" id="editAttachmentCount" min="0">
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Reply To ID:</label>
+                     <input type="number" id="editReplyToId" placeholder="Leave empty if not a reply">
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Reply To Text:</label>
+                     <textarea id="editReplyToText" placeholder="Reply text content"></textarea>
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Reply To Sender:</label>
+                     <input type="number" id="editReplyToSender" placeholder="Reply sender ID">
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Recalled:</label>
+                     <select id="editRecalled">
+                         <option value="false">No</option>
+                         <option value="true">Yes</option>
+                     </select>
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Recalled At:</label>
+                     <input type="datetime-local" id="editRecalledAt">
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Recall Type:</label>
+                     <select id="editRecallType">
+                         <option value="none">None</option>
+                         <option value="soft">Soft</option>
+                         <option value="hard">Hard</option>
+                     </select>
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Saved by Sender:</label>
+                     <select id="editSavedBySender">
+                         <option value="false">No</option>
+                         <option value="true">Yes</option>
+                     </select>
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Saved by Receiver:</label>
+                     <select id="editSavedByReceiver">
+                         <option value="false">No</option>
+                         <option value="true">Yes</option>
+                     </select>
+                 </div>
+                 
+                 <div style="display: flex; gap: 15px; justify-content: flex-end;">
+                     <button type="button" class="btn btn-warning" onclick="closeEditModal()">Cancel</button>
+                     <button type="submit" class="btn btn-success">💾 Save Changes</button>
+                 </div>
+             </form>
+        </div>
+    </div>
+
+    <!-- Add Message Modal -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>➕ Add New Message</h2>
+                <span class="close" onclick="closeAddModal()">&times;</span>
+            </div>
+                         <form id="addForm">
+                 <div class="form-group">
+                     <label>Sender ID:</label>
+                     <input type="number" id="addSenderId" required>
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Receiver ID:</label>
+                     <input type="number" id="addReceiverId" required>
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Message Content:</label>
+                     <textarea id="addContent" required></textarea>
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Status:</label>
+                     <select id="addStatus" required>
+                         <option value="sent">Sent</option>
+                         <option value="delivered">Delivered</option>
+                         <option value="read">Read</option>
+                     </select>
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Message Type:</label>
+                     <select id="addMessageType">
+                         <option value="text">Text</option>
+                         <option value="image">Image</option>
+                         <option value="video">Video</option>
+                         <option value="audio">Audio</option>
+                         <option value="file">File</option>
+                     </select>
+                 </div>
+                 
+                 <div class="form-group">
+                     <label>Attachment Count:</label>
+                     <input type="number" id="addAttachmentCount" min="0" value="0">
+                 </div>
+                 
+                 <div style="display: flex; gap: 15px; justify-content: flex-end;">
+                     <button type="button" class="btn btn-warning" onclick="closeAddModal()">Cancel</button>
+                     <button type="submit" class="btn btn-success">➕ Add Message</button>
+                 </div>
+             </form>
+        </div>
+    </div>
+
+    <script>
+        let allMessages = [];
+        let filteredMessages = [];
+        let currentPage = 1;
+        let totalPages = 1;
+
+        // Load messages when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔧 Setting up admin dashboard event listeners...');
+            
+            try {
+                const editForm = document.getElementById('editForm');
+                const addForm = document.getElementById('addForm');
+                
+                if (editForm) {
+                    editForm.addEventListener('submit', handleEditSubmit);
+                    console.log('✅ Edit form event listener added');
+                } else {
+                    console.error('❌ Edit form not found');
+                }
+                
+                if (addForm) {
+                    addForm.addEventListener('submit', handleAddSubmit);
+                    console.log('✅ Add form event listener added');
+                } else {
+                    console.error('❌ Add form not found');
+                }
+                
+                console.log('🎯 Admin dashboard setup complete');
+                console.log('📱 Loading messages...');
+                loadMessages();
+            } catch (error) {
+                console.error('❌ Error setting up admin dashboard:', error);
+            }
+        });
+
+        async function loadMessages(preservePage = false) {
+            try {
+                const messageId = document.getElementById('messageIdFilter').value;
+                const searchTerm = document.getElementById('searchInput').value;
+                const real_nameSearch = document.getElementById('real_nameSearchInput').value;
+                const senderId = document.getElementById('senderFilter').value;
+                const receiverId = document.getElementById('receiverFilter').value;
+                const status = document.getElementById('statusFilter').value;
+                // recallFilter removed - use recall_type field directly if needed
+
+                console.log('🔍 Search parameters:', { messageId, searchTerm, real_nameSearch, senderId, receiverId, status });
+
+                // Show loading
+                document.getElementById('messagesTableBody').innerHTML = 
+                    '<tr><td colspan="21" class="loading">Loading messages...</td></tr>';
+
+                // Build query parameters
+                const params = new URLSearchParams({
+                    page: preservePage ? currentPage : 1,
+                    limit: 50
+                });
+
+                if (messageId) params.append('message_id', messageId);
+                if (searchTerm) params.append('search', searchTerm);
+                if (real_nameSearch) params.append('real_name_search', real_nameSearch);
+                if (senderId) params.append('sender_id', senderId);
+                if (receiverId) params.append('receiver_id', receiverId);
+                if (status) params.append('status', status);
+                // recalled_by_sender filter removed - using recall_type instead
+
+                console.log('📡 API request URL:', `http://localhost:3000/api/admin/messages?${params.toString()}`);
+
+                const response = await fetch(`http://localhost:3000/api/admin/messages?${params.toString()}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    allMessages = data.messages;
+                    filteredMessages = data.messages;
+                    displayMessages();
+                    updateStats();
+                    updatePagination(data.pagination);
+                } else {
+                    throw new Error(data.error || 'Failed to load messages');
+                }
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                document.getElementById('messagesTableBody').innerHTML = 
+                    `<tr><td colspan="21" class="error">Error loading messages: ${error.message}</td></tr>`;
+            }
+        }
+
+        function displayMessages() {
+            const tbody = document.getElementById('messagesTableBody');
+            
+            if (filteredMessages.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="21" class="loading">No messages found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filteredMessages.map(message => `
+                <tr>
+                    <td><strong>${message.id || '-'}</strong></td>
+                    <td>
+                        <div class="user-info">
+                            <div class="user-id-badge">ID: ${message.sender_id || '-'}</div>
+                            <div class="real_name-display">@${message.sender_real_name || 'Unknown'}</div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="user-info">
+                            <div class="user-id-badge">ID: ${message.receiver_id || '-'}</div>
+                            <div class="real_name-display">@${message.receiver_real_name || 'Unknown'}</div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="message-content ${message.message && message.message.length > 30 ? 'expandable' : ''}" 
+                             onclick="toggleContent(this)" 
+                             title="${message.message || ''}">
+                            <div class="message-text">${highlightSearchTerm(message.message || 'No content')}</div>
+                            ${message.message && message.message.length > 30 ? '<div class="expand-hint">Click to expand</div>' : ''}
+                        </div>
+                    </td>
+                    <td>${formatDateTime(message.timestamp) || '-'}</td>
+                    <td>${message.status || '-'}</td>
+                    <td>
+                        <span class="${message.deleted_by_sender ? 'highlight-changed' : ''}">
+                            ${message.deleted_by_sender ? 'true' : 'false'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="${message.deleted_by_receiver ? 'highlight-changed' : ''}">
+                            ${message.deleted_by_receiver ? 'true' : 'false'}
+                        </span>
+                    </td>
+                    <td>${message.deleted_at ? formatDateTime(message.deleted_at) : 'null'}</td>
+                    <td>${message.read_at ? formatDateTime(message.read_at) : 'null'}</td>
+                    <td>
+                        <span class="${message.is_read ? 'highlight-changed' : ''}">
+                            ${message.is_read ? 'true' : 'false'}
+                        </span>
+                    </td>
+                    <td>${message.message_type || 'null'}</td>
+                    <td>${message.attachment_count || 'null'}</td>
+                    <td>${message.reply_to_id || 'null'}</td>
+                    <td>${message.reply_to_text || 'null'}</td>
+                    <td>${message.reply_to_sender || 'null'}</td>
+                    <td>
+                        <!-- recalled_by_sender column removed - use recall_type instead -->
+                    </td>
+                    <td>${message.recalled_at ? formatDateTime(message.recalled_at) : 'null'}</td>
+                    <td>
+                        <span class="${message.recall_type && message.recall_type !== 'none' ? 'highlight-changed' : ''}">
+                            ${message.recall_type || 'none'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="${message.saved_by_sender ? 'highlight-changed' : ''}">
+                            ${message.saved_by_sender ? 'true' : 'false'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="${message.saved_by_receiver ? 'highlight-changed' : ''}">
+                            ${message.saved_by_receiver ? 'true' : 'false'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-primary btn-sm" onclick="editMessage('${message.id}')" title="Edit" data-message-id="${message.id}">✏️</button>
+                            <button class="btn btn-danger btn-sm" onclick="confirmDeleteMessage('${message.id}')" title="Delete" data-message-id="${message.id}">🗑️</button>
+                            <button class="btn btn-warning btn-sm" onclick="toggleRecall('${message.id}')" title="${message.recall_type && message.recall_type !== 'none' ? 'Disable Recall' : 'Enable Recall'}" data-message-id="${message.id}">
+                                ${message.recall_type && message.recall_type !== 'none' ? '🔄' : '⏹️'}
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function highlightSearchTerm(text) {
+            const searchTerm = document.getElementById('searchInput').value;
+            if (!searchTerm) return text;
+            
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            return text.replace(regex, '<span class="search-highlight">$1</span>');
+        }
+
+        function toggleContent(element) {
+            if (element.classList.contains('expandable')) {
+                element.classList.toggle('expanded');
+            }
+        }
+
+        function updateStats() {
+            const total = allMessages.length;
+            const recalled = allMessages.filter(m => m.recall_type && m.recall_type !== 'none').length;
+            const unread = allMessages.filter(m => !m.read_at).length;
+            const saved = allMessages.filter(m => m.saved_by_sender || m.saved_by_receiver).length;
+
+            document.getElementById('totalMessages').textContent = total;
+            document.getElementById('recalledMessages').textContent = recalled;
+            document.getElementById('unreadMessages').textContent = unread;
+            document.getElementById('savedMessages').textContent = saved;
+        }
+
+        function updatePagination(pagination) {
+            const paginationDiv = document.getElementById('pagination');
+            const { current_page, total_pages, has_next, has_prev } = pagination;
+            
+            currentPage = current_page;
+            totalPages = total_pages;
+
+            let paginationHTML = '';
+            
+            if (has_prev) {
+                paginationHTML += `<button onclick="changePage(${currentPage - 1})">← Previous</button>`;
+            }
+            
+            for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                paginationHTML += `<button class="${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+            }
+            
+            if (has_next) {
+                paginationHTML += `<button onclick="changePage(${currentPage + 1})">Next →</button>`;
+            }
+            
+            paginationDiv.innerHTML = paginationHTML;
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            loadMessages();
+        }
+
+        function clearFilters() {
+            document.getElementById('messageIdFilter').value = '';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('real_nameSearchInput').value = '';
+            document.getElementById('senderFilter').value = '';
+            document.getElementById('receiverFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('recallFilter').value = '';
+            loadMessages();
+        }
+
+                 function editMessage(messageId) {
+            console.log('🔍 Editing message with ID:', messageId, 'Type:', typeof messageId);
+            console.log('📝 All messages:', allMessages);
+            
+            // Convert messageId to number for comparison
+            const numericId = parseInt(messageId);
+            const message = allMessages.find(m => m.id === numericId || m.id == messageId);
+            
+            if (!message) {
+                console.error('❌ Message not found with ID:', messageId);
+                return;
+            }
+            
+            console.log('✅ Found message:', message);
+
+            document.getElementById('editMessageId').value = message.id;
+            document.getElementById('editSenderId').value = message.sender_id;
+            document.getElementById('editReceiverId').value = message.receiver_id;
+            document.getElementById('editContent').value = message.message || '';
+            document.getElementById('editStatus').value = message.status;
+            document.getElementById('editDeletedBySender').value = message.deleted_by_sender ? 'true' : 'false';
+            document.getElementById('editDeletedByReceiver').value = message.deleted_by_receiver ? 'true' : 'false';
+            document.getElementById('editDeletedAt').value = message.deleted_at ? 
+                new Date(message.deleted_at).toISOString().slice(0, 16) : '';
+            document.getElementById('editReadAt').value = message.read_at ? 
+                new Date(message.read_at).toISOString().slice(0, 16) : '';
+            document.getElementById('editIsRead').value = message.is_read ? 'true' : 'false';
+            document.getElementById('editMessageType').value = message.message_type || 'text';
+            document.getElementById('editAttachmentCount').value = message.attachment_count || 0;
+            document.getElementById('editReplyToId').value = message.reply_to_id || '';
+            document.getElementById('editReplyToText').value = message.reply_to_text || '';
+            document.getElementById('editReplyToSender').value = message.reply_to_sender || '';
+            // editRecalled field removed - use editRecallType instead
+            document.getElementById('editRecalledAt').value = message.recalled_at ? 
+                new Date(message.recalled_at).toISOString().slice(0, 16) : '';
+            document.getElementById('editRecallType').value = message.recall_type || 'none';
+            document.getElementById('editSavedBySender').value = message.saved_by_sender ? 'true' : 'false';
+            document.getElementById('editSavedByReceiver').value = message.saved_by_receiver ? 'true' : 'false';
+
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        function showAddMessageModal() {
+            document.getElementById('addModal').style.display = 'block';
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').style.display = 'none';
+        }
+
+                 async function handleEditSubmit(e) {
+             e.preventDefault();
+             
+             try {
+                 const messageId = document.getElementById('editMessageId').value;
+                 const formData = {
+                     sender_id: parseInt(document.getElementById('editSenderId').value),
+                     receiver_id: parseInt(document.getElementById('editReceiverId').value),
+                     message: document.getElementById('editContent').value,
+                     status: document.getElementById('editStatus').value,
+                     deleted_by_sender: document.getElementById('editDeletedBySender').value === 'true',
+                     deleted_by_receiver: document.getElementById('editDeletedByReceiver').value === 'true',
+                     deleted_at: document.getElementById('editDeletedAt').value || null,
+                     read_at: document.getElementById('editReadAt').value || null,
+                     is_read: document.getElementById('editIsRead').value === 'true',
+                     message_type: document.getElementById('editMessageType').value,
+                     attachment_count: parseInt(document.getElementById('editAttachmentCount').value) || 0,
+                     reply_to_id: document.getElementById('editReplyToId').value ? parseInt(document.getElementById('editReplyToId').value) : null,
+                     reply_to_text: document.getElementById('editReplyToText').value || null,
+                     reply_to_sender: document.getElementById('editReplyToSender').value ? parseInt(document.getElementById('editReplyToSender').value) : null,
+                     // recalled_by_sender removed - using recall_type only
+                     recalled_at: document.getElementById('editRecalledAt').value || null,
+                     recall_type: document.getElementById('editRecallType').value,
+                     saved_by_sender: document.getElementById('editSavedBySender').value === 'true',
+                     saved_by_receiver: document.getElementById('editSavedByReceiver').value === 'true'
+                 };
+
+                 const response = await fetch(`http://localhost:3000/api/admin/messages/${messageId}`, {
+                     method: 'PUT',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify(formData)
+                 });
+
+                 const data = await response.json();
+                 
+                 if (data.success) {
+                     showSuccess('Message updated successfully!');
+                     closeEditModal();
+                     loadMessages(true);
+                 } else {
+                     throw new Error(data.error || 'Failed to update message');
+                 }
+             } catch (error) {
+                 console.error('Error updating message:', error);
+                 showError(`Error updating message: ${error.message}`);
+             }
+         }
+
+                 async function handleAddSubmit(e) {
+             e.preventDefault();
+             
+             try {
+                 const formData = {
+                     sender_id: document.getElementById('addSenderId').value,
+                     receiver_id: document.getElementById('addReceiverId').value,
+                     message: document.getElementById('addContent').value,
+                     status: document.getElementById('addStatus').value,
+                     message_type: document.getElementById('addMessageType').value,
+                     attachment_count: document.getElementById('addAttachmentCount').value
+                 };
+
+                 const response = await fetch('http://localhost:3000/api/admin/messages', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify(formData)
+                 });
+
+                 const data = await response.json();
+                 
+                 if (data.success) {
+                     showSuccess('Message added successfully!');
+                     closeAddModal();
+                     currentPage = 1;
+                     loadMessages(false);
+                 } else {
+                     throw new Error(data.error || 'Failed to add message');
+                 }
+             } catch (error) {
+                 console.error('Error adding message:', error);
+                 showError(`Error adding message: ${error.message}`);
+             }
+         }
+
+        async function deleteMessage(messageId) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/admin/messages/${messageId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess('Message deleted successfully!');
+                    loadMessages(true);
+                } else {
+                    throw new Error(data.error || 'Failed to delete message');
+                }
+            } catch (error) {
+                console.error('Error deleting message:', error);
+                showError(`Error deleting message: ${error.message}`);
+            }
+        }
+
+        async function toggleRecall(messageId) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/admin/messages/${messageId}/toggle-recall`, {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess('Message recall status toggled!');
+                    loadMessages(true);
+                } else {
+                    throw new Error(data.error || 'Failed to toggle recall');
+                }
+            } catch (error) {
+                console.error('Error toggling recall:', error);
+                showError(`Error toggling recall: ${error.message}`);
+            }
+        }
+
+        function exportToCSV() {
+            if (filteredMessages.length === 0) {
+                showError('No messages to export');
+                return;
+            }
+
+            const headers = ['id', 'sender_id (real_name)', 'receiver_id (real_name)', 'message', 'timestamp', 'status', 'deleted_by_sender', 'deleted_by_receiver', 'deleted_at', 'read_at', 'saved_by_sender', 'is_read', 'message_type', 'attachment_count', 'reply_to_id', 'reply_to_text', 'reply_to_sender', 'recalled_at', 'recall_type', 'saved_by_sender', 'saved_by_receiver'];
+            const csvContent = [
+                headers.join(','),
+                ...filteredMessages.map(msg => [
+                    msg.id,
+                    `${msg.sender_id} - ${msg.sender_real_name || 'Unknown'}`,
+                    `${msg.receiver_id} - ${msg.receiver_real_name || 'Unknown'}`,
+                    `"${(msg.message || '').replace(/"/g, '""')}"`,
+                    msg.timestamp,
+                    msg.status,
+                    msg.deleted_by_sender ? 'Yes' : 'No',
+                    msg.deleted_by_receiver ? 'Yes' : 'No',
+                    msg.deleted_at || '',
+                    msg.read_at || '',
+                    (msg.saved_by_sender || msg.saved_by_receiver) ? 'Yes' : 'No',
+                    msg.is_read ? 'Yes' : 'No',
+                    msg.message_type || 'text',
+                    msg.attachment_count || 0,
+                    msg.reply_to_id || '',
+                    `"${(msg.reply_to_text || '').replace(/"/g, '""')}"`,
+                    msg.reply_to_sender || '',
+                    (msg.recall_type && msg.recall_type !== 'none') ? 'Yes' : 'No',
+                    msg.recalled_at || '',
+                    msg.recall_type || 'none',
+                    msg.saved_by_sender ? 'Yes' : 'No',
+                    msg.saved_by_receiver ? 'Yes' : 'No'
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `messages_export_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function formatDateTime(timestamp) {
+            if (!timestamp) return '';
+            const date = new Date(timestamp);
+            return date.toLocaleString();
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success';
+            successDiv.textContent = message;
+            document.querySelector('.container').insertBefore(successDiv, document.querySelector('.controls'));
+            
+            setTimeout(() => successDiv.remove(), 5000);
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = message;
+            document.querySelector('.container').insertBefore(errorDiv, document.querySelector('.controls'));
+            
+            setTimeout(() => errorDiv.remove(), 5000);
+        }
+
+        function confirmDeleteMessage(messageId) {
+            console.log('🗑️ Deleting message with ID:', messageId, 'Type:', typeof messageId);
+            
+            // Convert messageId to number for comparison
+            const numericId = parseInt(messageId);
+            const message = allMessages.find(m => m.id === numericId || m.id == messageId);
+            
+            if (!message) {
+                console.error('❌ Message not found with ID:', messageId);
+                return;
+            }
+            
+            console.log('✅ Found message to delete:', message);
+
+            const confirmed = confirm(`Are you sure you want to delete message ID ${messageId}?\n\nContent: "${(message.message || '').substring(0, 100)}${message.message && message.message.length > 100 ? '...' : ''}"\n\nThis action cannot be undone.`);
+            
+            if (confirmed) {
+                deleteMessage(messageId);
+            }
+        }
+
+
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        function toggleControlsAndStats() {
+            const controls = document.querySelector('.controls');
+            const stats = document.querySelector('.stats');
+            const toggleButton = document.querySelector('.controls-toggle');
+            const isHidden = controls.classList.contains('hidden');
+
+            if (isHidden) {
+                // Show both sections
+                controls.classList.remove('hidden');
+                stats.classList.remove('hidden');
+                toggleButton.textContent = '🔽 Hide Controls & Stats';
+                toggleButton.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                toggleButton.style.color = 'white';
+            } else {
+                // Hide both sections
+                controls.classList.add('hidden');
+                stats.classList.add('hidden');
+                toggleButton.textContent = '🔼 Show Controls & Stats';
+                toggleButton.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+                toggleButton.style.color = 'white';
+            }
+        }
+    </script>
+</body>
+</html>

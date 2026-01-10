@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{pageTitle}} - Totilove</title>
+    <link rel="stylesheet" href="/assets/css/vendor/font-awesome.min.css">
+    <!-- User authentication data -->
+    <script>
+        // Inject user data from server template variables
+        window.currentUser = {
+            id: parseInt('{{userId}}') || null,
+            real_name: '{{real_name}}' || '',
+            real_name: '{{real_name}}' || '{{realName}}' || '',
+            email: '{{userEmail}}' || '',
+            age: parseInt('{{userAge}}') || null,
+            gender: '{{userGender}}' || '',
+            location: '{{userLocation}}' || '',
+            memberSince: '{{memberSince}}' || '',
+            lastActive: '{{lastActive}}' || ''
+        };
+
+        // Set authentication status
+        window.isAuthenticated = window.currentUser.id && window.currentUser.id !== 'null' && window.currentUser.id !== '';
+
+        // Extract session token from URL or session manager
+        function getSessionToken() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlToken = urlParams.get('token');
+
+        // Token handling removed - using cookies only
+    </script>
+
+    <!-- Online Activity Tracker -->
+    <script src="/assets/online-tracker.js"></script>
+
+    <style>
+        :root {
+            --primary: #e94057;
+            --primary-gradient: linear-gradient(135deg, #e94057 0%, #8a2387 100%);
+            --secondary: #8a2387;
+            --accent: #f27121;
+            --white: #ffffff;
+            --light-bg: #f8f9fa;
+            --muted: #8e8e93;
+            --dark: #1d1d1f;
+            --light-gray: #e5e5ea;
+            --success: #4cd964;
+            --warning: #ffcc00;
+            --danger: #ff3b30;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.12);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--light-bg);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        .profile-container {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        .profile-header {
+            background: var(--primary-gradient);
+            color: var(--white);
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 2.5rem;
+            font-weight: bold;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+            .profile-avatar img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                border-radius: 50%;
+            }
+
+        .online-dot {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 20px;
+            height: 20px;
+            background: var(--success);
+            border: 2px solid var(--white);
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        .profile-main {
+            flex: 1;
+        }
+
+        .profile-real_name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .profile-meta {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            opacity: 0.9;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 12px;
+        }
+
+        .profile-likes, .profile-views {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+
+        .profile-status {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.85);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tab-navigation {
+            background: var(--white);
+            padding: 0 24px;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 4px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding: 8px 0;
+        }
+
+            .tab-buttons::-webkit-scrollbar {
+                display: none;
+            }
+
+        .tab-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            color: var(--muted);
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+            .tab-btn:hover {
+                background: rgba(233, 64, 87, 0.1);
+                color: var(--primary);
+            }
+
+            .tab-btn.active {
+                background: var(--primary);
+                color: var(--white);
+            }
+
+        .talk-notification-badge {
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            min-width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .tab-content {
+            padding: 24px;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+            .tab-panel.active {
+                display: block;
+                animation: fadeIn 0.3s ease;
+            }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .logout-btn {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--danger);
+        }
+
+            .logout-btn:hover {
+                background: var(--danger);
+                color: var(--white);
+            }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+                padding: 24px 20px;
+            }
+
+            .profile-avatar {
+                width: 100px;
+                height: 100px;
+            }
+
+            .profile-real_name {
+                font-size: 1.5rem;
+            }
+
+            .tab-buttons {
+                gap: 2px;
+            }
+
+            .tab-btn {
+                padding: 10px 14px;
+                font-size: 0.9rem;
+            }
+
+            .tab-content {
+                padding: 20px 16px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .app-container {
+                padding: 0 12px;
+            }
+
+            .tab-btn {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+            }
+
+                .tab-btn i {
+                    margin-right: 0;
+                }
+
+                .tab-btn span:not(.talk-notification-badge) {
+                    display: none;
+                }
+        }
+
+        /* Notification Styles */
+        .layout-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--white);
+            color: var(--dark);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            z-index: 10000;
+            max-width: 350px;
+            animation: slideInRight 0.3s ease-out;
+            border-left: 4px solid var(--primary);
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            gap: 12px;
+        }
+
+        .notification-icon {
+            font-size: 1.25rem;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .notification-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notification-title {
+            display: block;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+            color: var(--dark);
+        }
+
+        .notification-message {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .notification-close {
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            padding: 4px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .notification-close:hover {
+                background: var(--light-gray);
+                color: var(--dark);
+            }
+
+        /* Loading and Error States */
+        #loading, #error {
+            padding: 24px;
+            text-align: center;
+        }
+
+        #loading {
+            color: var(--muted);
+        }
+
+        .error-message {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--danger);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            margin: 16px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="profile-container" id="profile-container">
+            <div id="loading" style="display: none;">Loading...</div>
+            <div id="error" class="error-message" style="display:none;"></div>
+
+            <!-- Profile Header (always visible) -->
+            <div class="profile-header">
+                <div class="profile-avatar" id="avatar">
+                    {{if:userAvatar}}
+                    <img src="{{userAvatar}}" alt="Profile Photo">
+                    {{else}}
+                    <i class="fas fa-user"></i>
+                    {{/if}}
+                    <div class="online-dot"></div>
+                </div>
+                <div class="profile-main">
+                    <div class="profile-real_name" id="real_name">{{real_name}}</div>
+                    <div class="profile-meta" id="meta">{{userAge}} • {{userLocation}}</div>
+                    <div class="profile-stats">
+                        <span class="profile-likes"><i class="fas fa-heart"></i> <span id="like-count">0</span></span>
+                        <span class="profile-views"><i class="fas fa-eye"></i> <span id="view-count">0</span></span>
+                    </div>
+                    <div class="profile-status" id="status"><i class="fas fa-circle"></i> {{lastActive}}</div>
+                </div>
+            </div>
+
+            <!-- Main Tab Navigation (always visible) -->
+            <div class="tab-navigation">
+                <div class="tab-buttons">
+                    <a href="/profile-basic" class="tab-btn {{profileActive}}">
+                        <i class="fas fa-user"></i>
+                        <span>Profile</span>
+                    </a>
+                    <a href="/matches" class="tab-btn {{matchesActive}}">
+                        <i class="fas fa-heart"></i>
+                        <span>Matches</span>
+                    </a>
+                    <a href="/search" class="tab-btn {{searchActive}}">
+                        <i class="fas fa-search"></i>
+                        <span>Search</span>
+                    </a>
+                    <a href="/talk" class="tab-btn {{talkActive}}">
+                        <i class="fas fa-comments"></i>
+                        <span>Talk</span>
+                        <span class="talk-notification-badge" id="talk-notification-badge" style="display: none;">0</span>
+                    </a>
+                    <a href="/activity" class="tab-btn {{activityActive}}">
+                        <i class="fas fa-bell"></i>
+                        <span>Activity</span>
+                    </a>
+                    <a href="/billing" class="tab-btn {{billingActive}}">
+                        <i class="fas fa-crown"></i>
+                        <span>Premium</span>
+                    </a>
+                    <a href="/settings" class="tab-btn {{settingsActive}}">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                    <a href="#" class="tab-btn logout-btn" onclick="if(window.handleLogout){window.handleLogout(event);}return false;">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+                {{content}}
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js?v=1.0.1"></script>
+            <script src="/assets/js/session-manager.js"></script>
+    <script src="/assets/js/instant-status-manager.js?v=4"></script>
+    <script>
+        // Enhanced Template System Integration
+        document.addEventListener('DOMContentLoaded', function () {
+            // Simple initialization - try to get user data from the page
+            const userData = window.currentUser || {};
+
+            // Check if we have user data in the template variables
+            if (userData && userData.id) {
+                window.currentUser = userData;
+                // Initialize immediately
+                initializeLayoutNotifications();
+                initializeInstantStatusManager();
+            } else {
+                // Use global navbar auth check
+                if (window.globalNavbar) {
+                    window.globalNavbar.checkAuthStatus().then(() => {
+                        if (window.currentUser) {
+                            initializeLayoutNotifications();
+                            initializeInstantStatusManager();
+                        }
+                    }).catch(() => {});
+                }
+            }
+
+            // Update message badge on page load
+            if (window.currentUser && window.currentUser.id) {
+                updateMessageBadge();
+                updateTalkNotificationBadge();
+            }
+
+            // Logout handled by window.handleLogout via onclick handlers
+        });
+
+        // Initialize Instant Status Manager
+        function initializeInstantStatusManager() {
+            // Wait for instant status manager to be ready
+            const checkStatusManager = setInterval(() => {
+                if (window.instantStatusManager && window.instantStatusManager.isInitialized) {
+                    clearInterval(checkStatusManager);
+
+                    // Register all status elements on the page
+                    const statusElements = document.querySelectorAll('.online-dot[data-user-id]');
+                    statusElements.forEach(element => {
+                        const userId = element.dataset.userId;
+                        if (userId) {
+                            window.instantStatusManager.registerStatusElement(element, userId);
+                        }
+                    });
+
+                    // Set up mutation observer for dynamically added elements
+                    const observer = new MutationObserver((mutations) => {
+                        mutations.forEach((mutation) => {
+                            mutation.addedNodes.forEach((node) => {
+                                if (node.nodeType === 1) {
+                                    const newStatusElements = node.querySelectorAll('.online-dot[data-user-id]');
+                                    newStatusElements.forEach(element => {
+                                        const userId = element.dataset.userId;
+                                        if (userId) {
+                                            window.instantStatusManager.registerStatusElement(element, userId);
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                    });
+
+                    observer.observe(document.body, {
+                        childList: true,
+                        subtree: true
+                    });
+                }
+            }, 100);
+        }
+
+        // WebSocket notification system for layout
+        let layoutSocket = null;
+
+        function initializeLayoutNotifications() {
+            if (!window.currentUser || !window.currentUser.id) {
+                return;
+            }
+
+            if (layoutSocket && layoutSocket.connected) {
+                return;
+            }
+
+            try {
+                // Use WebSocket-only transport to avoid CSP unsafe-eval violations
+                layoutSocket = io({
+                    transports: ['websocket']
+                });
+
+                layoutSocket.on('connect', () => {
+                    // Authenticate the socket connection
+                    const authData = {
+                        userId: window.currentUser.id,
+                        real_name: window.currentUser.real_name || window.currentUser.real_name || window.currentUser.email,
+                        real_name: window.currentUser.real_name || window.currentUser.real_name || window.currentUser.email
+                    };
+                    layoutSocket.emit('authenticate', authData);
+                });
+
+                layoutSocket.on('authenticated', (data) => {
+                    // Update badge after authentication
+                    updateMessageBadge();
+                    updateTalkNotificationBadge();
+                });
+
+                // Listen for new messages
+                layoutSocket.on('new_message', async (messageData) => {
+                    // Check if this message is for the current user
+                    if (messageData.receiverId == window.currentUser.id) {
+                        // Prevent duplicate notifications by checking source and message ID
+                        const messageKey = `${messageData.id}_${messageData.source || 'unknown'}`;
+                        if (window.processedMessages && window.processedMessages.has(messageKey)) {
+                            return;
+                        }
+
+                        // Mark this message as processed
+                        if (!window.processedMessages) window.processedMessages = new Set();
+                        window.processedMessages.add(messageKey);
+
+                        // Clean up old processed messages (keep only last 10)
+                        if (window.processedMessages.size > 10) {
+                            const firstKey = window.processedMessages.values().next().value;
+                            window.processedMessages.delete(firstKey);
+                        }
+
+                        // Update message badge
+                        updateMessageBadge();
+
+                        // Update talk notification badge with new message count
+                        updateTalkNotificationBadge();
+
+                        // Show layout notification
+                        showLayoutNotification(messageData);
+                    }
+                });
+
+            } catch (error) {
+                // Silent error handling
+            }
+        }
+
+        // Update message notification badge
+        window.updateMessageBadge = async function () {
+            try {
+                // Get unread message count
+                const response = await fetch(`/api/messages/count?user_id=${window.currentUser.id}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const totalCount = data.total_count || 0;
+
+                    // Update layout badge (messages-badge)
+                    const layoutBadge = document.getElementById('messages-badge');
+                    if (layoutBadge) {
+                        if (totalCount > 0) {
+                            layoutBadge.textContent = totalCount;
+                            layoutBadge.style.display = 'inline-block';
+                        } else {
+                            layoutBadge.style.display = 'none';
+                        }
+                    }
+                }
+            } catch (error) {
+                // Silent error handling
+            }
+        }
+
+        // Update talk notification badge with new message count
+        window.updateTalkNotificationBadge = async function () {
+            try {
+                // Get unread message count for new messages
+                const response = await fetch(`/api/messages/count?user_id=${window.currentUser.id}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const unreadCount = data.unread_count || 0;
+
+                    // Update talk notification badge - show unread count
+                    const talkBadge = document.getElementById('talk-notification-badge');
+                    if (talkBadge) {
+                        if (unreadCount > 0) {
+                            talkBadge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+                            talkBadge.style.display = 'flex';
+                        } else {
+                            talkBadge.style.display = 'none';
+                        }
+                    }
+                }
+            } catch (error) {
+                // Silent error handling
+            }
+        }
+
+        // Show notification in layout
+        function showLayoutNotification(messageData) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'layout-notification';
+            notification.innerHTML = `
+                    <div class="notification-content">
+                        <i class="fas fa-envelope notification-icon"></i>
+                        <div class="notification-text">
+                            <span class="notification-title">New Message!</span>
+                            <span class="notification-message">From ${messageData.senderUsername || 'Someone'}</span>
+                        </div>
+                        <button class="notification-close" onclick="this.parentElement.parentElement.remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+
+            // Add to page
+            document.body.appendChild(notification);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Logout handled by window.handleLogout directly via onclick handlers
+    </script>
+</body>
+</html>

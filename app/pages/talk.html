@@ -1,0 +1,2332 @@
+<!DOCTYPE html>
+<!-- Cache buster: 2025-01-05-00:23:00 - Search panel shows only buttons initially, dropdowns appear on click -->
+<!-- 
+    IMPORTANT MESSAGE FOR CURSOR AI:
+    DONT USE AND DONT CREATE localStorage FOR THIS APP
+    Do not use localStorage for storing any data in this application.
+    All data should be stored in the database and retrieved via API calls.
+-->
+<!-- Include User Profile Modal -->
+{{include:modals/user-profile-modal}}
+
+<!-- Include Universal Block Confirmation Modal (for user profile modal) -->
+{{include:modals/block-confirm-modal}}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Totilove - Messages (Improved)</title>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="/assets/css/vendor/font-awesome.min.css">
+
+    <!-- Online Activity Tracker -->
+    <script src="/assets/online-tracker.js"></script>
+    
+    <!-- CSRF Token Management (auto-injects tokens into all requests) -->
+    <script src="/assets/js/csrf-token.js"></script>
+
+    <!-- User authentication data -->
+    <script>
+        // Extract session token from URL (for navigation links)
+        function getSessionToken() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('token') || '';
+        }
+        
+        // Expose globally for CSRF token management and navigation links
+        window.getSessionToken = getSessionToken;
+
+        // Extract user ID from session token
+        function getUserIdFromToken() {
+            const token = getSessionToken();
+            return token ? parseInt(token) : null;
+        }
+
+        // Inject user data from server template variables or fallback to token
+        window.currentUser = {
+            id: parseInt('{{userId}}') || getUserIdFromToken() || null,
+            username: '{{realName}}' || 'User',
+            email: '{{userEmail}}' || '',
+            age: parseInt('{{userAge}}') || null,
+            gender: '{{userGender}}' || '',
+            location: '{{userLocation}}' || '',
+            memberSince: '{{memberSince}}' || '',
+            lastActive: '{{lastActive}}' || '',
+            avatar: '{{userAvatar}}' || ''
+        };
+
+        // Set authentication status
+        window.isAuthenticated = window.currentUser.id && window.currentUser.id !== 'null' && window.currentUser.id !== '';
+
+        // Store session token globally
+        window.sessionToken = getSessionToken();
+
+        // API Base URL - Use main application server for message operations
+        window.API_BASE_URL = window.location.origin;
+
+
+    </script>
+    <!-- External CSS Files (extracted from inline styles) -->
+    <link rel="stylesheet" href="/assets/css/talk.css">
+    <link rel="stylesheet" href="/assets/css/talk_components.css">
+    <link rel="stylesheet" href="/assets/css/talk_modals.css">
+    <link rel="stylesheet" href="/assets/css/talk_pagination.css">
+    <!-- Profile Modal and Report Modal styles are inline in their HTML components -->
+    <!-- NOTE: Inline <style> block removed - styles moved to talk_components.css and talk_modals.css -->
+    
+    <!-- Styles for deleted user messages -->
+    <style>
+        .message-deleted-user {
+            filter: blur(3px);
+            opacity: 0.6;
+            cursor: pointer;
+            transition: filter 0.3s, opacity 0.3s;
+            position: relative;
+        }
+
+        .message-deleted-user:hover {
+            filter: blur(1px);
+            opacity: 0.8;
+        }
+
+        .message-deleted-user::after {
+            content: '👤 Account Deactivated';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+        }
+
+        .message-deleted-user:hover::after {
+            opacity: 1;
+        }
+
+        /* Conversation list item for deleted users */
+        .conversation-item-deleted {
+            opacity: 0.7;
+            border-left: 3px solid #ff9800;
+        }
+
+        .conversation-item-deleted .conversation-preview {
+            filter: blur(2px);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Image attachment styles */
+        .message-attachments {
+            margin-top: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .attachment-image-container {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f5f5f5;
+        }
+
+        .attachment-image {
+            display: block;
+            transition: opacity 0.2s ease;
+        }
+
+        .attachment-image:hover {
+            opacity: 0.9;
+        }
+
+        .message-text {
+            margin-bottom: 4px;
+        }
+
+        /* Remove blue bubble background for image-only messages (no text) */
+        .message.sent .message-bubble.image-only-bubble {
+            background: transparent;
+            padding: 0;
+            box-shadow: none;
+            border-radius: 0;
+        }
+
+        .message.sent .message-bubble.image-only-bubble .message-attachments {
+            padding: 0;
+            margin-top: 0;
+            background: transparent;
+            border-radius: 0;
+        }
+
+        /* Upload progress indicator */
+        .upload-progress {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+        }
+
+        /* Hide message button in user profile modal on talk page */
+        #userProfileModal .modal-message-btn {
+            display: none;
+        }
+
+        /* Make action buttons display in one row with just icons on mobile in talk.html */
+        @media (max-width: 768px) {
+            #userProfileModal .actions {
+                flex-direction: row;
+                flex-wrap: nowrap;
+                gap: 0.5rem;
+                justify-content: space-between;
+            }
+            
+            #userProfileModal .btn {
+                width: auto;
+                flex: 1 1 auto;
+                min-width: 0;
+                padding: 0.6rem;
+                font-size: 1rem;
+                justify-content: center;
+            }
+            
+            /* Hide all text spans, show only icons */
+            #userProfileModal .btn span {
+                display: none;
+            }
+            
+            /* Ensure icons are visible */
+            #userProfileModal .btn i {
+                display: inline-block;
+                margin: 0;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #userProfileModal .actions {
+                flex-direction: row;
+                flex-wrap: nowrap;
+                gap: 0.4rem;
+                justify-content: space-between;
+            }
+            
+            #userProfileModal .btn {
+                width: auto;
+                flex: 1 1 auto;
+                min-width: 0;
+                padding: 0.5rem;
+                font-size: 0.9rem;
+                justify-content: center;
+            }
+            
+            /* Hide all text spans, show only icons */
+            #userProfileModal .btn span {
+                display: none;
+            }
+            
+            /* Ensure icons are visible */
+            #userProfileModal .btn i {
+                display: inline-block;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Search Panel -->
+        <div class="search-panel" id="searchPanel">
+        <div class="search-panel-header">
+            <div class="search-panel-title">Search in chat</div>
+            <button class="search-panel-close" id="closeSearchPanelBtn">✕</button>
+        </div>
+        <div class="search-panel-content">
+            <input type="text" class="search-panel-input" placeholder="Type to search" id="searchPanelInput">
+            <div class="search-filters">
+                <div class="search-filter-label">Filter:</div>
+
+                <div class="filter-dropdowns-row">
+                    <div class="filter-dropdown">
+                        <button class="filter-dropdown-btn" id="senderFilterBtn">
+                            <span id="senderFilterDisplay">👤 Sender</span>
+                            <span>∨</span>
+                        </button>
+                        <div class="filter-dropdown-content" id="senderFilterContent">
+                            <div class="filter-dropdown-list" id="senderFilterList">
+                                <!-- "You" remains; current chat partner is injected dynamically from JS -->
+                                <div class="filter-dropdown-item" data-value="me">
+                                    <div class="filter-dropdown-avatar">Y</div>
+                                    <span>You</span>
+                                </div>
+                                <!-- Conversation-specific sender will be appended here from JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-dropdown">
+                        <button class="filter-dropdown-btn" id="timeFilterBtn">
+                            <span>📅 Time</span>
+                            <span>∨</span>
+                        </button>
+                        <div class="filter-dropdown-content" id="timeFilterContent">
+                            <div class="filter-dropdown-list">
+                                <!-- Date suggestion section -->
+                                <div class="filter-dropdown-section">
+                                    <div class="filter-dropdown-item date-suggestion-trigger" data-value="date-suggestion">
+                                        <span>📅 Quick Select</span>
+                                        <span class="arrow-right">→</span>
+                                    </div>
+                                </div>
+
+                                <div class="filter-dropdown-separator"></div>
+
+                                <!-- Custom range section -->
+                                <div class="filter-dropdown-section">
+                                    <div class="filter-dropdown-section-title">Custom range</div>
+                                    <div class="date-input-group">
+                                        <div class="date-input-container">
+                                            <label for="startDate">Start date</label>
+                                            <input type="date" class="date-input" id="startDate" max="" min="2020-01-01">
+                                            <span class="date-icon">📅</span>
+                                        </div>
+                                        <div class="date-input-container">
+                                            <label for="endDate">End date</label>
+                                            <input type="date" class="date-input" id="endDate" max="" min="2020-01-01">
+                                            <span class="date-icon">📅</span>
+                                        </div>
+                                    </div>
+                                    <button type="button" id="clearDateRangeBtn" class="clear-date-range-btn" aria-label="Clear date range filter">
+                                        Clear date range
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Search results list (messages) -->
+                <div class="search-results">
+                    <div class="search-messages-input-container">
+                        <input type="text" class="search-messages-input" id="searchMessagesInput" placeholder="Search messages..." aria-label="Search within displayed messages">
+                    </div>
+                    <div class="search-results-header" id="searchResultsHeader">
+                        <span id="searchResultsTitle">Messages</span>
+                    </div>
+                    <div class="search-results-stats" id="searchResultsStats" role="status" aria-live="polite">
+                        <span id="searchResultsStatsText"></span>
+                        <button type="button" id="clearMessagesBtn" class="clear-messages-btn" style="display: none;" aria-label="Clear messages">Clear</button>
+                    </div>
+                    <div class="search-results-list" id="searchResultsList" role="list" aria-label="Search results">
+                        <div class="search-results-empty" id="searchResultsEmpty">
+                            Select a conversation and start typing to search messages.
+                        </div>
+                    </div>
+                    <div class="view-more-container" id="viewMoreContainer" style="display: none;">
+                        <button type="button" id="viewMoreBtn" class="view-more-btn" aria-label="View more messages">View more</button>
+                    </div>
+                </div>
+
+                <!-- Side dropdown for date suggestions -->
+                <div class="date-suggestion-dropdown" id="dateSuggestionDropdown">
+                    <div class="date-suggestion-header">
+                        <span>📅 Quick Select</span>
+                    </div>
+                    <div class="date-suggestion-item" data-value="last7days">
+                        <span class="date-suggestion-icon">📆</span>
+                        <span>Last 7 days</span>
+                    </div>
+                    <div class="date-suggestion-item" data-value="last30days">
+                        <span class="date-suggestion-icon">📅</span>
+                        <span>Last 30 days</span>
+                    </div>
+                    <div class="date-suggestion-item" data-value="last3months">
+                        <span class="date-suggestion-icon">🗓️</span>
+                        <span>Last 3 months</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="search-instruction">
+            <div class="search-instruction-icon">🔍</div>
+            <div class="search-instruction-text">Enter keywords to start searching</div>
+        </div>
+    </div>
+        <!-- Top Application Bar -->
+        <div class="header">
+            <div class="user-avatar">
+                <img src="{{userAvatar}}" alt="User Avatar" class="avatar-img" id="userAvatarImg">
+            </div>
+            <div class="user-info">
+                <span class="username">{{real_name}}</span>
+            </div>
+
+            <div class="header-actions">
+                <!-- Navigation back to previous page -->
+                <a href="#" id="backToPreviousBtn" class="header-btn" title="Back to Previous Page">⬅️</a>
+                <a href="/profile-basic?token={{sessionToken}}" class="header-btn" title="Profile">👤</a>
+                <div class="top-separator"></div>
+                <button class="header-btn" title="Contacts">👥</button>
+                <button class="header-btn" title="Settings">⚙️</button>
+                <div class="top-separator"></div>
+                <button class="header-btn" title="Search" id="searchPanelBtn">🔍</button>
+                <button class="header-btn chat-back-btn-mobile" id="chatBackBtn" title="Back to conversations" style="display: none;">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+
+                <!-- Connection Status Indicator -->
+                <div class="connection-status connecting" id="connectionStatus" style="display: none;">
+                    🔌 Connecting...
+                </div>
+            </div>
+        </div>
+        <!-- Main Content Area (Sidebar + Chat) -->
+        <div class="main-content" style="display: flex; flex: 1; overflow: hidden;">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <div class="search-container">
+                        <input type="text" class="search-input" placeholder="Search conversations..." id="searchInput">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                    <div class="filters">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="unread">Unread</button>
+                        <button class="filter-btn" data-filter="saved">Saved</button>
+                    </div>
+                </div>
+
+                <div class="conversations" id="conversationsList">
+                    <!-- Conversations will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Main Chat Area -->
+            <div class="chat-area">
+            <div class="chat-header" id="chatHeader" style="display: none;">
+                <button class="chat-back-btn-mobile" id="chatBackBtn2" title="Back to conversations">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="chat-avatar" id="chatAvatar">H</div>
+                <div class="chat-info">
+                    <div class="chat-name" id="chatName">Honey</div>
+                    <div class="chat-location" id="chatLocation" style="display: none; font-size: 0.85rem; color: #3498db; align-items: center; gap: 0.3rem; margin-top: 0.2rem;">
+                        <i class="fas fa-map-marker-alt" style="font-size: 0.8rem;"></i> <span id="chatLocationText"></span>
+                    </div>
+                    <div class="chat-status" id="chatStatus" style="display: none;"></div>
+                </div>
+                <div class="chat-actions">
+                    <button class="chat-action-btn" title="Voice Call">📞</button>
+                    <button class="chat-action-btn" title="Video Call">📹</button>
+                    <button class="chat-action-btn" title="More" id="chatMoreBtn">⋮</button>
+                </div>
+                <!-- Chat More Menu (for block and remove options) -->
+                <div id="chatMoreMenu" class="chat-more-menu" style="display: none; position: fixed; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10000; min-width: 200px; padding: 8px 0;">
+                    <button class="chat-menu-item" id="blockUserButton" style="display: none; width: 100%; padding: 12px 16px; border: none; background: transparent; text-align: left; cursor: pointer; font-size: 14px; color: #333; transition: background 0.2s;">
+                        <i class="fas fa-ban" style="margin-right: 8px; color: #dc3545;"></i> Block User
+                    </button>
+                    <button class="chat-menu-item" id="removeUserButton" style="display: none; width: 100%; padding: 12px 16px; border: none; background: transparent; text-align: left; cursor: pointer; font-size: 14px; color: #333; transition: background 0.2s; border-top: 1px solid #e0e0e0;">
+                        <i class="fas fa-user-minus" style="margin-right: 8px; color: #e74c3c;"></i> Remove from conversation
+                    </button>
+                </div>
+            </div>
+
+            <!-- Block Confirmation Modal -->
+            <div id="blockConfirmModal" class="remove-user-modal" style="display: none; position: fixed; z-index: 10001; pointer-events: none;">
+                <div class="remove-user-content" style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 16px; min-width: 280px; max-width: 320px; pointer-events: auto;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                        <div style="width: 32px; height: 32px; border-radius: 50%; background: #fee; display: flex; align-items: center; justify-content: center; color: #dc3545;">
+                            <i class="fas fa-ban" style="font-size: 14px;"></i>
+                        </div>
+                        <h3 style="margin: 0; font-size: 14px; font-weight: 600; color: #333;">Block User?</h3>
+                    </div>
+                    <p style="margin: 0 0 16px 0; font-size: 13px; color: #666; line-height: 1.4;">Block <strong id="blockUsername">this user</strong> from your conversation list?</p>
+                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                        <button id="inlineBlockCancelBtn" style="padding: 6px 12px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 13px; color: #666; transition: all 0.2s;">
+                            Cancel
+                        </button>
+                        <button id="inlineBlockYesBtn" style="padding: 6px 12px; border: none; background: #dc3545; border-radius: 4px; cursor: pointer; font-size: 13px; color: white; transition: all 0.2s;">
+                            Block
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Remove User Confirmation Modal -->
+            <div id="removeUserConfirmModal" class="remove-user-modal" style="display: none; position: fixed; z-index: 10001; pointer-events: none;">
+                <div class="remove-user-content" style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 16px; min-width: 280px; max-width: 320px; pointer-events: auto;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                        <div style="width: 32px; height: 32px; border-radius: 50%; background: #fee; display: flex; align-items: center; justify-content: center; color: #dc3545;">
+                            <i class="fas fa-trash" style="font-size: 14px;"></i>
+                        </div>
+                        <h3 style="margin: 0; font-size: 14px; font-weight: 600; color: #333;">Remove from Conversation?</h3>
+                    </div>
+                    <p style="margin: 0 0 16px 0; font-size: 13px; color: #666; line-height: 1.4;">Remove <strong id="removeUsername">this user</strong> from your conversation list?</p>
+                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                        <button id="inlineRemoveCancelBtn" style="padding: 6px 12px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 13px; color: #666; transition: all 0.2s;">
+                            Cancel
+                        </button>
+                        <button id="inlineRemoveYesBtn" style="padding: 6px 12px; border: none; background: #dc3545; border-radius: 4px; cursor: pointer; font-size: 13px; color: white; transition: all 0.2s;">
+                            Remove
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Pagination Controls -->
+            <div class="message-pagination" id="messagePagination" style="display: none; padding: 10px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div class="pagination-info" style="font-size: 0.9rem; color: #666;"></div>
+                <div class="pagination-numbers" style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;"></div>
+            </div>
+
+            <div class="messages-area" id="messagesArea">
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-state-icon">💬</div>
+                    <div class="empty-state-title">Select a conversation</div>
+                    <div class="empty-state-text">Choose a conversation from the list to start messaging</div>
+                </div>
+            </div>
+
+            <div class="message-input-area" id="messageInputArea" style="display: none;">
+                <!-- Image Preview Area -->
+                <div class="image-preview-area" id="imagePreviewArea" style="display: none;">
+                    <div class="image-preview-header">
+                        <span class="image-preview-title">📷 Images to send:</span>
+                        <button class="image-preview-clear" id="clearImagePreviewsBtn">✕</button>
+                    </div>
+                    <div class="image-preview-list" id="imagePreviewList"></div>
+                    <div class="image-preview-actions">
+                        <button class="image-preview-send" id="sendImagesWithPreviewsBtn">Send Images</button>
+                    </div>
+                </div>
+
+                <!-- Typing Status Area Above Input -->
+                <div class="typing-status-area" id="typingStatusArea" style="display: none;">
+                    <span class="typing-status" id="typingStatus">Someone is typing...</span>
+                </div>
+
+                <div class="character-counter" id="characterCounter">0 / 2000</div>
+
+                <div class="input-container" id="inputContainer">
+                    <div class="input-actions-wrapper">
+                        <textarea class="message-input" placeholder="Type a message..." id="messageInput" rows="1" maxlength="2000"></textarea>
+                        <div class="input-actions">
+                            <button class="input-action-btn" title="Attach Image" id="selectImageBtn">📎</button>
+                            <button class="input-action-btn" title="Emoji" id="showEmojiPickerBtn">😊</button>
+                            <button class="input-action-btn send-btn" title="Send Message" id="sendMessageBtn">➤</button>
+                            <input type="file" id="imageInput" accept="image/*" multiple style="display: none;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Utility Modules (Phase 3: Extracted) -->
+    <script src="/assets/js/talk/talk_config.js"></script>
+    <script src="/assets/js/talk/talk_utils.js"></script>
+    <script src="/assets/js/talk/talk_state.js"></script>
+
+    <!-- Search Modules (Phase 4: Extracted) -->
+    <script src="/assets/js/talk/search/talk_search-results.js"></script>
+    <script src="/assets/js/talk/search/talk_search-panel.js"></script>
+    <script src="/assets/js/talk/search/talk_search-filters.js"></script>
+
+    <!-- Conversation Modules (Phase 5: Extracted) -->
+    <script src="/assets/js/talk/conversations/talk_conversation-loader.js"></script>
+    <script src="/assets/js/talk/conversations/talk_conversation-renderer.js"></script>
+    <script src="/assets/js/talk/conversations/talk_conversation-selector.js"></script>
+    
+    <!-- Message Modules (Phase 6: Extracted) -->
+    <script src="/assets/js/talk/messages/talk_message-loader.js"></script>
+    <script src="/assets/js/talk/messages/talk_message-factory.js"></script>
+    <script src="/assets/js/talk/messages/talk_message-renderer.js"></script>
+    <script src="/assets/js/talk/messages/talk_message-pagination.js"></script>
+    <script src="/assets/js/talk/messages/talk_message-actions.js"></script>
+    <script src="/assets/js/talk/messages/talk_message-validator.js"></script>
+    <script src="/assets/js/talk/messages/talk_message-sender.js"></script>
+    <script src="/assets/js/talk/messages/talk_message-save.js"></script>
+    <script src="/assets/js/talk/messages/talk_message-recall.js"></script>
+    
+    <!-- Image Modules (Phase 7: Extracted) -->
+    <script src="/assets/js/talk/images/talk_image-compressor.js"></script>
+    <script src="/assets/js/talk/images/talk_image-handler.js"></script>
+    <script src="/assets/js/talk/images/talk_image-preview.js"></script>
+    
+    <!-- WebSocket Modules (Phase 8: Extracted) -->
+    <script src="/assets/js/talk/websocket/talk_socket-manager.js"></script>
+    <script src="/assets/js/talk/websocket/talk_realtime-messaging.js"></script>
+    <script src="/assets/js/talk/websocket/talk_typing-indicator.js"></script>
+
+    <!-- Block Manager & App Initialization Modules (Phase 9: Extracted) -->
+    <script src="/assets/js/talk/talk_block-manager.js"></script>
+    <script src="/assets/js/talk/conversations/talk_conversation-remover.js"></script>
+    <script src="/assets/js/talk/talk_app-init.js"></script>
+
+    <script>
+        // ===== REMAINING JAVASCRIPT (to be extracted in later phases) =====
+        // Note: CONFIG, Utils, and state variables are now loaded from external modules above
+        // NOTE: Utils object removed - now loaded from talk_utils.js
+        // NOTE: State variables removed - now managed by talk_state.js (TalkState object)
+        // NOTE: Search functions removed - now loaded from talk_search-*.js modules
+
+        // REMOVED: initApp, setupSmartRefresh functions - now in talk_app-init.js
+        // - initApp → talk_app-init.js
+        // - setupSmartRefresh → talk_app-init.js
+        // - setupEventListeners → talk_app-init.js
+
+        /**
+         * Show toast notification (same UI as reference talk.html)
+         * Used for bad words validation, image upload success, and other messages
+         * @param {string} message - Notification message
+         * @param {string} type - Notification type ('success', 'error', 'info', 'warning')
+         * @example
+         * showNotification('Image uploaded successfully', 'success');
+         * showNotification('Your message contains inappropriate language', 'error');
+         */
+        function showNotification(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.style.cssText = `
+                position: fixed;
+                /* Nudge a bit higher so it sits clearly above the top bar */
+                top: 8px;
+                right: 20px;
+                background: ${type === 'success' ? '#00b894' : type === 'error' ? '#e74c3c' : type === 'warning' ? '#ffc107' : '#667eea'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                max-width: 300px;
+                animation: slideInRight 0.3s ease-out;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            `;
+            
+            // Determine icon based on type
+            const icon = type === 'success' ? 'check-circle' : 
+                        type === 'error' ? 'exclamation-circle' : 
+                        type === 'warning' ? 'exclamation-triangle' :
+                        'info-circle';
+            
+            toast.innerHTML = `
+                <i class="fas fa-${icon}"></i>
+                <span>${message}</span>
+            `;
+
+            document.body.appendChild(toast);
+
+            // Auto remove after 5 seconds (same as reference talk.html)
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    // Only remove the toast element, not its parent
+                    toast.remove();
+                }
+            }, 5000);
+        }
+
+        // Make showNotification globally available
+        window.showNotification = showNotification;
+
+        // Clean up old cache entries
+        function cleanupCache() {
+            const now = Date.now();
+            let cleaned = 0;
+
+            for (const [key, value] of messageCache.entries()) {
+                if (now - value.timestamp > CACHE_DURATION * 2) {
+                    messageCache.delete(key);
+                    cleaned++;
+                }
+            }
+        }
+
+
+
+
+
+        // Load conversations from API
+        // Debounced version of loadConversations to prevent multiple rapid calls
+        // ===== CONVERSATION MODULE (Phase 5: Extracted) =====
+        // - loadConversations, debouncedLoadConversations → talk_conversation-loader.js
+        // - renderConversations, createConversationElement → talk_conversation-renderer.js
+        // - selectConversation → talk_conversation-selector.js
+
+        // ===== MESSAGE MODULE (Phase 6: Extracted) =====
+        // - loadMessages → talk_message-loader.js
+        // - renderMessages, displayMessage, setupScrollLazyLoading → talk_message-renderer.js
+        // - MessageFactory, createMessageElement, processMessageText, isMessageSentByMe → talk_message-factory.js
+        // - addMessageActions, openImageViewer, showReactionPicker, startReply, cancelReply, forwardMessage, deleteMessage → talk_message-actions.js
+        // - sanitizeMessage, validateMessageContent, validateMessageInput, updateCharacterCounter → talk_message-validator.js
+        // - sendMessage, sendImagesWithPreviews → talk_message-sender.js
+        // - saveMessage, unsaveMessage, refreshSavedMessages, getSavedMessagePreview → talk_message-save.js
+        // - performDeleteMessage, removeMessageFromDOM, replaceMessageWithRecalledText, createRecalledMessagePlaceholder → talk_message-recall.js
+        
+        // REMOVED: loadMessages function (lines 553-703) - now in talk_message-loader.js
+
+        // Mark conversation as read
+        async function markConversationAsRead(partnerId) {
+            try {
+                const response = await fetch('/api/messages/mark-conversation-read', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-ID': currentUserId
+                    },
+                    body: JSON.stringify({
+                        conversationPartnerId: partnerId
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                if (data.success) {
+                    // Conversation marked as read
+                    // If on unread tab, refresh conversations to remove this conversation from unread list
+                    const currentFilter = getCurrentFilter();
+                    if (currentFilter === 'unread') {
+                        // Update conversation unread count
+                        const conversation = Object.values(conversations).find(c => c.partnerId === partnerId);
+                        if (conversation) {
+                            conversation.unread = 0;
+                        }
+                        // Refresh the filtered conversations list
+                        filterConversations('unread');
+                    }
+                }
+            } catch (error) {
+                console.error('Error marking conversation as read:', error);
+            }
+        }
+
+        // Mark individual message as read
+        async function markMessageAsRead(messageId) {
+            try {
+                if (!validateMessageAndUser(messageId, currentUserId)) {
+                    return;
+                }
+
+                const response = await fetch(`/api/messages/${messageId}/mark-read`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-ID': currentUserId
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update the message in our local data structure
+                    let messageConversation = null;
+                    Object.values(conversations).forEach(conversation => {
+                        if (conversation.messages) {
+                            const message = conversation.messages.find(msg => msg.id === messageId);
+                            if (message) {
+                                message.isRead = true;
+                                message.read_at = new Date().toISOString();
+                                messageConversation = conversation;
+                            }
+                        }
+                    });
+
+                    // If on unread tab and viewing this conversation, remove the message from view
+                    const currentFilter = getCurrentFilter();
+                    if (currentFilter === 'unread' && messageConversation && currentConversation === messageConversation.id) {
+                        // Remove the message element from DOM with fade out
+                        const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+                        if (messageElement && !messageElement.classList.contains('system')) {
+                            messageElement.style.transition = 'opacity 0.3s, transform 0.3s';
+                            messageElement.style.opacity = '0';
+                            messageElement.style.transform = 'translateX(-20px)';
+                            setTimeout(() => {
+                                if (messageElement.parentNode) {
+                                    messageElement.remove();
+                                }
+                                // Update unread header count
+                                const unreadHeader = document.querySelector('[data-message-id="unread-header"]');
+                                if (unreadHeader) {
+                                    const remainingMessages = Array.from(document.querySelectorAll('[data-message-id]'))
+                                        .filter(el => !el.classList.contains('system') && el.getAttribute('data-message-id') !== 'unread-header');
+                                    if (remainingMessages.length > 0) {
+                                        const headerText = unreadHeader.querySelector('.message-text, .message-content');
+                                        if (headerText) {
+                                            headerText.textContent = 
+                                                `Showing ${remainingMessages.length} unread message${remainingMessages.length > 1 ? 's' : ''} from this conversation`;
+                                        }
+                                    } else {
+                                        // No more unread messages, show empty state
+                                        const messagesArea = document.getElementById('messagesArea');
+                                        if (messagesArea && typeof renderMessages === 'function') {
+                                            renderMessages([{
+                                                type: 'system',
+                                                text: 'No unread messages in this conversation',
+                                                time: 'Now',
+                                                id: 'no-unread',
+                                                isRead: true,
+                                                content: 'No unread messages in this conversation',
+                                                timestamp: Date.now()
+                                            }]);
+                                        }
+                                    }
+                                }
+                            }, 300);
+                        }
+                    }
+
+                    // Update conversation unread count immediately
+                    if (messageConversation) {
+                        // Decrease unread count for this conversation
+                        if (messageConversation.unread > 0) {
+                            messageConversation.unread--;
+                        }
+                    }
+
+                    // Update conversation list to refresh unread counts from database
+                    if (typeof loadConversations === 'function') {
+                        await loadConversations();
+                    }
+                    
+                    // If on unread tab, refresh the filtered conversations list
+                    if (currentFilter === 'unread') {
+                        filterConversations('unread');
+                    }
+                } else {
+                    // Failed to mark message as read
+                }
+            } catch (error) {
+                // Error marking message as read - don't show notification for this as it happens automatically
+            }
+        }
+
+        // Message Factory removed - now loaded from talk_message-factory.js
+        // Functions removed - now loaded from message modules:
+        // - MessageFactory, createMessageElement, processMessageText, isMessageSentByMe → talk_message-factory.js
+        // - createEnhancedLoadingPlaceholder → (still needed in main file for now)
+        
+        // REMOVED: MessageFactory block (lines 1076-1543) - now in talk_message-factory.js
+        // Show recalled messages with "Message recalled" text instead of hiding them
+        function filterOutRecalledMessages(messages) {
+            // Don't filter out recalled messages - let them show with "Message recalled" text
+            return messages;
+        }
+
+        // Helper function to generate cache key for current conversation
+        function getCurrentConversationCacheKey() {
+            return currentConversation && conversations[currentConversation]
+                ? `${currentUserId}_${conversations[currentConversation].partnerId}`
+                : null;
+        }
+
+        // Helper function to get current conversation ID
+        function getCurrentConversationId() {
+            return currentConversation && conversations[currentConversation]
+                ? conversations[currentConversation].partnerId
+                : null;
+        }
+
+        // Helper function to get current filter state
+        function getCurrentFilter() {
+            return document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+        }
+
+        // Helper function to find message by ID with proper type conversion
+        function findMessageById(messageId, messages = null) {
+            const msgList = messages || (currentConversation && conversations[currentConversation]?.messages);
+            if (!msgList) return null;
+            return msgList.find(m => String(m.id) === String(messageId));
+        }
+
+        // REMOVED: getCurrentTimestamp, generateTempMessageId, MESSAGE_CONFIG, updateCharacterCounter, validateMessageInput
+        // - Now loaded from talk_message-validator.js
+
+        // Helper function to validate conversation
+        function validateConversation(conversation) {
+            return conversation && conversation.partnerId;
+        }
+
+        // Helper function to create error with fallback message
+        function createError(message, fallback = 'Operation failed') {
+            return new Error(message || fallback);
+        }
+
+        // Helper function to validate message ID and user ID
+        function validateMessageAndUser(messageId, userId) {
+            return messageId && userId;
+        }
+
+        // REMOVED: addMessageActions function - now in talk_message-actions.js
+
+        // createImageMessageElement function removed - now handled by MessageFactory.createImageMessage
+
+        // createTextMessageElement function removed - now handled by MessageFactory.createTextMessage
+
+        // REMOVED: openImageViewer function - now in talk_message-actions.js
+
+        // processMessageText removed - now loaded from talk_message-factory.js
+
+
+
+        // Performance optimization: Debounce function for smooth scrolling
+        const smoothScrollToBottom = Utils.debounce(() => {
+            const messagesArea = document.getElementById('messagesArea');
+            if (messagesArea) {
+                messagesArea.scrollTo({
+                    top: messagesArea.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
+        }, 100);
+
+        // Enhanced scroll to bottom with smooth animation
+        // (smoothScrollToBottom is already defined above)
+
+        // REMOVED: All message action functions - now in talk_message-actions.js
+        // - showReactionPicker, addReaction, startReply, showReplyPreview, cancelReply,
+        //   forwardMessage, replyToMessage, showConfirmationModal, closeConfirmationModal,
+        //   confirmDelete, confirmDeleteFromModal, deleteMessage
+
+
+
+        // Save message functionality - Database-based
+        // REMOVED: saveMessage function - now in talk_message-save.js
+
+        // REMOVED: unsaveMessage function - now in talk_message-save.js
+
+        // REMOVED: replaceMessageWithRecalledText, createRecalledMessagePlaceholder
+        // - Now in talk_message-recall.js
+
+        // NEW FUNCTION: Check message read status
+        async function checkMessageReadStatus(messageId) {
+            try {
+                const response = await fetch(`/api/messages/${messageId}/status`);
+                const result = await response.json();
+                return result.isRead;
+            } catch (error) {
+                return false; // Assume unread if error
+            }
+        }
+
+        // REMOVED: sendMessage function - now in talk_message-sender.js
+
+        // REMOVED: Typing indicator functions - now in talk_typing-indicator.js
+        // - showTypingIndicator, hideTypingIndicator, sendTypingIndicator
+
+        // Filter conversations
+        function filterConversations(filter, skipRender = false) {
+            
+            switch (filter) {
+                case 'all':
+                    // Include ALL conversations including deleted users
+                    filteredConversations = Object.values(conversations);
+                    break;
+                case 'unread':
+                    filteredConversations = Object.values(conversations).filter(c => c.unread > 0);
+                    break;
+                case 'saved':
+                    // Get saved messages from database (loaded in CONFIG)
+                    const savedMessages = CONFIG.USERS.SAVED_MESSAGES || [];
+
+                    if (savedMessages.length === 0) {
+                        // No saved messages - show empty state
+                        filteredConversations = [];
+                    } else {
+                        // Get unique conversation IDs from saved messages
+                        const savedConversationIds = [...new Set(savedMessages.map(msg => parseInt(msg.conversationId)))];
+
+                        // Filter conversations that have saved messages
+                        filteredConversations = Object.values(conversations).filter(c => {
+                            const partnerId = parseInt(c.partnerId);
+                            const hasSaved = savedConversationIds.includes(partnerId);
+                            if (hasSaved) {
+                            }
+                            return hasSaved;
+                        });
+
+
+                        // Add saved message count to each conversation
+                        filteredConversations.forEach(conv => {
+                            const partnerId = parseInt(conv.partnerId);
+                            const savedCount = savedMessages.filter(msg => parseInt(msg.conversationId) === partnerId).length;
+                            conv.savedMessageCount = savedCount;
+                        });
+                    }
+                    break;
+            }
+
+            // Only render if not skipping (prevents infinite loops)
+            if (!skipRender) {
+                renderConversations();
+            }
+        }
+
+        // Search conversations
+        // Debounced search for better performance
+        function debouncedSearchConversations(query) {
+            if (searchDebounceTimer) {
+                clearTimeout(searchDebounceTimer);
+            }
+
+            searchDebounceTimer = setTimeout(() => {
+                searchConversations(query);
+            }, CONFIG.TIMEOUTS.SEARCH_DEBOUNCE);
+        }
+
+        // Enhanced search with performance optimization
+        function searchConversations(query) {
+            const startTime = performance.now();
+
+            if (!query.trim()) {
+                // When clearing search, restore the current filter
+                const currentFilter = getCurrentFilter();
+                filterConversations(currentFilter);
+            } else {
+                // When searching, apply search to current filtered conversations
+                const currentFilter = getCurrentFilter();
+                let baseConversations;
+
+                switch (currentFilter) {
+                    case 'unread':
+                        baseConversations = Object.values(conversations).filter(c => c.unread > 0);
+                        break;
+                    case 'saved':
+                        // Get saved messages from database (loaded in CONFIG)
+                        const savedMessages = CONFIG.USERS.SAVED_MESSAGES || [];
+                        if (savedMessages.length === 0) {
+                            baseConversations = [];
+                        } else {
+                            const savedConversationIds = [...new Set(savedMessages.map(msg => parseInt(msg.conversationId)))];
+                            baseConversations = Object.values(conversations).filter(c =>
+                                savedConversationIds.includes(parseInt(c.partnerId))
+                            );
+
+                            // Add saved message count to each conversation
+                            baseConversations.forEach(c => {
+                                const savedCount = savedMessages.filter(msg => parseInt(msg.conversationId) === parseInt(c.partnerId)).length;
+                                c.savedMessageCount = savedCount;
+                            });
+                        }
+                        break;
+                    default:
+                        baseConversations = Object.values(conversations);
+                }
+
+                // Optimized search with early termination
+                const queryLower = query.toLowerCase();
+                filteredConversations = baseConversations.filter(conversation => {
+                    // Check name first (faster)
+                    if (conversation.name.toLowerCase().includes(queryLower)) {
+                        return true;
+                    }
+
+                    // Check messages only if name doesn't match
+                    return conversation.messages && conversation.messages.some(msg =>
+                        msg.text && msg.text.toLowerCase().includes(queryLower)
+                    );
+                });
+            }
+
+            const searchTime = performance.now() - startTime;
+
+
+            renderConversations();
+        }
+
+
+
+
+
+
+
+        // REMOVED: setupEventListeners function - now in talk_app-init.js
+
+        // Close specific dropdowns but keep time filter open if date suggestion is active
+
+        // Search Panel Functions FROM HEREDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
+        // Search Panel Functions FROM HEREDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
+        // Search Panel Functions FROM HEREDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
+
+
+
+        // Search Panel Functions FROM HEREDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
+        // Search Panel Functions FROM HEREDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
+        // Search Panel Functions FROM HEREDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
+
+
+
+        // REMOVED: Block manager functions - now in talk_block-manager.js
+        // - blockCurrentUser, closeBlockConfirm, confirmBlock → talk_block-manager.js
+        
+        // Update block button visibility based on received messages
+        function updateBlockButtonVisibility() {
+            const blockButton = document.getElementById('blockUserButton');
+            if (!blockButton) return;
+            
+            const currentConversation = TalkState ? TalkState.getCurrentConversation() : (window.currentConversation || null);
+            const conversations = TalkState ? TalkState.getConversations() : (window.conversations || {});
+            const currentUserId = TalkState ? TalkState.getCurrentUserId() : (window.currentUser?.id || null);
+            
+            if (currentConversation && conversations[currentConversation]) {
+                const conversation = conversations[currentConversation];
+                const partnerId = conversation.partnerId;
+                
+                // Check if user has received messages
+                let hasReceivedMessages = false;
+                
+                // First check conversation messages
+                if (conversation.messages && Array.isArray(conversation.messages)) {
+                    hasReceivedMessages = conversation.messages.some(message => {
+                        const senderId = message.sender_id || message.senderId;
+                        const receiverId = message.receiver_id || message.receiverId;
+                        return senderId && 
+                               parseInt(senderId) === parseInt(partnerId) &&
+                               receiverId &&
+                               parseInt(receiverId) === parseInt(currentUserId);
+                    });
+                }
+                
+                // If not found, check message cache
+                if (!hasReceivedMessages) {
+                    const messageCache = TalkState && TalkState.getMessageCache ? TalkState.getMessageCache() : (window.messageCache || new Map());
+                    if (messageCache && messageCache.size > 0) {
+                        for (const [key, value] of messageCache.entries()) {
+                            if (key.includes(partnerId.toString()) && key.includes(currentUserId.toString())) {
+                                const messages = Array.isArray(value) ? value : (value.messages || []);
+                                if (messages.some(msg => {
+                                    const senderId = msg.sender_id || msg.senderId;
+                                    const receiverId = msg.receiver_id || msg.receiverId;
+                                    return senderId && 
+                                           parseInt(senderId) === parseInt(partnerId) &&
+                                           receiverId &&
+                                           parseInt(receiverId) === parseInt(currentUserId);
+                                })) {
+                                    hasReceivedMessages = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Show or hide button
+                if (hasReceivedMessages) {
+                    blockButton.style.display = 'block';
+                    blockButton.style.visibility = 'visible';
+                } else {
+                    blockButton.style.display = 'none';
+                    blockButton.style.visibility = 'hidden';
+                }
+            } else {
+                // No conversation - hide button
+                blockButton.style.display = 'none';
+                blockButton.style.visibility = 'hidden';
+            }
+        }
+        
+        // REMOVED: Remove user functions - now in talk_conversation-remover.js
+        // - updateRemoveUserButtonVisibility, removeUserFromConversation → talk_conversation-remover.js
+        
+        // Make function globally available
+        window.updateBlockButtonVisibility = updateBlockButtonVisibility;
+        
+        // Show chat more menu
+        function showChatMoreMenu(event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            const menu = document.getElementById('chatMoreMenu');
+            if (menu) {
+                const isVisible = menu.style.display !== 'none';
+                menu.style.display = isVisible ? 'none' : 'block';
+                
+                // Update button visibility before showing menu
+                if (!isVisible) {
+                    updateBlockButtonVisibility();
+                    if (typeof updateRemoveUserButtonVisibility === 'function') {
+                        updateRemoveUserButtonVisibility();
+                    }
+                    
+                    // Check if menu should be shown (if there are visible items)
+                    const blockButton = document.getElementById('blockUserButton');
+                    const removeButton = document.getElementById('removeUserButton');
+                    if ((!blockButton || blockButton.style.display === 'none') && 
+                        (!removeButton || removeButton.style.display === 'none')) {
+                        // No visible items - don't show the menu
+                        menu.style.display = 'none';
+                        return;
+                    }
+                }
+                
+                // Position menu relative to button
+                const btn = document.getElementById('chatMoreBtn');
+                if (btn && !isVisible) {
+                    const rect = btn.getBoundingClientRect();
+                    menu.style.top = (rect.bottom + 5) + 'px';
+                    menu.style.right = (window.innerWidth - rect.right) + 'px';
+                }
+                
+                // Close menu when clicking outside
+                if (!isVisible) {
+                    setTimeout(() => {
+                        const closeMenu = (e) => {
+                            if (!menu.contains(e.target) && e.target.id !== 'chatMoreBtn' && !e.target.closest('#chatMoreMenu')) {
+                                menu.style.display = 'none';
+                                document.removeEventListener('click', closeMenu);
+                            }
+                        };
+                        document.addEventListener('click', closeMenu);
+                    }, 0);
+                }
+            }
+        }
+
+        // REMOVED: setupDynamicEventListeners function - filter dropdown functionality now handled by talk_search-filters.js module
+        // The setupFilterDropdowns() function from the module handles all filter dropdown setup
+
+
+
+
+
+
+        // Add custom filter example
+        function addCustomFilter() {
+            const customFilter = {
+                id: 'custom',
+                type: 'dropdown',
+                icon: '🔧',
+                label: 'Custom',
+                options: [
+                    { value: 'option1', label: 'Option 1', avatar: '1' },
+                    { value: 'option2', label: 'Option 2', avatar: '2' },
+                    { value: 'option3', label: 'Option 3', avatar: '3' }
+                ],
+                searchable: false
+            };
+            addNewFilter(customFilter);
+        }
+
+        // Add message type filter
+        function addMessageTypeFilter() {
+            const messageTypeFilter = {
+                id: 'messageType',
+                type: 'dropdown',
+                icon: '💬',
+                label: 'Message Type',
+                options: [
+                    { value: 'all', label: 'All Messages', avatar: '💬' },
+                    { value: 'text', label: 'Text Only', avatar: '📝' },
+                    { value: 'image', label: 'Images', avatar: '🖼️' },
+                    { value: 'file', label: 'Files', avatar: '📁' },
+                    { value: 'link', label: 'Links', avatar: '��' }
+                ],
+                searchable: false
+            };
+            addNewFilter(messageTypeFilter);
+        }
+
+        // Add priority filter
+        function addPriorityFilter() {
+            const priorityFilter = {
+                id: 'priority',
+                type: 'dropdown',
+                icon: '⭐',
+                label: 'Priority',
+                options: [
+                    { value: 'all', label: 'All Priorities', avatar: '⭐' },
+                    { value: 'high', label: 'High Priority', avatar: '🔴' },
+                    { value: 'medium', label: 'Medium Priority', avatar: '🟡' },
+                    { value: 'low', label: 'Low Priority', avatar: '🟢' }
+                ],
+                searchable: false
+            };
+            addNewFilter(priorityFilter);
+        }
+
+
+
+        // Close all filter dropdowns
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check authentication first
+            if (!window.isAuthenticated) {
+                window.location.href = '/login';
+                return;
+            }
+
+            // Initialize currentUserId in TalkState early
+            if (typeof TalkState !== 'undefined' && window.currentUser?.id) {
+                TalkState.setCurrentUserId(window.currentUser.id);
+            }
+
+            // Update navigation links with session token
+            updateNavigationLinks();
+
+            // Initialize main app
+            if (typeof window.initApp === 'function') {
+                window.initApp();
+            } else {
+                console.error('initApp function not found. Make sure talk_app-init.js is loaded.');
+                // Retry after a short delay in case script is still loading
+                setTimeout(() => {
+                    if (typeof window.initApp === 'function') {
+                        window.initApp();
+                    }
+                }, 100);
+            }
+
+            // Ensure current filter is applied after initialization
+            const currentFilter = getCurrentFilter();
+            if (currentFilter !== 'all') {
+    
+                filterConversations(currentFilter);
+            }
+            
+            // Handle user parameter from URL to open specific conversation
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetUserId = urlParams.get('user');
+            if (targetUserId) {
+                // Wait for conversations to load, then select the conversation with this user
+                let attempts = 0;
+                const maxAttempts = 20; // Try for up to 10 seconds (20 * 500ms)
+                const selectConversationByUserId = () => {
+                    attempts++;
+                    // Check if TalkState and conversations are available
+                    if (typeof TalkState !== 'undefined' && typeof TalkState.getConversations === 'function') {
+                        const conversations = TalkState.getConversations();
+                        if (conversations && Object.keys(conversations).length > 0) {
+                            // Find conversation with matching partnerId
+                            const targetConversation = Object.values(conversations).find(conv => 
+                                conv.partnerId && parseInt(conv.partnerId) === parseInt(targetUserId)
+                            );
+                            if (targetConversation && typeof selectConversation === 'function') {
+                                selectConversation(targetConversation.id, null);
+                                // Clean up URL parameter
+                                const newUrl = window.location.pathname + (urlParams.get('token') ? `?token=${urlParams.get('token')}` : '');
+                                window.history.replaceState({}, '', newUrl);
+                                return; // Success, stop retrying
+                            }
+                        }
+                    }
+                    // Retry if not found and haven't exceeded max attempts
+                    if (attempts < maxAttempts) {
+                        setTimeout(selectConversationByUserId, 500);
+                    }
+                };
+                // Start checking after a delay to allow conversations to load
+                setTimeout(selectConversationByUserId, 1000);
+            }
+            
+            // Debug: Check if saved messages are loaded
+            
+
+
+
+            // Ensure all dropdowns start closed
+
+
+            // Set up periodic status refresh for online indicators
+            setInterval(() => {
+                if (window.OnlineCheck && conversations) {
+                    Object.values(conversations).forEach(conversation => {
+                        if (conversation.partnerId) {
+                            // Update conversation status periodically
+                            const statusElement = document.querySelector(`[data-conversation-id="${conversation.id}"] .chat-status`);
+                            if (statusElement) {
+                                window.OnlineCheck.updateUserStatus(statusElement, conversation.partnerId, { showLastSeen: true });
+                            }
+                        }
+                    });
+                }
+            }, 30010); // Refresh every 30 seconds
+        });
+
+
+        // Add CSS for slide-in animation
+        // Styles moved to static <style> tag in <head> to avoid CSP violations
+
+        // Update all navigation links with session token
+        function updateNavigationLinks() {
+            const sessionToken = getSessionToken();
+            const links = document.querySelectorAll('a[href*="/profile"], a[href*="/messages"], a[href*="/search"], a[href*="/matches"], a[href*="/activity"], a[href*="/settings"], a[href*="/logout"]');
+
+            links.forEach(link => {
+                if (link.href.includes('?token=')) {
+                    // Link already has token parameter
+                    return;
+                }
+
+                const url = new URL(link.href);
+                if (!url.searchParams.has('token')) {
+                    url.searchParams.set('token', sessionToken);
+                    link.href = url.toString();
+                }
+            });
+        }
+
+
+
+        // Keyboard navigation for easy return to previous page
+        document.addEventListener('keydown', function (e) {
+            // Escape key to go back to previous page
+            if (e.key === 'Escape') {
+                history.back();
+            }
+
+            // Ctrl/Cmd + B to go back to previous page
+            if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+                e.preventDefault();
+                history.back();
+            }
+        });
+
+        // Add tooltip for keyboard shortcuts
+
+
+        // Simple image upload functionality
+        // Initialize global variables for message sending (used by talk_message-sender.js)
+        if (!window.selectedImages) {
+            window.selectedImages = [];
+        }
+        if (!window.currentReply) {
+            window.currentReply = null; // Track the message being replied to
+        }
+        // Keep local references for backward compatibility (matches reference)
+        let selectedImages = window.selectedImages;
+        let currentReply = window.currentReply;
+
+        // REMOVED: Image handling functions - now in talk_image-*.js modules
+        // - selectImage, handleImageSelect, uploadImages → talk_image-handler.js
+        // - compressImage → talk_image-compressor.js
+        // - createImagePreview, removeImagePreview, clearImagePreviews → talk_image-preview.js
+
+        // REMOVED: sendImagesWithPreviews function - now in talk_message-sender.js
+        // REMOVED: replaceProgressWithImages function - now in talk_image-preview.js
+
+        // Function to clean up stuck uploading messages
+        function cleanupStuckMessages() {
+
+            const stuckMessages = document.querySelectorAll('[data-message-id]');
+
+            stuckMessages.forEach(messageElement => {
+                const loadingPlaceholder = messageElement.querySelector('.loading-placeholder');
+                const hasActions = messageElement.querySelector('.message-actions');
+
+                // If message has loading placeholder but no actions, it's likely stuck
+                if (loadingPlaceholder && !hasActions) {
+
+
+                    // Convert loading to error state
+                    loadingPlaceholder.innerHTML = `
+                                                <div class="image-error-clean">
+                                                    <span>📷 Upload failed or timed out</span>
+                                                </div>
+                                            `;
+
+                    // Add actions so it can be deleted
+                    const message = {
+                        id: messageElement.getAttribute('data-message-id'),
+                        type: messageElement.classList.contains('sent') ? 'sent' : 'received',
+                        isUploading: false
+                    };
+                    addMessageActions(messageElement, message);
+                }
+            });
+        }
+
+        // REMOVED: Image display and loading functions - now in talk_image-preview.js
+        // - addImagesToMessage, loadNewImages, loadImageWithFallback, retryImageLoad
+
+        // Function to reload current conversation to fetch missing attachment data
+        function reloadConversation() {
+            if (currentConversation) {
+                showNotification('🔄 Reloading conversation...', 'info');
+                loadConversation(currentConversation);
+            }
+        }
+
+        function updateLastSeen(timestamp) {
+            // Status bar removed - last seen tracking disabled
+            // Function kept for compatibility but functionality moved to StatusManager
+        }
+
+
+
+        // REMOVED: uploadImages function - now in talk_image-handler.js (as legacy wrapper)
+
+        // Helper function to format message timestamp with enhanced format
+        function formatMessageTime(timestamp) {
+            if (!timestamp) return 'Unknown time';
+
+            // Handle invalid dates
+            const date = new Date(timestamp);
+            if (isNaN(date.getTime())) {
+                return 'Invalid time';
+            }
+
+            const now = new Date();
+            const diff = now - date;
+
+            // Handle future dates - allow small tolerance for clock differences (< 1 second)
+            if (diff < -1000) {
+                // Only show "Future time" if more than 1 second in the future (clock sync issues)
+                return 'Future time';
+            } else if (diff < 0) {
+                // Less than 1 second difference - treat as "now" to avoid "Future time" for same-moment messages
+                const timeString = date.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+                return `<span style="font-size: 80%;">${timeString}</span> <span style="font-size: 90%;">(0m ago)</span>`;
+            }
+
+            // Format time as 10:11 PM
+            const timeString = date.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+
+            // Calculate relative time
+            let relativeTime = '';
+            if (diff < 3600000) {
+                const minutes = Math.floor(diff / 60000);
+                relativeTime = `${minutes}m ago`;
+            } else if (diff < 86400000) {
+                const hours = Math.floor(diff / 3600000);
+                relativeTime = `${hours}h ago`;
+            } else if (diff < 604800000) {
+                const days = Math.floor(diff / 86400000);
+                relativeTime = `${days}d ago`;
+            } else if (diff < 2592000000) {
+                const weeks = Math.floor(diff / 604800000);
+                relativeTime = `${weeks}w ago`;
+            } else if (diff < 31536000000) {
+                const months = Math.floor(diff / 2592000000);
+                relativeTime = `${months} month${months > 1 ? 's' : ''} ago`;
+            } else {
+                const years = Math.floor(diff / 31536000000);
+                relativeTime = `${years}y ago`;
+            }
+
+            // Format date as M/D/YYYY
+            const dateString = date.toLocaleDateString('en-US', {
+                month: 'numeric',
+                day: 'numeric',
+                year: 'numeric'
+            });
+
+            // Check if it's today
+            if (date.toDateString() === now.toDateString()) {
+                // Today: "10:11 PM (1m ago)" - time reduced by 20%, relative time reduced by 10%
+                return `<span style="font-size: 80%;">${timeString}</span> <span style="font-size: 90%;">(${relativeTime})</span>`;
+            } else {
+                // Other days: "8/12/2025, 10:11 PM (2d ago)" - date/time reduced by 20%, relative time reduced by 10%
+                return `<span style="font-size: 80%;">${dateString}, ${timeString}</span> <span style="font-size: 90%;">(${relativeTime})</span>`;
+            }
+        }
+
+    </script>
+
+    <!-- Socket.IO for real-time messaging -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // REMOVED: WebSocket initialization and event handlers - now in talk_websocket-*.js modules
+        // Socket variables are now managed in talk_socket-manager.js
+        // Real-time message handlers are set up automatically after authentication
+        // Functions are exposed globally from modules: initializeWebSocket, setupStatusWebSocketListeners, etc.
+        /*
+        REMOVED CODE (now in modules):
+        - Socket initialization → talk_socket-manager.js
+        - All socket.on() event handlers → talk_realtime-messaging.js  
+        - Typing indicator functions → talk_typing-indicator.js
+        */
+        
+        // REMOVED: All WebSocket code - now in talk_websocket-*.js modules
+
+        // Unified status management system
+        const StatusManager = {
+            // Update current chat status display
+            updateCurrentChat: async function () {
+                if (!currentConversation || !conversations[currentConversation]) return;
+
+                const conversation = conversations[currentConversation];
+                const chatStatus = document.getElementById('chatStatus');
+                const chatAvatar = document.getElementById('chatAvatar');
+                const chatLocation = document.getElementById('chatLocation');
+                const chatLocationText = document.getElementById('chatLocationText');
+                
+                if (!chatAvatar || !conversation.partnerId) return;
+                
+                // Fetch and display partner's location
+                if (chatLocation && chatLocationText && !conversation.isDeleted && conversation.name !== 'Deleted User' && conversation.name !== 'Account Deactivated') {
+                    try {
+                        const response = await fetch(`/api/user/${conversation.partnerId}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success && data.user) {
+                                // Build location from city and country (no state)
+                                const locationParts = [];
+                                if (data.user.city_name) locationParts.push(data.user.city_name);
+                                if (data.user.country_name) locationParts.push(data.user.country_name);
+                                
+                                const locationString = locationParts.length > 0 ? locationParts.join(', ') : null;
+                                
+                                if (locationString) {
+                                    chatLocationText.textContent = locationString;
+                                    chatLocation.style.display = 'flex';
+                                } else {
+                                    chatLocation.style.display = 'none';
+                                }
+                            } else {
+                                chatLocation.style.display = 'none';
+                            }
+                        } else {
+                            chatLocation.style.display = 'none';
+                        }
+                    } catch (error) {
+                        chatLocation.style.display = 'none';
+                    }
+                } else if (chatLocation) {
+                    chatLocation.style.display = 'none';
+                }
+                
+                const isOnline = conversation.is_online !== undefined 
+                    ? conversation.is_online 
+                    : (conversation.status && conversation.status.toLowerCase().includes('online'));
+                const isDeleted = conversation.isDeleted || conversation.name === 'Deleted User' || conversation.name === 'Account Deactivated';
+                
+                // Update online indicator on chat avatar
+                let indicator = chatAvatar.querySelector('.online-indicator');
+                if (!isDeleted && isOnline) {
+                    // User is online - show indicator dot, hide status text
+                    if (!indicator) {
+                        indicator = document.createElement('div');
+                        indicator.className = 'online-indicator';
+                        indicator.setAttribute('data-user-id', conversation.partnerId);
+                        chatAvatar.appendChild(indicator);
+                    }
+                    indicator.style.display = 'block';
+                    // Register with instantStatusManager
+                    if (window.instantStatusManager && window.instantStatusManager.isInitialized) {
+                        window.instantStatusManager.registerStatusElement(indicator, conversation.partnerId);
+                    }
+                    
+                    // Hide status text when online - remove "online" class to prevent any display
+                    if (chatStatus) {
+                        chatStatus.style.display = 'none';
+                        chatStatus.textContent = '';
+                        chatStatus.innerHTML = '';
+                        chatStatus.classList.remove('online');
+                        chatStatus.classList.add('offline'); // Add offline class to ensure proper styling
+                    }
+                } else {
+                    // User is offline - hide indicator dot, show last seen time
+                    if (indicator) {
+                        indicator.style.display = 'none';
+                    }
+                    
+                    // Show last seen time when offline
+                    if (chatStatus && !isDeleted) {
+                        chatStatus.style.display = 'block';
+                        // Use OnlineCheck to update with last seen time
+                        // IMPORTANT: Always pass empty onlineText to prevent "●Online" from appearing
+                        if (window.OnlineCheck && window.OnlineCheck.updateUserStatus) {
+                            await window.OnlineCheck.updateUserStatus(chatStatus, conversation.partnerId, {
+                                showLastSeen: true,
+                                onlineText: '', // Empty - no text when online, only green dot on avatar
+                                offlineText: 'Offline'
+                            });
+                            
+                            // Double-check: If user is online after the async call, hide the status
+                            const currentIsOnline = conversation.is_online !== undefined 
+                                ? conversation.is_online 
+                                : (conversation.status && conversation.status.toLowerCase().includes('online'));
+                            if (currentIsOnline && chatStatus) {
+                                chatStatus.style.display = 'none';
+                                chatStatus.textContent = '';
+                                chatStatus.innerHTML = '';
+                            }
+                        } else if (window.UserStatus && window.UserStatus.updateUserStatus) {
+                            await window.UserStatus.updateUserStatus(chatStatus, conversation.partnerId, {
+                                showLastSeen: true
+                            });
+                        } else {
+                            // Fallback: fetch last seen manually
+                            try {
+                                const response = await fetch(`/api/user-lastseen/${conversation.partnerId}`);
+                                const data = await response.json();
+                                if (data.success && data.lastSeen) {
+                                    const lastSeenDate = new Date(data.lastSeen);
+                                    const formatted = formatTimeAgo(lastSeenDate.toISOString());
+                                    chatStatus.textContent = `Last seen ${formatted}`;
+                                } else {
+                                    chatStatus.textContent = 'Offline';
+                                }
+                            } catch (error) {
+                                chatStatus.textContent = 'Offline';
+                            }
+                        }
+                    } else if (chatStatus && isDeleted) {
+                        chatStatus.style.display = 'none';
+                    }
+                }
+            },
+
+            // Update user online status
+            updateUserOnline: async function (userId, isOnline) {
+                // Get conversations from TalkState
+                const conversations = TalkState ? TalkState.getConversations() : (window.conversations || {});
+                
+                let statusUpdated = false;
+                Object.values(conversations).forEach(conversation => {
+                    if (conversation.partnerId == userId) {
+                        conversation.status = isOnline ? 'Online' : 'Offline';
+                        conversation.is_online = isOnline;
+                        if (isOnline) {
+                            conversation.lastOnlineTime = Date.now();
+                        }
+                        statusUpdated = true;
+                    }
+                });
+
+                // If status was updated, re-render conversations to update online indicator
+                if (statusUpdated && typeof renderConversations === 'function') {
+                    renderConversations();
+                }
+
+                // Update current chat status and header avatar indicator if this is the active conversation
+                const currentConversation = TalkState ? TalkState.getCurrentConversation() : (window.currentConversation || null);
+                if (currentConversation && conversations[currentConversation] && conversations[currentConversation].partnerId == userId) {
+                    // Update both avatar indicator and status text
+                    this.updateCurrentChat();
+                    
+                    // Extra safeguard: If user is online, ensure chatStatus is hidden immediately
+                    if (isOnline) {
+                        const chatStatus = document.getElementById('chatStatus');
+                        if (chatStatus) {
+                            chatStatus.style.display = 'none';
+                            chatStatus.textContent = '';
+                            chatStatus.innerHTML = '';
+                            chatStatus.classList.remove('online');
+                            chatStatus.classList.add('offline'); // Add offline class to ensure proper styling
+                        }
+                    }
+                }
+            },
+
+            // Fallback status display (hidden - status shown via online dot on avatar)
+            updateStatusFallback: function (chatStatus, status) {
+                // Hide the status text - online indicator is shown on avatar instead
+                if (chatStatus) {
+                    chatStatus.style.display = 'none';
+                }
+            }
+        };
+
+        // Update current chat status display using unified system
+        async function updateCurrentChatStatus() {
+            await StatusManager.updateCurrentChat();
+        }
+
+        // Cleanup function to prevent memory leaks
+        function cleanupStatusListeners() {
+            if (window.statusListenersInitialized) {
+                window.statusListenersInitialized = false;
+
+            }
+        }
+
+        // Clean up when page is unloaded (using pagehide instead of beforeunload for better compatibility)
+        window.addEventListener('pagehide', cleanupStatusListeners);
+
+        // Helper function to create enhanced loading placeholders (disabled - no loading text)
+        function createEnhancedLoadingPlaceholder(attachmentCount) {
+            // Return empty placeholder - no loading text
+            const placeholder = document.createElement('div');
+            placeholder.className = 'enhanced-loading-placeholder';
+            placeholder.style.display = 'none';
+            return placeholder;
+        }
+
+        // Update user online status using the unified system
+        async function updateUserOnlineStatus(userId, isOnline) {
+            await StatusManager.updateUserOnline(userId, isOnline);
+        }
+
+
+
+
+
+        // Play notification sound
+        function playNotificationSound() {
+            try {
+                // Create audio context for notification sound
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            } catch (error) {
+
+            }
+        }
+
+        // Update connection status indicator
+        function updateConnectionStatus(status) {
+            const indicator = document.getElementById('connectionStatus');
+            if (!indicator) return;
+
+            // Remove existing classes
+            indicator.classList.remove('connected', 'disconnected', 'connecting');
+
+            // Add new class and update text
+            switch (status) {
+                case 'connected':
+                    indicator.classList.add('connected');
+                    indicator.innerHTML = '🟢 Real-time ON';
+                    indicator.style.display = 'block';
+                    // Auto-hide after 3 seconds
+                    setTimeout(() => {
+                        indicator.style.display = 'none';
+                    }, 3000);
+                    break;
+                case 'disconnected':
+                    indicator.classList.add('disconnected');
+                    indicator.innerHTML = '🔴 Offline mode';
+                    indicator.style.display = 'block';
+                    break;
+                case 'connecting':
+                    indicator.classList.add('connecting');
+                    indicator.innerHTML = '🟡 Connecting...';
+                    indicator.style.display = 'block';
+                    break;
+            }
+        }
+
+    </script>
+
+    <script>
+        // NOTE: Search panel and filter functions removed - now loaded from talk_search-*.js modules
+        // Functions extracted:
+        // - openSearchPanel, closeSearchPanel → talk_search-panel.js
+        // - closeAllDropdowns, closeOtherDropdowns, setupFilterDropdowns → talk_search-filters.js
+        // - All date range filter setup → talk_search-filters.js (setupDateRangeFilters function)
+
+        // ===== SEARCH INITIALIZATION (Phase 4: Extracted) =====
+        document.addEventListener('DOMContentLoaded', function () {
+            // Search panel button handlers
+            const searchPanelBtn = document.getElementById('searchPanelBtn');
+            if (searchPanelBtn) {
+                searchPanelBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    // Call openSearchPanel directly (now globally available)
+                    if (typeof window.openSearchPanel === 'function') {
+                        window.openSearchPanel();
+                    } else if (typeof openSearchPanel === 'function') {
+                        openSearchPanel();
+                    } else {
+                        console.error('openSearchPanel function not found. Make sure talk_search-panel.js is loaded.');
+                        // Fallback: manually toggle the panel
+                        const searchPanel = document.getElementById('searchPanel');
+                        if (searchPanel) {
+                            searchPanel.classList.add('show');
+                            searchPanelBtn.classList.add('active');
+                        }
+                    }
+                });
+            } else {
+                console.error('searchPanelBtn element not found');
+            }
+
+            // Close search panel when clicking outside
+            document.addEventListener('click', function (e) {
+                const searchPanel = document.getElementById('searchPanel');
+                if (!searchPanel.contains(e.target) && !document.getElementById('searchPanelBtn').contains(e.target)) {
+                    if (typeof closeSearchPanel === 'function') {
+                        closeSearchPanel();
+                    }
+                }
+            });
+
+            // Setup filter dropdowns and date range filters from modules
+            if (typeof setupFilterDropdowns === 'function') {
+                setupFilterDropdowns();
+            }
+            if (typeof setupDateRangeFilters === 'function') {
+                setupDateRangeFilters();
+            }
+
+            // Setup search messages input (filters displayed messages)
+            const searchMessagesInput = document.getElementById('searchMessagesInput');
+            if (searchMessagesInput) {
+                let filterDebounceTimeout = null;
+                searchMessagesInput.addEventListener('input', function () {
+                    clearTimeout(filterDebounceTimeout);
+                    filterDebounceTimeout = setTimeout(() => {
+                        if (typeof filterDisplayedMessages === 'function') {
+                            filterDisplayedMessages();
+                        }
+                    }, 200); // 200ms debounce for smooth filtering
+                });
+                // Also filter on Enter key
+                searchMessagesInput.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        clearTimeout(filterDebounceTimeout);
+                        if (typeof filterDisplayedMessages === 'function') {
+                            filterDisplayedMessages();
+                        }
+                    }
+                });
+            }
+
+            // Setup clear messages button
+            const clearMessagesBtn = document.getElementById('clearMessagesBtn');
+            if (clearMessagesBtn) {
+                clearMessagesBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (typeof clearCurrentMessages === 'function') {
+                        clearCurrentMessages();
+                    }
+                });
+            }
+
+            // REMOVED: Duplicate filter dropdown setup code - all functionality is handled by talk_search-filters.js module
+            // The setupFilterDropdowns() function (called at line 1735-1736) handles all filter dropdown event listeners
+        });
+    </script>
+
+    <!-- Online Status Utility Scripts -->
+    <script src="/assets/js/online-check.js?v=20251214a"></script>
+    <script src="/assets/js/user-status.js?v=20251214"></script>
+    <script src="/assets/js/instant-status-manager.js?v=4"></script>
+
+
+    <!-- Include shared emoji picker utility -->
+    <script src="/assets/js/emoji-picker.js"></script>
+
+    <!-- Include User Profile Modal -->
+    <!-- Include User Report Modal -->
+    {{include:modals/user-report-modal}}
+
+    <!-- Profile Modal Actions Script -->
+    <script src="/components/modals/profile-modal-actions.js"></script>
+
+    <script>
+        // Profile modal functions are now in external file: /components/modals/user-profile-modal.js
+        // Fallback closeProfileModal function in case modal script hasn't loaded yet
+        if (typeof window.closeProfileModal !== 'function') {
+            window.closeProfileModal = function() {
+                const modal = document.getElementById('userProfileModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            };
+        }
+        
+        // Configure modal to use TalkState's getCurrentUserId
+        function configureModalForTalk() {
+            if (window.UserProfileModal) {
+                window.UserProfileModal.setGetCurrentUserId(() => {
+                    return TalkState ? TalkState.getCurrentUserId() : (window.currentUser?.id || null);
+                });
+                window.UserProfileModal.setGetSessionToken(() => {
+                    return window.sessionToken || (() => {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        return urlParams.get('token') || '';
+                    })();
+                });
+            } else {
+                // Retry if modal JS hasn't loaded yet
+                setTimeout(configureModalForTalk, 100);
+            }
+        }
+        
+        // Helper function for escaping HTML (still needed for other parts of the page)
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const seconds = Math.floor((now - date) / 1000);
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes}m ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h ago`;
+            const days = Math.floor(hours / 24);
+            if (days < 7) return `${days}d ago`;
+            const weeks = Math.floor(days / 7);
+            if (weeks < 4) return `${weeks}w ago`;
+            const months = Math.floor(days / 30);
+            if (months < 12) return `${months}mo ago`;
+            const years = Math.floor(days / 365);
+            return `${years}y ago`;
+        }
+
+        // Load email verification check utility
+        if (!window.checkEmailVerificationStatus) {
+            const script = document.createElement('script');
+            script.src = '/assets/js/email-verification-check.js';
+            document.head.appendChild(script);
+        }
+        
+        // Helper functions for modal action buttons
+        function likeProfileInModal() {
+            if (window.ProfileModalActions) {
+                window.ProfileModalActions.likeProfileInModal();
+            }
+        }
+        
+        function favouriteProfileInModal() {
+            if (window.ProfileModalActions) {
+                window.ProfileModalActions.favouriteProfileInModal();
+            }
+        }
+        
+        function blockProfileInModal() {
+            const currentProfileUserId = window.getCurrentProfileUserId ? window.getCurrentProfileUserId() : null;
+            if (!currentProfileUserId) {
+                return;
+            }
+            
+            const real_nameElement = document.getElementById('modal-profile-real_name');
+            const real_name = real_nameElement ? real_nameElement.textContent.trim().split(' ')[0] : 'this user';
+            
+            // Show universal block confirmation modal (use class to distinguish from inline modal)
+            const blockConfirmModal = document.querySelector('.block-confirm-modal');
+            if (blockConfirmModal) {
+                const blockUsernameEl = blockConfirmModal.querySelector('#blockUsername');
+                if (blockUsernameEl) {
+                    blockUsernameEl.textContent = real_name;
+                }
+                blockConfirmModal.style.display = 'flex';
+            }
+            
+            // Store context for confirmBlock function
+            window.pendingBlockUserId = currentProfileUserId;
+            window.pendingBlockContext = 'talk';
+        }
+        
+        // REMOVED: Duplicate block functions - now using talk_block-manager.js
+        // The block manager functions (blockCurrentUser, closeBlockConfirm, confirmBlock) 
+        // are already defined in talk_block-manager.js and exposed to window
+        
+        function reportProfileInModal() {
+            const currentProfileUserId = window.getCurrentProfileUserId ? window.getCurrentProfileUserId() : null;
+            if (!currentProfileUserId) {
+                return;
+            }
+            
+            // Get real_name from modal
+            const realNameElement = document.getElementById('modal-profile-real_name');
+            const real_name = realNameElement ? realNameElement.textContent.trim() : null;
+            
+            // Open report modal
+            if (typeof openReportModal === 'function') {
+                openReportModal(currentProfileUserId, real_name);
+            } else {
+                console.error('openReportModal function not found. Make sure user-report-modal is included.');
+                if (typeof showNotification === 'function') {
+                    showNotification('Report functionality is not available. Please refresh the page.', 'error');
+                }
+            }
+        }
+        
+        // Initialize ProfileModalActions
+        function initProfileModalActions() {
+            if (typeof window.ProfileModalActions !== 'undefined') {
+                window.ProfileModalActions.init({
+                    getCurrentUserId: () => {
+                        return TalkState ? TalkState.getCurrentUserId() : (window.currentUser?.id || null);
+                    },
+                    getCurrentProfileUserId: () => window.getCurrentProfileUserId ? window.getCurrentProfileUserId() : null,
+                    getSessionToken: () => {
+                        return window.sessionToken || (() => {
+                            const urlParams = new URLSearchParams(window.location.search);
+                            return urlParams.get('token') || '';
+                        })();
+                    },
+                    showNotification: (message, type) => {
+                        if (typeof showNotification === 'function') {
+                            showNotification(message, type);
+                        }
+                    }
+                });
+            } else {
+                setTimeout(initProfileModalActions, 100);
+            }
+        }
+        
+        // Setup modal action button handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            configureModalForTalk();
+            initProfileModalActions();
+            
+            // Modal event listeners are handled by the external modal JS
+            
+            // Modal action buttons
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.modal-like-btn')) {
+                    e.preventDefault();
+                    likeProfileInModal();
+                }
+                
+                if (e.target.closest('.modal-favourite-btn')) {
+                    e.preventDefault();
+                    favouriteProfileInModal();
+                }
+                
+                if (e.target.closest('.modal-block-btn')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    blockProfileInModal();
+                }
+                
+                if (e.target.closest('.modal-report-btn')) {
+                    e.preventDefault();
+                    reportProfileInModal();
+                }
+            });
+        });
+
+        // Store current deleted user ID for backward compatibility
+        let currentDeletedUserId = null;
+
+        async function clearConversationWithDeletedUser(deletedUserId) {
+            // Use provided deletedUserId or fallback to currentDeletedUserId
+            const targetDeletedUserId = deletedUserId || currentDeletedUserId;
+            if (!targetDeletedUserId) {
+                console.error('No deleted user ID provided');
+                return;
+            }
+            
+            // Find the button that was clicked (if any)
+            const clearBtn = document.querySelector(`[data-clear-user-id="${targetDeletedUserId}"]`);
+            
+            // Disable button during processing
+            if (clearBtn) {
+                clearBtn.disabled = true;
+                clearBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Clearing...';
+            }
+            
+            try {
+                const token = getSessionToken();
+                
+                // Ensure userId is a valid integer
+                let userId = window.currentUser?.id;
+                if (!userId || isNaN(userId)) {
+                    // Try to get from URL parameter as fallback
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const urlUserId = urlParams.get('userId') || urlParams.get('currentUser');
+                    userId = urlUserId ? parseInt(urlUserId) : null;
+                } else {
+                    userId = parseInt(userId);
+                }
+                
+                // Ensure deletedUserId is a valid integer
+                const deletedUserId = parseInt(targetDeletedUserId);
+                
+                if (!userId || isNaN(userId)) {
+                    if (typeof showNotification === 'function') {
+                        showNotification('Error: Could not determine your user ID. Please refresh the page and try again.', 'error');
+                    }
+                    if (clearBtn) {
+                        clearBtn.disabled = false;
+                        clearBtn.innerHTML = '<i class="fas fa-trash"></i> Clear';
+                    }
+                    return;
+                }
+                
+                if (!deletedUserId || isNaN(deletedUserId)) {
+                    alert('Error: Invalid deleted user ID.');
+                    if (clearBtn) {
+                        clearBtn.disabled = false;
+                        clearBtn.innerHTML = '<i class="fas fa-trash"></i> Clear';
+                    }
+                    return;
+                }
+                
+                // Add timeout to prevent hanging
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+                
+                let response;
+                try {
+                    response = await fetch('/api/messages/clear-deleted-user-conversation', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include',
+                        signal: controller.signal,
+                        body: JSON.stringify({
+                            token: token,
+                            deletedUserId: deletedUserId,
+                            userId: userId
+                        })
+                    });
+                    clearTimeout(timeoutId);
+                } catch (fetchError) {
+                    clearTimeout(timeoutId);
+                    if (fetchError.name === 'AbortError') {
+                        throw new Error('Request timed out. Please try again.');
+                    }
+                    throw fetchError;
+                }
+                
+                // Check content type before parsing
+                const contentType = response.headers.get('content-type');
+                let data;
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    
+                    // Try to parse as JSON, fallback to text
+                    try {
+                        data = JSON.parse(errorText);
+                        throw new Error(data.error || 'Failed to clear conversation');
+                    } catch (parseError) {
+                        if (parseError instanceof Error && parseError.message !== 'Failed to clear conversation') {
+                            throw parseError;
+                        }
+                        throw new Error(`Server error: ${response.status}. ${errorText.substring(0, 100)}`);
+                    }
+                }
+                
+                // Parse response
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    const text = await response.text();
+                    throw new Error('Server returned unexpected response format');
+                }
+                
+                if (data.success) {
+                    // Show success message using toast notification
+                    if (typeof showNotification === 'function') {
+                        showNotification('Deactivated account removed from conversation list', 'success');
+                    }
+                    
+                    // Reset button (though it will be removed with the conversation)
+                    if (clearBtn) {
+                        clearBtn.disabled = false;
+                        clearBtn.innerHTML = '<i class="fas fa-trash"></i> Clear';
+                    }
+                    
+                    // Reload conversations and messages
+                    if (typeof loadConversations === 'function') {
+                        loadConversations();
+                    }
+                    if (typeof TalkState && typeof TalkState.loadConversations === 'function') {
+                        TalkState.loadConversations();
+                    }
+                    
+                    // Clear messages area
+                    const messagesArea = document.getElementById('messagesArea');
+                    if (messagesArea) {
+                        messagesArea.innerHTML = '<div class="empty-state" id="emptyState"><div class="empty-state-icon">💬</div><div class="empty-state-title">Select a conversation</div><div class="empty-state-text">Choose a conversation from the list to start messaging</div></div>';
+                    }
+                    
+                    // Remove conversation from list if it exists
+                    const conversationItem = document.querySelector(`[data-conversation-id="${deletedUserId}"]`);
+                    if (conversationItem) {
+                        conversationItem.remove();
+                    }
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+            } catch (error) {
+                console.error('Error clearing conversation:', error);
+                if (typeof showNotification === 'function') {
+                    showNotification('Failed to clear conversation: ' + error.message, 'error');
+                }
+                
+                // Always reset button
+                if (clearBtn) {
+                    clearBtn.disabled = false;
+                    clearBtn.innerHTML = '<i class="fas fa-trash"></i> Clear';
+                }
+            }
+        }
+
+        // Make function globally available
+        window.clearConversationWithDeletedUser = clearConversationWithDeletedUser;
+    </script>
+    <!-- CSRF Token Status (logging disabled for production) -->
+    <script>
+    // CSRF token status logging removed to reduce console noise
+    // Token is automatically managed by csrf-token.js
+    </script>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded',function(){
+    document.getElementById('closeSearchPanelBtn')?.addEventListener('click',closeSearchPanel);
+    document.getElementById('userAvatarImg')?.addEventListener('error',function(){
+        const gender = window.currentUser?.gender || '';
+        const defaultImg = (gender && gender.toString().toLowerCase() === 'f') ? '/assets/images/default_profile_female.svg' : '/assets/images/default_profile_male.svg';
+        if(!this.src.includes('default_profile_')){this.src=defaultImg;}
+    });
+    document.getElementById('backToPreviousBtn')?.addEventListener('click',e=>{e.preventDefault();history.back();});
+    document.getElementById('searchPanelBtn')?.addEventListener('click',function(){if(typeof openSearchPanel==='function')openSearchPanel();else if(typeof window.openSearchPanel==='function')window.openSearchPanel();});
+    document.querySelectorAll('#chatBackBtn,#chatBackBtn2').forEach(b=>b?.addEventListener('click',goBackToConversations));
+    document.getElementById('chatMoreBtn')?.addEventListener('click',showChatMoreMenu);
+    document.getElementById('blockUserButton')?.addEventListener('click',blockCurrentUser);
+    document.getElementById('removeUserButton')?.addEventListener('click',removeUserFromConversation);
+    document.getElementById('inlineBlockCancelBtn')?.addEventListener('click',closeBlockConfirm);
+    document.getElementById('inlineBlockYesBtn')?.addEventListener('click',confirmBlock);
+    document.getElementById('inlineRemoveCancelBtn')?.addEventListener('click',closeRemoveUserConfirm);
+    document.getElementById('inlineRemoveYesBtn')?.addEventListener('click',confirmRemoveUser);
+    document.getElementById('clearImagePreviewsBtn')?.addEventListener('click',clearImagePreviews);
+    document.getElementById('sendImagesWithPreviewsBtn')?.addEventListener('click',sendImagesWithPreviews);
+    document.getElementById('selectImageBtn')?.addEventListener('click',selectImage);
+    document.getElementById('showEmojiPickerBtn')?.addEventListener('click',()=>showEmojiPicker('messageInput'));
+    document.getElementById('sendMessageBtn')?.addEventListener('click',sendMessage);
+    document.getElementById('imageInput')?.addEventListener('change',handleImageSelect);
+    });
+    </script>

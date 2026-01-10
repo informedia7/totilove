@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logout - Totilove</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .logout-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .logout-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #ff6b6b;
+        }
+
+        .logout-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .logout-message {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .logout-progress {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .logout-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #ffa500);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .logout-status {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+
+        .logout-link {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .logout-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .fade-out {
+            animation: fadeOut 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="logout-container" id="logoutContainer">
+        <div class="logout-icon">🚪</div>
+        <h1 class="logout-title">Logging Out...</h1>
+        <p class="logout-message">Cleaning up your session and logging you out securely.</p>
+        
+        <div class="logout-progress">
+            <div class="logout-progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div class="logout-status" id="status">Initializing logout process...</div>
+        
+        <a href="/login" class="logout-link" id="loginLink" style="display: none;">
+            <span class="spinner"></span>Redirecting to Login
+        </a>
+    </div>
+
+    <!-- Session Manager --><script>
+        // Get session token from URL parameters
+        const progressBar = document.getElementById('progressBar');
+        const status = document.getElementById('status');
+        const loginLink = document.getElementById('loginLink');
+        const logoutContainer = document.getElementById('logoutContainer');
+        
+        let progress = 0;
+        
+        // Simulate logout process
+        const logoutSteps = [
+            { progress: 20, message: 'Clearing session data...' },
+            { progress: 40, message: 'Removing authentication tokens...' },
+            { progress: 60, message: 'Cleaning browser storage...' },
+            { progress: 80, message: 'Finalizing logout...' },
+            { progress: 100, message: 'Logout complete!' }
+        ];
+        
+        let currentStep = 0;
+        
+        function updateProgress() {
+            if (currentStep < logoutSteps.length) {
+                const step = logoutSteps[currentStep];
+                progress = step.progress;
+                progressBar.style.width = progress + '%';
+                status.textContent = step.message;
+                currentStep++;
+                
+                setTimeout(updateProgress, 800);
+            } else {
+                // Logout complete - clean up and redirect
+                cleanupAndRedirect();
+            }
+        }
+        
+        function cleanupAndRedirect() {
+            // Use global logout function (handles everything)
+            if (window.handleLogout) {
+                window.handleLogout({ preventDefault: () => {} });
+            } else {
+                // Fallback: redirect to login if handleLogout not available
+                status.textContent = 'Redirecting to login page...';
+                loginLink.style.display = 'inline-block';
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 1000);
+            }
+            
+            // Redirect after a short delay
+            setTimeout(() => {
+                logoutContainer.classList.add('fade-out');
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 500);
+            }, 1500);
+        }
+        
+        // Start logout process
+        setTimeout(updateProgress, 500);
+        
+        // Manual logout link (in case auto-redirect fails)
+        loginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = '/login';
+        });
+    </script>
+</body>
+</html> 

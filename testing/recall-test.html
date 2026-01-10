@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recall System Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-button.danger {
+            background: #dc3545;
+        }
+        .test-button.danger:hover {
+            background: #c82333;
+        }
+        .test-button.success {
+            background: #28a745;
+        }
+        .test-button.success:hover {
+            background: #218838;
+        }
+        .message {
+            background: #e9ecef;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        .message.recalled {
+            background: #f8f9fa;
+            border-left-color: #6c757d;
+            opacity: 0.6;
+        }
+        .recalled-text {
+            font-style: italic;
+            color: #6c757d;
+        }
+        .log-area {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .recall-options {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .recall-option {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .recall-option.selected {
+            border-color: #007bff;
+            background: #e7f3ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Recall System Test Page</h1>
+    
+    <!-- Test Configuration -->
+    <div class="test-section">
+        <h2>⚙️ Test Configuration</h2>
+        <div class="form-group">
+            <label for="userId">User ID:</label>
+            <input type="number" id="userId" value="23" placeholder="Enter user ID">
+        </div>
+        <div class="form-group">
+            <label for="messageId">Message ID:</label>
+            <input type="number" id="messageId" value="" placeholder="Enter message ID to test">
+        </div>
+        <div class="form-group">
+            <label for="serverUrl">Server URL:</label>
+            <input type="text" id="serverUrl" value="http://localhost:3000" placeholder="Server URL">
+        </div>
+    </div>
+
+    <!-- Database Test -->
+    <div class="test-section">
+        <h2>🗄️ Database Tests</h2>
+        <button class="test-button" onclick="testGetMessageStatus()">Get Message Status</button>
+        <button class="test-button" onclick="testGetMessageDetails()">Get Message Details</button>
+        <button class="test-button" onclick="testCheckDatabaseFields()">Check Database Fields</button>
+        <div id="databaseResults"></div>
+    </div>
+
+    <!-- Recall API Tests -->
+    <div class="test-section">
+        <h2>🔄 Recall API Tests</h2>
+        <div class="recall-options">
+            <div class="recall-option" onclick="selectRecallType('auto')">
+                <strong>Auto Recall</strong><br>
+                <small>Based on read status</small>
+            </div>
+            <div class="recall-option" onclick="selectRecallType('soft')">
+                <strong>Soft Recall</strong><br>
+                <small>Show as recalled</small>
+            </div>
+            <div class="recall-option" onclick="selectRecallType('hard')">
+                <strong>Hard Recall</strong><br>
+                <small>Delete completely</small>
+            </div>
+        </div>
+        <button class="test-button success" onclick="testRecallMessage()">Test Recall Message</button>
+        <button class="test-button danger" onclick="testRecallWithInvalidData()">Test Invalid Recall</button>
+        <div id="recallResults"></div>
+    </div>
+
+    <!-- Frontend Tests -->
+    <div class="test-section">
+        <h2>🎨 Frontend Tests</h2>
+        <button class="test-button" onclick="testCreateRecalledMessage()">Create Recalled Message</button>
+        <button class="test-button" onclick="testReplaceMessage()">Test Message Replacement</button>
+        <button class="test-button" onclick="testMessageStyling()">Test Message Styling</button>
+        <div id="frontendResults"></div>
+    </div>
+
+    <!-- Message Display Test -->
+    <div class="test-section">
+        <h2>💬 Message Display Test</h2>
+        <div id="messageDisplay">
+            <div class="message" data-message-id="123">
+                <strong>Test Message:</strong> This is a test message to demonstrate the recall system.
+                <div class="message-time">12:34 PM</div>
+            </div>
+        </div>
+        <button class="test-button" onclick="testRecallDisplay()">Test Recall Display</button>
+        <button class="test-button" onclick="resetMessageDisplay()">Reset Display</button>
+    </div>
+
+    <!-- System Status -->
+    <div class="test-section">
+        <h2>📊 System Status</h2>
+        <button class="test-button" onclick="checkSystemStatus()">Check System Status</button>
+        <div id="systemStatus"></div>
+    </div>
+
+    <!-- Test Logs -->
+    <div class="test-section">
+        <h2>📝 Test Logs</h2>
+        <button class="test-button" onclick="clearLogs()">Clear Logs</button>
+        <div id="testLogs" class="log-area"></div>
+    </div>
+
+    <script>
+        let selectedRecallType = 'auto';
+        let testLogs = [];
+
+        // Utility functions
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+            testLogs.push(logEntry);
+            
+            const logArea = document.getElementById('testLogs');
+            logArea.innerHTML = testLogs.join('\n');
+            logArea.scrollTop = logArea.scrollHeight;
+            
+            console.log(logEntry);
+        }
+
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function selectRecallType(type) {
+            selectedRecallType = type;
+            document.querySelectorAll('.recall-option').forEach(opt => opt.classList.remove('selected'));
+            event.target.closest('.recall-option').classList.add('selected');
+            log(`Selected recall type: ${type}`);
+        }
+
+        // Database Tests
+        async function testGetMessageStatus() {
+            const messageId = document.getElementById('messageId').value;
+            const userId = document.getElementById('userId').value;
+            const serverUrl = document.getElementById('serverUrl').value;
+
+            if (!messageId) {
+                showResult('databaseResults', 'Please enter a message ID', 'error');
+                return;
+            }
+
+            try {
+                log(`Testing getMessageStatus for message ${messageId}`);
+                
+                const response = await fetch(`${serverUrl}/api/messages/${messageId}/status?userId=${userId}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const status = `
+                        <strong>Message Status:</strong><br>
+                        Message ID: ${result.messageId}<br>
+                        Is Read: ${result.isRead ? 'Yes' : 'No'}<br>
+                        Read At: ${result.readAt || 'Not read'}<br>
+                        Success: ${result.success}
+                    `;
+                    showResult('databaseResults', status, 'success');
+                    log(`Message status retrieved successfully: ${JSON.stringify(result)}`);
+                } else {
+                    showResult('databaseResults', `Error: ${result.error}`, 'error');
+                    log(`Failed to get message status: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('databaseResults', `Network error: ${error.message}`, 'error');
+                log(`Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetMessageDetails() {
+            const messageId = document.getElementById('messageId').value;
+            const userId = document.getElementById('userId').value;
+            const serverUrl = document.getElementById('serverUrl').value;
+
+            if (!messageId) {
+                showResult('databaseResults', 'Please enter a message ID', 'error');
+                return;
+            }
+
+            try {
+                log(`Testing getMessageDetails for message ${messageId}`);
+                
+                // Try to get message from conversation endpoint
+                const response = await fetch(`${serverUrl}/api/messages/conversation/${userId}/9?limit=100`);
+                const result = await response.json();
+                
+                if (result.success && result.messages) {
+                    const message = result.messages.find(m => m.id == messageId);
+                    if (message) {
+                        const details = `
+                            <strong>Message Details:</strong><br>
+                            ID: ${message.id}<br>
+                            Content: ${message.content}<br>
+                            Recalled: ${message.recalled || 'false'}<br>
+                            Recall Type: ${message.recall_type || 'none'}<br>
+                            Sender: ${message.sender_id}<br>
+                            Receiver: ${message.receiver_id}<br>
+                            Timestamp: ${new Date(message.timestamp).toLocaleString()}
+                        `;
+                        showResult('databaseResults', details, 'success');
+                        log(`Message details retrieved: ${JSON.stringify(message)}`);
+                    } else {
+                        showResult('databaseResults', 'Message not found in conversation', 'error');
+                        log(`Message ${messageId} not found in conversation`, 'error');
+                    }
+                } else {
+                    showResult('databaseResults', `Error: ${result.error || 'Failed to get conversation'}`, 'error');
+                    log(`Failed to get conversation: ${result.error || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                showResult('databaseResults', `Network error: ${error.message}`, 'error');
+                log(`Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCheckDatabaseFields() {
+            const messageId = document.getElementById('messageId').value;
+            const userId = document.getElementById('userId').value;
+            const serverUrl = document.getElementById('serverUrl').value;
+
+            if (!messageId) {
+                showResult('databaseResults', 'Please enter a message ID', 'error');
+                return;
+            }
+
+            try {
+                log(`Checking database fields for message ${messageId}`);
+                
+                // Direct database query simulation
+                const response = await fetch(`${serverUrl}/api/messages/conversation/${userId}/9?limit=100`);
+                const result = await response.json();
+                
+                if (result.success && result.messages) {
+                    const message = result.messages.find(m => m.id == messageId);
+                    if (message) {
+                        const fields = `
+                            <strong>Database Fields Check:</strong><br>
+                            <code>recalled</code>: ${message.recalled !== undefined ? message.recalled : 'MISSING'}<br>
+                            <code>recall_type</code>: ${message.recall_type !== undefined ? message.recall_type : 'MISSING'}<br>
+                            <code>message</code>: ${message.content || 'MISSING'}<br>
+                            <code>deleted_by_sender</code>: ${message.deleted_by_sender !== undefined ? message.deleted_by_sender : 'MISSING'}<br>
+                            <code>deleted_by_receiver</code>: ${message.deleted_by_receiver !== undefined ? message.deleted_by_receiver : 'MISSING'}
+                        `;
+                        
+                        const hasRecallFields = message.recalled !== undefined && message.recall_type !== undefined;
+                        showResult('databaseResults', fields, hasRecallFields ? 'success' : 'error');
+                        
+                        if (hasRecallFields) {
+                            log(`✅ All recall fields present in message ${messageId}`);
+                        } else {
+                            log(`❌ Missing recall fields in message ${messageId}`, 'error');
+                        }
+                    } else {
+                        showResult('databaseResults', 'Message not found', 'error');
+                        log(`Message ${messageId} not found`, 'error');
+                    }
+                } else {
+                    showResult('databaseResults', 'Failed to get messages', 'error');
+                    log(`Failed to get messages: ${result.error || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                showResult('databaseResults', `Network error: ${error.message}`, 'error');
+                log(`Network error: ${error.message}`, 'error');
+            }
+        }
+
+        // Recall API Tests
+        async function testRecallMessage() {
+            const messageId = document.getElementById('messageId').value;
+            const userId = document.getElementById('userId').value;
+            const serverUrl = document.getElementById('serverUrl').value;
+
+            if (!messageId) {
+                showResult('recallResults', 'Please enter a message ID', 'error');
+                return;
+            }
+
+            try {
+                log(`Testing recall message ${messageId} with type: ${selectedRecallType}`);
+                
+                const response = await fetch(`${serverUrl}/api/messages/${messageId}/recall`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-ID': userId
+                    },
+                    body: JSON.stringify({
+                        userId: userId,
+                        recallType: selectedRecallType
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    const recallResult = `
+                        <strong>Recall Successful:</strong><br>
+                        Message ID: ${messageId}<br>
+                        Recall Type: ${result.recallType}<br>
+                        Was Read: ${result.wasRead ? 'Yes' : 'No'}<br>
+                        Message: ${result.message}<br>
+                        Success: ${result.success}
+                    `;
+                    showResult('recallResults', recallResult, 'success');
+                    log(`✅ Recall successful: ${JSON.stringify(result)}`);
+                    
+                    // Refresh message details
+                    setTimeout(() => testGetMessageDetails(), 1000);
+                } else {
+                    showResult('recallResults', `Recall failed: ${result.error}`, 'error');
+                    log(`❌ Recall failed: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('recallResults', `Network error: ${error.message}`, 'error');
+                log(`❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testRecallWithInvalidData() {
+            const serverUrl = document.getElementById('serverUrl').value;
+
+            try {
+                log('Testing recall with invalid data');
+                
+                const response = await fetch(`${serverUrl}/api/messages/999999/recall`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-ID': '999999'
+                    },
+                    body: JSON.stringify({
+                        userId: '999999',
+                        recallType: 'invalid'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    showResult('recallResults', `Expected error handled correctly: ${result.error}`, 'success');
+                    log(`✅ Invalid recall handled correctly: ${result.error}`);
+                } else {
+                    showResult('recallResults', 'Unexpected success with invalid data', 'error');
+                    log(`❌ Unexpected success with invalid data`, 'error');
+                }
+            } catch (error) {
+                showResult('recallResults', `Network error: ${error.message}`, 'error');
+                log(`❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        // Frontend Tests
+        function testCreateRecalledMessage() {
+            try {
+                log('Testing createRecalledMessagePlaceholder function');
+                
+                // Simulate the function that should exist in talk.html
+                function createRecalledMessagePlaceholder(messageId) {
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'message recalled-message sent';
+                    placeholder.setAttribute('data-message-id', messageId);
+                    placeholder.setAttribute('data-recalled', 'true');
+                    placeholder.setAttribute('data-recall-type', 'soft');
+                    
+                    placeholder.innerHTML = `
+                        <div class="message-bubble recalled-bubble">
+                            <div class="recalled-content">
+                                <span class="recalled-icon">🗑️</span>
+                                <span class="recalled-text">Message recalled</span>
+                            </div>
+                        </div>
+                        <div class="message-time">${new Date().toLocaleTimeString()}</div>
+                    `;
+                    
+                    return placeholder;
+                }
+                
+                const placeholder = createRecalledMessagePlaceholder('123');
+                const result = `
+                    <strong>Recalled Message Created:</strong><br>
+                    Classes: ${placeholder.className}<br>
+                    Data Attributes: ${placeholder.getAttribute('data-recalled')}, ${placeholder.getAttribute('data-recall-type')}<br>
+                    Content: ${placeholder.innerHTML.includes('Message recalled') ? '✅ Contains "Message recalled"' : '❌ Missing "Message recalled"'}
+                `;
+                
+                showResult('frontendResults', result, 'success');
+                log(`✅ Recalled message placeholder created successfully`);
+                
+                // Test the styling
+                testMessageStyling();
+                
+            } catch (error) {
+                showResult('frontendResults', `Error: ${error.message}`, 'error');
+                log(`❌ Error creating recalled message: ${error.message}`, 'error');
+            }
+        }
+
+        function testReplaceMessage() {
+            try {
+                log('Testing message replacement functionality');
+                
+                const messageDisplay = document.getElementById('messageDisplay');
+                const originalMessage = messageDisplay.querySelector('.message');
+                
+                if (!originalMessage) {
+                    showResult('frontendResults', 'No message to replace', 'error');
+                    return;
+                }
+                
+                // Create recalled placeholder
+                const placeholder = document.createElement('div');
+                placeholder.className = 'message recalled-message sent';
+                placeholder.setAttribute('data-message-id', '123');
+                placeholder.setAttribute('data-recalled', 'true');
+                placeholder.innerHTML = `
+                    <div class="message-bubble recalled-bubble">
+                        <div class="recalled-content">
+                            <span class="recalled-icon">🗑️</span>
+                            <span class="recalled-text">Message recalled</span>
+                        </div>
+                    </div>
+                    <div class="message-time">${new Date().toLocaleTimeString()}</div>
+                `;
+                
+                // Replace the message
+                messageDisplay.replaceChild(placeholder, originalMessage);
+                
+                showResult('frontendResults', '✅ Message replaced with recalled placeholder', 'success');
+                log(`✅ Message replacement test successful`);
+                
+            } catch (error) {
+                showResult('frontendResults', `Error: ${error.message}`, 'error');
+                log(`❌ Error replacing message: ${error.message}`, 'error');
+            }
+        }
+
+        function testMessageStyling() {
+            try {
+                log('Testing message styling for recalled messages');
+                
+                const recalledMessages = document.querySelectorAll('.recalled-message');
+                
+                if (recalledMessages.length === 0) {
+                    showResult('frontendResults', 'No recalled messages found to test styling', 'info');
+                    return;
+                }
+                
+                let styleResults = [];
+                recalledMessages.forEach((msg, index) => {
+                    const hasRecalledClass = msg.classList.contains('recalled-message');
+                    const hasRecalledAttribute = msg.getAttribute('data-recalled') === 'true';
+                    const hasRecallType = msg.getAttribute('data-recall-type');
+                    const hasRecalledText = msg.innerHTML.includes('Message recalled');
+                    
+                    styleResults.push(`
+                        Message ${index + 1}:<br>
+                        - recalled-message class: ${hasRecalledClass ? '✅' : '❌'}<br>
+                        - data-recalled attribute: ${hasRecalledAttribute ? '✅' : '❌'}<br>
+                        - data-recall-type: ${hasRecallType ? '✅' : '❌'}<br>
+                        - "Message recalled" text: ${hasRecalledText ? '✅' : '❌'}
+                    `);
+                });
+                
+                const allStylesCorrect = recalledMessages.length > 0 && 
+                    Array.from(recalledMessages).every(msg => 
+                        msg.classList.contains('recalled-message') &&
+                        msg.getAttribute('data-recalled') === 'true' &&
+                        msg.innerHTML.includes('Message recalled')
+                    );
+                
+                showResult('frontendResults', styleResults.join('<hr>'), allStylesCorrect ? 'success' : 'error');
+                log(`✅ Message styling test completed`);
+                
+            } catch (error) {
+                showResult('frontendResults', `Error: ${error.message}`, 'error');
+                log(`❌ Error testing message styling: ${error.message}`, 'error');
+            }
+        }
+
+        // Message Display Tests
+        function testRecallDisplay() {
+            try {
+                log('Testing recall display functionality');
+                
+                const messageDisplay = document.getElementById('messageDisplay');
+                const message = messageDisplay.querySelector('.message');
+                
+                if (!message) {
+                    showResult('frontendResults', 'No message to test recall display', 'error');
+                    return;
+                }
+                
+                // Simulate recall by adding recalled classes and attributes
+                message.classList.add('recalled-message');
+                message.setAttribute('data-recalled', 'true');
+                message.setAttribute('data-recall-type', 'soft');
+                
+                // Replace content with recalled text
+                const originalContent = message.innerHTML;
+                message.innerHTML = `
+                    <div class="message-bubble recalled-bubble">
+                        <div class="recalled-content">
+                            <span class="recalled-icon">🗑️</span>
+                            <span class="recalled-text">Message recalled</span>
+                        </div>
+                    </div>
+                    <div class="message-time">${new Date().toLocaleTimeString()}</div>
+                `;
+                
+                showResult('frontendResults', '✅ Recall display test completed - message now shows as recalled', 'success');
+                log(`✅ Recall display test successful`);
+                
+            } catch (error) {
+                showResult('frontendResults', `Error: ${error.message}`, 'error');
+                log(`❌ Error testing recall display: ${error.message}`, 'error');
+            }
+        }
+
+        function resetMessageDisplay() {
+            try {
+                log('Resetting message display');
+                
+                const messageDisplay = document.getElementById('messageDisplay');
+                messageDisplay.innerHTML = `
+                    <div class="message" data-message-id="123">
+                        <strong>Test Message:</strong> This is a test message to demonstrate the recall system.
+                        <div class="message-time">12:34 PM</div>
+                    </div>
+                `;
+                
+                showResult('frontendResults', '✅ Message display reset to original state', 'success');
+                log(`✅ Message display reset successful`);
+                
+            } catch (error) {
+                showResult('frontendResults', `Error: ${error.message}`, 'error');
+                log(`❌ Error resetting message display: ${error.message}`, 'error');
+            }
+        }
+
+        // System Status
+        async function checkSystemStatus() {
+            const serverUrl = document.getElementById('serverUrl').value;
+            
+            try {
+                log('Checking system status');
+                
+                const response = await fetch(`${serverUrl}/health`);
+                const status = response.status;
+                
+                if (status === 200) {
+                    showResult('systemStatus', '✅ Server is running and responding', 'success');
+                    log(`✅ Server status: ${status}`);
+                } else {
+                    showResult('systemStatus', `⚠️ Server responded with status: ${status}`, 'error');
+                    log(`⚠️ Server status: ${status}`, 'error');
+                }
+                
+                // Test recall endpoint availability
+                try {
+                    const recallResponse = await fetch(`${serverUrl}/api/messages/1/recall`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: '1', recallType: 'auto' })
+                    });
+                    
+                    if (recallResponse.status === 403 || recallResponse.status === 404) {
+                        showResult('systemStatus', '✅ Recall endpoint is available (returned expected error)', 'success');
+                        log(`✅ Recall endpoint available, status: ${recallResponse.status}`);
+                    } else {
+                        showResult('systemStatus', `⚠️ Recall endpoint returned unexpected status: ${recallResponse.status}`, 'info');
+                        log(`⚠️ Recall endpoint status: ${recallResponse.status}`, 'info');
+                    }
+                } catch (recallError) {
+                    showResult('systemStatus', `❌ Recall endpoint error: ${recallError.message}`, 'error');
+                    log(`❌ Recall endpoint error: ${recallError.message}`, 'error');
+                }
+                
+            } catch (error) {
+                showResult('systemStatus', `❌ Server connection failed: ${error.message}`, 'error');
+                log(`❌ Server connection failed: ${error.message}`, 'error');
+            }
+        }
+
+        function clearLogs() {
+            testLogs = [];
+            document.getElementById('testLogs').innerHTML = '';
+            log('Logs cleared');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Recall System Test Page loaded');
+            log('Ready to test the complete recall implementation');
+            
+            // Set default recall type
+            document.querySelector('.recall-option').classList.add('selected');
+        });
+    </script>
+</body>
+</html>

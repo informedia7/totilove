@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Configuration - Totilove Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .config-sections-wrapper {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 1024px) {
+            .config-sections-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none;">← Back to Dashboard</a>
+                <form method="POST" action="/logout" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+            <h1>⚙️ System Configuration</h1>
+            <p>Manage system settings and platform configuration</p>
+        </div>
+        
+        <div class="content">
+            <form id="configForm">
+                <div class="config-sections-wrapper">
+                    <!-- Registration Settings -->
+                    <div class="config-section">
+                        <h2>📝 Registration Settings</h2>
+                        
+                        <div class="config-item">
+                            <label>
+                                <input type="checkbox" name="registration_enabled" id="registration_enabled">
+                                Enable Registration
+                            </label>
+                            <div class="description">Allow new users to register</div>
+                        </div>
+
+                        <div class="config-item">
+                            <label>
+                                <input type="checkbox" name="registration_require_email_verification" id="registration_require_email_verification">
+                                Require Email Verification
+                            </label>
+                            <div class="description email-verification-description">New users must verify their email before using the platform</div>
+                        </div>
+
+                        <div class="config-item">
+                            <label>
+                                <input type="checkbox" name="registration_require_profile_verification" id="registration_require_profile_verification">
+                                Require Profile Verification
+                            </label>
+                            <div class="description">New users must have their profile verified by admin</div>
+                        </div>
+
+                        <div class="config-item">
+                            <label>Minimum Age</label>
+                            <div class="description">Minimum age requirement for registration</div>
+                            <input type="number" name="registration_minimum_age" id="registration_minimum_age" min="18" max="100">
+                        </div>
+
+                        <div class="config-item">
+                            <label>Blocked Email Domains (JSON array)</label>
+                            <div class="description">List of email domains to block (e.g., ["spam.com", "fake.com"])</div>
+                            <textarea name="registration_blocked_email_domains" id="registration_blocked_email_domains" class="json-input"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Profile Settings -->
+                    <div class="config-section">
+                        <h2>👤 Profile Settings</h2>
+                        
+                        <div class="config-item">
+                            <label>Minimum Photos Required</label>
+                            <div class="description">Minimum number of photos users must upload</div>
+                            <input type="number" name="profile_minimum_photos" id="profile_minimum_photos" min="0" max="20">
+                        </div>
+
+                        <div class="config-item">
+                            <label>Profile Completeness Threshold (%)</label>
+                            <div class="description">Minimum profile completeness percentage</div>
+                            <input type="number" name="profile_completeness_threshold" id="profile_completeness_threshold" min="0" max="100">
+                        </div>
+
+                        <div class="config-item">
+                            <label>Required Fields (JSON array)</label>
+                            <div class="description">Fields that must be filled (e.g., ["username", "email", "gender"])</div>
+                            <textarea name="profile_required_fields" id="profile_required_fields" class="json-input"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Image Approval Settings -->
+                    <div class="config-section">
+                        <h2>🖼️ Image Approval Settings</h2>
+                        
+                        <div class="config-item">
+                            <label>
+                                <input type="checkbox" name="image_approval_enabled" id="image_approval_enabled">
+                                Enable image approval process
+                            </label>
+                            <div class="description">When enabled, all uploaded images must be approved by an admin before being visible to other users. When disabled, images are immediately visible after upload.</div>
+                        </div>
+                    </div>
+
+                    <!-- Messaging Settings -->
+                    <div class="config-section">
+                        <h2>💬 Messaging Settings</h2>
+                        
+                        <div class="config-item">
+                            <label>Messages Per Day Limit</label>
+                            <div class="description">Maximum messages per day per user (0 = unlimited)</div>
+                            <input type="number" name="messaging_messages_per_day_limit" id="messaging_messages_per_day_limit" min="0">
+                        </div>
+
+                        <div class="config-item">
+                            <label>Message Length Limit (characters)</label>
+                            <div class="description">Maximum message length</div>
+                            <input type="number" name="messaging_message_length_limit" id="messaging_message_length_limit" min="1" max="10000">
+                        </div>
+
+                        <div class="config-item">
+                            <label>Attachment Limit</label>
+                            <div class="description">Maximum attachments per message</div>
+                            <input type="number" name="messaging_attachment_limit" id="messaging_attachment_limit" min="0" max="20">
+                        </div>
+
+                        <div class="config-item">
+                            <label>Attachment Size Limit (MB)</label>
+                            <div class="description">Maximum attachment size</div>
+                            <input type="number" name="messaging_attachment_size_limit_mb" id="messaging_attachment_size_limit_mb" min="1" max="100">
+                        </div>
+
+                        <div class="config-item">
+                            <label>
+                                <input type="checkbox" name="messaging_spam_detection_enabled" id="messaging_spam_detection_enabled">
+                                Enable Spam Detection
+                            </label>
+                            <div class="description">Automatically detect and filter spam messages</div>
+                        </div>
+                    </div>
+
+                    <!-- Matching Settings -->
+                    <div class="config-section">
+                        <h2>🎯 Matching Settings</h2>
+                        
+                        <div class="config-item">
+                            <label>Default Distance Radius (km)</label>
+                            <div class="description">Default search radius for matching</div>
+                            <input type="number" name="matching_distance_radius_default" id="matching_distance_radius_default" min="1" max="1000">
+                        </div>
+
+                        <div class="config-item">
+                            <label>Default Age Range - Min</label>
+                            <div class="description">Default minimum age for matching</div>
+                            <input type="number" name="matching_age_range_default_min" id="matching_age_range_default_min" min="18" max="100">
+                        </div>
+
+                        <div class="config-item">
+                            <label>Default Age Range - Max</label>
+                            <div class="description">Default maximum age for matching</div>
+                            <input type="number" name="matching_age_range_default_max" id="matching_age_range_default_max" min="18" max="100">
+                        </div>
+
+                        <div class="config-item">
+                            <label>
+                                <input type="checkbox" name="matching_gender_preferences_enabled" id="matching_gender_preferences_enabled">
+                                Enable Gender Preferences
+                            </label>
+                            <div class="description">Allow users to set gender preferences in matching</div>
+                        </div>
+                    </div>
+
+                    <!-- General Settings -->
+                    <div class="config-section">
+                        <h2>🌐 General Settings</h2>
+                        
+                        <div class="config-item">
+                            <label>Site Name</label>
+                            <div class="description">Name of the application</div>
+                            <input type="text" name="site_name" id="site_name">
+                        </div>
+
+                        <div class="config-item">
+                            <label>Site Description</label>
+                            <div class="description">Description of the application</div>
+                            <input type="text" name="site_description" id="site_description">
+                        </div>
+
+                        <div class="config-item">
+                            <label>
+                                <input type="checkbox" name="maintenance_mode" id="maintenance_mode">
+                                Maintenance Mode
+                            </label>
+                            <div class="description">Enable maintenance mode (blocks all user access)</div>
+                        </div>
+
+                        <div class="config-item">
+                            <label>Maintenance Message</label>
+                            <div class="description">Message shown to users during maintenance</div>
+                            <input type="text" name="maintenance_message" id="maintenance_message">
+                        </div>
+                    </div>
+
+                    <!-- Email Settings -->
+                    <div class="config-section">
+                        <h2>📧 Email Settings</h2>
+                        
+                        <div class="config-item">
+                            <label>SMTP Host</label>
+                            <div class="description">SMTP server hostname</div>
+                            <input type="text" name="email_smtp_host" id="email_smtp_host">
+                        </div>
+
+                        <div class="config-item">
+                            <label>SMTP Port</label>
+                            <div class="description">SMTP server port</div>
+                            <input type="number" name="email_smtp_port" id="email_smtp_port" min="1" max="65535">
+                        </div>
+
+                        <div class="config-item">
+                            <label>SMTP Username</label>
+                            <div class="description">SMTP authentication username</div>
+                            <input type="text" name="email_smtp_user" id="email_smtp_user">
+                        </div>
+
+                        <div class="config-item">
+                            <label>SMTP Password</label>
+                            <div class="description">SMTP authentication password (stored encrypted)</div>
+                            <input type="password" name="email_smtp_password" id="email_smtp_password">
+                        </div>
+
+                        <div class="config-item">
+                            <label>From Email Address</label>
+                            <div class="description">Default sender email address</div>
+                            <input type="email" name="email_from_address" id="email_from_address">
+                        </div>
+
+                        <div class="config-item">
+                            <label>
+                                <input type="checkbox" name="email_notifications_enabled" id="email_notifications_enabled">
+                                Enable Email Notifications
+                            </label>
+                            <div class="description">Send email notifications to users</div>
+                        </div>
+                    </div>
+
+                    <!-- Security Settings -->
+                    <div class="config-section">
+                        <h2>🔒 Security Settings</h2>
+                        
+                        <div class="config-item">
+                            <label>Password Minimum Length</label>
+                            <div class="description">Minimum password length requirement</div>
+                            <input type="number" name="security_password_min_length" id="security_password_min_length" min="6" max="50">
+                        </div>
+
+                        <div class="config-item">
+                            <label>
+                                <input type="checkbox" name="security_password_require_uppercase" id="security_password_require_uppercase">
+                                Require Uppercase Letter
+                            </label>
+                        </div>
+
+                        <div class="config-item">
+                            <label>
+                                <input type="checkbox" name="security_password_require_lowercase" id="security_password_require_lowercase">
+                                Require Lowercase Letter
+                            </label>
+                        </div>
+
+                        <div class="config-item">
+                            <label>
+                                <input type="checkbox" name="security_password_require_number" id="security_password_require_number">
+                                Require Number
+                            </label>
+                        </div>
+
+                        <div class="config-item">
+                            <label>
+                                <input type="checkbox" name="security_password_require_special" id="security_password_require_special">
+                                Require Special Character
+                            </label>
+                        </div>
+
+                        <div class="config-item">
+                            <label>Session Timeout (minutes)</label>
+                            <div class="description">Session timeout duration (1440 = 24 hours)</div>
+                            <input type="number" name="security_session_timeout_minutes" id="security_session_timeout_minutes" min="1">
+                        </div>
+
+                        <div class="config-item">
+                            <label>
+                                <input type="checkbox" name="security_rate_limit_enabled" id="security_rate_limit_enabled">
+                                Enable Rate Limiting
+                            </label>
+                            <div class="description">Limit API requests per IP address</div>
+                        </div>
+
+                        <div class="config-item">
+                            <label>Rate Limit (requests per minute)</label>
+                            <div class="description">Maximum requests per minute per IP</div>
+                            <input type="number" name="security_rate_limit_requests_per_minute" id="security_rate_limit_requests_per_minute" min="1">
+                        </div>
+
+                        <div class="config-item">
+                            <label>
+                                <input type="checkbox" name="security_ip_blocking_enabled" id="security_ip_blocking_enabled">
+                                Enable IP Blocking
+                            </label>
+                            <div class="description">Allow blocking specific IP addresses</div>
+                        </div>
+                    </div>
+
+                    <!-- Performance Settings -->
+                    <div class="config-section">
+                        <h2>⚡ Performance Settings</h2>
+                        
+                        <div class="config-item">
+                            <label>
+                                <input type="checkbox" name="performance_cache_enabled" id="performance_cache_enabled">
+                                Enable Caching
+                            </label>
+                            <div class="description">Enable Redis caching for improved performance</div>
+                        </div>
+
+                        <div class="config-item">
+                            <label>Cache TTL (seconds)</label>
+                            <div class="description">Cache time-to-live in seconds</div>
+                            <input type="number" name="performance_cache_ttl_seconds" id="performance_cache_ttl_seconds" min="1">
+                        </div>
+
+                        <div class="config-item">
+                            <label>Database Pool - Max Connections</label>
+                            <div class="description">Maximum database connections in pool</div>
+                            <input type="number" name="performance_db_pool_max" id="performance_db_pool_max" min="1" max="100">
+                        </div>
+
+                        <div class="config-item">
+                            <label>Database Pool - Min Connections</label>
+                            <div class="description">Minimum database connections in pool</div>
+                            <input type="number" name="performance_db_pool_min" id="performance_db_pool_min" min="1" max="50">
+                        </div>
+
+                        <div class="config-item">
+                            <label>API Rate Limit (per minute)</label>
+                            <div class="description">API rate limit for general endpoints</div>
+                            <input type="number" name="performance_api_rate_limit" id="performance_api_rate_limit" min="1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="save-button">
+                    <button type="submit" class="btn btn-primary">Save All Settings</button>
+                    <button type="button" class="btn btn-secondary" onclick="loadSettings()">Reset to Defaults</button>
+                </div>
+            </form>
+
+            <!-- Status Message -->
+            <div id="statusMessage" style="display: none; margin-top: 20px; padding: 12px; border-radius: 6px;"></div>
+        </div>
+    </div>
+
+    <script src="/js/admin-configuration.js"></script>
+</body>
+</html>

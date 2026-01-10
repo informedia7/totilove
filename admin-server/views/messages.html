@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Management - Totilove Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .messages-container {
+            padding: 20px;
+        }
+        .message-content-cell:hover {
+            white-space: normal;
+            word-wrap: break-word;
+            position: absolute;
+            background: white;
+            border: 1px solid #ddd;
+            padding: 8px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none;">← Back to Dashboard</a>
+                <form method="POST" action="/logout" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+            <h1>💬 Message Management</h1>
+            <p>View, edit, delete, and manage all messages between users</p>
+        </div>
+        
+        <div class="content">
+            <div class="messages-container">
+                <!-- Filters -->
+                <div class="filters-panel">
+                    <h2>Filters</h2>
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label>Message ID</label>
+                            <input type="number" id="messageIdFilter" placeholder="Search by ID">
+                        </div>
+                        <div class="filter-group">
+                            <label>Search</label>
+                            <input type="text" id="searchInput" placeholder="Search messages...">
+                        </div>
+                        <div class="filter-group">
+                            <label>Username</label>
+                            <input type="text" id="usernameSearchInput" placeholder="Search by username">
+                        </div>
+                        <div class="filter-group">
+                            <label>Sender ID</label>
+                            <input type="number" id="senderFilter" placeholder="Sender ID">
+                        </div>
+                        <div class="filter-group">
+                            <label>Receiver ID</label>
+                            <input type="number" id="receiverFilter" placeholder="Receiver ID">
+                        </div>
+                        <div class="filter-group">
+                            <label>Status</label>
+                            <select id="statusFilter">
+                                <option value="">All</option>
+                                <option value="sent">Sent</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="read">Read</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="applyFilters" class="btn btn-primary">🔍 Search</button>
+                        <button id="clearFilters" class="btn btn-secondary">🔄 Clear</button>
+                        <button id="addMessageBtn" class="btn btn-success">➕ Add Message</button>
+                        <button id="exportCSVBtn" class="btn btn-info">📊 Export CSV</button>
+                    </div>
+                </div>
+
+                <!-- Statistics -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalMessages">-</div>
+                        <div class="stat-label">Total Messages</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="recalledMessages">-</div>
+                        <div class="stat-label">Recalled Messages</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="unreadMessages">-</div>
+                        <div class="stat-label">Unread Messages</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="savedMessages">-</div>
+                        <div class="stat-label">Saved Messages</div>
+                    </div>
+                </div>
+
+                <!-- Messages Table -->
+                <div class="messages-table-container">
+                    <table class="messages-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Message</th>
+                                <th>Timestamp</th>
+                                <th>Status</th>
+                                <th>Read At</th>
+                                <th>Recall Type</th>
+                                <th>Saved</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="messagesTableBody">
+                            <tr>
+                                <td colspan="10" style="text-align: center; padding: 40px;">Loading messages...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit Message Modal -->
+    <div id="editModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Edit Message</h2>
+                <span class="close" id="closeEditModal">&times;</span>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="editMessageId">
+                <div class="form-group">
+                    <label>Sender ID:</label>
+                    <input type="number" id="editSenderId" required>
+                </div>
+                <div class="form-group">
+                    <label>Receiver ID:</label>
+                    <input type="number" id="editReceiverId" required>
+                </div>
+                <div class="form-group">
+                    <label>Message:</label>
+                    <textarea id="editContent" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Status:</label>
+                    <select id="editStatus" required>
+                        <option value="sent">Sent</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="read">Read</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Recall Type:</label>
+                    <select id="editRecallType">
+                        <option value="none">None</option>
+                        <option value="soft">Soft</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Saved by Sender:</label>
+                    <select id="editSavedBySender">
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Saved by Receiver:</label>
+                    <select id="editSavedByReceiver">
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" id="cancelEditBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">💾 Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Message Modal -->
+    <div id="addModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>➕ Add Message</h2>
+                <span class="close" id="closeAddModal">&times;</span>
+            </div>
+            <form id="addForm">
+                <div class="form-group">
+                    <label>Sender ID:</label>
+                    <input type="number" id="addSenderId" required>
+                </div>
+                <div class="form-group">
+                    <label>Receiver ID:</label>
+                    <input type="number" id="addReceiverId" required>
+                </div>
+                <div class="form-group">
+                    <label>Message:</label>
+                    <textarea id="addContent" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Status:</label>
+                    <select id="addStatus" required>
+                        <option value="sent">Sent</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="read">Read</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" id="cancelAddBtn">Cancel</button>
+                    <button type="submit" class="btn btn-success">➕ Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/notifications.js"></script>
+    <script src="/js/admin-messages.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+

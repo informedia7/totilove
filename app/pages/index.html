@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="app.name">Totilove</title>
+    <link rel="stylesheet" href="/assets/css/vendor/font-awesome.min.css">
+    <link rel="stylesheet" href="/components/navbar/global-navbar.css">
+    <link rel="stylesheet" href="/components/navbar/navbar.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/default_profile_male.svg">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(45deg, #e74c3c, #c0392b);
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --light-bg: #f8f9fa;
+            --white: #ffffff;
+            --text-dark: #333333;
+            --text-muted: #666666;
+            --border-light: #e9ecef;
+            --shadow-soft: 0 5px 25px rgba(0,0,0,0.1);
+            --shadow-hover: 0 10px 30px rgba(0,0,0,0.15);
+            --border-radius: 15px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--light-bg);
+            padding-top: 0; /* Remove padding to eliminate white space */
+            margin: 0;
+        }
+
+        /* Override global navbar to use gradient background */
+        .global-navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+            display: flex !important;
+            justify-content: center !important;
+        }
+
+        .global-navbar-brand {
+            color: white !important;
+            font-weight: 700 !important;
+            font-size: 1.5rem !important;
+            flex-shrink: 0 !important;
+        }
+
+            .global-navbar-brand i {
+                background: linear-gradient(135deg, #fff 0%, #f8f9fa 25%, #fff 50%, #e3f2fd 75%, #fff 100%) !important;
+                -webkit-background-clip: text !important;
+                -webkit-text-fill-color: transparent !important;
+                background-clip: text !important;
+                font-size: 1.8rem !important;
+            }
+
+        .global-nav-link {
+            color: white !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            padding: 0.7rem 1.5rem !important;
+            border-radius: 10px !important;
+            text-decoration: none !important;
+            transition: all 0.3s ease !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+
+            .global-nav-link:hover {
+                background: rgba(255, 255, 255, 0.2) !important;
+                color: white !important;
+                transform: translateY(-2px) !important;
+            }
+
+            .global-nav-link.active {
+                background: rgba(255, 255, 255, 0.3) !important;
+                color: white !important;
+            }
+
+            .global-nav-link i {
+                font-size: 1rem !important;
+            }
+
+        .global-navbar-container {
+            max-width: 800px !important;
+            margin: 0 auto !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 0 2rem !important;
+            height: 100% !important;
+            gap: 3rem !important;
+        }
+
+        .global-navbar-brand {
+            flex: 0 0 auto !important;
+        }
+
+        .global-navbar-nav {
+            flex: 0 0 auto !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 1rem !important;
+            list-style: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .global-navbar-user {
+            flex: 0 0 auto !important;
+        }
+
+        .global-nav-item {
+            position: relative !important;
+        }
+
+        .global-navbar-user {
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            flex-shrink: 0 !important;
+        }
+
+        .global-auth-buttons {
+            display: flex !important;
+            gap: 1rem !important;
+            align-items: center !important;
+        }
+
+        .global-btn-outline {
+            padding: 0.7rem 1.5rem !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            background: transparent !important;
+            color: white !important;
+            border-radius: 10px !important;
+            text-decoration: none !important;
+            transition: all 0.3s ease !important;
+            font-weight: 600 !important;
+        }
+
+            .global-btn-outline:hover {
+                background: rgba(255, 255, 255, 0.1) !important;
+                border-color: rgba(255, 255, 255, 0.5) !important;
+                color: white !important;
+            }
+
+        .global-btn-solid {
+            padding: 0.7rem 1.5rem !important;
+            background: rgba(255, 255, 255, 0.2) !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            color: white !important;
+            border-radius: 10px !important;
+            text-decoration: none !important;
+            transition: all 0.3s ease !important;
+            font-weight: 600 !important;
+        }
+
+            .global-btn-solid:hover {
+                background: rgba(255, 255, 255, 0.3) !important;
+                color: white !important;
+            }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .global-navbar-container {
+                flex-direction: column !important;
+                gap: 1rem !important;
+                padding: 1rem !important;
+                height: auto !important;
+            }
+
+            .global-navbar-brand {
+                margin-right: 0 !important;
+            }
+
+            .global-navbar-nav {
+                order: 2 !important;
+                flex: none !important;
+            }
+
+            .global-navbar-user {
+                order: 3 !important;
+                margin-left: 0 !important;
+            }
+        }
+
+        /* Remove any white spaces or borders */
+        .global-navbar {
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            outline: none !important;
+        }
+
+        .global-navbar-container {
+            margin: 0 !important;
+            padding: 0 1rem !important;
+            border: none !important;
+            outline: none !important;
+        }
+
+        /* Ensure no gaps between navbar and content */
+        .global-navbar + * {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+
+        /* Remove any potential white borders */
+        .global-navbar::before,
+        .global-navbar::after {
+            display: none !important;
+        }
+
+        .global-navbar-container::before,
+        .global-navbar-container::after {
+            display: none !important;
+        }
+
+        /* Ensure navbar is flush with top */
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* Add padding to main content to account for fixed navbar */
+        .main-content {
+            padding-top: 80px !important;
+        }
+
+        /* Language Switcher - Integrated with Navbar */
+        .language-switcher {
+            position: relative;
+            display: inline-block;
+            margin-left: 1rem;
+            order: 999; /* Ensure it appears last in flex layout */
+        }
+
+        /* Ensure language switcher appears on the right in navbar */
+        .global-navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .global-navbar-user .language-switcher {
+                margin-left: auto; /* Push to the right */
+            }
+
+        .language-switcher .custom-select {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 5px 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .language-switcher .select-selected {
+            background: transparent;
+            border: none;
+            padding: 5px 25px 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            min-width: 120px;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+            .language-switcher .select-selected:after {
+                content: '';
+                position: absolute;
+                right: 8px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 0;
+                height: 0;
+                border-left: 4px solid transparent;
+                border-right: 4px solid transparent;
+                border-top: 4px solid #333;
+            }
+
+            .language-switcher .select-selected.select-arrow-active:after {
+                border-top: none;
+                border-bottom: 4px solid #333;
+            }
+
+        .language-switcher .select-items {
+            position: absolute;
+            background-color: white;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 99;
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+            margin-top: 5px;
+            overflow: visible;
+            min-width: 160px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .language-switcher .select-hide {
+            display: none;
+        }
+
+        .language-switcher .select-items div {
+            padding: 10px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+        }
+
+            .language-switcher .select-items div:hover {
+                background-color: #f8f9fa;
+            }
+
+            .language-switcher .select-items div.same-as-selected {
+                background-color: #f8f9fa;
+            }
+
+        /* Flag icons using CSS */
+        .flag-icon {
+            display: inline-block;
+            width: 24px;
+            height: 18px;
+            margin-right: 8px;
+            border-radius: 3px;
+            vertical-align: middle;
+        }
+
+        .flag-us {
+            background: linear-gradient(to bottom, #B22234 0%, #B22234 7.7%, #FFFFFF 7.7%, #FFFFFF 15.4%, #B22234 15.4%);
+        }
+
+        .flag-es {
+            background: linear-gradient(to bottom, #C60B1E 25%, #FFC400 25%, #FFC400 75%, #C60B1E 75%);
+        }
+
+        .flag-fr {
+            background: linear-gradient(to right, #002395 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #ED2939 66.66%);
+        }
+
+        .flag-de {
+            background: linear-gradient(to bottom, #000000 33.33%, #DD0000 33.33%, #DD0000 66.66%, #FFCE00 66.66%);
+        }
+
+        .flag-it {
+            background: linear-gradient(to right, #009246 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #CE2B37 66.66%);
+        }
+
+        .flag-ru {
+            background: linear-gradient(to bottom, #FFFFFF 33.33%, #0039A6 33.33%, #0039A6 66.66%, #D52B1E 66.66%);
+        }
+
+        .flag-cn {
+            background: #DE2910;
+            position: relative;
+        }
+
+            .flag-cn:before {
+                content: '★';
+                color: #FFDE00;
+                position: absolute;
+                left: 2px;
+                top: -1px;
+                font-size: 12px;
+            }
+
+        .flag-vn {
+            background: linear-gradient(to bottom, #DA020E 50%, #FFFF00 50%);
+            position: relative;
+        }
+
+            .flag-vn:before {
+                content: '★';
+                color: #FFFF00;
+                position: absolute;
+                left: 8px;
+                top: 1px;
+                font-size: 10px;
+            }
+
+        .flag-th {
+            background: linear-gradient(to bottom, #ED1C24 16.66%, #FFFFFF 16.66%, #FFFFFF 33.33%, #241D4F 33.33%, #241D4F 66.66%, #FFFFFF 66.66%, #FFFFFF 83.33%, #ED1C24 83.33%);
+        }
+
+        .flag-ph {
+            background: linear-gradient(to bottom, #0038A8 50%, #FFFFFF 50%);
+            position: relative;
+        }
+
+            .flag-ph:before {
+                content: '★';
+                color: #FCD116;
+                position: absolute;
+                left: 8px;
+                top: 1px;
+                font-size: 10px;
+            }
+
+        /* Custom Select Dropdown */
+        .custom-select {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .select-selected {
+            background: transparent;
+            border: none;
+            padding: 8px 35px 8px 15px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-dark);
+            min-width: 160px;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+            .select-selected:after {
+                content: '';
+                position: absolute;
+                right: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 0;
+                height: 0;
+                border-left: 6px solid transparent;
+                border-right: 6px solid transparent;
+                border-top: 6px solid var(--text-dark);
+            }
+
+            .select-selected.select-arrow-active:after {
+                border-top: none;
+                border-bottom: 6px solid var(--text-dark);
+            }
+
+        .select-items {
+            position: absolute;
+            background-color: white;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 99;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .select-hide {
+            display: none;
+        }
+
+        .select-items div {
+            padding: 12px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+        }
+
+            .select-items div:hover {
+                background-color: var(--light-bg);
+            }
+
+            .select-items div.same-as-selected {
+                background-color: var(--light-bg);
+            }
+
+        /* Hero Section */
+        .hero-section {
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding-top: 80px;
+        }
+
+        .hero-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 2px, transparent 2px), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.1) 2px, transparent 2px);
+            background-size: 50px 50px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: var(--white);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .hero-features {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        .hero-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+            .hero-feature i {
+                color: #ffd700;
+                font-size: 1.2rem;
+            }
+
+        .hero-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--secondary-gradient);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(231, 76, 60, 0.6);
+                color: var(--white);
+            }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--white);
+            border: 2px solid var(--white);
+        }
+
+            .btn-outline:hover {
+                background: var(--white);
+                color: var(--text-dark);
+            }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 100px 0;
+            background: var(--light-bg);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-radius: var(--border-radius);
+            background: var(--white);
+            box-shadow: var(--shadow-soft);
+            transition: var(--transition);
+            border: 1px solid var(--border-light);
+            height: 100%;
+        }
+
+            .feature-card:hover {
+                transform: translateY(-10px);
+                box-shadow: var(--shadow-hover);
+            }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            width: 80px;
+            height: 80px;
+            line-height: 80px;
+            border-radius: 50%;
+            color: var(--white);
+            background: var(--primary-gradient);
+        }
+
+        .feature-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .feature-description {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Language & Interest Showcase */
+        .showcase-section {
+            padding: 100px 0;
+            background: var(--light-bg);
+        }
+
+        .showcase-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--border-light);
+            background: var(--white);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+            .tab-btn.active,
+            .tab-btn:hover {
+                background: var(--primary-gradient);
+                color: var(--white);
+                border-color: transparent;
+            }
+
+        .tab-content {
+            display: none;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+            .tab-content.active {
+                display: block;
+            }
+
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .showcase-item {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-soft);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+            .showcase-item:hover {
+                transform: translateY(-5px);
+                box-shadow: var(--shadow-hover);
+            }
+
+        .showcase-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 0;
+            background: var(--white);
+            text-align: center;
+        }
+
+        .cta-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+        }
+
+        .cta-description {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: #2c3e50;
+            color: var(--white);
+            padding: 60px 0 30px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: #ecf0f1;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+            .footer-section ul li {
+                margin-bottom: 0.5rem;
+            }
+
+                .footer-section ul li a {
+                    color: #bdc3c7;
+                    text-decoration: none;
+                    transition: var(--transition);
+                }
+
+                    .footer-section ul li a:hover {
+                        color: var(--white);
+                    }
+
+        .footer-bottom {
+            border-top: 1px solid #34495e;
+            padding-top: 2rem;
+            text-align: center;
+            color: #bdc3c7;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .hero-features {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .feature-card {
+                padding: 2rem 1rem;
+            }
+
+            .showcase-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .language-switcher {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 20px;
+                margin-left: 0; /* Remove left margin on mobile */
+                order: 1; /* Ensure it appears first on mobile for better UX */
+            }
+
+            /* On mobile, adjust navbar user section */
+            .global-navbar-user {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+                .global-navbar-user .language-switcher {
+                    margin-left: 0; /* Reset margin on mobile */
+                    align-self: center;
+                }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .features-grid,
+            .showcase-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+
+
+    <!-- Hero Section -->
+    <section class="hero-section main-content">
+        <div class="hero-pattern"></div>
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title" data-i18n="hero.title">Find Love Across Borders</h1>
+                <p class="hero-subtitle" data-i18n="hero.subtitle">
+                    Connect with people worldwide through our intelligent matching system.
+                    Support for 25+ languages, cultural preferences, and your preferred measurement system.
+                </p>
+
+                <div class="hero-features">
+                    <div class="hero-feature">
+                        <i class="fas fa-globe"></i>
+                        <span data-i18n="hero.features.languages">25+ Languages</span>
+                    </div>
+                    <div class="hero-feature">
+                        <i class="fas fa-heart"></i>
+                        <span data-i18n="hero.features.matching">Smart Matching</span>
+                    </div>
+                    <div class="hero-feature">
+                        <i class="fas fa-shield-alt"></i>
+                        <span data-i18n="hero.features.security">Safe & Secure</span>
+                    </div>
+                    <div class="hero-feature">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span data-i18n="hero.features.mobile">Mobile Ready</span>
+                    </div>
+                </div>
+
+                <div class="hero-actions">
+                    <a href="/pages/register.html" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> <span data-i18n="hero.cta.primary">Join Free Today</span>
+                    </a>
+                    <a href="#features" class="btn btn-outline">
+                        <i class="fas fa-play"></i> <span data-i18n="hero.cta.secondary">Learn More</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Language & Interest Showcase -->
+    <section class="showcase-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title" data-i18n="showcase.title">Express Yourself Completely</h2>
+                <p class="section-subtitle" data-i18n="showcase.subtitle">
+                    Share your languages, interests, and preferences in the way that feels most natural to you.
+                </p>
+            </div>
+
+            <div class="showcase-tabs">
+                <button class="tab-btn active" onclick="showTab('languages')">
+                    <i class="fas fa-comments"></i> <span data-i18n="showcase.tabs.languages">Languages</span>
+                </button>
+                <button class="tab-btn" onclick="showTab('interests')">
+                    <i class="fas fa-heart"></i> <span data-i18n="showcase.tabs.interests">Interests</span>
+                </button>
+                <button class="tab-btn" onclick="showTab('measurements')">
+                    <i class="fas fa-ruler"></i> <span data-i18n="showcase.tabs.measurements">Measurements</span>
+                </button>
+            </div>
+
+            <div id="languages" class="tab-content active">
+                <div class="showcase-grid">
+                    <div class="showcase-item language-item">
+                        <div class="showcase-icon">🇺🇸</div>
+                        <h4>English</h4>
+                        <p data-i18n="showcase.languages.english">Native, Fluent, Advanced</p>
+                    </div>
+                    <div class="showcase-item language-item">
+                        <div class="showcase-icon">🇻🇳</div>
+                        <h4>Tiếng Việt</h4>
+                        <p data-i18n="showcase.languages.vietnamese">Southeast Asian Language</p>
+                    </div>
+                    <div class="showcase-item language-item">
+                        <div class="showcase-icon">🇹🇭</div>
+                        <h4>ไทย</h4>
+                        <p data-i18n="showcase.languages.thai">Tonal Language Family</p>
+                    </div>
+                    <div class="showcase-item language-item">
+                        <div class="showcase-icon">🇨🇳</div>
+                        <h4>中文</h4>
+                        <p data-i18n="showcase.languages.chinese">Mandarin Chinese</p>
+                    </div>
+                    <div class="showcase-item language-item">
+                        <div class="showcase-icon">🌍</div>
+                        <h4>21+ More</h4>
+                        <p data-i18n="showcase.languages.more">Worldwide Coverage</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="interests" class="tab-content">
+                <div class="showcase-grid">
+                    <div class="showcase-item interest-item">
+                        <div class="showcase-icon">⚽</div>
+                        <h4>Sports & Fitness</h4>
+                        <p>Soccer, Basketball, Yoga</p>
+                    </div>
+                    <div class="showcase-item interest-item">
+                        <div class="showcase-icon">🎨</div>
+                        <h4>Arts & Creativity</h4>
+                        <p>Photography, Painting, Music</p>
+                    </div>
+                    <div class="showcase-item interest-item">
+                        <div class="showcase-icon">💻</div>
+                        <h4>Technology</h4>
+                        <p>Programming, AI, Gaming</p>
+                    </div>
+                    <div class="showcase-item interest-item">
+                        <div class="showcase-icon">✈️</div>
+                        <h4>Travel & Adventure</h4>
+                        <p>Exploring, Hiking, Culture</p>
+                    </div>
+                    <div class="showcase-item interest-item">
+                        <div class="showcase-icon">🍳</div>
+                        <h4>Food & Cooking</h4>
+                        <p>Culinary Arts, Dining</p>
+                    </div>
+                    <div class="showcase-item interest-item">
+                        <div class="showcase-icon">📚</div>
+                        <h4>15+ Categories</h4>
+                        <p>Express Your Passions</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="measurements" class="tab-content">
+                <div class="showcase-grid">
+                    <div class="showcase-item measurement-item">
+                        <div class="showcase-icon">📏</div>
+                        <h4>Height Display</h4>
+                        <p>180cm ↔ 5'11"</p>
+                    </div>
+                    <div class="showcase-item measurement-item">
+                        <div class="showcase-icon">⚖️</div>
+                        <h4>Weight System</h4>
+                        <p>70kg ↔ 154lbs</p>
+                    </div>
+                    <div class="showcase-item measurement-item">
+                        <div class="showcase-icon">🌡️</div>
+                        <h4>Temperature</h4>
+                        <p>°C ↔ °F</p>
+                    </div>
+                    <div class="showcase-item measurement-item">
+                        <div class="showcase-icon">🇺🇸</div>
+                        <h4>US Imperial</h4>
+                        <p>Feet, Inches, Pounds</p>
+                    </div>
+                    <div class="showcase-item measurement-item">
+                        <div class="showcase-icon">🇬🇧</div>
+                        <h4>UK System</h4>
+                        <p>Stone, Pounds, Feet</p>
+                    </div>
+                    <div class="showcase-item measurement-item">
+                        <div class="showcase-icon">🌍</div>
+                        <h4>Metric Global</h4>
+                        <p>Centimeters, Kilograms</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title" data-i18n="features.title">Why Choose Totilove?</h2>
+                <p class="section-subtitle" data-i18n="features.subtitle">
+                    Our platform combines cutting-edge technology with cultural sensitivity
+                    to help you find meaningful connections worldwide.
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-language"></i>
+                    </div>
+                    <h3 class="feature-title" data-i18n="features.items.languages.title">Multi-Language Support</h3>
+                    <p class="feature-description" data-i18n="features.items.languages.description">
+                        Connect in your native language. We support 25+ world languages with
+                        fluency tracking and cultural matching preferences.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="feature-title" data-i18n="features.items.matching.title">Smart Matching Algorithm</h3>
+                    <p class="feature-description" data-i18n="features.items.matching.description">
+                        Our AI-powered system considers shared languages, interests, cultural background,
+                        and personal preferences for optimal compatibility.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="feature-title" data-i18n="features.items.interests.title">Interest-Based Connections</h3>
+                    <p class="feature-description" data-i18n="features.items.interests.description">
+                        Find people who share your passions. From sports to arts, technology to travel -
+                        connect over what you love most.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-globe-asia"></i>
+                    </div>
+                    <h3 class="feature-title" data-i18n="features.items.culture.title">Cultural Intelligence</h3>
+                    <p class="feature-description" data-i18n="features.items.culture.description">
+                        Respect cultural differences with automatic regional preferences, measurement systems,
+                        and culturally-aware matching.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="feature-title" data-i18n="features.items.privacy.title">Privacy & Security</h3>
+                    <p class="feature-description" data-i18n="features.items.privacy.description">
+                        Your safety is our priority. Advanced verification, privacy controls, and secure messaging
+                        keep your personal information protected.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3 class="feature-title" data-i18n="features.items.mobile.title">Mobile Optimized</h3>
+                    <p class="feature-description" data-i18n="features.items.mobile.description">
+                        Stay connected anywhere. Our responsive design works perfectly on desktop,
+                        tablet, and mobile devices.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title" data-i18n="cta.title">Ready to Find Your Perfect Match?</h2>
+                <p class="cta-description" data-i18n="cta.description">
+                    Join thousands of people worldwide who have found love through our
+                    intelligent, culturally-aware matching system.
+                </p>
+                <div class="hero-actions">
+                    <a href="/pages/register.html" class="btn btn-primary">
+                        <i class="fas fa-heart"></i> <span data-i18n="cta.primary">Start Your Journey</span>
+                    </a>
+                    <a href="/pages/login.html" class="btn btn-outline">
+                        <i class="fas fa-sign-in-alt"></i> <span data-i18n="cta.secondary">Sign In</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>💕 <span data-i18n="app.name">Totilove</span></h3>
+                    <p data-i18n="footer.description">Connecting hearts across cultures and continents. Find love that transcends borders.</p>
+                </div>
+                <div class="footer-section">
+                    <h3 data-i18n="footer.features">Features</h3>
+                    <ul>
+                        <li><a href="#features" data-i18n="features.items.languages.title">Multi-Language Support</a></li>
+                        <li><a href="#features" data-i18n="features.items.matching.title">Smart Matching</a></li>
+                        <li><a href="#features" data-i18n="features.items.culture.title">Cultural Intelligence</a></li>
+                        <li><a href="#features" data-i18n="features.items.interests.title">Interest Matching</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3 data-i18n="footer.support">Support</h3>
+                    <ul>
+                        <li><a href="/help">Help Center</a></li>
+                        <li><a href="/safety">Safety Tips</a></li>
+                        <li><a href="/contact">Contact Us</a></li>
+                        <li><a href="/feedback">Feedback</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3 data-i18n="footer.legal">Legal</h3>
+                    <ul>
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                        <li><a href="/terms">Terms of Service</a></li>
+                        <li><a href="/cookies">Cookie Policy</a></li>
+                        <li><a href="/community">Community Guidelines</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 <span data-i18n="app.name">Totilove</span>. <span data-i18n="footer.copyright">All rights reserved. Made with ❤️ for love without borders.</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/assets/i18n/simple-i18n.js"></script>
+    <script src="/components/navbar/global-navbar.js"></script>
+    <script>
+        // Initialize everything on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Initialize i18n system
+                if (window.simpleI18n) {
+                    await window.simpleI18n.init();
+                }
+                
+                // Initialize navbar
+                if (typeof GlobalNavbar !== 'undefined') {
+                    window.globalNavbar = new GlobalNavbar();
+                    // Hide buttons after navbar checks auth
+                    setTimeout(() => {
+                        if (window.globalNavbar?.isAuthenticated || window.currentUser?.id) {
+                            document.querySelectorAll('a.btn-primary[href*="register"]').forEach(btn => btn.style.display = 'none');
+                        }
+                    }, 500);
+                }
+                
+                // Initialize scroll animations
+                initScrollAnimations();
+            } catch (error) {
+                // Silent fallback
+            }
+        });
+
+
+
+
+        // Tab switching functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.closest('.tab-btn').classList.add('active');
+        }
+
+        // Scroll animations
+        function initScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Observe feature cards
+            const featureCards = document.querySelectorAll('.feature-card');
+            featureCards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+
+            // Observe showcase items
+            const showcaseItems = document.querySelectorAll('.showcase-item');
+            showcaseItems.forEach((item, index) => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(30px)';
+                item.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+                observer.observe(item);
+            });
+        }
+
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Listen for language change events
+        document.addEventListener('languageChanged', function(event) {
+            console.log('Language switched to:', event.detail.language);
+            // Refresh page content when language changes
+            window.simpleI18n.translatePage();
+        });
+    </script>
+</body>
+</html>

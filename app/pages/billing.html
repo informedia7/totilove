@@ -1,0 +1,2179 @@
+<!-- Premium Subscription & Billing Page -->
+<div class="billing-page-container">
+    <!-- Billing Header -->
+    <div class="billing-header">
+        <div class="header-content">
+            <div class="subscription-status">
+                <div class="status-card current-plan">
+                    <div class="plan-icon">
+                        <i class="fas" id="current-plan-icon"></i>
+                    </div>
+                    <div class="plan-info">
+                        <div class="plan-label">Current Plan</div>
+                        <h3 id="current-plan-name">Free Plan</h3>
+                        <p id="current-plan-desc">Basic features included</p>
+                        <div class="plan-expiry" id="plan-expiry" style="display: none;">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Renews: <span id="expiry-date">--</span></span>
+                        </div>
+                    </div>
+                    <div class="plan-badge" id="plan-badge">
+                        <span class="badge free">FREE</span>
+                    </div>
+                </div>
+            </div>
+            <div class="billing-actions">
+                <button class="btn-premium" onclick="showPlanSelector()">
+                    <i class="fas fa-crown"></i>
+                    <span>Upgrade to Premium</span>
+                </button>
+                <button class="btn-secondary" onclick="viewBillingHistory()">
+                    <i class="fas fa-receipt"></i>
+                    <span>Billing History</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Premium Plans Section -->
+    <div class="plans-section" id="plans-section">
+        <div class="section-header">
+            <div class="section-title-wrapper">
+                <h2><i class="fas fa-crown"></i> Choose Your Premium Plan</h2>
+                <p class="section-subtitle">Unlock premium features and find your perfect match faster</p>
+            </div>
+            
+            <div class="billing-toggle-wrapper">
+                <div class="billing-toggle">
+                    <span class="toggle-label" data-cycle="monthly">Monthly</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="billing-cycle" onchange="toggleBillingCycle()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label" data-cycle="yearly">
+                        Yearly 
+                        <span class="save-badge">
+                            <i class="fas fa-tag"></i> Save 25%
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="pricing-cards" id="pricing-cards">
+            <!-- Plans will be loaded dynamically from database -->
+            <div style="text-align: center; padding: 2rem; color: var(--muted-color);">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <p>Loading plans...</p>
+            </div>
+            <!-- Basic Premium Plan -->
+            <div class="pricing-card basic" style="display: none;">
+                <div class="card-header">
+                    <div class="plan-icon-wrapper">
+                        <div class="plan-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <h3>Premium Basic</h3>
+                    <p class="plan-subtitle">Enhanced dating experience</p>
+                </div>
+                
+                <div class="price-section">
+                    <div class="price">
+                        <span class="currency">$</span>
+                        <span class="amount" data-monthly="9.99" data-yearly="7.49">9.99</span>
+                        <span class="period">/month</span>
+                    </div>
+                    <div class="yearly-savings" style="display: none;">
+                        <i class="fas fa-check-circle"></i>
+                        <span class="save-text">Save $30/year</span>
+                    </div>
+                    <div class="price-note">Billed monthly</div>
+                </div>
+
+                <div class="features-list">
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Unlimited likes</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>See who liked you</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Advanced search filters</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Priority profile visibility</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Read receipts</span>
+                    </div>
+                </div>
+
+                <button class="select-plan-btn" onclick="selectPlan('basic')">
+                    <span>Choose Basic</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- Premium Plus Plan -->
+            <div class="pricing-card plus popular">
+                <div class="popular-badge">
+                    <i class="fas fa-fire"></i>
+                    <span>Most Popular</span>
+                </div>
+                
+                <div class="card-header">
+                    <div class="plan-icon-wrapper">
+                        <div class="plan-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                    </div>
+                    <h3>Premium Plus</h3>
+                    <p class="plan-subtitle">Maximum matching power</p>
+                </div>
+                
+                <div class="price-section">
+                    <div class="price">
+                        <span class="currency">$</span>
+                        <span class="amount" data-monthly="19.99" data-yearly="14.99">19.99</span>
+                        <span class="period">/month</span>
+                    </div>
+                    <div class="yearly-savings" style="display: none;">
+                        <i class="fas fa-check-circle"></i>
+                        <span class="save-text">Save $60/year</span>
+                    </div>
+                    <div class="price-note">Billed monthly</div>
+                </div>
+
+                <div class="features-list">
+                    <div class="feature premium">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Everything in Basic</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Super likes (5/day)</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Boost profile visibility</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Incognito browsing</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Priority customer support</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Profile verification badge</span>
+                    </div>
+                </div>
+
+                <button class="select-plan-btn premium" onclick="selectPlan('plus')">
+                    <span>Choose Plus</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- VIP Plan -->
+            <div class="pricing-card vip">
+                <div class="card-header">
+                    <div class="plan-icon-wrapper">
+                        <div class="plan-icon">
+                            <i class="fas fa-gem"></i>
+                        </div>
+                    </div>
+                    <h3>VIP Elite</h3>
+                    <p class="plan-subtitle">Ultimate dating experience</p>
+                </div>
+                
+                <div class="price-section">
+                    <div class="price">
+                        <span class="currency">$</span>
+                        <span class="amount" data-monthly="39.99" data-yearly="29.99">39.99</span>
+                        <span class="period">/month</span>
+                    </div>
+                    <div class="yearly-savings" style="display: none;">
+                        <i class="fas fa-check-circle"></i>
+                        <span class="save-text">Save $120/year</span>
+                    </div>
+                    <div class="price-note">Billed monthly</div>
+                </div>
+
+                <div class="features-list">
+                    <div class="feature premium">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Everything in Plus</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Unlimited super likes</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Weekly profile boost</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Advanced matching algorithm</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Personal dating coach</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>VIP customer support</span>
+                    </div>
+                </div>
+
+                <button class="select-plan-btn vip" onclick="selectPlan('vip')">
+                    <span>Choose VIP</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Trust Indicators -->
+        <div class="trust-indicators">
+            <div class="trust-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>Secure Payment</span>
+            </div>
+            <div class="trust-item">
+                <i class="fas fa-lock"></i>
+                <span>SSL Encrypted</span>
+            </div>
+            <div class="trust-item">
+                <i class="fas fa-undo"></i>
+                <span>Cancel Anytime</span>
+            </div>
+            <div class="trust-item">
+                <i class="fas fa-headset"></i>
+                <span>24/7 Support</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Method Section -->
+    <div class="payment-section" id="payment-section" style="display: none;">
+        <div class="payment-container">
+            <div class="payment-header">
+                <button class="back-button" onclick="hidePaymentSection()">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Plans</span>
+                </button>
+                <h3><i class="fas fa-credit-card"></i> Complete Your Purchase</h3>
+                <div class="selected-plan-summary" id="selected-plan-summary">
+                    <!-- Plan summary will be inserted here -->
+                </div>
+            </div>
+
+            <div class="payment-methods">
+                <div class="payment-tabs">
+                    <button class="payment-tab active" data-method="card">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Credit Card</span>
+                    </button>
+                    <button class="payment-tab" data-method="paypal">
+                        <i class="fab fa-paypal"></i>
+                        <span>PayPal</span>
+                    </button>
+                    <button class="payment-tab" data-method="apple">
+                        <i class="fab fa-apple"></i>
+                        <span>Apple Pay</span>
+                    </button>
+                </div>
+
+                <!-- Credit Card Payment -->
+                <div class="payment-form active" id="card-payment">
+                    <form id="payment-form">
+                        <div class="form-row">
+                            <div class="form-group full">
+                                <label for="cardholder-name">
+                                    <i class="fas fa-user"></i> Cardholder Name
+                                </label>
+                                <input type="text" id="cardholder-name" placeholder="Full name as on card" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group full">
+                                <label for="card-element">
+                                    <i class="fas fa-credit-card"></i> Card Information
+                                </label>
+                                <div id="card-element" class="card-element">
+                                    <!-- Stripe Elements will be inserted here -->
+                                </div>
+                                <div id="card-errors" class="error-message"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group half">
+                                <label for="billing-country">
+                                    <i class="fas fa-globe"></i> Country
+                                </label>
+                                <select id="billing-country" required>
+                                    <option value="">Select Country</option>
+                                    <option value="US">United States</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="GB">United Kingdom</option>
+                                    <option value="AU">Australia</option>
+                                    <option value="DE">Germany</option>
+                                    <option value="FR">France</option>
+                                    <option value="ES">Spain</option>
+                                    <option value="IT">Italy</option>
+                                    <option value="NL">Netherlands</option>
+                                    <option value="SE">Sweden</option>
+                                </select>
+                            </div>
+                            <div class="form-group half">
+                                <label for="billing-zip">
+                                    <i class="fas fa-map-marker-alt"></i> ZIP Code
+                                </label>
+                                <input type="text" id="billing-zip" placeholder="ZIP Code" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group full">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="auto-renew" checked>
+                                    <span class="checkmark"></span>
+                                    <span class="checkbox-text">Automatically renew subscription</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group full">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="terms-agree" required>
+                                    <span class="checkmark"></span>
+                                    <span class="checkbox-text">
+                                        I agree to the <a href="#" onclick="showTerms()">Terms of Service</a> and 
+                                        <a href="#" onclick="showPrivacy()">Privacy Policy</a>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="payment-security">
+                            <i class="fas fa-lock"></i>
+                            <span>Your payment information is secure and encrypted</span>
+                        </div>
+
+                        <button type="submit" class="payment-submit-btn" id="payment-submit">
+                            <span class="btn-text">Complete Purchase</span>
+                            <span class="btn-amount" id="payment-amount">$9.99/month</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- PayPal Payment -->
+                <div class="payment-form" id="paypal-payment">
+                    <div class="paypal-container">
+                        <div class="paypal-info">
+                            <i class="fab fa-paypal"></i>
+                            <h4>Pay with PayPal</h4>
+                            <p>You will be redirected to PayPal to complete your payment securely.</p>
+                        </div>
+                        <div id="paypal-button-container">
+                            <!-- PayPal button will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Apple Pay -->
+                <div class="payment-form" id="apple-payment">
+                    <div class="apple-pay-container">
+                        <div class="apple-pay-info">
+                            <i class="fab fa-apple"></i>
+                            <h4>Pay with Apple Pay</h4>
+                            <p>Use your Apple Pay account for a quick and secure checkout.</p>
+                        </div>
+                        <button class="apple-pay-btn" id="apple-pay-button">
+                            <i class="fab fa-apple"></i>
+                            <span>Pay with Apple Pay</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Billing History Section -->
+    <div class="billing-history-section" id="billing-history" style="display: none;">
+        <div class="history-header">
+            <div class="header-left">
+                <h3><i class="fas fa-receipt"></i> Billing History</h3>
+                <p class="history-subtitle">View and download your past invoices</p>
+            </div>
+            <button class="btn-secondary" onclick="downloadInvoices()">
+                <i class="fas fa-download"></i>
+                <span>Download All</span>
+            </button>
+        </div>
+
+        <div class="history-table-container">
+            <table class="billing-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="billing-history-list">
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem;">
+                            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--muted-color);"></i>
+                            <p style="margin-top: 1rem; color: var(--muted-color);">Loading billing history...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Success/Failure Messages -->
+    <div class="payment-result" id="payment-result" style="display: none;">
+        <div class="result-content">
+            <div class="result-icon" id="result-icon">
+                <!-- Icon will be set by JavaScript -->
+            </div>
+            <h3 id="result-title">Payment Processing...</h3>
+            <p id="result-message">Please wait while we process your payment.</p>
+            <div class="result-actions" id="result-actions">
+                <!-- Actions will be set by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Billing Page Styles */
+.billing-page-container {
+    padding: 0;
+    min-height: 100vh;
+    background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+}
+
+/* Billing Header */
+.billing-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    margin-bottom: 3rem;
+    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.status-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    min-width: 350px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.plan-icon {
+    width: 70px;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.plan-info {
+    flex: 1;
+}
+
+.plan-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.plan-info h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.plan-info p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 0.95rem;
+}
+
+.plan-expiry {
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+    opacity: 0.85;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.plan-badge {
+    margin-left: auto;
+}
+
+.badge {
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.badge.free {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.badge.premium {
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    color: #333;
+}
+
+.badge.vip {
+    background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+    color: #333;
+}
+
+.status-badge {
+    padding: 0.35rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.success {
+    background: #10b981;
+    color: white;
+}
+
+.status-badge.pending {
+    background: #f59e0b;
+    color: white;
+}
+
+.billing-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-premium {
+    background: linear-gradient(45deg, #ffd700, #ff6b6b);
+    color: #333;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+    font-size: 1rem;
+}
+
+.btn-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+}
+
+.btn-premium i {
+    font-size: 1.1rem;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: var(--primary);
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 8px;
+}
+
+.btn-link:hover {
+    color: var(--secondary);
+    background: rgba(102, 126, 234, 0.1);
+}
+
+/* Plans Section */
+.plans-section {
+    margin-bottom: 4rem;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-title-wrapper h2 {
+    color: var(--dark-color);
+    margin-bottom: 0.75rem;
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.section-title-wrapper .section-subtitle {
+    color: var(--muted-color);
+    font-size: 1.15rem;
+    margin-bottom: 2.5rem;
+}
+
+.billing-toggle-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.billing-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    background: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-label {
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.save-badge {
+    background: linear-gradient(45deg, #10b981, #059669);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 65px;
+    height: 34px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #e5e7eb;
+    transition: 0.4s;
+    border-radius: 34px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+input:checked + .toggle-slider {
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(31px);
+}
+
+/* Pricing Cards */
+.pricing-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto 3rem;
+}
+
+.pricing-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    position: relative;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    display: flex;
+    flex-direction: column;
+}
+
+.pricing-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.pricing-card.selected {
+    border: 3px solid var(--primary);
+    box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+    transform: translateY(-5px);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+}
+
+.pricing-card.selected .select-plan-btn {
+    background: var(--primary);
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+}
+
+.pricing-card.popular {
+    border-color: var(--primary);
+    transform: scale(1.03);
+    box-shadow: 0 15px 50px rgba(102, 126, 234, 0.25);
+}
+
+.popular-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 0.5rem 1.25rem;
+    border-radius: 25px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    z-index: 1;
+}
+
+.card-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.plan-icon-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.card-header .plan-icon {
+    width: 90px;
+    height: 90px;
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.25rem;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.card-header h3 {
+    color: var(--dark-color);
+    margin-bottom: 0.5rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.plan-subtitle {
+    color: var(--muted-color);
+    margin: 0;
+    font-size: 1rem;
+}
+
+/* Price Section */
+.price-section {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.price {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.currency {
+    font-size: 1.75rem;
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.amount {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--dark-color);
+    line-height: 1;
+}
+
+.period {
+    font-size: 1.25rem;
+    color: var(--muted-color);
+    font-weight: 500;
+}
+
+.yearly-savings {
+    color: #10b981;
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.price-note {
+    color: var(--muted-color);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+/* Features List */
+.features-list {
+    margin-bottom: 2rem;
+    flex: 1;
+}
+
+.feature {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.feature:last-child {
+    border-bottom: none;
+}
+
+.feature i {
+    color: #10b981;
+    font-size: 1.1rem;
+    width: 20px;
+    flex-shrink: 0;
+}
+
+.feature span {
+    color: var(--dark-color);
+    font-size: 1rem;
+}
+
+.feature.premium {
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.feature.premium span {
+    color: var(--primary);
+}
+
+/* Select Plan Button */
+.select-plan-btn {
+    width: 100%;
+    padding: 1.25rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: auto;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.select-plan-btn:hover {
+    background: var(--secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.select-plan-btn.premium {
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+}
+
+.select-plan-btn.vip {
+    background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+    color: #333;
+}
+
+/* Trust Indicators */
+.trust-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin-top: 3rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.trust-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--muted-color);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.trust-item i {
+    font-size: 1.75rem;
+    color: var(--primary);
+    margin-bottom: 0.25rem;
+}
+
+/* Payment Section */
+.payment-section {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    padding: 2.5rem;
+    margin-bottom: 3rem;
+}
+
+.payment-header {
+    margin-bottom: 2rem;
+}
+
+.back-button {
+    background: none;
+    border: none;
+    color: var(--primary);
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0.5rem 0;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.back-button:hover {
+    color: var(--secondary);
+    transform: translateX(-3px);
+}
+
+.payment-header h3 {
+    color: var(--dark-color);
+    margin-bottom: 1.5rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.selected-plan-summary {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    border: 1px solid #dee2e6;
+}
+
+.plan-summary h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--dark-color);
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.plan-summary .plan-price {
+    margin: 0.5rem 0;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.plan-summary .plan-billing {
+    margin: 0;
+    color: var(--muted-color);
+    font-size: 0.9rem;
+}
+
+/* Payment Tabs */
+.payment-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0;
+}
+
+.payment-tab {
+    padding: 1rem 1.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--muted-color);
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+    margin-bottom: -2px;
+}
+
+.payment-tab.active,
+.payment-tab:hover {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+.payment-tab i {
+    font-size: 1.25rem;
+}
+
+/* Payment Forms */
+.payment-form {
+    display: none;
+}
+
+.payment-form.active {
+    display: block;
+}
+
+.form-row {
+    display: flex;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    flex: 1;
+}
+
+.form-group.full {
+    flex: none;
+    width: 100%;
+}
+
+.form-group.half {
+    flex: 1;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 0.95rem;
+}
+
+.form-group label i {
+    color: var(--primary);
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    background: #f8f9fa;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.card-element {
+    padding: 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.card-element:focus-within {
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.error-message {
+    color: #ef4444;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Checkbox Styling */
+.checkbox-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    cursor: pointer;
+    position: relative;
+    padding-left: 0;
+}
+
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    width: 0;
+    height: 0;
+}
+
+.checkmark {
+    width: 22px;
+    height: 22px;
+    background-color: #fff;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    flex-shrink: 0;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.checkbox-container input:checked ~ .checkmark {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 7px;
+    top: 3px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.checkbox-text {
+    color: var(--dark-color);
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+.checkbox-text a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.checkbox-text a:hover {
+    text-decoration: underline;
+}
+
+.payment-security {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    border-radius: 10px;
+    color: #166534;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.payment-security i {
+    font-size: 1.1rem;
+}
+
+/* Payment Submit Button */
+.payment-submit-btn {
+    width: 100%;
+    padding: 1.5rem;
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.payment-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.payment-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.paypal-container,
+.apple-pay-container {
+    text-align: center;
+    padding: 2rem;
+}
+
+.paypal-info,
+.apple-pay-info {
+    margin-bottom: 2rem;
+}
+
+.paypal-info i,
+.apple-pay-info i {
+    font-size: 3rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.paypal-info h4,
+.apple-pay-info h4 {
+    color: var(--dark-color);
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.paypal-info p,
+.apple-pay-info p {
+    color: var(--muted-color);
+    margin: 0;
+}
+
+.apple-pay-btn {
+    width: 100%;
+    max-width: 400px;
+    padding: 1.25rem;
+    background: #000;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+}
+
+.apple-pay-btn:hover {
+    background: #333;
+    transform: translateY(-2px);
+}
+
+.apple-pay-btn i {
+    font-size: 1.5rem;
+}
+
+/* Billing History */
+.billing-history-section {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    padding: 2.5rem;
+    margin-bottom: 3rem;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.header-left h3 {
+    color: var(--dark-color);
+    margin: 0 0 0.5rem 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.history-subtitle {
+    color: var(--muted-color);
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.billing-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.billing-table th,
+.billing-table td {
+    padding: 1.25rem;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.billing-table th {
+    background: #f8f9fa;
+    font-weight: 700;
+    color: var(--dark-color);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.billing-table td {
+    color: var(--dark-color);
+}
+
+.billing-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+/* Payment Result */
+.payment-result {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.result-content {
+    background: white;
+    border-radius: 24px;
+    padding: 3.5rem;
+    text-align: center;
+    max-width: 450px;
+    margin: 2rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.result-icon {
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
+}
+
+.result-icon.success {
+    color: #10b981;
+}
+
+.result-icon.error {
+    color: #ef4444;
+}
+
+.result-icon.processing {
+    color: var(--primary);
+    animation: spin 1s linear infinite;
+}
+
+.result-content h3 {
+    color: var(--dark-color);
+    margin-bottom: 1rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.result-content p {
+    color: var(--muted-color);
+    margin-bottom: 2rem;
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+
+.result-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .billing-header {
+        padding: 1.5rem;
+    }
+
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+
+    .status-card {
+        min-width: auto;
+        width: 100%;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .plan-badge {
+        margin-left: 0;
+        margin-top: 1rem;
+    }
+
+    .billing-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn-premium,
+    .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .section-title-wrapper h2 {
+        font-size: 1.75rem;
+    }
+
+    .billing-toggle {
+        padding: 0.5rem 1rem;
+    }
+
+    .pricing-cards {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .pricing-card.popular {
+        transform: none;
+    }
+
+    .trust-indicators {
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        padding: 1.5rem;
+    }
+
+    .payment-section {
+        padding: 1.5rem;
+    }
+
+    .form-row {
+        flex-direction: column;
+    }
+
+    .form-group.half {
+        width: 100%;
+    }
+
+    .payment-tabs {
+        flex-wrap: wrap;
+    }
+
+    .payment-tab {
+        flex: 1;
+        min-width: 100px;
+        justify-content: center;
+    }
+
+    .history-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .billing-table {
+        font-size: 0.85rem;
+    }
+
+    .billing-table th,
+    .billing-table td {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .result-content {
+        padding: 2rem;
+        margin: 1rem;
+    }
+}
+</style>
+
+<script>
+// Billing System JavaScript
+let selectedPlan = null;
+let selectedPlanId = null;
+let selectedPlanName = null;
+let selectedMonthlyPrice = null;
+let selectedYearlyPrice = null;
+let selectedCycle = 'monthly';
+let stripe = null;
+let cardElement = null;
+
+// Initialize billing page
+document.addEventListener('DOMContentLoaded', function() {
+    initializeBilling();
+    initializeStripe();
+});
+
+function initializeBilling() {
+    // Load current user subscription status
+    loadUserSubscription();
+    
+    // Initialize payment method tabs
+    setupPaymentTabs();
+    
+    // Load billing history
+    loadBillingHistory();
+    
+    // Load billing plans from database
+    loadBillingPlans();
+}
+
+async function loadUserSubscription() {
+    try {
+        const token = getSessionToken();
+        if (!token) {
+            console.error('No session token available');
+            // Fallback to mock data
+            loadCurrentSubscription();
+            return;
+        }
+        
+        const response = await fetch(`/api/account/subscription?token=${token}`);
+        const data = await response.json();
+        
+        if (data.success && data.subscription) {
+            const subscription = {
+                plan: data.subscription.plan || 'free',
+                status: data.subscription.status || 'active',
+                expiresAt: data.subscription.expiresAt || null
+            };
+            updateSubscriptionDisplay(subscription);
+        } else {
+            // Fallback to mock data if API fails
+            console.warn('Failed to load subscription, using default');
+            loadCurrentSubscription();
+        }
+    } catch (error) {
+        console.error('Error loading subscription:', error);
+        // Fallback to mock data on error
+        loadCurrentSubscription();
+    }
+}
+
+function loadCurrentSubscription() {
+    // Simulate loading current subscription
+    // In real app, this would be an API call
+    const mockSubscription = {
+        plan: 'free',
+        status: 'active',
+        expiresAt: null
+    };
+    
+    updateSubscriptionDisplay(mockSubscription);
+}
+
+// Load billing plans from database
+let availablePlans = [];
+
+async function loadBillingPlans() {
+    try {
+        const response = await fetch('/api/billing/plans');
+        const data = await response.json();
+        
+        if (data.success && data.plans) {
+            availablePlans = data.plans;
+            renderBillingPlans(data.plans);
+        } else {
+            console.error('Failed to load plans:', data.error);
+            showPlansError();
+        }
+    } catch (error) {
+        console.error('Error loading billing plans:', error);
+        showPlansError();
+    }
+}
+
+function renderBillingPlans(plans) {
+    const container = document.getElementById('pricing-cards');
+    if (!container) return;
+    
+    if (plans.length === 0) {
+        container.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--muted-color);">No plans available at this time.</div>';
+        return;
+    }
+    
+    // Map plan types to icons and classes
+    const planTypeMap = {
+        'free': { icon: 'fa-user', class: 'free' },
+        'basic': { icon: 'fa-star', class: 'basic' },
+        'premium': { icon: 'fa-crown', class: 'plus popular' },
+        'vip': { icon: 'fa-gem', class: 'vip' }
+    };
+    
+    container.innerHTML = plans.map((plan, index) => {
+        const planConfig = planTypeMap[plan.plan_type] || { icon: 'fa-star', class: 'basic' };
+        const isPopular = plan.plan_type === 'premium' || index === Math.floor(plans.length / 2);
+        const monthlyPrice = plan.price_monthly || 0;
+        const yearlyPrice = plan.price_yearly || 0;
+        const savings = monthlyPrice > 0 ? ((monthlyPrice * 12) - yearlyPrice).toFixed(2) : 0;
+        
+        // Parse features from JSON
+        const features = typeof plan.features === 'string' ? JSON.parse(plan.features) : (plan.features || {});
+        const featuresList = Object.entries(features).map(([key, value]) => {
+            if (typeof value === 'boolean' && value) {
+                return `<div class="feature"><i class="fas fa-check-circle"></i><span>${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span></div>`;
+            }
+            return '';
+        }).filter(f => f).join('');
+        
+        return `
+            <div class="pricing-card ${planConfig.class} ${isPopular ? 'popular' : ''}" data-plan-id="${plan.id}" data-plan-type="${plan.plan_type}">
+                ${isPopular ? `
+                <div class="popular-badge">
+                    <i class="fas fa-fire"></i>
+                    <span>Most Popular</span>
+                </div>` : ''}
+                
+                <div class="card-header">
+                    <div class="plan-icon-wrapper">
+                        <div class="plan-icon">
+                            <i class="fas ${planConfig.icon}"></i>
+                        </div>
+                    </div>
+                    <h3>${plan.name}</h3>
+                    <p class="plan-subtitle">${plan.description || 'Premium features'}</p>
+                </div>
+                
+                <div class="price-section">
+                    <div class="price">
+                        <span class="currency">$</span>
+                        <span class="amount" data-monthly="${monthlyPrice}" data-yearly="${yearlyPrice}">${monthlyPrice}</span>
+                        <span class="period">/month</span>
+                    </div>
+                    ${yearlyPrice > 0 && savings > 0 ? `
+                    <div class="yearly-savings" style="display: none;">
+                        <i class="fas fa-check-circle"></i>
+                        <span class="save-text">Save $${savings}/year</span>
+                    </div>` : ''}
+                    <div class="price-note">Billed monthly</div>
+                </div>
+
+                <div class="features-list">
+                    ${featuresList || '<div class="feature"><i class="fas fa-check-circle"></i><span>Premium features included</span></div>'}
+                </div>
+
+                <button class="select-plan-btn ${plan.plan_type === 'vip' ? 'vip' : plan.plan_type === 'premium' ? 'premium' : ''}" onclick="selectPlan('${plan.plan_type}', ${plan.id}, ${monthlyPrice}, ${yearlyPrice}, '${plan.name.replace(/'/g, "\\'")}')">
+                    <span>Choose ${plan.name}</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        `;
+    }).join('');
+}
+
+function showPlansError() {
+    const container = document.getElementById('pricing-cards');
+    if (container) {
+        container.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--danger-color);">Error loading plans. Please try again later.</div>';
+    }
+}
+
+function getSessionToken() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('token') || window.sessionToken || '';
+}
+
+function updateSubscriptionDisplay(subscription) {
+    const planIcon = document.getElementById('current-plan-icon');
+    const planName = document.getElementById('current-plan-name');
+    const planDesc = document.getElementById('current-plan-desc');
+    const planBadge = document.getElementById('plan-badge');
+    const planExpiry = document.getElementById('plan-expiry');
+    
+    switch (subscription.plan) {
+        case 'basic':
+            planIcon.className = 'fas fa-star';
+            planName.textContent = 'Premium Basic';
+            planDesc.textContent = 'Enhanced dating experience';
+            planBadge.innerHTML = '<span class="badge premium">PREMIUM</span>';
+            break;
+        case 'plus':
+            planIcon.className = 'fas fa-crown';
+            planName.textContent = 'Premium Plus';
+            planDesc.textContent = 'Maximum matching power';
+            planBadge.innerHTML = '<span class="badge premium">PREMIUM+</span>';
+            break;
+        case 'vip':
+            planIcon.className = 'fas fa-gem';
+            planName.textContent = 'VIP Elite';
+            planDesc.textContent = 'Ultimate dating experience';
+            planBadge.innerHTML = '<span class="badge vip">VIP</span>';
+            break;
+        default:
+            planIcon.className = 'fas fa-user';
+            planName.textContent = 'Free Plan';
+            planDesc.textContent = 'Basic features included';
+            planBadge.innerHTML = '<span class="badge free">FREE</span>';
+    }
+    
+    if (subscription.expiresAt) {
+        planExpiry.style.display = 'flex';
+        document.getElementById('expiry-date').textContent = new Date(subscription.expiresAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    } else {
+        planExpiry.style.display = 'none';
+    }
+}
+
+function toggleBillingCycle() {
+    const toggle = document.getElementById('billing-cycle');
+    selectedCycle = toggle.checked ? 'yearly' : 'monthly';
+    
+    // Update all pricing displays
+    document.querySelectorAll('.amount').forEach(amount => {
+        const monthly = amount.dataset.monthly;
+        const yearly = amount.dataset.yearly;
+        amount.textContent = selectedCycle === 'yearly' ? yearly : monthly;
+    });
+    
+    // Show/hide yearly savings
+    document.querySelectorAll('.yearly-savings').forEach(savings => {
+        savings.style.display = selectedCycle === 'yearly' ? 'flex' : 'none';
+    });
+    
+    // Update period text
+    document.querySelectorAll('.period').forEach(period => {
+        period.textContent = selectedCycle === 'yearly' ? '/year' : '/month';
+    });
+    
+    // Update price note
+    document.querySelectorAll('.price-note').forEach(note => {
+        note.textContent = selectedCycle === 'yearly' ? 'Billed annually' : 'Billed monthly';
+    });
+}
+
+function showPlanSelector() {
+    document.getElementById('plans-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+function selectPlan(planType, planId = null, monthlyPrice = null, yearlyPrice = null, planName = null) {
+    // Store plan details
+    selectedPlan = planType;
+    if (planId) {
+        selectedPlanId = planId;
+        selectedPlanName = planName || planType;
+        selectedMonthlyPrice = monthlyPrice;
+        selectedYearlyPrice = yearlyPrice;
+    }
+    
+    // Get current cycle from toggle
+    const toggle = document.getElementById('billing-cycle');
+    selectedCycle = toggle && toggle.checked ? 'yearly' : 'monthly';
+    
+    // Add visual feedback - highlight selected plan
+    document.querySelectorAll('.pricing-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    const selectedCard = document.querySelector(`[data-plan-type="${planType}"]`);
+    if (selectedCard) {
+        selectedCard.classList.add('selected');
+    }
+    
+    // Update plan summary
+    updatePlanSummary();
+    
+    // Show payment section
+    const paymentSection = document.getElementById('payment-section');
+    if (paymentSection) {
+        paymentSection.style.display = 'block';
+        setTimeout(() => {
+            paymentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+    } else {
+        console.error('Payment section not found');
+    }
+}
+
+function hidePaymentSection() {
+    document.getElementById('payment-section').style.display = 'none';
+    document.getElementById('plans-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+function updatePlanSummary() {
+    // Use stored plan data if available
+    if (selectedPlanName && selectedMonthlyPrice !== null) {
+        const price = selectedCycle === 'yearly' ? selectedYearlyPrice : selectedMonthlyPrice;
+        const period = selectedCycle === 'yearly' ? 'year' : 'month';
+        
+        document.getElementById('selected-plan-summary').innerHTML = `
+            <div class="plan-summary">
+                <h4>${selectedPlanName}</h4>
+                <p class="plan-price">$${price.toFixed(2)}/${period}</p>
+                <p class="plan-billing">Billed ${selectedCycle === 'yearly' ? 'annually' : 'monthly'}</p>
+            </div>
+        `;
+        
+        document.getElementById('payment-amount').textContent = `$${price.toFixed(2)}/${period}`;
+        return;
+    }
+    
+    // Fallback to old method
+    const planData = {
+        basic: { name: 'Premium Basic', price: selectedCycle === 'yearly' ? '7.49' : '9.99' },
+        plus: { name: 'Premium Plus', price: selectedCycle === 'yearly' ? '14.99' : '19.99' },
+        vip: { name: 'VIP Elite', price: selectedCycle === 'yearly' ? '29.99' : '39.99' }
+    };
+    
+    const plan = planData[selectedPlan] || planData.basic;
+    const period = selectedCycle === 'yearly' ? 'year' : 'month';
+    
+    document.getElementById('selected-plan-summary').innerHTML = `
+        <div class="plan-summary">
+            <h4>${plan.name}</h4>
+            <p class="plan-price">$${plan.price}/${period}</p>
+            <p class="plan-billing">Billed ${selectedCycle === 'yearly' ? 'annually' : 'monthly'}</p>
+        </div>
+    `;
+    
+    document.getElementById('payment-amount').textContent = `$${plan.price}/${period}`;
+}
+
+function setupPaymentTabs() {
+    document.querySelectorAll('.payment-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            const method = this.dataset.method;
+            switchPaymentMethod(method);
+        });
+    });
+}
+
+function switchPaymentMethod(method) {
+    // Update tab states
+    document.querySelectorAll('.payment-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelector(`[data-method="${method}"]`).classList.add('active');
+    
+    // Update form states
+    document.querySelectorAll('.payment-form').forEach(form => {
+        form.classList.remove('active');
+    });
+    document.getElementById(`${method}-payment`).classList.add('active');
+}
+
+function initializeStripe() {
+    // Initialize Stripe (replace with your publishable key)
+    // stripe = Stripe('pk_test_your_stripe_publishable_key');
+    
+    // Create card element
+    // const elements = stripe.elements();
+    // cardElement = elements.create('card');
+    // cardElement.mount('#card-element');
+    
+    // Handle form submission
+    const form = document.getElementById('payment-form');
+    if (form) {
+        form.addEventListener('submit', handlePayment);
+    }
+}
+
+async function handlePayment(event) {
+    event.preventDefault();
+    
+    const submitBtn = document.getElementById('payment-submit');
+    const originalText = submitBtn.innerHTML;
+    
+    // Show loading state
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    submitBtn.disabled = true;
+    
+    try {
+        // Show processing result
+        showPaymentResult('processing', 'Processing Payment', 'Please wait while we process your payment securely...');
+        
+        // Simulate payment processing
+        setTimeout(() => {
+            // Simulate success (in real app, this would be actual Stripe processing)
+            const success = Math.random() > 0.1; // 90% success rate for demo
+            
+            if (success) {
+                showPaymentResult('success', 'Payment Successful!', 'Welcome to Premium! Your subscription is now active and you can start enjoying all premium features.');
+                setTimeout(() => {
+                    // Reload page to show new subscription status
+                    window.location.reload();
+                }, 3000);
+            } else {
+                showPaymentResult('error', 'Payment Failed', 'There was an issue processing your payment. Please check your card details and try again.');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }, 2000);
+        
+    } catch (error) {
+        console.error('Payment error:', error);
+        showPaymentResult('error', 'Payment Error', 'An unexpected error occurred. Please try again or contact support.');
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+}
+
+function showPaymentResult(type, title, message) {
+    const resultDiv = document.getElementById('payment-result');
+    const iconDiv = document.getElementById('result-icon');
+    const titleDiv = document.getElementById('result-title');
+    const messageDiv = document.getElementById('result-message');
+    const actionsDiv = document.getElementById('result-actions');
+    
+    // Set icon based on type
+    iconDiv.className = `result-icon ${type}`;
+    switch (type) {
+        case 'success':
+            iconDiv.innerHTML = '<i class="fas fa-check-circle"></i>';
+            break;
+        case 'error':
+            iconDiv.innerHTML = '<i class="fas fa-times-circle"></i>';
+            break;
+        case 'processing':
+            iconDiv.innerHTML = '<i class="fas fa-spinner"></i>';
+            break;
+    }
+    
+    titleDiv.textContent = title;
+    messageDiv.textContent = message;
+    
+    // Set actions based on type
+    if (type === 'error') {
+        actionsDiv.innerHTML = `
+            <button class="btn-secondary" onclick="hidePaymentResult()" style="background: var(--accent); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                <i class="fas fa-arrow-left"></i> Try Again
+            </button>
+        `;
+    } else if (type === 'success') {
+        actionsDiv.innerHTML = `
+            <button class="btn-premium" onclick="window.location.reload()" style="background: linear-gradient(45deg, #ffd700, #ff6b6b); color: #333; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 700; cursor: pointer;">
+                <i class="fas fa-crown"></i> Continue to Premium
+            </button>
+        `;
+    } else {
+        actionsDiv.innerHTML = '';
+    }
+    
+    resultDiv.style.display = 'flex';
+}
+
+function hidePaymentResult() {
+    document.getElementById('payment-result').style.display = 'none';
+}
+
+function viewBillingHistory() {
+    document.getElementById('billing-history').style.display = 'block';
+    document.getElementById('billing-history').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function loadBillingHistory() {
+    try {
+        const token = getSessionToken();
+        if (!token) {
+            console.error('No session token available');
+            // Fallback to empty state
+            const tbody = document.getElementById('billing-history-list');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--muted-color);">No billing history available</td></tr>';
+            return;
+        }
+        
+        const response = await fetch(`/api/account/billing-history?token=${token}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        const tbody = document.getElementById('billing-history-list');
+        
+        if (data.success && data.history && data.history.length > 0) {
+            tbody.innerHTML = data.history.map(item => {
+                const date = new Date(item.date || item.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                const amount = item.amount ? `$${parseFloat(item.amount).toFixed(2)}` : '$0.00';
+                const status = item.status || 'Paid';
+                const description = item.description || item.plan_name || 'Subscription Payment';
+                const invoiceId = item.invoice_id || item.id || 'N/A';
+                
+                return `
+                    <tr>
+                        <td>${date}</td>
+                        <td>${description}</td>
+                        <td style="font-weight: 700; color: var(--dark-color);">${amount}</td>
+                        <td><span class="status-badge ${status.toLowerCase() === 'paid' || status.toLowerCase() === 'success' ? 'success' : 'pending'}">${status}</span></td>
+                        <td>
+                            <button class="btn-link" onclick="downloadInvoice('${invoiceId}')">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        } else {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--muted-color);"><i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>No billing history available</td></tr>';
+        }
+    } catch (error) {
+        console.error('Error loading billing history:', error);
+        const tbody = document.getElementById('billing-history-list');
+        const errorMessage = error.message && error.message.includes('HTTP error') 
+            ? 'Network error. Please check your connection and try again.' 
+            : 'Error loading billing history. Please try again later.';
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--muted-color);"><i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>${errorMessage}</td></tr>`;
+    }
+}
+
+function downloadInvoice(invoiceId) {
+    // Simulate invoice download
+    alert(`Downloading invoice ${invoiceId}...`);
+}
+
+function downloadInvoices() {
+    // Simulate downloading all invoices
+    alert('Downloading all invoices...');
+}
+
+function showTerms() {
+    // Show terms of service modal
+    alert('Terms of Service modal would open here');
+}
+
+function showPrivacy() {
+    // Show privacy policy modal
+    alert('Privacy Policy modal would open here');
+}
+</script>

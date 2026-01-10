@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Management - Totilove Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none;">← Back to Dashboard</a>
+                <form method="POST" action="/logout" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+            <h1>🗄️ Database Management</h1>
+            <p>Manage database integrity, check for corruption, and view table statistics</p>
+        </div>
+        
+        <div class="content">
+            <!-- Database Integrity Checker Section -->
+            <div class="welcome-card" style="margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <div>
+                        <h2 style="margin-bottom: 8px;">🔍 Database Integrity Checker</h2>
+                        <p style="color: #666; margin: 0;">Check and fix database corruption issues</p>
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button id="check-corruption-btn" 
+                                style="padding: 10px 24px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                            Check Corruption
+                        </button>
+                        <button id="fix-corruption-btn" 
+                                style="padding: 10px 24px; background: #e74c3c; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; display: none;">
+                            Fix Issues
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="corruption-status" style="display: none; margin-top: 20px;">
+                    <div id="corruption-summary" style="padding: 16px; border-radius: 8px; margin-bottom: 16px;"></div>
+                    <div id="corruption-details" style="max-height: 400px; overflow-y: auto;"></div>
+                </div>
+                
+                <div id="corruption-loading" style="display: none; text-align: center; padding: 20px; color: #667eea;">
+                    <p>Checking database integrity...</p>
+                </div>
+            </div>
+
+            <!-- Database Tables Overview Section -->
+            <div class="welcome-card" style="margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <div>
+                        <h2 style="margin-bottom: 8px;">📊 Database Tables Overview</h2>
+                        <p style="color: #666; margin: 0;">View statistics for all database tables</p>
+                    </div>
+                    <button id="refresh-tables-btn" 
+                            style="padding: 10px 24px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                        Refresh Statistics
+                    </button>
+                </div>
+                
+                <div id="tables-loading" style="display: none; text-align: center; padding: 20px; color: #667eea;">
+                    <p>Loading table statistics...</p>
+                </div>
+                
+                <div id="tables-overview" style="display: none;">
+                    <div id="tables-stats" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; margin-top: 16px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/notifications.js"></script>
+    <script src="/js/admin-database-management.js"></script>
+</body>
+</html>
+
+

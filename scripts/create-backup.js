@@ -91,3 +91,4 @@ console.log('\n💡 To restore:');
 console.log(`   cp -r ${backupDir}/css/* app/assets/css/`);
 console.log(`   cp -r ${backupDir}/js/* app/assets/js/`);
 
+

@@ -1,0 +1,1114 @@
+<!-- User Profile Modal - Updated: Advanced UI with Dark Mode -->
+<div id="userProfileModal" class="profile-modal" role="dialog" aria-modal="true" aria-labelledby="modal-profile-real_name" aria-describedby="modal-profile-content" tabindex="-1">
+    <div class="profile-modal-content">
+        <button class="dark-toggle" id="profileModalDarkToggle" aria-label="Toggle dark mode">
+            <i class="fas fa-moon"></i>
+        </button>
+        <button class="close-profile-modal" id="closeProfileModalBtn" aria-label="Close modal">&times;</button>
+        
+        <div id="modal-loading" class="loading" style="text-align: center; padding: 3rem;">
+            <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i>
+            <p style="margin-top: 1rem; color: #888;">Loading profile...</p>
+        </div>
+        
+        <div id="modal-error" class="error" style="display: none; text-align: center; padding: 2rem; color: var(--danger-color);">
+            <i class="fas fa-exclamation-triangle fa-2x"></i>
+            <p>Error loading profile</p>
+        </div>
+        
+        <div id="modal-profile-content" style="display: none;">
+            <!-- HEADER -->
+            <div class="profile-header">
+                <img id="modal-profile-avatar" class="profile-avatar" src="/assets/images/default_profile_male.svg" alt="Profile">
+                <div>
+                    <h2 id="modal-profile-real_name" class="profile-real_name" style="margin-bottom: 0; padding-bottom: 0; line-height: 1.2;">
+                        Loading...
+                    </h2>
+                    
+                    <div id="modal-profile-location-header" style="margin-top: 0.1rem !important; margin-bottom: 0; font-size: 1.14rem; color: #87CEEB; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; word-wrap: break-word; overflow-wrap: break-word;">
+                        <i class="fas fa-map-marker-alt" style="color: #87CEEB; font-size: 1.08rem; flex-shrink: 0;"></i>
+                        <span id="modal-profile-location-text" style="word-wrap: break-word; overflow-wrap: break-word;">Loading...</span>
+                    </div>
+                    
+                    <div id="modal-profile-meta" class="profile-meta" style="margin-top: 0.18rem;">
+                        <span><i class="fas fa-birthday-cake"></i> <span id="modal-profile-age">Loading...</span></span>
+                    </div>
+                    
+                    <div id="modal-profile-status" class="status" style="margin-top: 0.135rem;">
+                        <span class="dot" id="status-dot" style="display: none; flex-shrink: 0;"></span>
+                        <span id="modal-status-text" style="word-wrap: break-word; overflow-wrap: break-word;">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- GRID -->
+            <div class="profile-grid">
+                <!-- Basic Information Card -->
+                <div class="card">
+                    <h3><i class="fas fa-user"></i> Basic Information</h3>
+                    <div class="info-list">
+                        <div class="info-item">
+                            <span class="info-label"><i class="fas fa-briefcase"></i> Occupation</span>
+                            <span class="info-value" id="modal-info-occupation">Not specified</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label"><i class="fas fa-graduation-cap"></i> Education</span>
+                            <span class="info-value" id="modal-info-education">Not specified</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- About Card -->
+                <div class="card">
+                    <h3><i class="fas fa-briefcase"></i> About</h3>
+                    <div id="modal-profile-about">
+                        <p>Loading...</p>
+                    </div>
+                </div>
+                
+                <!-- Interests Card -->
+                <div class="card">
+                    <h3><i class="fas fa-star"></i> Interests and Hobbies</h3>
+                    <div id="modal-profile-interests" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        <span>Loading...</span>
+                    </div>
+                </div>
+                
+                <!-- Photos Card -->
+                <div class="card">
+                    <h3><i class="fas fa-images"></i> Photos</h3>
+                    <div id="modal-profile-photos" class="photos">
+                        <img src="/assets/images/default_profile_male.svg" alt="Loading...">
+                    </div>
+                </div>
+                
+                <!-- I am looking for Card -->
+                <div class="card">
+                    <h3><i class="fas fa-heart"></i> I am looking for</h3>
+                    <div id="modal-profile-looking-for">
+                        <p>Loading...</p>
+                    </div>
+                </div>
+                
+                <!-- Under construction Card -->
+                <div class="card">
+                    <h3><i class="fas fa-hard-hat"></i> Under construction</h3>
+                    <div id="modal-profile-under-construction">
+                        <p>This section is currently under construction.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ACTIONS -->
+            <div class="actions">
+                <button class="btn like modal-like-btn" id="modal-like-btn" data-action="like">
+                    <i class="fas fa-thumbs-up"></i> <span class="like-btn-text">Like</span>
+                </button>
+                <button class="btn fav modal-favourite-btn" id="modal-favourite-btn" data-action="favourite">
+                    <i class="fas fa-heart"></i> <span class="favourite-btn-text">Add to Favourites</span>
+                </button>
+                <button class="btn msg modal-message-btn" id="modal-message-btn" data-action="message">
+                    <i class="fas fa-paper-plane"></i> <span class="message-btn-text">Message</span>
+                </button>
+                <button class="btn block modal-block-btn" id="modal-block-btn" data-action="block" style="display: none;">
+                    <i class="fas fa-ban"></i> Block
+                </button>
+                <button class="btn report modal-report-btn" id="modal-report-btn" data-action="report" style="display: none;">
+                    <i class="fas fa-flag"></i> Report
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+document.getElementById('userProfileModal')?.addEventListener('click',e=>{if(e.target.id==='userProfileModal'&&typeof window.closeProfileModal==='function')window.closeProfileModal();});
+document.getElementById('profileModalDarkToggle')?.addEventListener('click',toggleDarkMode);
+document.getElementById('closeProfileModalBtn')?.addEventListener('click',()=>{if(typeof window.closeProfileModal==='function')window.closeProfileModal();});
+});
+</script>
+
+<style>
+:root {
+    --primary: #667eea;
+    --secondary: #764ba2;
+    --danger-color: #e74c3c;
+    --success-color: #00b894;
+}
+
+/* ===== MODAL ===== */
+.profile-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.75);
+    display: none;
+    padding: 1.2rem;
+    z-index: 10000;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.profile-modal.dark {
+    background: rgba(0,0,0,.9);
+}
+
+.profile-modal-content {
+    max-width: 1100px;
+    margin: auto;
+    background: #fff;
+    border-radius: 22px;
+    padding: 1.5rem;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.profile-modal.dark .profile-modal-content {
+    background: #121212;
+    color: #eee;
+}
+
+/* ===== HEADER ===== */
+.profile-modal .close-profile-modal {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 2.2rem;
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    color: #333;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+}
+
+.profile-modal .close-profile-modal:hover {
+    background: #fff;
+    color: #e74c3c;
+    border-color: #e74c3c;
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    transform: scale(1.1);
+}
+
+.profile-modal.dark .close-profile-modal {
+    background: rgba(30, 30, 30, 0.95);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.profile-modal.dark .close-profile-modal:hover {
+    background: #2a2a2a;
+    color: #e74c3c;
+    border-color: #e74c3c;
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
+.profile-modal .dark-toggle {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    font-size: 1.6rem;
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s;
+    color: #333;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+}
+
+.profile-modal .dark-toggle:hover {
+    background: #fff;
+    color: #667eea;
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    transform: scale(1.1);
+}
+
+.profile-modal.dark .dark-toggle {
+    background: rgba(30, 30, 30, 0.95);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #fbbf24;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.profile-modal.dark .dark-toggle:hover {
+    background: #2a2a2a;
+    color: #fbbf24;
+    border-color: #fbbf24;
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+}
+
+.profile-modal .profile-header {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    border-bottom: none;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    color: white;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.profile-modal .profile-header > div {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.profile-modal.dark .profile-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.profile-modal.dark .profile-header * {
+    color: inherit;
+}
+
+.profile-modal .profile-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 8px 20px rgba(0,0,0,.2);
+    flex-shrink: 0;
+}
+
+.profile-modal .profile-real_name {
+    margin: 0;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2ecc71;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-shadow: 1px 1px 5px rgba(0,0,0,0.1);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    min-width: 0;
+    flex-wrap: wrap;
+    line-height: 1.2;
+}
+
+.profile-modal.dark .profile-real_name {
+    color: #2ecc71;
+    text-shadow: 1px 1px 5px rgba(0,0,0,0.3);
+}
+
+.profile-modal .profile-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: .9rem;
+    color: #ffffff;
+    margin-top: 0.18rem !important;
+    margin-bottom: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.profile-modal.dark .profile-meta {
+    color: #ffffff;
+}
+
+.profile-modal.dark #modal-profile-location-header {
+    color: #87CEEB;
+}
+
+.profile-modal.dark #modal-profile-location-text {
+    color: #87CEEB;
+}
+
+.profile-modal.dark .status {
+    color: #ffffff;
+}
+
+.profile-modal.dark #modal-status-text {
+    color: #ffffff;
+}
+
+.profile-modal .verified {
+    color: #1da1f2;
+    margin-left: .4rem;
+}
+
+.profile-modal .status {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    margin-top: 0.135rem !important;
+    margin-bottom: 0;
+    font-size: .9rem;
+    color: #ffffff;
+    flex-wrap: wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+}
+
+.profile-modal .dot {
+    width: 8px;
+    height: 8px;
+    background: #00b894;
+    border-radius: 50%;
+    animation: modal-pulse 1.5s infinite;
+}
+
+@keyframes modal-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(0,184,148,.6); }
+    70% { box-shadow: 0 0 0 8px rgba(0,184,148,0); }
+    100% { box-shadow: 0 0 0 0 rgba(0,184,148,0); }
+}
+
+/* ===== GRID ===== */
+.profile-modal .profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+    gap: 1.5rem;
+    margin-top: 1.2rem;
+}
+
+.profile-modal .card {
+    background: #f9fafb;
+    border-radius: 16px;
+    padding: 1.1rem;
+}
+
+.profile-modal.dark .card {
+    background: #1c1c1c;
+}
+
+.profile-modal .card h3 {
+    margin-bottom: .8rem;
+    font-size: 1rem;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.profile-modal .info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.profile-modal .info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0;
+    margin-bottom: -0.2rem;
+    border: none;
+    border-bottom: none !important;
+}
+
+.profile-modal .info-item:last-child {
+    margin-bottom: 0;
+}
+
+.profile-modal .info-item:last-child {
+    padding-bottom: 0;
+}
+
+.profile-modal .info-label {
+    font-weight: 500;
+    color: #888;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.profile-modal .info-label i {
+    color: #000;
+    font-size: 0.9rem;
+}
+
+.profile-modal.dark .info-label {
+    color: #aaa;
+}
+
+.profile-modal .info-value {
+    font-weight: 600;
+    color: #333;
+    text-align: right;
+}
+
+.profile-modal.dark .info-value {
+    color: #eee;
+}
+
+/* ===== TAGS ===== */
+.profile-modal .tags {
+    display: flex;
+    gap: .4rem;
+    flex-wrap: wrap;
+}
+
+.profile-modal .tags span {
+    background: linear-gradient(90deg,var(--primary),#764ba2);
+    color: #fff;
+    padding: .3rem .8rem;
+    border-radius: 20px;
+    font-size: .75rem;
+}
+
+.profile-modal .interest-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.8rem;
+    background: #f8f9fa;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    color: #333;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.profile-modal.dark .interest-item {
+    background: #2a2a2a;
+    color: #eee;
+}
+
+/* Interest text spans (plain text style) */
+.profile-modal .interest-text-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #333;
+    margin-right: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.profile-modal.dark .interest-text-item {
+    color: #eee;
+}
+
+.profile-modal.dark .interest-text-item i {
+    color: #000;
+}
+
+.profile-modal .interest-text-item i {
+    color: #000;
+    font-size: 1rem;
+}
+
+.profile-modal .interest-text-empty {
+    color: #888 !important;
+}
+
+.profile-modal.dark .interest-text-empty {
+    color: #aaa !important;
+}
+
+.profile-modal .interest-text-empty i {
+    color: #888 !important;
+}
+
+.profile-modal.dark .interest-text-empty i {
+    color: #aaa !important;
+}
+
+/* ===== PHOTOS ===== */
+.profile-modal .photos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(130px,1fr));
+    gap: .8rem;
+}
+
+.profile-modal .photos img {
+    width: 100%;
+    height: 154px;
+    object-fit: cover;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.profile-modal .photos img:hover {
+    transform: scale(1.05);
+}
+
+/* ===== ACTIONS ===== */
+.profile-modal .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+    justify-content: center;
+    margin-top: 1.2rem;
+}
+
+.profile-modal .btn {
+    padding: .6rem 1.4rem;
+    border-radius: 30px;
+    border: none;
+    font-size: .8rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    transition: all 0.3s ease;
+}
+
+.profile-modal .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.profile-modal .like { background: linear-gradient(90deg,#e74c3c,#c44569); color:#fff; }
+.profile-modal .fav { background: linear-gradient(90deg,#f39c12,#e67e22); color:#fff; }
+.profile-modal .msg { background: linear-gradient(90deg,#667eea,#5a6fd8); color:#fff; }
+.profile-modal .block { background: #f5f6fa; color: #d63031; border: 2px solid #d63031; }
+.profile-modal .report { background: #f5f6fa; color: #e74c3c; border: 2px solid #e74c3c; }
+
+.profile-modal.dark .block,
+.profile-modal.dark .report {
+    background: #2a2a2a;
+}
+
+.profile-modal .loading, 
+.profile-modal .error {
+    text-align: center;
+    padding: 3rem;
+}
+
+.profile-modal .loading p, 
+.profile-modal .error p {
+    margin-top: 1rem;
+    color: #888;
+}
+
+.profile-modal.dark .loading p,
+.profile-modal.dark .error p {
+    color: #aaa;
+}
+
+/* ===== LIGHTBOX ===== */
+.lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20000;
+    cursor: pointer;
+}
+
+.lightbox img {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 12px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .profile-modal {
+        padding: 0.5rem;
+    }
+    
+    .profile-modal-content {
+        padding: 1rem;
+        border-radius: 16px;
+    }
+    
+    .dark-toggle,
+    .close-profile-modal {
+        width: 36px;
+        height: 36px;
+        font-size: 1.5rem;
+        top: 0.75rem;
+    }
+    
+    .dark-toggle {
+        left: 0.75rem;
+    }
+    
+    .close-profile-modal {
+        right: 0.75rem;
+    }
+    
+    .profile-modal .profile-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem 1rem;
+        gap: 1rem;
+        margin-top: 2.5rem;
+    }
+    
+    .profile-modal .profile-avatar {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .profile-modal .profile-real_name {
+        font-size: 1.5rem;
+        justify-content: center;
+    }
+    
+    .profile-modal .profile-meta {
+        justify-content: center;
+        font-size: 0.85rem;
+    }
+    
+    .profile-modal .status {
+        justify-content: center;
+        font-size: 0.85rem;
+    }
+    
+    #modal-profile-location-header {
+        justify-content: center;
+        font-size: 1rem;
+    }
+    
+    .profile-modal .profile-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .profile-modal .card {
+        padding: 1rem;
+    }
+    
+    .profile-modal .card h3 {
+        font-size: 0.95rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .profile-modal .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .profile-modal.dark .info-item {
+        border-bottom-color: #333;
+    }
+    
+    .profile-modal .info-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    
+    .profile-modal .info-label {
+        font-size: 0.85rem;
+    }
+    
+    .profile-modal .info-value {
+        text-align: left;
+        font-size: 0.9rem;
+        width: 100%;
+    }
+    
+    .profile-modal .photos {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    
+    .profile-modal .photos img {
+        height: 120px;
+    }
+    
+    .profile-modal .actions {
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+    
+    .profile-modal .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 0.75rem 1.2rem;
+        font-size: 0.85rem;
+    }
+    
+    .profile-modal .interest-text-item {
+        font-size: 0.85rem;
+        margin-right: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-modal {
+        padding: 0;
+    }
+    
+    .profile-modal-content {
+        padding: 0.75rem;
+        border-radius: 12px;
+        margin: 0;
+        min-height: 100vh;
+        border-radius: 0;
+    }
+    
+    .dark-toggle,
+    .close-profile-modal {
+        width: 32px;
+        height: 32px;
+        font-size: 1.3rem;
+        top: 0.5rem;
+    }
+    
+    .dark-toggle {
+        left: 0.5rem;
+    }
+    
+    .close-profile-modal {
+        right: 0.5rem;
+    }
+    
+    .profile-modal .profile-header {
+        padding: 1.25rem 0.75rem;
+        margin-top: 2rem;
+        margin-bottom: 0.75rem;
+        border-radius: 12px;
+    }
+    
+    .profile-modal .profile-avatar {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .profile-modal .profile-real_name {
+        font-size: 1.3rem;
+    }
+    
+    .profile-modal .profile-meta {
+        font-size: 0.8rem;
+        gap: 0.75rem;
+    }
+    
+    .profile-modal .status {
+        font-size: 0.8rem;
+    }
+    
+    #modal-profile-location-header {
+        font-size: 0.9rem;
+    }
+    
+    .profile-modal .profile-grid {
+        gap: 0.75rem;
+    }
+    
+    .profile-modal .card {
+        padding: 0.875rem;
+        border-radius: 12px;
+    }
+    
+    .profile-modal .card h3 {
+        font-size: 0.9rem;
+        margin-bottom: 0.625rem;
+    }
+    
+    .profile-modal .info-item {
+        margin-bottom: 0.625rem;
+        padding-bottom: 0.625rem;
+    }
+    
+    .profile-modal .info-label {
+        font-size: 0.8rem;
+    }
+    
+    .profile-modal .info-value {
+        font-size: 0.85rem;
+    }
+    
+    .profile-modal .photos {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+    
+    .profile-modal .photos img {
+        height: 100px;
+        border-radius: 8px;
+    }
+    
+    .profile-modal .actions {
+        gap: 0.625rem;
+    }
+    
+    .profile-modal .btn {
+        padding: 0.625rem 1rem;
+        font-size: 0.8rem;
+        border-radius: 25px;
+    }
+    
+    .profile-modal .interest-text-item {
+        font-size: 0.8rem;
+        margin-right: 0.5rem;
+        margin-bottom: 0.4rem;
+    }
+    
+    .profile-modal .loading,
+    .profile-modal .error {
+        padding: 2rem 1rem;
+    }
+}
+</style>
+
+<script>
+(function() {
+    const modal = document.getElementById('userProfileModal');
+    const modalWindow = modal?.querySelector('.profile-modal-content');
+    const closeBtn = modal?.querySelector('.close-profile-modal');
+    const focusableSelector = 'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    let previousFocus = null;
+    let previousOverflow = null;
+    let isActive = false;
+
+    if (!modal || !modalWindow) return;
+
+    function trapFocus(e) {
+        if (e.key !== 'Tab') return;
+        const focusable = Array.from(modal.querySelectorAll(focusableSelector)).filter(el => el.offsetParent !== null);
+        if (focusable.length === 0) {
+            e.preventDefault();
+            modalWindow.focus();
+            return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+        }
+    }
+
+    function handleKeydown(e) {
+        if (e.key === 'Escape') {
+            e.stopPropagation();
+            if (typeof window.closeProfileModal === 'function') {
+                window.closeProfileModal();
+            } else {
+                hideModal();
+            }
+            return;
+        }
+        trapFocus(e);
+    }
+
+    function hideModal() {
+        modal.style.display = 'none';
+    }
+
+    function onOpen() {
+        if (isActive) return;
+        isActive = true;
+        previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        modal.addEventListener('keydown', handleKeydown, true);
+        setTimeout(() => {
+            (closeBtn || modalWindow).focus();
+        }, 0);
+    }
+
+    function onClose() {
+        if (!isActive) return;
+        isActive = false;
+        modal.removeEventListener('keydown', handleKeydown, true);
+        document.body.style.overflow = previousOverflow;
+        if (previousFocus && typeof previousFocus.focus === 'function') {
+            previousFocus.focus();
+        }
+    }
+
+    const observer = new MutationObserver(() => {
+        const isVisible = getComputedStyle(modal).display !== 'none';
+        if (isVisible) {
+            onOpen();
+        } else {
+            onClose();
+        }
+    });
+
+    observer.observe(modal, { attributes: true, attributeFilter: ['style'] });
+
+    window.addEventListener('pagehide', () => observer.disconnect());
+    
+    // Dark mode toggle
+    window.toggleDarkMode = function() {
+        modal.classList.toggle('dark');
+        const icon = modal.querySelector('.dark-toggle i');
+        if (modal.classList.contains('dark')) {
+            icon.className = 'fas fa-sun';
+        } else {
+            icon.className = 'fas fa-moon';
+        }
+    };
+    
+    // Photo lightbox functionality
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('#modal-profile-photos img')) {
+            e.preventDefault();
+            e.stopPropagation();
+            const img = e.target.closest('img');
+            if (!img || img.src.includes('default_profile_')) return;
+            
+            const box = document.createElement('div');
+            box.className = 'lightbox';
+            box.innerHTML = '<img src="' + img.src + '" alt="Profile photo">';
+            box.onclick = function(e) {
+                e.stopPropagation();
+                box.remove();
+            };
+            document.body.appendChild(box);
+        }
+    });
+})();
+
+// Function to render interests and hobbies with icons in the modal
+(function() {
+    // Icon mapping for interests and hobbies
+    function getInterestIcon(interest) {
+        if (interest.icon) {
+            let iconClass = interest.icon;
+            if (iconClass.includes('fa-')) {
+                if (!iconClass.includes('fas ') && !iconClass.includes('far ') && !iconClass.includes('fab ')) {
+                    iconClass = 'fas ' + iconClass;
+                }
+            } else {
+                iconClass = 'fas fa-' + iconClass;
+            }
+            return iconClass;
+        }
+        const iconMap = {
+            // Travel & Adventure
+            'travel': 'fa-plane', 'travelling': 'fa-plane', 'tourism': 'fa-plane', 'traveling': 'fa-plane',
+            'adventure': 'fa-mountain', 'exploring': 'fa-compass',
+            // Music & Arts
+            'music': 'fa-music', 'musician': 'fa-music', 'singing': 'fa-microphone', 'dancing': 'fa-music', 'dance': 'fa-music',
+            'photography': 'fa-camera', 'photographer': 'fa-camera-retro',
+            'art': 'fa-palette', 'painting': 'fa-paint-brush', 'drawing': 'fa-pencil-alt', 'arts': 'fa-palette', 'creativity': 'fa-palette',
+            // Health & Wellness
+            'health': 'fa-heartbeat', 'wellness': 'fa-spa', 'health & wellness': 'fa-spa', 'health and wellness': 'fa-spa',
+            'yoga': 'fa-child', 'meditation': 'fa-om',
+            // Reading & Education
+            'reading': 'fa-book', 'books': 'fa-book-open', 'literature': 'fa-book-reader', 'book': 'fa-book',
+            // Sports & Fitness
+            'sports': 'fa-futbol', 'sport': 'fa-futbol', 'football': 'fa-futbol', 'soccer': 'fa-futbol',
+            'sports & fitness': 'fa-futbol', 'sports and fitness': 'fa-futbol',
+            'fitness': 'fa-dumbbell', 'exercise': 'fa-running', 'gym': 'fa-dumbbell', 'workout': 'fa-dumbbell',
+            'hiking': 'fa-hiking', 'running': 'fa-running', 'jogging': 'fa-running',
+            // Social & Community
+            'social': 'fa-users', 'community': 'fa-users', 'social & community': 'fa-users', 'social and community': 'fa-users',
+            'socializing': 'fa-users', 'networking': 'fa-network-wired',
+            // Entertainment
+            'gaming': 'fa-gamepad', 'games': 'fa-dice', 'video games': 'fa-gamepad', 'gaming': 'fa-gamepad',
+            'movies': 'fa-film', 'cinema': 'fa-video', 'film': 'fa-film', 'tv': 'fa-tv', 'television': 'fa-tv',
+            // Nature & Outdoors
+            'nature': 'fa-leaf', 'outdoors': 'fa-tree', 'camping': 'fa-campground', 'gardening': 'fa-seedling', 'plants': 'fa-leaf',
+            // Food & Cooking
+            'cooking': 'fa-utensils', 'food': 'fa-hamburger', 'baking': 'fa-cookie-bite', 'culinary': 'fa-utensils',
+            'food & cooking': 'fa-utensils', 'food and cooking': 'fa-utensils',
+            // Activities
+            'cycling': 'fa-bicycle', 'biking': 'fa-bicycle', 'bike': 'fa-bicycle',
+            'skiing': 'fa-skiing', 'snowboarding': 'fa-skiing',
+            'swimming': 'fa-swimmer', 'surfing': 'fa-water',
+            'basketball': 'fa-basketball-ball', 'tennis': 'fa-table-tennis', 'volleyball': 'fa-volleyball-ball',
+            // Technology
+            'technology': 'fa-laptop', 'tech': 'fa-laptop-code', 'programming': 'fa-code', 'coding': 'fa-laptop-code',
+            // Vehicles
+            'cars': 'fa-car', 'driving': 'fa-car-side', 'automotive': 'fa-car',
+            // Other
+            'coffee': 'fa-coffee', 'tea': 'fa-coffee',
+            'writing': 'fa-pen', 'blogging': 'fa-blog',
+            'interests and hobbies': 'fa-heart', 'interests': 'fa-heart', 'hobbies': 'fa-heart'
+        };
+        const name = (interest.name || '').toLowerCase().trim();
+        // Try exact match first
+        let iconClass = iconMap[name];
+        // If not found, try matching any part of the name
+        if (!iconClass) {
+            for (const key in iconMap) {
+                if (name.includes(key) || key.includes(name)) {
+                    iconClass = iconMap[key];
+                    break;
+                }
+            }
+        }
+        // If still not found, try to infer from common words
+        if (!iconClass) {
+            if (name.includes('sport') || name.includes('fitness')) iconClass = 'fa-futbol';
+            else if (name.includes('music') || name.includes('dance')) iconClass = 'fa-music';
+            else if (name.includes('art') || name.includes('creativity')) iconClass = 'fa-palette';
+            else if (name.includes('read') || name.includes('book')) iconClass = 'fa-book';
+            else if (name.includes('travel') || name.includes('adventure')) iconClass = 'fa-plane';
+            else if (name.includes('food') || name.includes('cook')) iconClass = 'fa-utensils';
+            else if (name.includes('tech') || name.includes('code')) iconClass = 'fa-laptop-code';
+            else if (name.includes('social') || name.includes('community')) iconClass = 'fa-handshake';
+            else if (name.includes('health') || name.includes('wellness')) iconClass = 'fa-spa';
+            else iconClass = 'fa-heart'; // Default to heart instead of star
+        }
+        return 'fas ' + iconClass;
+    }
+    
+    // Escape HTML helper
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // Function to render interests with icons (plain text, no button styling)
+    window.renderModalInterests = function(interests) {
+        const interestsElement = document.getElementById('modal-profile-interests');
+        if (!interestsElement) return;
+        
+        if (interests && Array.isArray(interests) && interests.length > 0) {
+            interestsElement.innerHTML = interests.map(interest => {
+                const iconClass = getInterestIcon(interest);
+                const interestName = escapeHtml(interest.name || 'Interest');
+                return '<span class="interest-text-item">' +
+                    '<i class="' + iconClass + '"></i>' +
+                    '<span>' + interestName + '</span>' +
+                    '</span>';
+            }).join('');
+        } else {
+            interestsElement.innerHTML = '<span class="interest-text-item interest-text-empty">' +
+                '<i class="fas fa-info-circle"></i>' +
+                '<span>No interests or hobbies listed</span>' +
+                '</span>';
+        }
+    };
+})();
+
+// Load external modal JavaScript
+(function() {
+    const script = document.createElement('script');
+    script.src = '/components/modals/user-profile-modal.js';
+    script.async = true;
+    document.head.appendChild(script);
+})();
+</script>

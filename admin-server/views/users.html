@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - Totilove Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none;">← Back to Dashboard</a>
+                <form method="POST" action="/logout" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+            <h1>👥 User Management</h1>
+            <p>View, search, edit, suspend, and manage all users. <strong>Suspend:</strong> Prevents login (reversible). <strong>Blacklist:</strong> Permanently blacklists user (stored in admin_blacklisted_users table). <strong>Delete:</strong> Permanently deletes account and all data (hard delete - cannot be undone).</p>
+        </div>
+        
+        <div class="content">
+            <!-- Filters Section -->
+            <div class="filters-panel">
+                <div class="filters-header">
+                    <h2>Filters</h2>
+                    <button id="clearFilters" class="btn btn-link">Clear All</button>
+                </div>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>Search</label>
+                        <input type="text" id="searchInput" placeholder="Username, email, ID, or location">
+                    </div>
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select id="statusFilter">
+                            <option value="">All</option>
+                            <option value="active">Active</option>
+                            <option value="banned">Suspended</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Gender</label>
+                        <select id="genderFilter">
+                            <option value="">All</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Age Min</label>
+                        <input type="number" id="ageMin" min="18" max="100">
+                    </div>
+                    <div class="filter-group">
+                        <label>Age Max</label>
+                        <input type="number" id="ageMax" min="18" max="100">
+                    </div>
+                    <div class="filter-group">
+                        <label>Email Verified</label>
+                        <select id="emailVerifiedFilter">
+                            <option value="">All</option>
+                            <option value="true">Verified</option>
+                            <option value="false">Not Verified</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Has Images</label>
+                        <select id="hasImagesFilter">
+                            <option value="">All</option>
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Sort By</label>
+                        <select id="sortBy">
+                            <option value="date_joined">Date Joined</option>
+                            <option value="last_login">Last Login</option>
+                            <option value="real_name">Real Name</option>
+                            <option value="username">Real Name</option>
+                            <option value="id">ID</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Order</label>
+                        <select id="sortOrder">
+                            <option value="DESC">Descending</option>
+                            <option value="ASC">Ascending</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Show per page</label>
+                        <select id="itemsPerPage">
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="1000">1000</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="applyFilters" class="btn btn-primary">Apply Filters</button>
+            </div>
+
+            <!-- Bulk Actions -->
+            <div class="bulk-actions" id="bulkActions" style="display: none;">
+                <span id="selectedCount">0</span> users selected
+                <select id="bulkOperation">
+                    <option value="">Select action...</option>
+                    <option value="ban">Suspend Selected</option>
+                    <option value="unban">Unsuspend Selected</option>
+                    <option value="verify_email">Verify Email</option>
+                    <option value="unverify_email">Unverify Email</option>
+                    <option value="verify_profile">Verify Profile</option>
+                    <option value="unverify_profile">Unverify Profile</option>
+                    <option value="blacklist">Blacklist User</option>
+                    <option value="delete">Delete Account</option>
+                </select>
+                <button id="executeBulk" class="btn btn-primary">Execute</button>
+                <button id="clearSelection" class="btn btn-secondary">Clear Selection</button>
+            </div>
+
+            <!-- Users Table -->
+            <div class="table-container">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAll"></th>
+                            <th class="sortable" data-sort="id">ID <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="real_name">Real Name <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="email">Email <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="age">Age <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="gender">Gender <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="location">Location <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="status">Status <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="image_count">Images <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="messages">Messages <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="likes">Likes <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="last_login">Last Login <span class="sort-arrow"></span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr>
+                            <td colspan="12" class="loading">Loading users...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <!-- User Detail Modal -->
+    <div id="userModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="userModalBody">Loading...</div>
+        </div>
+    </div>
+
+    <script src="/js/notifications.js"></script>
+    <script src="/js/admin-users.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
