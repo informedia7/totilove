@@ -1,7 +1,499 @@
 /**
  * Layout Styles (Mobile-First)
  * 
- * Grids, containers, headers, footers
+ * Grids, containers, headers, footers, page structure
+ * NO media queries here - this IS mobile CSS
+ * Desktop enhancements go in 04-responsive.css
+ * 
+ * Extracted from:
+ * - app/assets/css/03-layout.css
+ * - app/components/layouts/layout.html
+ * - Common layout patterns
+ * 
+ * Migration Phase 1: Week 6
  */
 
-/* Layout styles will go here */
+/* ===== CONTAINERS ===== */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--md, 1rem);
+    box-sizing: border-box;
+}
+
+.container-fluid {
+    width: 100%;
+    padding: 0 var(--md, 1rem);
+    box-sizing: border-box;
+}
+
+.container-sm {
+    max-width: 600px;
+}
+
+.container-md {
+    max-width: 900px;
+}
+
+.container-lg {
+    max-width: 1200px;
+}
+
+.container-xl {
+    max-width: 1400px;
+}
+
+/* ===== GRID SYSTEM ===== */
+.grid {
+    display: grid;
+    gap: var(--md, 1rem);
+    width: 100%;
+}
+
+.grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* Auto-fit grid */
+.grid-auto-fit {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.grid-auto-fill {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+/* ===== FLEXBOX UTILITIES ===== */
+.flex {
+    display: flex;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.flex-row {
+    flex-direction: row;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.flex-nowrap {
+    flex-wrap: nowrap;
+}
+
+.items-start {
+    align-items: flex-start;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.items-end {
+    align-items: flex-end;
+}
+
+.justify-start {
+    justify-content: flex-start;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.justify-end {
+    justify-content: flex-end;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.justify-around {
+    justify-content: space-around;
+}
+
+.gap-xs {
+    gap: var(--xs, 0.25rem);
+}
+
+.gap-sm {
+    gap: var(--sm, 0.5rem);
+}
+
+.gap-md {
+    gap: var(--md, 1rem);
+}
+
+.gap-lg {
+    gap: var(--lg, 1.5rem);
+}
+
+.gap-xl {
+    gap: var(--xl, 2rem);
+}
+
+/* ===== SPACING UTILITIES ===== */
+.p-xs {
+    padding: var(--xs, 0.25rem);
+}
+
+.p-sm {
+    padding: var(--sm, 0.5rem);
+}
+
+.p-md {
+    padding: var(--md, 1rem);
+}
+
+.p-lg {
+    padding: var(--lg, 1.5rem);
+}
+
+.p-xl {
+    padding: var(--xl, 2rem);
+}
+
+.px-xs {
+    padding-left: var(--xs, 0.25rem);
+    padding-right: var(--xs, 0.25rem);
+}
+
+.px-sm {
+    padding-left: var(--sm, 0.5rem);
+    padding-right: var(--sm, 0.5rem);
+}
+
+.px-md {
+    padding-left: var(--md, 1rem);
+    padding-right: var(--md, 1rem);
+}
+
+.px-lg {
+    padding-left: var(--lg, 1.5rem);
+    padding-right: var(--lg, 1.5rem);
+}
+
+.py-xs {
+    padding-top: var(--xs, 0.25rem);
+    padding-bottom: var(--xs, 0.25rem);
+}
+
+.py-sm {
+    padding-top: var(--sm, 0.5rem);
+    padding-bottom: var(--sm, 0.5rem);
+}
+
+.py-md {
+    padding-top: var(--md, 1rem);
+    padding-bottom: var(--md, 1rem);
+}
+
+.py-lg {
+    padding-top: var(--lg, 1.5rem);
+    padding-bottom: var(--lg, 1.5rem);
+}
+
+.m-xs {
+    margin: var(--xs, 0.25rem);
+}
+
+.m-sm {
+    margin: var(--sm, 0.5rem);
+}
+
+.m-md {
+    margin: var(--md, 1rem);
+}
+
+.m-lg {
+    margin: var(--lg, 1.5rem);
+}
+
+.m-xl {
+    margin: var(--xl, 2rem);
+}
+
+.mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.my-auto {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+/* ===== PAGE STRUCTURE ===== */
+.page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.page-header {
+    flex-shrink: 0;
+    padding: var(--md, 1rem);
+    background: var(--card, #fff);
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
+}
+
+.page-content {
+    flex: 1;
+    padding: var(--md, 1rem);
+    min-height: 0;
+}
+
+.page-footer {
+    flex-shrink: 0;
+    padding: var(--md, 1rem);
+    background: var(--bg-light, #f8f9fa);
+    border-top: 1px solid var(--border-color, #e0e0e0);
+    text-align: center;
+    color: var(--text-muted, #777);
+    font-size: var(--f-sm, 0.875rem);
+}
+
+/* ===== SECTIONS ===== */
+.section {
+    margin-bottom: var(--xl, 2rem);
+}
+
+.section:last-child {
+    margin-bottom: 0;
+}
+
+.section-header {
+    margin-bottom: var(--lg, 1.5rem);
+    padding-bottom: var(--md, 1rem);
+    border-bottom: 2px solid var(--border-color, #e0e0e0);
+}
+
+.section-title {
+    font-size: var(--f-xl, 1.25rem);
+    font-weight: 600;
+    color: var(--text-color, #333);
+    margin: 0;
+}
+
+.section-subtitle {
+    font-size: var(--f-md, 1rem);
+    color: var(--text-muted, #777);
+    margin-top: var(--xs, 0.25rem);
+}
+
+/* ===== RESULTS LAYOUT ===== */
+#app-root .results-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--md, 1rem);
+    padding: var(--md, 1rem);
+    margin-bottom: var(--md, 1rem);
+}
+
+#app-root .results-count {
+    font-size: var(--f-lg, 1.125rem);
+    font-weight: 600;
+    color: var(--dark, #2c3e50);
+}
+
+#app-root .results-stats {
+    font-size: var(--f-sm, 0.875rem);
+    color: var(--text-muted, #777);
+}
+
+/* ===== PAGINATION LAYOUT ===== */
+#app-root .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--sm, 0.5rem);
+    padding: var(--md, 1rem);
+    flex-wrap: wrap;
+}
+
+#app-root .page-info {
+    font-size: var(--f-sm, 0.875rem);
+    color: var(--text-muted, #777);
+    margin: 0 var(--sm, 0.5rem);
+}
+
+/* ===== LOAD MORE CONTAINER ===== */
+#app-root .load-more-container {
+    padding: var(--md, 1rem);
+    text-align: center;
+    margin-top: var(--md, 1rem);
+}
+
+/* ===== EMPTY STATES LAYOUT ===== */
+#app-root .empty-state,
+#app-root .no-results,
+#app-root .empty-state-wrapper {
+    text-align: center;
+    padding: var(--xl, 2rem);
+    color: var(--text-muted, #777);
+}
+
+#app-root .empty-state-icon,
+#app-root .empty-icon-wrapper {
+    margin-bottom: var(--md, 1rem);
+    opacity: 0.5;
+    font-size: 3rem;
+}
+
+#app-root .empty-state-message,
+#app-root .empty-title {
+    font-size: var(--f-lg, 1.125rem);
+    margin-bottom: var(--sm, 0.5rem);
+    color: var(--text-color, #333);
+    font-weight: 600;
+}
+
+#app-root .empty-state-action,
+#app-root .empty-actions {
+    margin-top: var(--md, 1rem);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sm, 0.5rem);
+    align-items: center;
+}
+
+/* ===== PROFILE CONTAINER ===== */
+.profile-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    background: var(--white, #fff);
+    border-radius: 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 0;
+    min-height: 600px;
+}
+
+/* ===== WIDTH UTILITIES ===== */
+.w-full {
+    width: 100%;
+}
+
+.w-auto {
+    width: auto;
+}
+
+.w-50 {
+    width: 50%;
+}
+
+.w-75 {
+    width: 75%;
+}
+
+.max-w-full {
+    max-width: 100%;
+}
+
+.max-w-sm {
+    max-width: 600px;
+}
+
+.max-w-md {
+    max-width: 900px;
+}
+
+.max-w-lg {
+    max-width: 1200px;
+}
+
+.max-w-xl {
+    max-width: 1400px;
+}
+
+/* ===== HEIGHT UTILITIES ===== */
+.h-full {
+    height: 100%;
+}
+
+.h-auto {
+    height: auto;
+}
+
+.min-h-screen {
+    min-height: 100vh;
+}
+
+.min-h-full {
+    min-height: 100%;
+}
+
+/* ===== OVERFLOW UTILITIES ===== */
+.overflow-hidden {
+    overflow: hidden;
+}
+
+.overflow-auto {
+    overflow: auto;
+}
+
+.overflow-x-auto {
+    overflow-x: auto;
+}
+
+.overflow-y-auto {
+    overflow-y: auto;
+}
+
+/* ===== POSITION UTILITIES ===== */
+.relative {
+    position: relative;
+}
+
+.absolute {
+    position: absolute;
+}
+
+.fixed {
+    position: fixed;
+}
+
+.sticky {
+    position: sticky;
+}
+
+/* ===== Z-INDEX UTILITIES ===== */
+.z-0 {
+    z-index: 0;
+}
+
+.z-10 {
+    z-index: 10;
+}
+
+.z-20 {
+    z-index: 20;
+}
+
+.z-30 {
+    z-index: 30;
+}
+
+.z-40 {
+    z-index: 40;
+}
+
+.z-50 {
+    z-index: 50;
+}

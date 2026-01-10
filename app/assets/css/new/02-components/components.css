@@ -23,6 +23,5 @@
 /* Import Chat component */
 @import url('./_chat.css');
 
-/* More components will be imported here as we extract them:
-   @import url('./_cards.css');
- */
+/* Import Cards & Utility Components */
+@import url('./_cards.css');
