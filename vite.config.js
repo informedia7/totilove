@@ -38,8 +38,8 @@ export default defineConfig({
     // Code splitting
     rollupOptions: {
       input: {
-        // Main entry point (will be created)
-        // main: resolve(__dirname, 'app/assets/js/new/main.js'),
+        // CSS entry point
+        main: resolve(__dirname, 'app/assets/css/new/main.css'),
       },
       
       output: {
