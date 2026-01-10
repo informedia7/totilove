@@ -1533,23 +1533,17 @@ async function loadRelationshipTypes() {
         const lookupData = responseData.data || responseData;
         let relationshipTypes = lookupData.relationshipTypes || [];
         
-        console.log('[Relationship Types] API Response:', { lookupData, relationshipTypes });
-        
         if (!Array.isArray(relationshipTypes)) {
-            console.warn('[Relationship Types] relationshipTypes is not an array:', relationshipTypes);
             relationshipTypes = [];
         }
         
         const relationshipSelect = document.getElementById('search-relationship');
         if (!relationshipSelect) {
-            console.error('[Relationship Types] Select element not found: #search-relationship');
             return Promise.resolve();
         }
         
         // Keep the "Any" option, then add relationship types
         relationshipSelect.innerHTML = '<option value="">Any</option>';
-        
-        console.log('[Relationship Types] Found', relationshipTypes.length, 'relationship types');
         
         if (relationshipTypes.length > 0) {
             relationshipTypes.forEach(type => {
@@ -1573,8 +1567,6 @@ async function loadRelationshipTypes() {
                 relationshipSelect.appendChild(option);
             });
             
-            console.log('[Relationship Types] Added', relationshipSelect.options.length - 1, 'options to dropdown');
-            
             // Restore relationship type from URL if present (after options are loaded)
             const urlParams = new URLSearchParams(window.location.search);
             const relationshipType = urlParams.get('relationshipType');
@@ -1593,11 +1585,8 @@ async function loadRelationshipTypes() {
                     }
                 }
             }
-        } else {
-            console.warn('[Relationship Types] No relationship types found in API response');
         }
     } catch (error) {
-        console.error('[Relationship Types] Error loading relationship types:', error);
         // Still initialize the dropdown with just "Any" option
         const relationshipSelect = document.getElementById('search-relationship');
         if (relationshipSelect) {
