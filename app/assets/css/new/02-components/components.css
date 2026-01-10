@@ -2,7 +2,17 @@
  * Component Styles (Mobile-First)
  * 
  * Import component files here
- * Will be split into: _user-card.css, _modals.css, etc.
+ * Components are split into separate files for maintainability
  */
 
-/* Component styles will go here */
+/* Import UserCard component */
+@import url('./_user-card.css');
+
+/* More components will be imported here as we extract them:
+   @import url('./_modals.css');
+   @import url('./_forms.css');
+   @import url('./_buttons.css');
+   @import url('./_cards.css');
+   @import url('./_navigation.css');
+   @import url('./_chat.css');
+ */
