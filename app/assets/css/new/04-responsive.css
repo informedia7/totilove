@@ -1,0 +1,11 @@
+/**
+ * Responsive Styles (Desktop Enhancements)
+ * 
+ * ONLY desktop enhancements via media queries
+ * Mobile styles are in base.css
+ */
+
+/* Desktop enhancements will go here */
+@media (min-width: 769px) {
+  /* Desktop-only styles */
+}
