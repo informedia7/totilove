@@ -14,8 +14,10 @@
 /* Import Forms component */
 @import url('./_forms.css');
 
+/* Import Buttons component */
+@import url('./_buttons.css');
+
 /* More components will be imported here as we extract them:
-   @import url('./_buttons.css');
    @import url('./_cards.css');
    @import url('./_navigation.css');
    @import url('./_chat.css');
