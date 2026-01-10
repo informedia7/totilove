@@ -25,6 +25,8 @@ import { Modal, ProfileModal } from './components/Modal.js';
 import { Form } from './components/Form.js';
 import { MultiSelect } from './components/MultiSelect.js';
 import { ChatInput } from './components/ChatInput.js';
+import { Dropdown } from './components/Dropdown.js';
+import { Pagination } from './components/Pagination.js';
 
 // Export for use in other modules
 export { 
@@ -36,7 +38,9 @@ export {
     ProfileModal,
     Form,
     MultiSelect,
-    ChatInput
+    ChatInput,
+    Dropdown,
+    Pagination
 };
 
 // Log initialization
@@ -49,7 +53,9 @@ if (typeof window !== 'undefined') {
         ProfileModal,
         Form,
         MultiSelect,
-        ChatInput
+        ChatInput,
+        Dropdown,
+        Pagination
     });
 }
 
