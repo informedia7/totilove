@@ -18,12 +18,39 @@ if (typeof window !== 'undefined' && window.currentUser) {
     }, { silent: true });
 }
 
+// Import components
+import { BaseComponent } from './components/BaseComponent.js';
+import { UserCard } from './components/UserCard.js';
+import { Modal, ProfileModal } from './components/Modal.js';
+import { Form } from './components/Form.js';
+import { MultiSelect } from './components/MultiSelect.js';
+import { ChatInput } from './components/ChatInput.js';
+
 // Export for use in other modules
-export { state, apiClient };
+export { 
+    state, 
+    apiClient,
+    BaseComponent,
+    UserCard,
+    Modal,
+    ProfileModal,
+    Form,
+    MultiSelect,
+    ChatInput
+};
 
 // Log initialization
 if (typeof window !== 'undefined') {
     console.log('[New Architecture] Main entry point loaded');
+    console.log('[New Architecture] Components available:', {
+        BaseComponent,
+        UserCard,
+        Modal,
+        ProfileModal,
+        Form,
+        MultiSelect,
+        ChatInput
+    });
 }
 
 
