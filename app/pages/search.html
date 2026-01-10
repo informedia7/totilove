@@ -1329,10 +1329,9 @@ function setGenderPreference() {
 }
 
 function initializeFilters() {
-    // Load countries dropdown, relationship types, and all filter options from database
+    // Load countries dropdown and all filter options from database
     Promise.all([
         loadCountries(),
-        loadRelationshipTypes(),
         loadSearchFilters()
     ]).then(() => {
         // After all data is loaded, populate form from URL parameters
@@ -1689,6 +1688,51 @@ async function loadSearchFilters() {
                     option.textContent = lifestyle.name;
                     lifestyleSelect.appendChild(option);
                 });
+            }
+            
+            // Populate Relationship Type dropdown
+            const relationshipSelect = document.getElementById('search-relationship');
+            if (relationshipSelect && filters.relationshipTypes) {
+                relationshipSelect.innerHTML = '<option value="">Any</option>';
+                filters.relationshipTypes.forEach(type => {
+                    const displayName = type.name || '';
+                    const displayNameLower = displayName.toLowerCase();
+                    
+                    // Skip "Any", "Prefer not to say", "Not important", and "Other" options
+                    if (displayNameLower === 'any' ||
+                        displayNameLower === 'prefer not to say' || 
+                        displayNameLower === 'not important' || 
+                        displayNameLower === 'other') {
+                        return;
+                    }
+                    
+                    const option = document.createElement('option');
+                    option.value = displayName;
+                    option.textContent = displayName;
+                    if (type.description) {
+                        option.title = type.description; // Add description as tooltip
+                    }
+                    relationshipSelect.appendChild(option);
+                });
+                
+                // Restore relationship type from URL if present (after options are loaded)
+                const urlParams = new URLSearchParams(window.location.search);
+                const relationshipType = urlParams.get('relationshipType');
+                if (relationshipType && relationshipSelect) {
+                    // Try to find exact match first
+                    const exactMatch = Array.from(relationshipSelect.options).find(opt => opt.value === relationshipType);
+                    if (exactMatch) {
+                        relationshipSelect.value = relationshipType;
+                    } else {
+                        // Try case-insensitive match
+                        const caseInsensitiveMatch = Array.from(relationshipSelect.options).find(opt => 
+                            opt.value.toLowerCase() === relationshipType.toLowerCase()
+                        );
+                        if (caseInsensitiveMatch) {
+                            relationshipSelect.value = caseInsensitiveMatch.value;
+                        }
+                    }
+                }
             }
             
             // Populate Smoking dropdown

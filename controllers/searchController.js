@@ -916,7 +916,8 @@ class SearchController {
                 childrenStatuses,
                 heights,
                 interests,
-                hobbies
+                hobbies,
+                relationshipTypes
             ] = await Promise.all([
                 this.db.query('SELECT id, name FROM user_body_types WHERE is_active = true ORDER BY display_order, name'),
                 this.db.query('SELECT id, name FROM user_eye_colors WHERE is_active = true ORDER BY display_order, name'),
@@ -952,6 +953,11 @@ class SearchController {
                     console.error('❌ Error fetching hobbies from user_hobbies_reference:', err.message);
                     // Return empty result if table doesn't exist or query fails
                     return { rows: [] };
+                }),
+                this.db.query('SELECT id, display_name as name, description FROM user_relationship_type_reference WHERE is_active = true ORDER BY display_order ASC, display_name ASC').catch(err => {
+                    console.error('❌ Error fetching relationship types from user_relationship_type_reference:', err.message);
+                    // Return empty result if table doesn't exist or query fails
+                    return { rows: [] };
                 })
             ]);
 
@@ -974,6 +980,7 @@ class SearchController {
                 heights: heights.rows,
                 interests: interests.rows,
                 hobbies: hobbies.rows,
+                relationshipTypes: relationshipTypes.rows,
                 genders: [
                     { id: 'male', name: 'Male' },
                     { id: 'female', name: 'Female' }
