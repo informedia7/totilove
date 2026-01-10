@@ -11,8 +11,10 @@
 /* Import Modals component */
 @import url('./_modals.css');
 
+/* Import Forms component */
+@import url('./_forms.css');
+
 /* More components will be imported here as we extract them:
-   @import url('./_forms.css');
    @import url('./_buttons.css');
    @import url('./_cards.css');
    @import url('./_navigation.css');

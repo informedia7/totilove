@@ -1,0 +1,377 @@
+/* ========================================
+   FORMS COMPONENT
+   Extracted from: 
+   - app/assets/css/02-components.css
+   - app/assets/css/profile-edit.css
+   - Inline styles in HTML files
+   Migration Phase 1: Week 4
+   
+   This file contains all form input styles.
+   Old files still exist and work - this is parallel extraction.
+   ======================================== */
+
+/* ===== FORM BASE STYLES ===== */
+:root {
+    /* Form Design Tokens */
+    --form-input-padding: var(--sm, 0.5rem) var(--md, 1rem);
+    --form-input-border: 1px solid #e0e0e0;
+    --form-input-border-radius: var(--r-md, 8px);
+    --form-input-font-size: var(--f-md, 1rem);
+    --form-input-focus-border: var(--primary-color, #667eea);
+    --form-input-focus-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+    --form-label-font-size: var(--f-sm, 0.875rem);
+    --form-label-font-weight: 500;
+    --form-error-color: #dc3545;
+    --form-success-color: #28a745;
+}
+
+/* ===== FORM GROUP ===== */
+.form-group {
+    margin-bottom: var(--md, 1rem);
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+/* ===== FORM LABELS ===== */
+label,
+.form-label {
+    display: block;
+    font-size: var(--form-label-font-size);
+    font-weight: var(--form-label-font-weight);
+    margin-bottom: var(--xs, 0.25rem);
+    color: var(--text, #333);
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+    font-size: 14px;
+}
+
+/* ===== FORM INPUTS ===== */
+/* Only target generic form inputs, NOT search-specific classes */
+/* Don't touch: .search-input, .filter-group, .search-wrapper, .search-container */
+
+/* Generic form inputs (only when not in search context) */
+.form-group input:not(.search-input),
+.form-group textarea,
+.form-group select {
+    min-height: var(--touch, 44px);
+    padding: var(--form-input-padding);
+    border-radius: var(--form-input-border-radius);
+    font-size: var(--form-input-font-size);
+    border: var(--form-input-border);
+    transition: var(--transition, all 0.3s ease);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-group input:not(.search-input):focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--form-input-focus-border);
+    box-shadow: var(--form-input-focus-shadow);
+}
+
+/* Field component (floating labels) - exclude search inputs */
+.field input:not(.search-input),
+.field select {
+    min-height: var(--touch, 44px);
+    padding: var(--form-input-padding);
+    border-radius: var(--form-input-border-radius);
+    font-size: var(--form-input-font-size);
+    transition: var(--transition, all 0.3s ease);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ===== TEXTAREA ===== */
+textarea {
+    min-height: calc(var(--touch, 44px) * 2);
+    padding: var(--sm, 0.5rem) var(--md, 1rem);
+    border-radius: var(--form-input-border-radius);
+    font-size: var(--form-input-font-size);
+    border: var(--form-input-border);
+    transition: var(--transition, all 0.3s ease);
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.5;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--form-input-focus-border);
+    box-shadow: var(--form-input-focus-shadow);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* ===== SELECT DROPDOWNS ===== */
+select {
+    min-height: var(--touch, 44px);
+    padding: var(--form-input-padding);
+    border-radius: var(--form-input-border-radius);
+    font-size: var(--form-input-font-size);
+    border: var(--form-input-border);
+    cursor: pointer;
+    transition: var(--transition, all 0.3s ease);
+    background: white;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+select:focus {
+    outline: none;
+    border-color: var(--form-input-focus-border);
+    box-shadow: var(--form-input-focus-shadow);
+}
+
+select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Sort/View Controls Select */
+.sort-controls select,
+.view-controls select {
+    min-height: var(--touch, 44px);
+    padding: var(--sm, 0.5rem) var(--md, 1rem);
+    border-radius: var(--form-input-border-radius);
+    font-size: var(--form-input-font-size);
+    border: var(--form-input-border);
+    cursor: pointer;
+    transition: var(--transition, all 0.3s ease);
+}
+
+.view-controls select {
+    padding: var(--sm, 0.5rem) var(--md, 1rem);
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: var(--form-input-border-radius);
+    background: white;
+    font-size: var(--f-sm, 0.875rem);
+    cursor: pointer;
+    transition: border-color var(--transition, all 0.3s ease);
+    min-height: var(--touch, 44px);
+}
+
+.view-controls select:hover {
+    border-color: var(--primary-color, #667eea);
+}
+
+.view-controls select:focus {
+    outline: none;
+    border-color: var(--primary-color, #667eea);
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+/* ===== FORM ROWS ===== */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+/* ===== INPUT STATES ===== */
+/* Error State */
+.form-control.error,
+.form-select.error,
+.form-group input.error,
+.form-group select.error,
+.form-group textarea.error {
+    border-color: var(--form-error-color);
+}
+
+.error-message {
+    color: var(--form-error-color);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: block;
+}
+
+/* Success State */
+.form-control.success,
+.form-select.success,
+.form-group input.success,
+.form-group select.success,
+.form-group textarea.success {
+    border-color: var(--form-success-color);
+}
+
+.success-message {
+    color: var(--form-success-color);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: block;
+}
+
+/* Disabled State */
+input:disabled,
+select:disabled,
+textarea:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+    background-color: #f5f5f5;
+}
+
+/* ===== RANGE INPUTS (SLIDERS) ===== */
+input[type="range"] {
+    width: 100%;
+    height: 8px;
+    border-radius: var(--form-input-border-radius);
+    background: #e0e0e0;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: var(--r-full, 50%);
+    background: var(--primary-color, #667eea);
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: var(--transition, all 0.3s ease);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: var(--r-full, 50%);
+    background: var(--primary-color, #667eea);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: var(--transition, all 0.3s ease);
+}
+
+/* ===== CHECKBOXES & RADIO BUTTONS ===== */
+/* Note: Specific checkbox/radio styles are handled by individual pages */
+/* Don't override existing checkbox/radio sizing (18px, 20px) */
+
+input[type="checkbox"],
+input[type="radio"] {
+    cursor: pointer;
+    accent-color: var(--primary-color, #667eea);
+}
+
+/* ===== FOCUS VISIBLE (KEYBOARD NAVIGATION) ===== */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--primary-color, #667eea);
+    outline-offset: 2px;
+}
+
+/* ===== PASSWORD INPUTS ===== */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper input {
+    padding-right: 3rem;
+}
+
+.password-toggle {
+    position: absolute;
+    right: var(--sm, 0.5rem);
+    cursor: pointer;
+    padding: var(--xs, 0.25rem);
+    color: var(--text-muted, #666);
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-toggle:hover {
+    color: var(--text, #333);
+}
+
+/* ===== FORM VALIDATION ===== */
+.form-group input:invalid:not(:placeholder-shown),
+.form-group select:invalid:not(:placeholder-shown),
+.form-group textarea:invalid:not(:placeholder-shown) {
+    border-color: var(--form-error-color);
+}
+
+.form-group input:valid:not(:placeholder-shown),
+.form-group select:valid:not(:placeholder-shown),
+.form-group textarea:valid:not(:placeholder-shown) {
+    border-color: var(--form-success-color);
+}
+
+/* ===== PLACEHOLDER STYLING ===== */
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-muted, #999);
+    opacity: 0.7;
+}
+
+/* ===== REQUIRED FIELD INDICATOR ===== */
+label.required::after,
+.form-label.required::after {
+    content: ' *';
+    color: var(--form-error-color);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    .form-group input:not(.search-input),
+    .form-group textarea,
+    .form-group select {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+    .form-group input,
+    .form-group textarea,
+    .form-group select,
+    textarea,
+    select {
+        transition: none;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        border-width: 2px;
+    }
+}
+
