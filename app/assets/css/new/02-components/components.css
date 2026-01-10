@@ -20,7 +20,9 @@
 /* Import Navigation component */
 @import url('./_navigation.css');
 
+/* Import Chat component */
+@import url('./_chat.css');
+
 /* More components will be imported here as we extract them:
    @import url('./_cards.css');
-   @import url('./_chat.css');
  */
