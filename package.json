@@ -1,26 +1,44 @@
 {
   "name": "totilove",
   "version": "1.0.0",
-  "main": "src/index.ts",
-  "type": "commonjs",
+  "description": "Totilove dating application",
+  "main": "server.js",
   "scripts": {
-    "start": "npx ts-node src/index.ts",
-    "dev": "nodemon --exec \"npx ts-node\" src/index.ts",
-    "register": "node register.js",
-    "register:dev": "nodemon register.js",
-    "db:init": "npx ts-node src/models.ts",
-    "test": "echo \"No tests yet. Add your test runner here.\""
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "build": "vite build",
+    "build:dev": "vite build --mode development",
+    "build:watch": "vite build --watch",
+    "build:css": "postcss app/assets/css/new/**/*.css -d dist/css --base app/assets/css/new --ext .css",
+    "preview": "vite preview"
   },
   "dependencies": {
+    "archiver": "^6.0.1",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
+    "compression": "^1.8.1",
+    "connect-flash": "^0.1.1",
+    "connect-redis": "^7.1.0",
     "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
+    "express-rate-limit": "^7.5.1",
+    "express-session": "^1.18.2",
+    "extract-zip": "^2.0.1",
+    "helmet": "^7.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.1",
+    "multer": "^2.0.2",
     "node-fetch": "^2.7.0",
+    "nodemailer": "^6.10.1",
     "pg": "^8.16.3",
     "redis": "^5.6.0",
-    "socket.io": "^4.8.1"
+    "sharp": "^0.34.3",
+    "simple-peer": "^9.11.1",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -28,8 +46,45 @@
     "@types/node": "^24.0.14",
     "@types/pg": "^8.15.4",
     "@types/socket.io": "^3.0.1",
+    "autoprefixer": "^10.4.20",
+    "cssnano": "^7.0.6",
     "nodemon": "^3.1.10",
+    "postcss": "^8.4.47",
+    "postcss-cli": "^11.0.0",
+    "terser": "^5.36.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
-  }
+    "typescript": "^5.8.3",
+    "vite": "^5.4.11"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
