@@ -360,9 +360,12 @@ const lookupLimiter = createLimiter({
  * Presence status read limiter
  * Protects frequently polled status endpoints
  */
+const statusReadLimiterWindowMs = toNumber(process.env.STATUS_READ_RATE_LIMIT_WINDOW_MS, 60 * 1000);
+const statusReadLimiterMax = toNumber(process.env.STATUS_READ_RATE_LIMIT_MAX, 600);
+
 const statusReadLimiter = createLimiter({
-    windowMs: 30 * 1000, // 30 seconds window
-    max: 90, // allow up to 90 read calls per 30 seconds
+    windowMs: statusReadLimiterWindowMs, // default 60 seconds
+    max: statusReadLimiterMax, // default 600 calls per window
     message: 'Too many status lookups, please slow down',
     standardHeaders: true,
     legacyHeaders: false
@@ -372,9 +375,12 @@ const statusReadLimiter = createLimiter({
  * Presence status mutation limiter
  * Protects write/heartbeat endpoints from abuse
  */
+const statusWriteLimiterWindowMs = toNumber(process.env.STATUS_WRITE_RATE_LIMIT_WINDOW_MS, 5 * 60 * 1000);
+const statusWriteLimiterMax = toNumber(process.env.STATUS_WRITE_RATE_LIMIT_MAX, 80);
+
 const statusWriteLimiter = createLimiter({
-    windowMs: 5 * 60 * 1000, // 5 minutes window
-    max: 40, // limit status mutations per identity
+    windowMs: statusWriteLimiterWindowMs,
+    max: statusWriteLimiterMax,
     message: 'Too many status updates, please slow down',
     standardHeaders: true,
     legacyHeaders: false
@@ -384,9 +390,12 @@ const statusWriteLimiter = createLimiter({
  * Presence heartbeat limiter
  * Dedicated limiter for high-frequency heartbeat pings
  */
+const presenceHeartbeatLimiterWindowMs = toNumber(process.env.PRESENCE_HEARTBEAT_RATE_LIMIT_WINDOW_MS, 60 * 1000);
+const presenceHeartbeatLimiterMax = toNumber(process.env.PRESENCE_HEARTBEAT_RATE_LIMIT_MAX, 180);
+
 const presenceHeartbeatLimiter = createLimiter({
-    windowMs: 60 * 1000, // 1 minute window
-    max: 30, // allow up to 30 heartbeat posts per minute (multi-tab safe)
+    windowMs: presenceHeartbeatLimiterWindowMs,
+    max: presenceHeartbeatLimiterMax,
     message: 'Too many heartbeat requests, please slow down',
     standardHeaders: true,
     legacyHeaders: false,
