@@ -309,9 +309,12 @@ const strictLimiter = createLimiter({
  * Validation endpoint rate limiter
  * Limits validation requests (email/username checks)
  */
+const validationLimiterWindowMs = toNumber(process.env.VALIDATION_RATE_LIMIT_WINDOW_MS, 1 * 60 * 1000);
+const validationLimiterMax = toNumber(process.env.VALIDATION_RATE_LIMIT_MAX, 60);
+
 const validationLimiter = createLimiter({
-    windowMs: 1 * 60 * 1000, // 1 minute
-    max: 10, // limit each identity to 10 validation requests per minute
+    windowMs: validationLimiterWindowMs,
+    max: validationLimiterMax,
     message: 'Too many validation requests, please try again later'
 });
 
