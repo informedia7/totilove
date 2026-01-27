@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "build": "vite build",
+    "build": "node -e \"console.log('Skipping build step; static assets served via Express')\"",
     "build:dev": "vite build --mode development",
     "build:watch": "vite build --watch",
     "build:css": "postcss app/assets/css/new/**/*.css -d dist/css --base app/assets/css/new --ext .css",

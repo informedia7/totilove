@@ -14,6 +14,7 @@
   "variables": {
     "NODE_ENV": "production",
     "NPM_CONFIG_PRODUCTION": "false",
-    "TRUST_PROXY": "1"
+    "TRUST_PROXY": "1",
+    "NIXPACKS_NODE_VERSION": "20"
   }
 }
