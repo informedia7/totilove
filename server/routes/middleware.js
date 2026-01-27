@@ -10,11 +10,12 @@
 function createUserStatusRateLimit() {
     const userStatusRequests = new Map();
     
+    const windowMs = parseInt(process.env.USER_STATUS_RATE_LIMIT_WINDOW_MS || '1000', 10);
+    const maxRequests = parseInt(process.env.USER_STATUS_RATE_LIMIT_MAX || '50', 10);
+
     return (req, res, next) => {
         const clientId = req.ip || req.connection.remoteAddress;
         const now = Date.now();
-        const windowMs = 1000; // 1 second window
-        const maxRequests = 10; // Max 10 requests per second
         
         if (!userStatusRequests.has(clientId)) {
             userStatusRequests.set(clientId, []);

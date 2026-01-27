@@ -9,6 +9,14 @@ let rateLimiterRedisClient = null;
 let rateLimiterStoreFactory = null;
 let createRedisClient = null;
 
+function toNumber(value, fallback) {
+    if (value === undefined || value === null || value === '') {
+        return fallback;
+    }
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
 try {
     rateLimit = require('express-rate-limit');
 } catch (e) {
@@ -262,9 +270,12 @@ const authLimiter = createLimiter({
  * API rate limiter (general)
  * General rate limit for API endpoints
  */
+const apiLimiterWindowMs = toNumber(process.env.API_RATE_LIMIT_WINDOW_MS, 5 * 60 * 1000); // default 5 minutes
+const apiLimiterMax = toNumber(process.env.API_RATE_LIMIT_MAX, 600);
+
 const apiLimiter = createLimiter({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each identity to 100 requests per 15 minutes
+    windowMs: apiLimiterWindowMs,
+    max: apiLimiterMax,
     message: 'Too many API requests, please try again later'
 });
 
@@ -272,9 +283,12 @@ const apiLimiter = createLimiter({
  * Account dashboard limiter
  * Allows higher burst traffic for widgets that fire multiple parallel requests
  */
+const accountLimiterWindowMs = toNumber(process.env.ACCOUNT_RATE_LIMIT_WINDOW_MS, 60 * 1000);
+const accountLimiterMax = toNumber(process.env.ACCOUNT_RATE_LIMIT_MAX, 900);
+
 const accountLimiter = createLimiter({
-    windowMs: 60 * 1000, // 1 minute window
-    max: 400, // allow up to 400 quick hits per minute
+    windowMs: accountLimiterWindowMs,
+    max: accountLimiterMax,
     message: 'Too many account requests, please slow down',
     standardHeaders: true,
     legacyHeaders: false,
