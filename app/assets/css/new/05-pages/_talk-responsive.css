@@ -508,9 +508,12 @@ body[data-nav-state="NAV_CHAT"] .chat-back-btn-mobile {
 }
 
 .conversation-time {
-    font-size: var(--font-size-xs);
+    display: block;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
     color: var(--color-gray-400);
     margin-top: var(--spacing-xs);
+    letter-spacing: 0.01em;
 }
 
 /* ===============================
@@ -652,10 +655,13 @@ body[data-nav-state="NAV_CHAT"] .chat-back-btn-mobile {
 }
 
 .message-time {
-    font-size: var(--font-size-xs);
+    display: block;
+    font-size: var(--font-size-sm);
+    line-height: 1.2;
     margin-top: var(--spacing-xs);
     margin-left: var(--spacing-xs);
-    font-weight: 500;
+    font-weight: 600;
+    letter-spacing: 0.01em;
     color: var(--color-gray-400);
 }
 
@@ -663,7 +669,7 @@ body[data-nav-state="NAV_CHAT"] .chat-back-btn-mobile {
     margin-left: 0;
     margin-right: var(--spacing-xs);
     text-align: right;
-    color: rgba(var(--color-white-rgb), 0.8);
+    color: rgba(var(--color-white-rgb), 0.85);
 }
 
 /* Message links */
@@ -1374,6 +1380,24 @@ body.dark-mode #timeFilterContent {
         padding: 6px 12px;
         font-size: 12px;
     }
+
+    .conversation-time {
+        font-size: var(--font-size-sm);
+    }
+
+    .message-time,
+    .message.sent .message-time {
+        font-size: var(--font-size-md);
+        font-weight: 600;
+    }
+
+    .message-time {
+        margin-left: var(--spacing-sm);
+    }
+
+    .message.sent .message-time {
+        margin-right: var(--spacing-sm);
+    }
 }
 
 /* ===============================
@@ -1833,7 +1857,8 @@ body.dark-mode #timeFilterContent {
     }
     
     .message-time {
-        font-size: var(--font-size-sm);
+        font-size: var(--font-size-md);
+        font-weight: 600;
         margin-top: var(--spacing-sm);
         margin-left: var(--spacing-sm);
     }
@@ -2083,21 +2108,22 @@ body.dark-mode #timeFilterContent {
     }
     
     .message-time {
-        font-size: var(--font-size-sm);
+        font-size: var(--font-size-md);
+        font-weight: 600;
     }
     
     .message-input {
-        font-size: 28px;
+        font-size: var(--font-size-xl);
         line-height: 1.35;
     }
 
     .message-input::placeholder {
-        font-size: 28px;
+        font-size: var(--font-size-xl);
     }
 
     .input-action-btn {
-        width: calc(var(--btn-size-xl) * 1.1);
-        height: calc(var(--btn-size-xl) * 1.1);
+        width: calc(var(--btn-size-xl) * 1.05);
+        height: calc(var(--btn-size-xl) * 1.05);
     }
 }
 
