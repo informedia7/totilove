@@ -250,8 +250,11 @@ class Server {
     }
 }
 
-// Cluster support for production
-if (cluster.isMaster && process.env.NODE_ENV === 'production') {
+// Cluster support for production (opt-in)
+const enableCluster = process.env.ENABLE_CLUSTER === 'true';
+const shouldUseCluster = cluster.isMaster && process.env.NODE_ENV === 'production' && enableCluster;
+
+if (shouldUseCluster) {
     const numCPUs = os.cpus().length;
     const numWorkers = Math.min(numCPUs, 4);
     
@@ -261,11 +264,14 @@ if (cluster.isMaster && process.env.NODE_ENV === 'production') {
     }
     
     // Handle worker exits
-    cluster.on('exit', (worker, code, signal) => {
+    cluster.on('exit', () => {
         cluster.fork();
     });
-    
 } else {
+    if (cluster.isMaster && process.env.NODE_ENV === 'production' && !enableCluster) {
+        console.info('ℹ️ Cluster mode disabled (set ENABLE_CLUSTER=true to opt-in).');
+    }
+
     // Start single server instance
     const server = new Server();
     server.start();
