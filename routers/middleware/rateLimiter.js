@@ -17,6 +17,25 @@ function toNumber(value, fallback) {
     return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
+function toBoolean(value, fallback = false) {
+    if (value === undefined || value === null) {
+        return fallback;
+    }
+
+    if (typeof value === 'boolean') {
+        return value;
+    }
+
+    const normalized = String(value).trim().toLowerCase();
+    if (['true', '1', 'yes', 'y', 'on'].includes(normalized)) {
+        return true;
+    }
+    if (['false', '0', 'no', 'n', 'off'].includes(normalized)) {
+        return false;
+    }
+    return fallback;
+}
+
 try {
     rateLimit = require('express-rate-limit');
 } catch (e) {
@@ -57,6 +76,23 @@ function normalizeIp(ip = '') {
         return 'unknown';
     }
     return ip.startsWith('::ffff:') ? ip.substring(7) : ip;
+}
+
+function resolveUserIdentifier(req) {
+    const candidate =
+        req?.user?.id ||
+        req?.user?.user_id ||
+        req?.session?.userId ||
+        req?.headers?.['x-user-id'] ||
+        req?.body?.userId ||
+        req?.params?.userId ||
+        req?.query?.userId;
+
+    if (candidate !== undefined && candidate !== null && candidate !== '') {
+        return String(candidate);
+    }
+
+    return null;
 }
 
 function shouldSkipRateLimit(req) {
@@ -107,17 +143,9 @@ function defaultRateLimitHandler(req, res, _next, options) {
 }
 
 const userScopedKeyGenerator = (req) => {
-    const candidate =
-        req.user?.id ||
-        req.user?.user_id ||
-        req.session?.userId ||
-        req.headers?.['x-user-id'] ||
-        req.body?.userId ||
-        req.params?.userId ||
-        req.query?.userId;
-
-    if (candidate !== undefined && candidate !== null && candidate !== '') {
-        return `user:${String(candidate)}`;
+    const resolved = resolveUserIdentifier(req);
+    if (resolved) {
+        return `user:${resolved}`;
     }
 
     return `ip:${normalizeIp(req.ip)}`;
@@ -247,12 +275,42 @@ const profileUpdateLimiter = createLimiter({
  * Limits image uploads to prevent abuse
  * More lenient to allow users to upload multiple images in a session
  */
+const imageUploadLimiterWindowMs = toNumber(process.env.IMAGE_UPLOAD_RATE_LIMIT_WINDOW_MS, 15 * 60 * 1000);
+const imageUploadLimiterMax = toNumber(process.env.IMAGE_UPLOAD_RATE_LIMIT_MAX, 200);
+const imageUploadLimiterSkipFailedRequests = toBoolean(process.env.IMAGE_UPLOAD_RATE_LIMIT_SKIP_FAILED, false);
+const imageUploadLimiterSkipSuccessfulRequests = toBoolean(
+    process.env.IMAGE_UPLOAD_RATE_LIMIT_SKIP_SUCCESSFUL,
+    false
+);
+const imageUploadExemptUserIds = new Set(
+    (process.env.IMAGE_UPLOAD_RATE_LIMIT_EXEMPT_USER_IDS || '')
+        .split(',')
+        .map((id) => id.trim())
+        .filter(Boolean)
+);
+
+function shouldSkipImageUploadLimiter(req) {
+    if (shouldSkipRateLimit(req)) {
+        return true;
+    }
+
+    const userId = resolveUserIdentifier(req);
+    if (userId && imageUploadExemptUserIds.has(userId)) {
+        return true;
+    }
+
+    return false;
+}
+
 const imageUploadLimiter = createLimiter({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 50, // limit each identity to 50 uploads per 15 minutes
+    windowMs: imageUploadLimiterWindowMs,
+    max: imageUploadLimiterMax,
     message: 'Too many image upload requests, please try again later',
     standardHeaders: true,
-    legacyHeaders: false
+    legacyHeaders: false,
+    skipFailedRequests: imageUploadLimiterSkipFailedRequests,
+    skipSuccessfulRequests: imageUploadLimiterSkipSuccessfulRequests,
+    skip: shouldSkipImageUploadLimiter
 });
 
 /**

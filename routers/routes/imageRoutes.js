@@ -406,8 +406,7 @@ function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
     // Start cleanup service
     startCleanupService(db, baseDir);
 
-    // Apply rate limiting and logging to all routes
-    router.use(imageUploadLimiter);
+    // Apply logging to all image routes (rate limiting is scoped per-upload)
     router.use(requestLogger);
 
     // Require authentication for all image routes
@@ -422,6 +421,7 @@ function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
      * POST /api/profile/upload-images - Upload images
      */
     router.post('/api/profile/upload-images', 
+        imageUploadLimiter,
         profileImageUpload.array('images', IMAGE_CONFIG.MAX_FILES),
         validateImageUpload,
         asyncHandler(async (req, res) => {
