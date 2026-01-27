@@ -122,14 +122,23 @@ function initializeRateLimitStore() {
 
     try {
         const redisUrl = process.env.RATE_LIMIT_REDIS_URL || process.env.REDIS_URL;
+        const redisPassword = process.env.RATE_LIMIT_REDIS_PASSWORD || process.env.REDIS_PASSWORD;
+        const redisUsername = process.env.RATE_LIMIT_REDIS_USER || process.env.REDIS_USER;
         const redisOptions = redisUrl
             ? { url: redisUrl }
             : {
                   socket: {
                       host: process.env.RATE_LIMIT_REDIS_HOST || process.env.REDIS_HOST || '127.0.0.1',
                       port: Number(process.env.RATE_LIMIT_REDIS_PORT || process.env.REDIS_PORT) || 6379
-                  }
+                  },
+                  password: redisPassword || undefined,
+                  username: redisUsername || undefined
               };
+
+        if (redisUrl && (redisPassword || redisUsername)) {
+            redisOptions.password = redisPassword || undefined;
+            redisOptions.username = redisUsername || undefined;
+        }
 
         if (!rateLimiterRedisClient) {
             const client = createRedisClient(redisOptions);

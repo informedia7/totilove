@@ -28,6 +28,7 @@ const { asyncHandler, ApiError } = require('../middleware/errorHandler');
 const { imageUploadLimiter } = require('../middleware/rateLimiter');
 const { requestLogger } = require('../middleware/requestLogger');
 const { requireAuth } = require('../middleware/authMiddleware');
+const virusScanner = require('../../utils/virusScanner');
 
 // ============================================================================
 // 1. IMAGE PROCESSING CONFIGURATION
@@ -85,15 +86,11 @@ class ApiResponse {
 // ============================================================================
 // 4. VIRUS SCANNING SETUP
 // ============================================================================
-let ClamScan = null;
-let clamscan = null;
-try {
-    ClamScan = require('clamscan');
-    clamscan = new ClamScan();
-    console.log('[ImageRoutes] ClamAV virus scanning enabled');
-} catch (e) {
-    console.warn('[ImageRoutes] ClamAV not available. Install with: npm install clamscan');
-    console.warn('[ImageRoutes] Virus scanning disabled. Images will be uploaded without scanning.');
+const virusScanConfigured = virusScanner.isScannerConfigured();
+if (virusScanConfigured) {
+    console.info('[ImageRoutes] Virus scanning configured; ClamAV will initialize on first use');
+} else {
+    console.info('[ImageRoutes] Virus scanning disabled (ENABLE_VIRUS_SCANNER is not true)');
 }
 
 // ============================================================================
@@ -456,11 +453,14 @@ function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
             const uploadedImages = [];
             const errors = [];
 
+            const scanner = await virusScanner.getVirusScanner();
+            const scannedForViruses = !!scanner;
+
             // VIRUS SCANNING: Scan all files before processing
-            if (clamscan) {
+            if (scanner) {
                 for (const file of req.files) {
                     try {
-                        const scanResult = await clamscan.scanFile(file.path);
+                        const scanResult = await scanner.scanFile(file.path);
                         if (scanResult.isInfected) {
                             // Clean up infected files
                             for (const f of req.files) {
@@ -595,7 +595,7 @@ function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
                 count: uploadedImages.length,
                 errors: errors.length > 0 ? errors : undefined
             }, {
-                scannedForViruses: clamscan !== null,
+                scannedForViruses,
                 compressionApplied: true,
                 thumbnailsGenerated: uploadedImages.length > 0,
                 processingTime: totalProcessingTime,

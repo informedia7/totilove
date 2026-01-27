@@ -3,16 +3,12 @@ const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs').promises;
 const crypto = require('crypto');
-
-let ClamScan = null;
-let clamscan = null;
-try {
-    ClamScan = require('clamscan');
-    clamscan = new ClamScan();
-    console.log('[ChatImageHandler] ClamAV virus scanning enabled');
-} catch (error) {
-    console.warn('[ChatImageHandler] ClamAV not available. Install with: npm install clamscan');
-    console.warn('[ChatImageHandler] Virus scanning disabled for chat uploads.');
+const virusScanner = require('./virusScanner');
+const chatVirusScanConfigured = virusScanner.isScannerConfigured();
+if (chatVirusScanConfigured) {
+    console.info('[ChatImageHandler] Virus scanning configured; ClamAV will initialize on first use');
+} else {
+    console.info('[ChatImageHandler] Virus scanning disabled (ENABLE_VIRUS_SCANNER not true)');
 }
 
 class ChatImageHandler {
@@ -37,16 +33,15 @@ class ChatImageHandler {
     }
 
     isVirusScannerEnabled() {
-        return !!clamscan;
+        return virusScanner.isScannerConfigured();
     }
 
     async scanUploadedFile(filePath) {
-        if (!clamscan) {
-            return { clean: true };
-        }
-
         try {
-            const scanResult = await clamscan.scanFile(filePath);
+            const scanResult = await virusScanner.scanFileWithClamAV(filePath);
+            if (!scanResult) {
+                return { clean: true };
+            }
             if (scanResult.isInfected) {
                 return {
                     clean: false,

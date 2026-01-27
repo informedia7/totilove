@@ -33,7 +33,6 @@ const checks = [
     
     // Config Files
     { name: 'Feature Flags', path: 'config/featureFlags.js' },
-    { name: 'Vite Config', path: 'vite.config.js' },
     { name: 'PostCSS Config', path: 'postcss.config.js' },
     { name: 'Manifest', path: 'app/manifest.json' },
     
