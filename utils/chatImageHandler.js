@@ -2,6 +2,7 @@ const multer = require('multer');
 const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs').promises;
+const fsSync = require('fs');
 const crypto = require('crypto');
 const virusScanner = require('./virusScanner');
 const chatVirusScanConfigured = virusScanner.isScannerConfigured();
@@ -17,6 +18,7 @@ class ChatImageHandler {
         this.imagesDir = path.join(this.uploadDir, 'images');
         this.thumbnailsDir = path.join(this.uploadDir, 'thumbnails');
         this.tempDir = path.join(this.uploadDir, 'temp');
+        this.ensureDirectories();
         
         // Supported image formats
         this.allowedMimeTypes = [
@@ -30,6 +32,17 @@ class ChatImageHandler {
         this.maxFileSize = 5 * 1024 * 1024; // 5MB
         this.thumbnailSize = 300; // 300x300 pixels (increased by 50% from 200px)
         this.maxImageDimension = 1920; // Max width/height for resizing
+    }
+
+    ensureDirectories() {
+        const directories = [this.uploadDir, this.imagesDir, this.thumbnailsDir, this.tempDir];
+        for (const dir of directories) {
+            try {
+                fsSync.mkdirSync(dir, { recursive: true });
+            } catch (error) {
+                console.error(`[ChatImageHandler] Failed to create directory ${dir}:`, error.message);
+            }
+        }
     }
 
     isVirusScannerEnabled() {
