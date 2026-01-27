@@ -26,8 +26,8 @@ function createProfileRoutes(authController, authMiddleware, io = null, redis = 
         throw new Error('AuthController is required for profile routes');
     }
 
-    // Apply rate limiting and logging
-    router.use(apiLimiter);
+    // Apply rate limiting specifically to /api/profile endpoints
+    router.use('/api/profile', apiLimiter);
     router.use(requestLogger);
 
     // Require authentication
