@@ -3,34 +3,39 @@
  * Creates route-specific middleware (rate limiting, etc.)
  */
 
+const { statusReadLimiter } = require('../../routers/middleware/rateLimiter');
+
 /**
  * Create rate limiting middleware for user status endpoints
  * @returns {Function} Express middleware
  */
 function createUserStatusRateLimit() {
+    if (typeof statusReadLimiter === 'function') {
+        return statusReadLimiter;
+    }
+
     const userStatusRequests = new Map();
-    
     const windowMs = parseInt(process.env.USER_STATUS_RATE_LIMIT_WINDOW_MS || '1000', 10);
     const maxRequests = parseInt(process.env.USER_STATUS_RATE_LIMIT_MAX || '50', 10);
 
     return (req, res, next) => {
         const clientId = req.ip || req.connection.remoteAddress;
         const now = Date.now();
-        
+
         if (!userStatusRequests.has(clientId)) {
             userStatusRequests.set(clientId, []);
         }
-        
+
         const requests = userStatusRequests.get(clientId);
         const recentRequests = requests.filter(time => now - time < windowMs);
-        
+
         if (recentRequests.length >= maxRequests) {
             return res.status(429).json({
                 success: false,
                 error: 'Too many requests. Please use bulk endpoints or reduce request frequency.'
             });
         }
-        
+
         recentRequests.push(now);
         userStatusRequests.set(clientId, recentRequests);
         next();

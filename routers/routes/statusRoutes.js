@@ -16,7 +16,12 @@ const router = express.Router();
 const { asyncHandler } = require('../middleware/errorHandler');
 const { requestLogger } = require('../middleware/requestLogger');
 const { optionalAuth, requireUserId } = require('../middleware/authMiddleware');
-const { statusReadLimiter, statusWriteLimiter, presenceHeartbeatLimiter } = require('../middleware/rateLimiter');
+const {
+    statusReadLimiter,
+    bulkStatusLimiter,
+    statusWriteLimiter,
+    presenceHeartbeatLimiter
+} = require('../middleware/rateLimiter');
 
 /**
  * Create status routes
@@ -61,7 +66,7 @@ function createStatusRoutes(authController, authMiddleware = null) {
      * POST /api/users-online-status
      * Bulk get online status for multiple users
      */
-    router.post('/api/users-online-status', statusReadLimiter, asyncHandler(async (req, res) => {
+    router.post('/api/users-online-status', bulkStatusLimiter || statusReadLimiter, asyncHandler(async (req, res) => {
         await authController.getUsersOnlineStatus(req, res);
     }));
 

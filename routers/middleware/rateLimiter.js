@@ -430,6 +430,22 @@ const statusReadLimiter = createLimiter({
 });
 
 /**
+ * Bulk status batch limiter
+ * Dedicated limiter for /api/users-online-status which fans-in many IDs per request
+ */
+const bulkStatusLimiterWindowMs = toNumber(process.env.BULK_STATUS_RATE_LIMIT_WINDOW_MS, 60 * 1000);
+const bulkStatusLimiterMax = toNumber(process.env.BULK_STATUS_RATE_LIMIT_MAX, 2400);
+
+const bulkStatusLimiter = createLimiter({
+    windowMs: bulkStatusLimiterWindowMs,
+    max: bulkStatusLimiterMax,
+    message: 'Too many bulk status requests, please pause briefly',
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: userScopedKeyGenerator
+});
+
+/**
  * Presence status mutation limiter
  * Protects write/heartbeat endpoints from abuse
  */
@@ -473,6 +489,7 @@ module.exports = {
     lookupLimiter,
     accountLimiter,
     statusReadLimiter,
+    bulkStatusLimiter,
     statusWriteLimiter,
     presenceHeartbeatLimiter,
     hasRateLimit: !!rateLimit
