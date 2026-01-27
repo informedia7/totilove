@@ -1,12 +1,54 @@
 const { Pool } = require('pg');
 const ActivityRateLimiter = require('../utils/activityRateLimiter');
 const BlockCheck = require('../utils/blockCheck');
+const { hydratePresenceStatuses, normalizeLastSeen } = require('../utils/presenceStatusHelper');
 
 class ActivityController {
-    constructor(db) {
+    constructor(db, presenceService = null) {
         this.db = db;
         this.rateLimiter = new ActivityRateLimiter(db);
         this.blockCheck = new BlockCheck(db);
+        this.presenceService = presenceService;
+        this.optionalColumns = {
+            usersLastSeenAt: null,
+            warnedUsersLastSeen: false
+        };
+    }
+
+    async ensureUsersLastSeenColumn() {
+        if (this.optionalColumns.usersLastSeenAt === null) {
+            try {
+                const columnCheck = await this.db.query(`
+                    SELECT EXISTS (
+                        SELECT 1 FROM information_schema.columns
+                        WHERE table_schema = 'public'
+                          AND table_name = 'users'
+                          AND column_name = 'last_seen_at'
+                    ) as exists
+                `);
+                this.optionalColumns.usersLastSeenAt = Boolean(columnCheck.rows[0]?.exists);
+            } catch (error) {
+                this.optionalColumns.usersLastSeenAt = false;
+            }
+
+            if (!this.optionalColumns.usersLastSeenAt && !this.optionalColumns.warnedUsersLastSeen) {
+                console.warn('users.last_seen_at column missing - activity endpoints will skip last seen data');
+                this.optionalColumns.warnedUsersLastSeen = true;
+            }
+        }
+
+        return this.optionalColumns.usersLastSeenAt;
+    }
+
+    async getLastSeenFragments(tableAlias = 'u', columnAlias = 'last_seen_at') {
+        const hasColumn = await this.ensureUsersLastSeenColumn();
+        return {
+            hasColumn,
+            select: hasColumn
+                ? `${tableAlias}.last_seen_at as ${columnAlias}`
+                : `NULL::timestamptz as ${columnAlias}`,
+            groupBy: hasColumn ? `, ${tableAlias}.last_seen_at` : ''
+        };
     }
 
     // Helper method to format profile image path
@@ -31,6 +73,8 @@ class ActivityController {
                     error: 'User not authenticated'
                 });
             }
+
+            const lastSeenFragments = await this.getLastSeenFragments();
 
             // Get today's count first (unique viewers from today)
             let viewers = [];
@@ -63,22 +107,18 @@ class ActivityController {
                             'Unknown'
                         ) as location,
                         ui.file_name as profile_image,
+                        up.preferred_gender,
+                        up.age_min as preferred_age_min,
+                        up.age_max as preferred_age_max,
                         pv.viewed_at,
                         1 as view_count,
-                        CASE 
-                            WHEN EXISTS (
-                                SELECT 1 FROM user_sessions 
-                                WHERE user_id = u.id 
-                                    AND is_active = true 
-                                    AND last_activity > NOW() - INTERVAL '5 minutes'
-                            ) THEN true
-                            ELSE false
-                        END as is_online
+                        ${lastSeenFragments.select}
                     FROM users_profile_views pv
                     JOIN users u ON pv.viewer_id = u.id
                     LEFT JOIN city c ON u.city_id = c.id
                     LEFT JOIN country co ON u.country_id = co.id
                     LEFT JOIN user_images ui ON u.id = ui.user_id AND ui.is_profile = 1
+                    LEFT JOIN user_preferences up ON up.user_id = u.id
                     WHERE pv.viewed_user_id = $1
                         ${todayOnly ? 'AND pv.viewed_at >= CURRENT_DATE' : ''}
                         AND NOT EXISTS (
@@ -93,8 +133,14 @@ class ActivityController {
                 const result = await this.db.query(viewersQuery, [userId, limit]);
                 viewers = result.rows.map(viewer => ({
                     ...viewer,
-                    profile_image: this.formatProfileImage(viewer.profile_image)
+                    profile_image: this.formatProfileImage(viewer.profile_image),
+                    is_online: false,
+                    last_seen_at: normalizeLastSeen(viewer.last_seen_at)
                 }));
+
+                await hydratePresenceStatuses(this.presenceService, viewers, {
+                    idSelector: (row) => row.user_id
+                });
 
                 // Get total count (from users_profile_views table)
                 const totalQuery = `
@@ -136,6 +182,8 @@ class ActivityController {
                 });
             }
 
+            const lastSeenFragments = await this.getLastSeenFragments();
+
             let favorites = [];
             let totalCount = 0;
 
@@ -169,24 +217,25 @@ class ActivityController {
                             'Unknown'
                         ) as location,
                         ui.file_name as profile_image,
+                        up.preferred_gender,
+                        up.age_min as preferred_age_min,
+                        up.age_max as preferred_age_max,
                         f.favorited_date as created_at,
-                        CASE 
-                            WHEN MAX(us.last_activity) > NOW() - INTERVAL '5 minutes' THEN true
-                            ELSE false
-                        END as is_online
+                        ${lastSeenFragments.select}
                     FROM users_favorites f
                     JOIN users u ON f.favorited_user_id = u.id
                     LEFT JOIN city c ON u.city_id = c.id
                     LEFT JOIN country co ON u.country_id = co.id
                     LEFT JOIN user_images ui ON u.id = ui.user_id AND ui.is_profile = 1
-                    LEFT JOIN user_sessions us ON u.id = us.user_id AND us.is_active = true
+                    LEFT JOIN user_preferences up ON up.user_id = u.id
                     WHERE f.favorited_by = $1
                         AND NOT EXISTS (
                             SELECT 1 FROM users_blocked_by_users bu
                             WHERE (bu.blocker_id = $1 AND bu.blocked_id = u.id)
                                OR (bu.blocker_id = u.id AND bu.blocked_id = $1)
                         )
-                    GROUP BY u.id, u.real_name, u.gender, u.birthdate, c.name, co.name, ui.file_name, f.favorited_date
+                    GROUP BY u.id, u.real_name, u.gender, u.birthdate, c.name, co.name, ui.file_name, f.favorited_date,
+                             up.preferred_gender, up.age_min, up.age_max${lastSeenFragments.groupBy}
                     ORDER BY f.favorited_date DESC
                     LIMIT $2
                 `;
@@ -194,8 +243,14 @@ class ActivityController {
                 const result = await this.db.query(favoritesQuery, [userId, limit]);
                 favorites = result.rows.map(favorite => ({
                     ...favorite,
-                    profile_image: this.formatProfileImage(favorite.profile_image)
+                    profile_image: this.formatProfileImage(favorite.profile_image),
+                    is_online: false,
+                    last_seen_at: normalizeLastSeen(favorite.last_seen_at)
                 }));
+
+                await hydratePresenceStatuses(this.presenceService, favorites, {
+                    idSelector: (row) => row.user_id
+                });
             } catch (error) {
                 console.log('ℹ️ Error querying favorites:', error.message);
             }
@@ -334,6 +389,8 @@ class ActivityController {
                 });
             }
 
+            const lastSeenFragments = await this.getLastSeenFragments();
+
             // Query from likes table - unique constraint ensures one like per user pair
             // Each result is a unique user who liked the current user
             // Only show likes from the last 24 hours to match "new" classification
@@ -349,21 +406,17 @@ class ActivityController {
                         'Unknown'
                     ) as location,
                     ui.file_name as profile_image,
+                    up.preferred_gender,
+                    up.age_min as preferred_age_min,
+                    up.age_max as preferred_age_max,
                     l.created_at as liked_at,
-                    CASE 
-                        WHEN EXISTS (
-                            SELECT 1 FROM user_sessions 
-                            WHERE user_id = u.id 
-                                AND is_active = true 
-                                AND last_activity > NOW() - INTERVAL '5 minutes'
-                        ) THEN true
-                        ELSE false
-                    END as is_online
+                        ${lastSeenFragments.select}
                 FROM users_likes l
                 JOIN users u ON l.liked_by = u.id
                 LEFT JOIN city c ON u.city_id = c.id
                 LEFT JOIN country co ON u.country_id = co.id
                 LEFT JOIN user_images ui ON u.id = ui.user_id AND ui.is_profile = 1
+                LEFT JOIN user_preferences up ON up.user_id = u.id
                 WHERE l.liked_user_id = $1
                     AND l.created_at >= NOW() - INTERVAL '24 hours'
                 ORDER BY l.created_at DESC
@@ -377,8 +430,14 @@ class ActivityController {
                 const result = await this.db.query(likesQuery, [userId, limit]);
                 likes = result.rows.map(like => ({
                     ...like,
-                    profile_image: this.formatProfileImage(like.profile_image)
+                    profile_image: this.formatProfileImage(like.profile_image),
+                    is_online: false,
+                    last_seen_at: normalizeLastSeen(like.last_seen_at)
                 }));
+
+                await hydratePresenceStatuses(this.presenceService, likes, {
+                    idSelector: (row) => row.user_id
+                });
 
                 // Get count of unique users who liked in last 24 hours (unique constraint ensures one like per user)
                 const countQuery = `
@@ -421,6 +480,8 @@ class ActivityController {
                 });
             }
 
+            const lastSeenFragments = await this.getLastSeenFragments();
+
             // Get today's count first (unique users who liked today)
             let todayCount = 0;
             let totalCount = 0;
@@ -452,21 +513,17 @@ class ActivityController {
                             'Unknown'
                         ) as location,
                         ui.file_name as profile_image,
+                        up.preferred_gender,
+                        up.age_min as preferred_age_min,
+                        up.age_max as preferred_age_max,
                         l.created_at as liked_at,
-                        CASE 
-                            WHEN EXISTS (
-                                SELECT 1 FROM user_sessions 
-                                WHERE user_id = u.id 
-                                    AND is_active = true 
-                                    AND last_activity > NOW() - INTERVAL '5 minutes'
-                            ) THEN true
-                            ELSE false
-                        END as is_online
+                        ${lastSeenFragments.select}
                     FROM users_likes l
                     JOIN users u ON l.liked_by = u.id
                     LEFT JOIN city c ON u.city_id = c.id
                     LEFT JOIN country co ON u.country_id = co.id
                     LEFT JOIN user_images ui ON u.id = ui.user_id AND ui.is_profile = 1
+                    LEFT JOIN user_preferences up ON up.user_id = u.id
                     WHERE l.liked_user_id = $1
                         ${todayOnly ? 'AND l.created_at >= CURRENT_DATE' : ''}
                         AND NOT EXISTS (
@@ -481,8 +538,14 @@ class ActivityController {
                 const result = await this.db.query(whoLikedMeQuery, [userId, limit]);
                 const users = result.rows.map(user => ({
                     ...user,
-                    profile_image: this.formatProfileImage(user.profile_image)
+                    profile_image: this.formatProfileImage(user.profile_image),
+                    is_online: false,
+                    last_seen_at: normalizeLastSeen(user.last_seen_at)
                 }));
+
+                await hydratePresenceStatuses(this.presenceService, users, {
+                    idSelector: (row) => row.user_id
+                });
 
                 // Get total count of unique users who liked (exclude blocked users to match the list)
                 const countQuery = `
@@ -536,6 +599,8 @@ class ActivityController {
                 });
             }
 
+            const lastSeenFragments = await this.getLastSeenFragments();
+
             // Query from users_likes table - users that the current user has liked
             const whoILikeQuery = `
                 SELECT 
@@ -550,21 +615,17 @@ class ActivityController {
                         'Unknown'
                     ) as location,
                     ui.file_name as profile_image,
+                    up.preferred_gender,
+                    up.age_min as preferred_age_min,
+                    up.age_max as preferred_age_max,
                     l.created_at as liked_at,
-                    CASE 
-                        WHEN EXISTS (
-                            SELECT 1 FROM user_sessions 
-                            WHERE user_id = u.id 
-                                AND is_active = true 
-                                AND last_activity > NOW() - INTERVAL '5 minutes'
-                        ) THEN true
-                        ELSE false
-                    END as is_online
+                    ${lastSeenFragments.select}
                 FROM users_likes l
                 JOIN users u ON l.liked_user_id = u.id
                 LEFT JOIN city c ON u.city_id = c.id
                 LEFT JOIN country co ON u.country_id = co.id
                 LEFT JOIN user_images ui ON u.id = ui.user_id AND ui.is_profile = 1
+                LEFT JOIN user_preferences up ON up.user_id = u.id
                 WHERE l.liked_by = $1
                     AND NOT EXISTS (
                         SELECT 1 FROM users_blocked_by_users bu
@@ -582,8 +643,14 @@ class ActivityController {
                 const result = await this.db.query(whoILikeQuery, [userId, limit]);
                 users = result.rows.map(user => ({
                     ...user,
-                    profile_image: this.formatProfileImage(user.profile_image)
+                    profile_image: this.formatProfileImage(user.profile_image),
+                    is_online: false,
+                    last_seen_at: normalizeLastSeen(user.last_seen_at)
                 }));
+
+                await hydratePresenceStatuses(this.presenceService, users, {
+                    idSelector: (row) => row.user_id
+                });
 
                 // Get total count of users I've liked
                 const countQuery = `

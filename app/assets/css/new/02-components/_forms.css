@@ -205,7 +205,26 @@ select:disabled {
     color: var(--form-error-color);
     font-size: 0.85rem;
     margin-top: 0.5rem;
-    display: block;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.error-message .error-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2em;
+    line-height: 1;
+    padding: 0;
+    color: inherit;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.error-message .error-close:hover {
+    opacity: 1;
 }
 
 /* Success State */
@@ -375,4 +394,17 @@ label.required::after,
     }
 }
 
+/* ===== AGE VALIDATION ERROR STYLES (CSP-SAFE) ===== */
+.age-error-message {
+    color: #e74c3c;
+    font-size: 0.85em;
+    margin-top: 4px;
+    display: block;
+    min-height: 1em;
+}
+
+input.error,
+select.error {
+    border-color: #e74c3c !important;
+}
 

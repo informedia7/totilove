@@ -192,7 +192,7 @@
                 setTimeout(() => {
                     el.style.outline = originalOutline;
                     el.style.zIndex = originalZIndex;
-                }, 3000);
+                }, 3001);
             }
         };
         

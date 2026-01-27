@@ -17,6 +17,27 @@ function setupMonitoringRoutes(app, monitoringUtils) {
     app.get('/metrics', (req, res) => {
         res.json(monitoringUtils.getMetrics());
     });
+
+    app.post('/metrics/presence-client', (req, res) => {
+        if (!monitoringUtils || typeof monitoringUtils.recordClientPresenceSamples !== 'function') {
+            return res.status(503).json({
+                success: false,
+                error: 'Monitoring unavailable'
+            });
+        }
+
+        const samples = req.body?.samples;
+        if (!Array.isArray(samples) || samples.length === 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'samples array required'
+            });
+        }
+
+        const metadata = req.body?.metadata || {};
+        monitoringUtils.recordClientPresenceSamples(samples, metadata, { ip: req.ip });
+        res.status(202).json({ success: true });
+    });
 }
 
 module.exports = { setupMonitoringRoutes };

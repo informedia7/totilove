@@ -206,17 +206,14 @@ export async function retry(fn, maxRetries = 3, baseDelay = 1000) {
 }
 
 /**
- * Check if device is mobile
- * @returns {boolean} True if mobile device
+ * Device detection utilities
+ * Properly distinguishes between mobile phones, tablets/iPads, and desktop
  */
-export function isMobile() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-           (window.innerWidth <= 768);
-}
 
 /**
  * Check if device supports touch
  * @returns {boolean} True if touch device
+ * Note: Use CSS media queries for layout decisions instead of device detection
  */
 export function isTouchDevice() {
     return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -269,3 +266,7 @@ export function safeJsonStringify(obj, defaultValue = '{}') {
         return defaultValue;
     }
 }
+
+// Note: Device detection functions removed - use CSS media queries instead
+// For layout decisions, use: window.matchMedia('(max-width: 768px)').matches
+// For touch detection, use: isTouchDevice() or CSS @media (hover: none) and (pointer: coarse)

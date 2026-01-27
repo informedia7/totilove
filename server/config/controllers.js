@@ -20,15 +20,22 @@ const MatchesController = require('../../database/controllers/matchesController'
  * @param {Object} io - Socket.IO instance
  * @returns {Object} Controllers object with all initialized controllers
  */
-function setupControllers(db, redis, authMiddleware, sessionTracker, messageService, io) {
-    const authController = new AuthController(db, authMiddleware, sessionTracker);
-    const messageController = new MessageController(db, messageService, io);
+function setupControllers(
+    db,
+    redis,
+    authMiddleware,
+    sessionTracker = null,
+    messageService,
+    io,
+    presenceService = null
+) {
+    const authController = new AuthController(db, authMiddleware, sessionTracker, presenceService);
+    const messageController = new MessageController(db, messageService, io, presenceService);
     const templateController = new TemplateController(db);
     const searchController = new SearchController();
-    const activityController = new ActivityController(db);
-    // Initialize MatchesController with optional Redis for caching
+    const activityController = new ActivityController(db, presenceService);
     const matchesController = new MatchesController(db, redis || null);
-    
+
     return {
         authController,
         messageController,

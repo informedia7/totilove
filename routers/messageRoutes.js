@@ -1,5 +1,6 @@
 const express = require('express');
 const multer = require('multer');
+const { messageCountLimiter } = require('./middleware/rateLimiter');
 
 class MessageRoutes {
     constructor(messageController, authMiddleware) {
@@ -50,7 +51,7 @@ class MessageRoutes {
         router.post('/save', (req, res) => this.messageController.saveMessage(req, res));
         router.post('/unsave', (req, res) => this.messageController.unsaveMessage(req, res));
         router.post('/bulk-delete', (req, res) => this.messageController.bulkDeleteMessages(req, res));
-        router.get('/count', (req, res) => this.messageController.getMessageCount(req, res));
+        router.get('/count', messageCountLimiter, (req, res) => this.messageController.getMessageCount(req, res));
         
         // Mark message as read endpoint
         router.post('/:messageId/mark-read', (req, res) => this.messageController.markMessageAsRead(req, res));

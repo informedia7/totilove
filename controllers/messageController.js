@@ -1743,9 +1743,31 @@ class MessageController {
                     });
                 }
                 
+                // Scan uploaded file for viruses before processing
+                if (req.file) {
+                    try {
+                        const scanResult = await imageHandler.scanUploadedFile(req.file.path);
+                        if (!scanResult.clean) {
+                            await imageHandler.deleteTempFile(req.file.path);
+                            return res.status(400).json({
+                                success: false,
+                                error: 'Uploaded image failed security scan',
+                                threats: scanResult.threats
+                            });
+                        }
+                    } catch (scanError) {
+                        await imageHandler.deleteTempFile(req.file?.path);
+                        return res.status(400).json({
+                            success: false,
+                            error: scanError.message || 'File security check failed'
+                        });
+                    }
+                }
+
                 // Validate image upload
                 const validation = imageHandler.validateImageUpload(req.file, userId, partnerId);
                 if (!validation.isValid) {
+                    await imageHandler.deleteTempFile(req.file?.path);
                     return res.status(400).json({
                         success: false,
                         error: validation.errors.join(', ')
@@ -1852,9 +1874,30 @@ class MessageController {
                 // Process each image
                 for (const file of req.files) {
                     try {
+                        // Virus scan before validation
+                        try {
+                            const scanResult = await imageHandler.scanUploadedFile(file.path);
+                            if (!scanResult.clean) {
+                                await imageHandler.deleteTempFile(file.path);
+                                errors.push({
+                                    filename: file.originalname,
+                                    error: 'Image failed security scan'
+                                });
+                                continue;
+                            }
+                        } catch (scanError) {
+                            await imageHandler.deleteTempFile(file.path);
+                            errors.push({
+                                filename: file.originalname,
+                                error: scanError.message || 'File security check failed'
+                            });
+                            continue;
+                        }
+
                         // Validate each image
                         const validation = imageHandler.validateImageUpload(file, userId, partnerId);
                         if (!validation.isValid) {
+                            await imageHandler.deleteTempFile(file.path);
                             errors.push({
                                 filename: file.originalname,
                                 error: validation.errors.join(', ')

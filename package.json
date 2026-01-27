@@ -10,11 +10,14 @@
     "build:dev": "vite build --mode development",
     "build:watch": "vite build --watch",
     "build:css": "postcss app/assets/css/new/**/*.css -d dist/css --base app/assets/css/new --ext .css",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:presence": "node --test tests/presence*.test.js",
+    "load:presence": "node scripts/presenceLoadTest.js"
   },
   "dependencies": {
+    "@socket.io/redis-adapter": "^8.2.0",
     "archiver": "^6.0.1",
-    "bcrypt": "^5.1.1",
+    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "compression": "^1.8.1",
     "connect-flash": "^0.1.1",
@@ -31,8 +34,9 @@
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
     "node-fetch": "^2.7.0",
-    "nodemailer": "^6.10.1",
+    "nodemailer": "^7.0.12",
     "pg": "^8.16.3",
+    "rate-limit-redis": "^4.3.1",
     "redis": "^5.6.0",
     "sharp": "^0.34.3",
     "simple-peer": "^9.11.1",
@@ -51,40 +55,13 @@
     "nodemon": "^3.1.10",
     "postcss": "^8.4.47",
     "postcss-cli": "^11.0.0",
+    "supertest": "^7.0.0",
     "terser": "^5.36.0",
-    "ts-node": "^10.9.2",
+    "ts-node": "^1.7.1",
     "typescript": "^5.8.3",
-    "vite": "^5.4.11"
+    "vite": "^7.3.1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC"
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

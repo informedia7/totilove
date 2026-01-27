@@ -35,7 +35,6 @@
                     </div>
                     
                     <div id="modal-profile-status" class="status" style="margin-top: 0.135rem;">
-                        <span class="dot" id="status-dot" style="display: none; flex-shrink: 0;"></span>
                         <span id="modal-status-text" style="word-wrap: break-word; overflow-wrap: break-word;">Loading...</span>
                     </div>
                 </div>
@@ -108,7 +107,7 @@
                     <i class="fas fa-heart"></i> <span class="favourite-btn-text">Add to Favourites</span>
                 </button>
                 <button class="btn msg modal-message-btn" id="modal-message-btn" data-action="message">
-                    <i class="fas fa-paper-plane"></i> <span class="message-btn-text">Message</span>
+                    <i class="fas fa-paper-plane"></i> <span class="message-btn-text">Send Message</span>
                 </button>
                 <button class="btn block modal-block-btn" id="modal-block-btn" data-action="block" style="display: none;">
                     <i class="fas fa-ban"></i> Block
@@ -362,20 +361,6 @@ document.getElementById('closeProfileModalBtn')?.addEventListener('click',()=>{i
     word-wrap: break-word;
     overflow-wrap: break-word;
     max-width: 100%;
-}
-
-.profile-modal .dot {
-    width: 8px;
-    height: 8px;
-    background: #00b894;
-    border-radius: 50%;
-    animation: modal-pulse 1.5s infinite;
-}
-
-@keyframes modal-pulse {
-    0% { box-shadow: 0 0 0 0 rgba(0,184,148,.6); }
-    70% { box-shadow: 0 0 0 8px rgba(0,184,148,0); }
-    100% { box-shadow: 0 0 0 0 rgba(0,184,148,0); }
 }
 
 /* ===== GRID ===== */

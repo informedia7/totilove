@@ -23,5 +23,8 @@
 /* Import Chat component */
 @import url('./_chat.css');
 
+/* Import Presence indicators */
+@import url('./_presence.css');
+
 /* Import Cards & Utility Components */
 @import url('./_cards.css');

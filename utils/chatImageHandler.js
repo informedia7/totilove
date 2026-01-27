@@ -4,6 +4,17 @@ const path = require('path');
 const fs = require('fs').promises;
 const crypto = require('crypto');
 
+let ClamScan = null;
+let clamscan = null;
+try {
+    ClamScan = require('clamscan');
+    clamscan = new ClamScan();
+    console.log('[ChatImageHandler] ClamAV virus scanning enabled');
+} catch (error) {
+    console.warn('[ChatImageHandler] ClamAV not available. Install with: npm install clamscan');
+    console.warn('[ChatImageHandler] Virus scanning disabled for chat uploads.');
+}
+
 class ChatImageHandler {
     constructor() {
         this.uploadDir = path.join(__dirname, '..', 'app', 'uploads', 'chat_images');
@@ -23,6 +34,43 @@ class ChatImageHandler {
         this.maxFileSize = 5 * 1024 * 1024; // 5MB
         this.thumbnailSize = 300; // 300x300 pixels (increased by 50% from 200px)
         this.maxImageDimension = 1920; // Max width/height for resizing
+    }
+
+    isVirusScannerEnabled() {
+        return !!clamscan;
+    }
+
+    async scanUploadedFile(filePath) {
+        if (!clamscan) {
+            return { clean: true };
+        }
+
+        try {
+            const scanResult = await clamscan.scanFile(filePath);
+            if (scanResult.isInfected) {
+                return {
+                    clean: false,
+                    threats: scanResult.viruses || []
+                };
+            }
+            return { clean: true };
+        } catch (error) {
+            console.error('[ChatImageHandler] Virus scan error:', error);
+            throw new Error('File security check failed');
+        }
+    }
+
+    async deleteTempFile(filePath) {
+        if (!filePath) {
+            return;
+        }
+        try {
+            await fs.unlink(filePath);
+        } catch (error) {
+            if (error.code !== 'ENOENT') {
+                console.warn('[ChatImageHandler] Unable to delete temp file:', error.message);
+            }
+        }
     }
 
     // Configure multer for file upload

@@ -3,13 +3,99 @@ const crypto = require('crypto');
 const ActivityRateLimiter = require('../../utils/activityRateLimiter');
 const emailService = require('../../services/emailService');
 
+const REAL_NAME_REGEX = /^[A-Za-z]{2,100}$/;
+
+function sanitizeTextInput(value, maxLength = 2000) {
+    if (value === undefined || value === null) {
+        return null;
+    }
+    const textValue = String(value);
+    const withoutTags = textValue.replace(/<[^>]*>/g, '');
+    const withoutControlChars = withoutTags.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '');
+    return withoutControlChars.trim().slice(0, maxLength);
+}
+
+function normalizeNullableValue(value) {
+    if (value === undefined || value === null) {
+        return null;
+    }
+    if (typeof value === 'string') {
+        const trimmed = value.trim();
+        if (
+            trimmed === '' ||
+            trimmed.toLowerCase() === 'null' ||
+            trimmed.toLowerCase() === 'undefined' ||
+            trimmed.toLowerCase() === 'not specified'
+        ) {
+            return null;
+        }
+        return trimmed;
+    }
+    return value;
+}
+
+function parseNullableInt(value) {
+    const normalized = normalizeNullableValue(value);
+    if (normalized === null) {
+        return null;
+    }
+    const parsed = parseInt(normalized, 10);
+    return Number.isNaN(parsed) ? null : parsed;
+}
+
+async function resolveHeightCmByReference(client, referenceId) {
+    const id = parseNullableInt(referenceId);
+    if (!id) {
+        return null;
+    }
+    const result = await client.query('SELECT height_cm FROM user_height_reference WHERE id = $1 LIMIT 1', [id]);
+    return result.rows.length > 0 ? result.rows[0].height_cm : null;
+}
+
+async function resolveWeightKgByReference(client, referenceId) {
+    const id = parseNullableInt(referenceId);
+    if (!id) {
+        return null;
+    }
+    const result = await client.query('SELECT weight_kg FROM user_weight_reference WHERE id = $1 LIMIT 1', [id]);
+    return result.rows.length > 0 ? result.rows[0].weight_kg : null;
+}
+
 class AuthController {
-    constructor(db, authMiddleware, sessionTracker = null) {
+    constructor(db, authMiddleware, sessionTracker = null, presenceService = null) {
         this.db = db;
         this.auth = authMiddleware;
         this.sessionTracker = sessionTracker;
+        this.presenceService = presenceService;
         this.sessions = null; // Initialize sessions as null
         this.rateLimiter = new ActivityRateLimiter(db);
+        this.tableExistenceCache = new Map();
+    }
+
+    async tableExists(tableName, runner = null) {
+        if (!tableName) {
+            return false;
+        }
+
+        if (this.tableExistenceCache.has(tableName)) {
+            return this.tableExistenceCache.get(tableName);
+        }
+
+        const queryRunner = runner || this.db;
+        if (!queryRunner || typeof queryRunner.query !== 'function') {
+            return false;
+        }
+
+        try {
+            const result = await queryRunner.query('SELECT to_regclass($1) AS table_name', [tableName]);
+            const exists = Boolean(result.rows && result.rows[0] && result.rows[0].table_name);
+            this.tableExistenceCache.set(tableName, exists);
+            return exists;
+        } catch (error) {
+            console.warn(`⚠️ Could not verify ${tableName} table:`, error.message);
+            this.tableExistenceCache.set(tableName, false);
+            return false;
+        }
     }
 
     async login(req, res) {
@@ -1765,6 +1851,113 @@ class AuthController {
         }
     }
 
+    isPresenceServiceReady() {
+        return Boolean(
+            this.presenceService &&
+            typeof this.presenceService.isEnabled === 'function' &&
+            this.presenceService.isEnabled()
+        );
+    }
+
+    async handlePresenceHeartbeat(req, res) {
+        try {
+            const resolvedUserId =
+                req.user?.id ??
+                req.userId ??
+                req.session?.user?.id ??
+                req.headers['x-user-id'];
+
+            if (!resolvedUserId) {
+                return res.status(401).json({
+                    success: false,
+                    error: 'Authentication required'
+                });
+            }
+
+            const normalizedUserId = parseInt(resolvedUserId, 10);
+            if (!Number.isInteger(normalizedUserId)) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Valid user ID is required'
+                });
+            }
+
+            const body = req.body || {};
+            const toNumberOrNull = (value) => {
+                const parsed = parseInt(value, 10);
+                return Number.isNaN(parsed) ? null : parsed;
+            };
+            const sanitizedMeta = {
+                transport: typeof body.transport === 'string' ? body.transport : 'http',
+                via: typeof body.via === 'string' ? body.via : null,
+                leader: Boolean(body.leader),
+                pageHidden: Boolean(body.pageHidden),
+                instanceId: typeof body.instanceId === 'string' ? body.instanceId : null,
+                trackedUsers: toNumberOrNull(body.trackedUsers),
+                waitingCount: toNumberOrNull(body.waitingCount),
+                hiddenQueue: toNumberOrNull(body.hiddenQueue)
+            };
+
+            let presencePayload = null;
+            if (this.isPresenceServiceReady()) {
+                try {
+                    presencePayload = await this.presenceService.markOnline(normalizedUserId, {
+                        source: 'http-heartbeat',
+                        origin: sanitizedMeta.instanceId || undefined,
+                        meta: sanitizedMeta
+                    });
+                } catch (presenceError) {
+                    console.warn('⚠️ Presence heartbeat Redis error:', presenceError.message);
+                }
+            }
+
+            if (this.sessionTracker) {
+                await this.sessionTracker.updateUserActivity(normalizedUserId, req);
+            } else {
+                await this.db.query(
+                    'UPDATE users SET last_login = NOW() WHERE id = $1',
+                    [normalizedUserId]
+                );
+            }
+
+            const ttlBaseMs = this.presenceService?.onlineThresholdMs
+                || (this.presenceService?.options?.heartbeatTTL
+                    ? this.presenceService.options.heartbeatTTL + (this.presenceService.options.gracePeriodMs || 0)
+                    : null);
+            const ttlSeconds = Math.max(1, Math.ceil((ttlBaseMs || 60000) / 1000));
+
+            const normalizeLastSeenValue = (value) => {
+                if (!value) {
+                    return new Date().toISOString();
+                }
+                const date = new Date(value);
+                return Number.isNaN(date.getTime()) ? new Date().toISOString() : date.toISOString();
+            };
+
+            res.json({
+                success: true,
+                userId: normalizedUserId,
+                ttlSeconds,
+                redisEnabled: this.isPresenceServiceReady(),
+                presence: presencePayload
+                    ? {
+                        isOnline: true,
+                        lastSeen: normalizeLastSeenValue(presencePayload.lastSeen),
+                        source: presencePayload.source || 'http-heartbeat',
+                        origin: presencePayload.origin || null
+                    }
+                    : null
+            });
+        } catch (error) {
+            console.error('❌ Presence heartbeat error:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to process heartbeat',
+                details: error.message
+            });
+        }
+    }
+
     /**
      * Verify email address using token
      */
@@ -2502,6 +2695,491 @@ class AuthController {
                 error: 'Failed to get billing plans',
                 details: error.message
             });
+        }
+    }
+
+    async updateProfile(req, res) {
+        const body = req.body || {};
+        const sessionUserId = req.user?.id || req.session?.user?.id || req.userId;
+        const targetUserId = parseNullableInt(body.userId) || sessionUserId;
+
+        if (!targetUserId) {
+            return res.status(400).json({
+                success: false,
+                error: 'User ID is required'
+            });
+        }
+
+        if (sessionUserId && targetUserId !== sessionUserId) {
+            return res.status(403).json({
+                success: false,
+                error: 'You are not authorized to update this profile'
+            });
+        }
+
+        const client = await this.db.connect();
+        let updatedName = null;
+        let releaseClient = true;
+
+        const ensureArray = (value) => {
+            if (Array.isArray(value)) {
+                return value;
+            }
+            if (value === undefined || value === null) {
+                return [];
+            }
+            return [value];
+        };
+
+        try {
+            await client.query('BEGIN');
+
+            const locationFieldsBeingUpdated = [];
+            const newLocationValues = {
+                country_id: null,
+                state_id: null,
+                city_id: null
+            };
+            let locationChangeData = null;
+
+            const userUpdates = [];
+            const userValues = [];
+            let userIndex = 1;
+
+            if (Object.prototype.hasOwnProperty.call(body, 'real_name')) {
+                const suppliedName = typeof body.real_name === 'string' ? body.real_name.trim() : '';
+                if (!suppliedName) {
+                    const error = new Error('Name is required');
+                    error.statusCode = 400;
+                    throw error;
+                }
+                if (!REAL_NAME_REGEX.test(suppliedName)) {
+                    const error = new Error('Name must be 2-100 alphabetic characters');
+                    error.statusCode = 400;
+                    throw error;
+                }
+                const normalizedName = suppliedName.charAt(0).toUpperCase() + suppliedName.slice(1);
+                userUpdates.push(`real_name = $${userIndex++}`);
+                userValues.push(normalizedName);
+                updatedName = normalizedName;
+            }
+
+            if (Object.prototype.hasOwnProperty.call(body, 'country')) {
+                userUpdates.push(`country_id = $${userIndex++}`);
+                const parsedCountry = parseNullableInt(body.country);
+                userValues.push(parsedCountry);
+                locationFieldsBeingUpdated.push('country');
+                newLocationValues.country_id = parsedCountry;
+            }
+
+            if (Object.prototype.hasOwnProperty.call(body, 'state')) {
+                userUpdates.push(`state_id = $${userIndex++}`);
+                const parsedState = parseNullableInt(body.state);
+                userValues.push(parsedState);
+                locationFieldsBeingUpdated.push('state');
+                newLocationValues.state_id = parsedState;
+            }
+
+            if (Object.prototype.hasOwnProperty.call(body, 'city')) {
+                userUpdates.push(`city_id = $${userIndex++}`);
+                const parsedCity = parseNullableInt(body.city);
+                userValues.push(parsedCity);
+                locationFieldsBeingUpdated.push('city');
+                newLocationValues.city_id = parsedCity;
+            }
+
+            if (locationFieldsBeingUpdated.length > 0) {
+                const currentLocationResult = await client.query(
+                    'SELECT country_id, state_id, city_id FROM users WHERE id = $1 FOR UPDATE',
+                    [targetUserId]
+                );
+                const oldLocationValues = currentLocationResult.rows[0] || {
+                    country_id: null,
+                    state_id: null,
+                    city_id: null
+                };
+
+                const normalizeValue = (val) => {
+                    if (val === '' || val === undefined || val === null) return null;
+                    return String(val);
+                };
+
+                let locationChanged = false;
+
+                if (locationFieldsBeingUpdated.includes('country')) {
+                    const oldVal = normalizeValue(oldLocationValues.country_id);
+                    const newVal = normalizeValue(newLocationValues.country_id);
+                    if ((oldVal === null) !== (newVal === null) || (oldVal !== null && newVal !== null && oldVal !== newVal)) {
+                        locationChanged = true;
+                    }
+                }
+
+                if (locationFieldsBeingUpdated.includes('state')) {
+                    const oldVal = normalizeValue(oldLocationValues.state_id);
+                    const newVal = normalizeValue(newLocationValues.state_id);
+                    if ((oldVal === null) !== (newVal === null) || (oldVal !== null && newVal !== null && oldVal !== newVal)) {
+                        locationChanged = true;
+                    }
+                }
+
+                if (locationFieldsBeingUpdated.includes('city')) {
+                    const oldVal = normalizeValue(oldLocationValues.city_id);
+                    const newVal = normalizeValue(newLocationValues.city_id);
+                    if ((oldVal === null) !== (newVal === null) || (oldVal !== null && newVal !== null && oldVal !== newVal)) {
+                        locationChanged = true;
+                    }
+                }
+
+                if (locationChanged) {
+                    const rateLimitCheck = await client.query(`
+                        SELECT COUNT(*) as change_count
+                        FROM user_location_history
+                        WHERE user_id = $1
+                        AND changed_at > NOW() - INTERVAL '30 days'
+                    `, [targetUserId]);
+
+                    const changeCount = parseInt(rateLimitCheck.rows[0]?.change_count || 0, 10);
+                    const maxChangesPerMonth = 1;
+
+                    if (changeCount >= maxChangesPerMonth) {
+                        await client.query('ROLLBACK');
+                        releaseClient = false;
+                        client.release();
+                        return res.status(200).json({
+                            success: true,
+                            locationLimitReached: true,
+                            nameLimitReached: false,
+                            message: `You have changed your location ${changeCount} time(s) in the last 30 days. Maximum ${maxChangesPerMonth} change(s) allowed per 30 days. Please wait before changing your location again.`
+                        });
+                    }
+
+                    const finalNewLocation = { ...oldLocationValues };
+                    if (locationFieldsBeingUpdated.includes('country') && newLocationValues.country_id !== null && newLocationValues.country_id !== undefined) {
+                        finalNewLocation.country_id = newLocationValues.country_id;
+                    }
+                    if (locationFieldsBeingUpdated.includes('state')) {
+                        finalNewLocation.state_id = newLocationValues.state_id;
+                    }
+                    if (locationFieldsBeingUpdated.includes('city')) {
+                        finalNewLocation.city_id = newLocationValues.city_id;
+                    }
+
+                    locationChangeData = {
+                        old: oldLocationValues,
+                        new: finalNewLocation
+                    };
+                }
+            }
+
+            if (userUpdates.length > 0) {
+                userValues.push(targetUserId);
+                await client.query(
+                    `UPDATE users SET ${userUpdates.join(', ')} WHERE id = $${userIndex}`,
+                    userValues
+                );
+            }
+
+            if (locationChangeData) {
+                const ipAddress = req.ip || req.headers['x-forwarded-for'] || req.connection?.remoteAddress || null;
+                const userAgent = req.headers['user-agent'] || null;
+                try {
+                    await client.query(`
+                        INSERT INTO user_location_history 
+                        (user_id, old_country_id, old_state_id, old_city_id,
+                         new_country_id, new_state_id, new_city_id,
+                         ip_address, user_agent, changed_at)
+                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+                    `, [
+                        targetUserId,
+                        locationChangeData.old.country_id,
+                        locationChangeData.old.state_id,
+                        locationChangeData.old.city_id,
+                        locationChangeData.new.country_id,
+                        locationChangeData.new.state_id,
+                        locationChangeData.new.city_id,
+                        ipAddress,
+                        userAgent
+                    ]);
+                } catch (historyError) {
+                    console.error('Error logging location change history:', historyError.message);
+                }
+            }
+
+            await client.query(
+                `INSERT INTO user_attributes (user_id)
+                 SELECT $1
+                 WHERE NOT EXISTS (
+                     SELECT 1 FROM user_attributes WHERE user_id = $1
+                 )`,
+                [targetUserId]
+            );
+            await client.query(
+                `INSERT INTO user_preferences (user_id)
+                 SELECT $1
+                 WHERE NOT EXISTS (
+                     SELECT 1 FROM user_preferences WHERE user_id = $1
+                 )`,
+                [targetUserId]
+            );
+
+            const attributeUpdates = [];
+            const attributeValues = [];
+            let attributeIndex = 1;
+
+            if (Object.prototype.hasOwnProperty.call(body, 'aboutMe')) {
+                const aboutValue = sanitizeTextInput(body.aboutMe, 2000);
+                attributeUpdates.push(`about_me = $${attributeIndex++}`);
+                attributeValues.push(aboutValue ?? '');
+            }
+
+            if (Object.prototype.hasOwnProperty.call(body, 'height_reference_id')) {
+                const heightCm = await resolveHeightCmByReference(client, body.height_reference_id);
+                attributeUpdates.push(`height_cm = $${attributeIndex++}`);
+                attributeValues.push(heightCm);
+            }
+
+            if (Object.prototype.hasOwnProperty.call(body, 'weight_reference_id')) {
+                const weightKg = await resolveWeightKgByReference(client, body.weight_reference_id);
+                attributeUpdates.push(`weight_kg = $${attributeIndex++}`);
+                attributeValues.push(weightKg);
+            }
+
+            const attributeIdFields = {
+                body_type: 'body_type_id',
+                eye_color: 'eye_color_id',
+                hair_color: 'hair_color_id',
+                ethnicity: 'ethnicity_id',
+                religion: 'religion_id',
+                education: 'education_id',
+                occupation: 'occupation_category_id',
+                income: 'income_id',
+                lifestyle: 'lifestyle_id',
+                living_situation: 'living_situation_id',
+                marital_status: 'marital_status_id',
+                smoking: 'smoking_preference_id',
+                drinking: 'drinking_preference_id',
+                exercise: 'exercise_habits_id',
+                number_of_children: 'number_of_children_id',
+                body_art: 'body_art_id',
+                english_ability: 'english_ability_id',
+                relocation: 'relocation_id'
+            };
+
+            for (const [payloadKey, columnName] of Object.entries(attributeIdFields)) {
+                if (Object.prototype.hasOwnProperty.call(body, payloadKey)) {
+                    attributeUpdates.push(`${columnName} = $${attributeIndex++}`);
+                    attributeValues.push(parseNullableInt(body[payloadKey]));
+                }
+            }
+
+            if (Object.prototype.hasOwnProperty.call(body, 'have_children')) {
+                attributeUpdates.push(`have_children = $${attributeIndex++}`);
+                attributeValues.push(normalizeNullableValue(body.have_children));
+            }
+
+            if (Object.prototype.hasOwnProperty.call(body, 'interest_category')) {
+                attributeUpdates.push(`interest_category_id = $${attributeIndex++}`);
+                attributeValues.push(parseNullableInt(body.interest_category));
+            }
+
+            if (attributeUpdates.length > 0) {
+                attributeValues.push(targetUserId);
+                await client.query(
+                    `UPDATE user_attributes SET ${attributeUpdates.join(', ')} WHERE user_id = $${attributeIndex}`,
+                    attributeValues
+                );
+            }
+
+            const preferenceUpdates = [];
+            const preferenceValues = [];
+            let preferenceIndex = 1;
+
+            if (Object.prototype.hasOwnProperty.call(body, 'partner_preferences')) {
+                const partnerValue = sanitizeTextInput(body.partner_preferences, 2000);
+                preferenceUpdates.push(`partner_preferences = $${preferenceIndex++}`);
+                preferenceValues.push(partnerValue ?? '');
+            }
+
+            if (Object.prototype.hasOwnProperty.call(body, 'preferred_age_min')) {
+                preferenceUpdates.push(`age_min = $${preferenceIndex++}`);
+                preferenceValues.push(parseNullableInt(body.preferred_age_min));
+            }
+
+            if (Object.prototype.hasOwnProperty.call(body, 'preferred_age_max')) {
+                preferenceUpdates.push(`age_max = $${preferenceIndex++}`);
+                preferenceValues.push(parseNullableInt(body.preferred_age_max));
+            }
+
+            if (Object.prototype.hasOwnProperty.call(body, 'preferred_gender')) {
+                preferenceUpdates.push(`preferred_gender = $${preferenceIndex++}`);
+                preferenceValues.push(normalizeNullableValue(body.preferred_gender));
+            }
+
+            if (Object.prototype.hasOwnProperty.call(body, 'preferred_distance')) {
+                preferenceUpdates.push(`location_radius = $${preferenceIndex++}`);
+                preferenceValues.push(parseNullableInt(body.preferred_distance));
+            }
+
+            if (Object.prototype.hasOwnProperty.call(body, 'preferred_height_reference_id')) {
+                const refValue = normalizeNullableValue(body.preferred_height_reference_id);
+                let preferredHeight = null;
+                if (refValue === '0') {
+                    preferredHeight = '0';
+                } else if (refValue) {
+                    const resolvedHeight = await resolveHeightCmByReference(client, refValue);
+                    preferredHeight = resolvedHeight != null ? String(resolvedHeight) : null;
+                }
+                preferenceUpdates.push(`preferred_height = $${preferenceIndex++}`);
+                preferenceValues.push(preferredHeight);
+            }
+
+            if (Object.prototype.hasOwnProperty.call(body, 'preferred_weight_reference_id')) {
+                const preferredWeight = await resolveWeightKgByReference(client, body.preferred_weight_reference_id);
+                preferenceUpdates.push(`preferred_weight = $${preferenceIndex++}`);
+                preferenceValues.push(preferredWeight);
+            }
+
+            const preferenceIdFields = {
+                preferred_body_type: 'preferred_body_type',
+                preferred_education: 'preferred_education',
+                preferred_religion: 'preferred_religion',
+                preferred_smoking: 'preferred_smoking',
+                preferred_drinking: 'preferred_drinking',
+                preferred_exercise: 'preferred_exercise',
+                preferred_number_of_children: 'preferred_number_of_children',
+                preferred_eye_color: 'preferred_eye_color',
+                preferred_hair_color: 'preferred_hair_color',
+                preferred_ethnicity: 'preferred_ethnicity',
+                preferred_occupation: 'preferred_occupation',
+                preferred_income: 'preferred_income',
+                preferred_marital_status: 'preferred_marital_status',
+                preferred_lifestyle: 'preferred_lifestyle',
+                preferred_body_art: 'preferred_body_art',
+                preferred_english_ability: 'preferred_english_ability'
+            };
+
+            for (const [payloadKey, columnName] of Object.entries(preferenceIdFields)) {
+                if (Object.prototype.hasOwnProperty.call(body, payloadKey)) {
+                    preferenceUpdates.push(`${columnName} = $${preferenceIndex++}`);
+                    preferenceValues.push(parseNullableInt(body[payloadKey]));
+                }
+            }
+
+            if (Object.prototype.hasOwnProperty.call(body, 'preferred_children')) {
+                preferenceUpdates.push(`preferred_children = $${preferenceIndex++}`);
+                preferenceValues.push(normalizeNullableValue(body.preferred_children));
+            }
+
+            if (Object.prototype.hasOwnProperty.call(body, 'relationship_type')) {
+                preferenceUpdates.push(`relationship_type = $${preferenceIndex++}`);
+                preferenceValues.push(normalizeNullableValue(body.relationship_type));
+            }
+
+            if (preferenceUpdates.length > 0) {
+                preferenceValues.push(targetUserId);
+                await client.query(
+                    `UPDATE user_preferences SET ${preferenceUpdates.join(', ')} WHERE user_id = $${preferenceIndex}`,
+                    preferenceValues
+                );
+            }
+
+            if (Object.prototype.hasOwnProperty.call(body, 'interest_categories')) {
+                const supportsInterestMulti = await this.tableExists('user_interests_multiple', client);
+                if (supportsInterestMulti) {
+                    const interestIds = ensureArray(body.interest_categories)
+                        .map(item => parseNullableInt(item?.id ?? item))
+                        .filter(id => id !== null);
+                    await client.query('DELETE FROM user_interests_multiple WHERE user_id = $1', [targetUserId]);
+                    if (interestIds.length > 0) {
+                        const uniqueInterestIds = Array.from(new Set(interestIds));
+                        const params = [targetUserId];
+                        const valuesSql = uniqueInterestIds.map((id, idx) => {
+                            params.push(id);
+                            return `($1, $${idx + 2})`;
+                        }).join(', ');
+                        await client.query(
+                            `INSERT INTO user_interests_multiple (user_id, interest_id) VALUES ${valuesSql} ON CONFLICT DO NOTHING`,
+                            params
+                        );
+                    }
+                } else {
+                    console.warn('⚠️ Skipping interest multi-select sync: user_interests_multiple table not available');
+                }
+            }
+
+            if (Object.prototype.hasOwnProperty.call(body, 'hobbies')) {
+                const supportsHobbyMulti = await this.tableExists('user_hobbies_multiple', client);
+                if (supportsHobbyMulti) {
+                    const hobbyIds = ensureArray(body.hobbies)
+                        .map(item => parseNullableInt(item?.id ?? item))
+                        .filter(id => id !== null);
+                    await client.query('DELETE FROM user_hobbies_multiple WHERE user_id = $1', [targetUserId]);
+                    if (hobbyIds.length > 0) {
+                        const uniqueHobbyIds = Array.from(new Set(hobbyIds));
+                        const params = [targetUserId];
+                        const valuesSql = uniqueHobbyIds.map((id, idx) => {
+                            params.push(id);
+                            return `($1, $${idx + 2})`;
+                        }).join(', ');
+                        await client.query(
+                            `INSERT INTO user_hobbies_multiple (user_id, hobby_id) VALUES ${valuesSql} ON CONFLICT DO NOTHING`,
+                            params
+                        );
+                    }
+                } else {
+                    console.warn('⚠️ Skipping hobbies multi-select sync: user_hobbies_multiple table not available');
+                }
+            }
+
+            if (Object.prototype.hasOwnProperty.call(body, 'preferred_countries')) {
+                const supportsPreferredCountries = await this.tableExists('user_preferred_countries', client);
+                if (supportsPreferredCountries) {
+                    const countryIds = ensureArray(body.preferred_countries)
+                        .map(country => parseNullableInt(country?.id ?? country?.country_id ?? country))
+                        .filter(id => id !== null);
+                    await client.query('DELETE FROM user_preferred_countries WHERE user_id = $1', [targetUserId]);
+                    if (countryIds.length > 0) {
+                        const uniqueCountryIds = Array.from(new Set(countryIds));
+                        const params = [targetUserId];
+                        const valuesSql = uniqueCountryIds.map((id, idx) => {
+                            params.push(id);
+                            return `($1, $${idx + 2})`;
+                        }).join(', ');
+                        await client.query(
+                            `INSERT INTO user_preferred_countries (user_id, country_id) VALUES ${valuesSql} ON CONFLICT DO NOTHING`,
+                            params
+                        );
+                    }
+                } else {
+                    console.warn('⚠️ Skipping preferred countries sync: user_preferred_countries table not available');
+                }
+            }
+
+            await client.query('COMMIT');
+
+            if (updatedName && req.session?.user) {
+                req.session.user.real_name = updatedName;
+            }
+
+            return res.json({
+                success: true,
+                message: 'Profile updated successfully',
+                real_name: updatedName,
+                locationLimitReached: false,
+                nameLimitReached: false
+            });
+        } catch (error) {
+            await client.query('ROLLBACK');
+            console.error('❌ Profile update error:', error);
+            const statusCode = error.statusCode || 500;
+            return res.status(statusCode).json({
+                success: false,
+                error: statusCode === 500 ? 'Failed to update profile' : error.message
+            });
+        } finally {
+            if (releaseClient) {
+                client.release();
+            }
         }
     }
 

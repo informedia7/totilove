@@ -5,8 +5,10 @@
 
 const MessageService = require('../../services/messageService');
 const sessionService = require('../../services/sessionService');
-const ActivityTracker = require('../../middleware/activityTracker');
 const BlockRateLimiter = require('../../utils/blockRateLimiter');
+const PresenceService = require('../../services/presenceService');
+const StateService = require('../../services/stateService');
+const featureFlags = require('../../config/featureFlags');
 
 /**
  * Setup all application services
@@ -16,40 +18,29 @@ const BlockRateLimiter = require('../../utils/blockRateLimiter');
  */
 function setupServices(db, redis) {
     const messageService = new MessageService(db, redis);
-    
-    // Initialize activity tracker
-    const activityTracker = new ActivityTracker(db);
-    
-    // Replace mocked session tracker with real activity tracker
-    const sessionTracker = {
-        updateUserActivity: (userId) => activityTracker.updateUserActivity(userId),
-        cleanupExpiredSessions: () => activityTracker.cleanupSessions(),
-        startPeriodicCleanup: () => {}, // Cleanup interval removed
-        isUserOnline: async (userId) => {
-            const result = await db.query(`
-                SELECT is_active, last_activity 
-                FROM user_sessions 
-                WHERE user_id = $1 
-                AND is_active = true 
-                AND last_activity > NOW() - INTERVAL '1 minute'
-                ORDER BY last_activity DESC 
-                LIMIT 1
-            `, [userId]);
-            
-            if (result.rows.length > 0) {
-                const lastActivity = result.rows[0].last_activity;
-                const timeDiff = Date.now() - new Date(lastActivity).getTime();
-                const minutesDiff = Math.floor(timeDiff / (1000 * 60));
-                
-                // User is only considered online if they had activity in the last minute
-                return minutesDiff < 1;
-            }
-            return false;
-        }
+
+    const presenceFlags = {
+        redisEnabled: typeof featureFlags.isPresenceRedisEnabled === 'function'
+            ? featureFlags.isPresenceRedisEnabled()
+            : true,
+        streamingEnabled: typeof featureFlags.isPresenceStreamingEnabled === 'function'
+            ? featureFlags.isPresenceStreamingEnabled()
+            : true
     };
-    
-    // Start automatic session cleanup
-    sessionTracker.startPeriodicCleanup();
+
+    const presenceService = redis && presenceFlags.redisEnabled
+        ? new PresenceService(redis, {
+              logger: console,
+              streamingEnabled: presenceFlags.streamingEnabled
+          })
+        : null;
+
+    const stateService = redis
+        ? new StateService(redis, {
+              logger: console,
+              prefix: 'state:user:'
+          })
+        : null;
     
     // Initialize block rate limiter
     const blockRateLimiter = new BlockRateLimiter(db, redis);
@@ -57,9 +48,9 @@ function setupServices(db, redis) {
     return {
         messageService,
         sessionService,
-        activityTracker,
-        sessionTracker,
-        blockRateLimiter
+        blockRateLimiter,
+        presenceService,
+        stateService
     };
 }
 

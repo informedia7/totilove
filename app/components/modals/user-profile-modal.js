@@ -9,6 +9,7 @@
     // Global state
     let currentProfileUserId = null;
     let currentProfileGender = null;
+    let modalPresenceUnsubscribe = null;
     
     // Utility functions
     function escapeHtml(text) {
@@ -70,6 +71,104 @@
     function getSessionToken() {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get('token') || '';
+    }
+
+    function cleanupModalPresenceSubscription() {
+        if (typeof modalPresenceUnsubscribe === 'function') {
+            try {
+                modalPresenceUnsubscribe();
+            } catch (error) {
+                console.warn('UserProfileModal: failed to cleanup presence subscription', error);
+            }
+        }
+        modalPresenceUnsubscribe = null;
+    }
+
+    function applyModalStatusFallback(profile) {
+        const statusText = document.getElementById('modal-status-text');
+        const statusDot = document.getElementById('status-dot');
+        if (!statusText) return;
+
+        if (statusDot) {
+            statusDot.style.display = 'inline-flex';
+            statusDot.style.backgroundColor = '#00b894';
+        }
+
+        if (profile?.is_online) {
+            statusText.innerHTML = '<i class="fas fa-circle" style="color: #00b894; font-size: 0.6rem;"></i> Online now';
+            statusText.style.color = '#00b894';
+            return;
+        }
+
+        if (statusDot) {
+            statusDot.style.display = profile?.last_active ? 'inline-flex' : 'none';
+            statusDot.style.backgroundColor = '#f39c12';
+        }
+
+        if (profile?.last_active) {
+            statusText.innerHTML = `<i class="fas fa-clock" style="margin-right: 0.3rem; color: #ffffff;"></i> Last active ${formatTimeAgo(profile.last_active)}`;
+            statusText.style.color = '#ffffff';
+            return;
+        }
+
+        statusText.textContent = 'Offline';
+        statusText.style.color = '#ffffff';
+    }
+
+    function updateModalPresenceStatus(status) {
+        const statusText = document.getElementById('modal-status-text');
+        const statusDot = document.getElementById('status-dot');
+        if (!statusText) return;
+
+        const isOnline = Boolean(status?.isOnline);
+        const lastSeen = status?.lastSeen || status?.timestamp || null;
+        const uiState = status?.uiState || (isOnline ? 'online' : 'offline');
+
+        if (statusDot) {
+            statusDot.style.display = uiState === 'offline' ? 'none' : 'inline-flex';
+            statusDot.style.backgroundColor = isOnline ? '#00b894' : '#f39c12';
+            statusDot.classList.toggle('is-online', isOnline);
+            statusDot.classList.toggle('is-stale', !isOnline && uiState !== 'offline');
+        }
+
+        if (isOnline) {
+            statusText.innerHTML = '<i class="fas fa-circle" style="color: #00b894; font-size: 0.6rem;"></i> Online now';
+            statusText.style.color = '#00b894';
+            return;
+        }
+
+        if (lastSeen) {
+            statusText.innerHTML = `<i class="fas fa-clock" style="margin-right: 0.3rem; color: #ffffff;"></i> Last active ${formatTimeAgo(lastSeen)}`;
+            statusText.style.color = '#ffffff';
+            return;
+        }
+
+        statusText.textContent = 'Offline';
+        statusText.style.color = '#ffffff';
+    }
+
+    function bindModalPresenceStatus(profile) {
+        const presence = window.Presence;
+        const userId = Number(profile?.id);
+        if (!presence?.subscribe || !presence?.requestStatus || !Number.isFinite(userId)) {
+            return false;
+        }
+
+        cleanupModalPresenceSubscription();
+
+        const handler = (status) => updateModalPresenceStatus(status);
+        modalPresenceUnsubscribe = presence.subscribe(userId, handler);
+
+        presence.requestStatus(userId).then(handler).catch(() => {
+            // Fallback already rendered; no-op on failure.
+        });
+
+        const statusContainer = document.getElementById('modal-profile-status');
+        if (statusContainer) {
+            statusContainer.dataset.userId = String(userId);
+        }
+
+        return true;
     }
     
     // Open profile modal
@@ -139,6 +238,8 @@
         loading.style.display = 'none';
         content.style.display = 'block';
         
+        cleanupModalPresenceSubscription();
+
         // Store profile gender for default image selection
         currentProfileGender = profile.gender;
         
@@ -173,21 +274,8 @@
         }
         
         // Status
-        const statusText = document.getElementById('modal-status-text');
-        const modal = document.getElementById('userProfileModal');
-        const isDark = modal && modal.classList.contains('dark');
-        if (statusText) {
-            if (profile.is_online) {
-                statusText.innerHTML = '<i class="fas fa-circle" style="color: #00b894; font-size: 0.6rem;"></i> Online now';
-                statusText.style.color = '#00b894';
-            } else if (profile.last_active) {
-                statusText.innerHTML = `<i class="fas fa-clock" style="margin-right: 0.3rem; color: #ffffff;"></i> Last active ${formatTimeAgo(profile.last_active)}`;
-                statusText.style.color = '#ffffff';
-            } else {
-                statusText.textContent = 'Offline';
-                statusText.style.color = '#ffffff';
-            }
-        }
+        applyModalStatusFallback(profile);
+        bindModalPresenceStatus(profile);
         
         // Basic Information section
         const occupationEl = document.getElementById('modal-info-occupation');
@@ -368,6 +456,7 @@
         if (modal) {
             modal.style.display = 'none';
         }
+        cleanupModalPresenceSubscription();
         currentProfileUserId = null;
     }
     

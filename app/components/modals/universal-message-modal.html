@@ -32,16 +32,15 @@
                 </div>
                 <div class="rich-text-editor" id="messageModalEditor" contenteditable="true" placeholder="Write your message here..."></div>
                 <div id="messageModalCharCount" style="text-align:right;font-size:0.95rem;color:#888;margin-top:4px;">0/1000</div>
+                <div class="message-modal-footer message-modal-footer--inline">
+                    <button class="cancel-btn" id="universalMessageCancelBtn">Cancel</button>
+                    <button class="send-btn" id="universalMessageSendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                        <span id="messageModalSendBtnText">Send Message</span>
+                    </button>
+                </div>
                 <textarea class="form-input form-textarea" id="messageModalContent" style="display: none;"></textarea>
             </div>
-        </div>
-
-        <div class="message-modal-footer">
-            <button class="cancel-btn" id="universalMessageCancelBtn">Cancel</button>
-            <button class="send-btn" id="universalMessageSendBtn">
-                <i class="fas fa-paper-plane"></i>
-                <span id="messageModalSendBtnText">Send Message</span>
-            </button>
         </div>
     </div>
 </div>
@@ -49,7 +48,7 @@
 
 
     <!-- Include shared emoji picker utility -->
-    <script src="/assets/js/emoji-picker.js"></script>
+    <script src="/assets/js/new/components/emoji-picker.js"></script>
 
     <!-- Universal Message Confirmation Modal -->
 <div id="universalMessageConfirmationModal" class="universal-message-confirmation-modal" role="dialog" aria-modal="true" aria-labelledby="universalConfirmationTitle" aria-describedby="universalConfirmationDetails" tabindex="-1" style="display: none;">
@@ -440,7 +439,7 @@
     // Load email verification check utility if not already loaded
     if (!window.checkEmailVerificationStatus) {
         const script = document.createElement('script');
-        script.src = '/assets/js/email-verification-check.js';
+        script.src = '/assets/js/new/shared/email-verification-check.js';
         document.head.appendChild(script);
     }
 

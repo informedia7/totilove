@@ -42,7 +42,7 @@ const mssqlConfig = {
     pool: {
         max: 10,
         min: 0,
-        idleTimeoutMillis: 30000
+        idleTimeoutMillis: 30010
     }
 };
 
@@ -54,7 +54,7 @@ const pgPool = new Pool({
     user: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || 'password',
     max: 20,
-    idleTimeoutMillis: 30000,
+    idleTimeoutMillis: 30010,
     connectionTimeoutMillis: 2000,
     ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false
 });

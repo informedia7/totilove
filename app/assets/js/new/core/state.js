@@ -6,7 +6,119 @@
  * Migration Phase 2: Week 8
  */
 
-import { safeJsonParse, safeJsonStringify } from './utils.js';
+
+class RemoteStateSync {
+    constructor(options = {}) {
+        this.basePath = options.basePath || '/api/state';
+        this.available = typeof fetch === 'function';
+    }
+
+    isAvailable() {
+        return this.available;
+    }
+
+    buildHeaders() {
+        return {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        };
+    }
+
+    async request(path = '', { method = 'GET', body = null } = {}) {
+        if (!this.available) {
+            throw new Error('State sync unavailable');
+        }
+
+        const options = {
+            method,
+            headers: this.buildHeaders(),
+            credentials: 'include'
+        };
+
+        if (body && method !== 'GET') {
+            options.body = JSON.stringify(body);
+        }
+
+        const response = await fetch(`${this.basePath}${path}`, options);
+        let payload = null;
+
+        if (response.status !== 204) {
+            try {
+                payload = await response.json();
+            } catch (_error) {
+                payload = null;
+            }
+        }
+
+        if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+                this.available = false;
+            }
+            const errorMessage = payload?.error || `State sync failed (${response.status})`;
+            throw new Error(errorMessage);
+        }
+
+        return payload;
+    }
+
+    async fetchAll(keys = null) {
+        if (!this.isAvailable()) {
+            return {};
+        }
+
+        const params = new URLSearchParams();
+        if (Array.isArray(keys) && keys.length > 0) {
+            keys.forEach(key => params.append('keys', key));
+        }
+
+        const query = params.toString() ? `?${params.toString()}` : '';
+        const payload = await this.request(query, { method: 'GET' });
+        return payload?.state || {};
+    }
+
+    async persist(key, value) {
+        if (!this.isAvailable() || !key) {
+            return;
+        }
+
+        try {
+            await this.request('', {
+                method: 'POST',
+                body: { updates: { [key]: value } }
+            });
+        } catch (error) {
+            console.warn('[StateSync] Persist failed:', error.message);
+        }
+    }
+
+    async remove(keys = []) {
+        if (!this.isAvailable() || !Array.isArray(keys) || keys.length === 0) {
+            return;
+        }
+
+        const params = new URLSearchParams();
+        keys.forEach(key => params.append('keys', key));
+        const query = params.toString() ? `?${params.toString()}` : '';
+
+        try {
+            await this.request(query, { method: 'DELETE' });
+        } catch (error) {
+            console.warn('[StateSync] Remove failed:', error.message);
+        }
+    }
+
+    async clearAll() {
+        if (!this.isAvailable()) {
+            return;
+        }
+
+        try {
+            await this.request('?all=true', { method: 'DELETE' });
+        } catch (error) {
+            console.warn('[StateSync] Clear failed:', error.message);
+        }
+    }
+}
 
 /**
  * Global State Manager
@@ -19,17 +131,13 @@ class StateManager {
         this.middleware = [];
         this.persistence = {
             enabled: true,
-            storage: typeof localStorage !== 'undefined' ? localStorage : null,
-            prefix: 'app_state_'
+            prefix: 'app_state_',
+            driver: typeof window !== 'undefined' ? new RemoteStateSync() : null,
+            ready: false
         };
         
-        // Load persisted state
+        // Load persisted state from remote storage
         this.loadPersistedState();
-        
-        // Listen for storage events (cross-tab communication)
-        if (typeof window !== 'undefined') {
-            window.addEventListener('storage', this.handleStorageEvent.bind(this));
-        }
     }
     
     /**
@@ -86,7 +194,7 @@ class StateManager {
         target[lastKey] = value;
         
         // Persist if enabled
-        if (persist && this.persistence.enabled && this.persistence.storage) {
+        if (persist && this.persistence.enabled && this.persistence.driver?.isAvailable?.()) {
             this.persistState(key, value);
         }
         
@@ -125,15 +233,16 @@ class StateManager {
             target = target[k];
         }
         
+        const oldValue = target[lastKey];
         delete target[lastKey];
         
         // Remove from persistence
-        if (this.persistence.enabled && this.persistence.storage) {
+        if (this.persistence.enabled && this.persistence.driver?.isAvailable?.()) {
             this.removePersistedState(key);
         }
         
         // Notify subscribers
-        this.notifySubscribers(key, undefined, target[lastKey]);
+        this.notifySubscribers(key, undefined, oldValue);
     }
     
     /**
@@ -255,14 +364,11 @@ class StateManager {
      * @param {*} value - Value to persist
      */
     persistState(key, value) {
-        if (!this.persistence.storage) return;
-        
-        try {
-            const storageKey = this.persistence.prefix + key.replace(/\./g, '_');
-            this.persistence.storage.setItem(storageKey, safeJsonStringify(value));
-        } catch (error) {
-            console.warn(`[StateManager] Failed to persist state for "${key}":`, error);
-        }
+        if (!this.persistence.driver?.isAvailable?.()) return;
+
+        this.persistence.driver.persist(key, value).catch(error => {
+            console.warn(`[StateManager] Failed to persist state for "${key}":`, error?.message || error);
+        });
     }
     
     /**
@@ -270,56 +376,33 @@ class StateManager {
      * @param {string} key - State key
      */
     removePersistedState(key) {
-        if (!this.persistence.storage) return;
-        
-        try {
-            const storageKey = this.persistence.prefix + key.replace(/\./g, '_');
-            this.persistence.storage.removeItem(storageKey);
-        } catch (error) {
-            console.warn(`[StateManager] Failed to remove persisted state for "${key}":`, error);
-        }
+        if (!this.persistence.driver?.isAvailable?.()) return;
+
+        this.persistence.driver.remove([key]).catch(error => {
+            console.warn(`[StateManager] Failed to remove persisted state for "${key}":`, error?.message || error);
+        });
     }
     
     /**
      * Load persisted state
      */
-    loadPersistedState() {
-        if (!this.persistence.storage) return;
-        
-        try {
-            const keys = Object.keys(this.persistence.storage);
-            const prefix = this.persistence.prefix;
-            
-            keys.forEach(storageKey => {
-                if (storageKey.startsWith(prefix)) {
-                    const stateKey = storageKey.slice(prefix.length).replace(/_/g, '.');
-                    const value = safeJsonParse(this.persistence.storage.getItem(storageKey));
-                    
-                    if (value !== null) {
-                        this.set(stateKey, value, { silent: true, persist: false });
-                    }
-                }
-            });
-        } catch (error) {
-            console.warn('[StateManager] Failed to load persisted state:', error);
-        }
-    }
-    
-    /**
-     * Handle storage event (cross-tab communication)
-     * @param {StorageEvent} event - Storage event
-     */
-    handleStorageEvent(event) {
-        if (!event.key || !event.key.startsWith(this.persistence.prefix)) {
+    async loadPersistedState() {
+        if (!this.persistence.driver?.isAvailable?.() || !this.persistence.enabled) {
+            this.persistence.ready = true;
             return;
         }
-        
-        const stateKey = event.key.slice(this.persistence.prefix.length).replace(/_/g, '.');
-        const newValue = safeJsonParse(event.newValue);
-        const oldValue = this.get(stateKey);
-        
-        // Update state without persisting (already persisted)
-        this.set(stateKey, newValue, { silent: false, persist: false });
+
+        try {
+            const records = await this.persistence.driver.fetchAll();
+            Object.entries(records).forEach(([stateKey, value]) => {
+                this.set(stateKey, value, { silent: true, persist: false });
+            });
+        } catch (error) {
+            console.warn('[StateManager] Failed to load persisted state:', error?.message || error);
+            this.persistence.enabled = false;
+        } finally {
+            this.persistence.ready = true;
+        }
     }
     
     /**
@@ -329,14 +412,9 @@ class StateManager {
     reset(clearPersistence = false) {
         this.state = {};
         
-        if (clearPersistence && this.persistence.storage) {
-            const keys = Object.keys(this.persistence.storage);
-            const prefix = this.persistence.prefix;
-            
-            keys.forEach(key => {
-                if (key.startsWith(prefix)) {
-                    this.persistence.storage.removeItem(key);
-                }
+        if (clearPersistence && this.persistence.driver?.isAvailable?.()) {
+            this.persistence.driver.clearAll().catch(error => {
+                console.warn('[StateManager] Failed to clear persisted state:', error?.message || error);
             });
         }
         
@@ -428,5 +506,48 @@ if (typeof window !== 'undefined') {
         notifications: []
     }, { silent: true });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

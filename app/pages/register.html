@@ -4,394 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Totilove</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#764ba2">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Totilove">
+    
     <link rel="stylesheet" href="/assets/css/vendor/font-awesome.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <!-- Register Page CSS - Extracted from inline styles - Phase 1 CSS Extraction -->
+    <link rel="stylesheet" href="/assets/css/new/05-pages/_register.css">
+    
+    <!-- PWA Initialization -->
+    <script src="/assets/js/new/pwa-init.js"></script>
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            position: relative;
-        }
-
-        .header h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 1rem;
-        }
-
-        .content {
-            padding: 30px;
-        }
-
-        .welcome-card {
-            background: white;
-            border-radius: 15px;
-            padding: 32px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            margin-bottom: 24px;
-        }
-
-        .welcome-card.half-width {
-            max-width: 50%;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .cards-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 24px;
-        }
-
-        @media (max-width: 768px) {
-            .welcome-card.half-width {
-                max-width: 100%;
-            }
-            .cards-row {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .welcome-card h2 {
-            color: #667eea;
-            margin-bottom: 12px;
-            font-size: 1.75rem;
-        }
-
-        .welcome-card p {
-            color: #666;
-            line-height: 1.6;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 1.5rem;
-            min-height: 80px;
-        }
-
-        .form-group label {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
-            font-size: 14px;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .form-control.error, .form-select.error {
-            border-color: #dc3545;
-        }
-
-        .form-control.success, .form-select.success {
-            border-color: #28a745;
-        }
-
-        .error-message {
-            color: #dc3545;
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
-            display: block;
-        }
-
-        .success-message {
-            color: #28a745;
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
-            display: block;
-        }
-
-        textarea.form-control {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .form-footer {
-            text-align: center;
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid #e9ecef;
-        }
-
-        .form-footer a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .form-footer a:hover {
-            text-decoration: underline;
-        }
-
-        .password-requirements {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 0.5rem;
-            font-size: 0.85rem;
-        }
-
-        .password-requirements ul {
-            margin: 0.5rem 0 0 1rem;
-            color: #666;
-        }
-
-        .password-requirements .valid {
-            color: #28a745;
-        }
-
-        .password-requirements .invalid {
-            color: #dc3545;
-        }
-
-        /* Notification System */
-        .notification-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 3000;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            max-width: 400px;
-        }
-
-        .notification {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            padding: 1rem 1.25rem;
-            border-left: 4px solid #667eea;
-            transform: translateX(100%);
-            opacity: 0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            min-width: 300px;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-            opacity: 1;
-        }
-
-        .notification-content {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            flex: 1;
-        }
-
-        .notification i:first-child {
-            font-size: 1.25rem;
-            flex-shrink: 0;
-        }
-
-        .notification-message {
-            font-size: 0.875rem;
-            color: #333;
-            line-height: 1.4;
-        }
-
-        .notification-close {
-            background: none;
-            border: none;
-            color: #666;
-            cursor: pointer;
-            padding: 0.25rem;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            flex-shrink: 0;
-        }
-
-        .notification-close:hover {
-            background: #f8f9fa;
-            color: #333;
-        }
-
-        .notification-success {
-            border-left-color: #28a745;
-        }
-
-        .notification-success i:first-child {
-            color: #28a745;
-        }
-
-        .notification-error {
-            border-left-color: #dc3545;
-        }
-
-        .notification-error i:first-child {
-            color: #dc3545;
-        }
-
-        .notification-warning {
-            border-left-color: #f59e0b;
-        }
-
-        .notification-warning i:first-child {
-            color: #f59e0b;
-        }
-
-        .notification-info {
-            border-left-color: #667eea;
-        }
-
-        .notification-info i:first-child {
-            color: #667eea;
-        }
-
-        .password-input-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .password-toggle {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #666;
-            font-size: 1.2rem;
-            padding: 5px;
-            z-index: 10;
-            transition: color 0.3s ease;
-        }
-
-        .password-toggle:hover {
-            color: #667eea;
-        }
-
-        .password-toggle:focus {
-            outline: none;
-            color: #667eea;
-        }
-
-        .loading {
-            opacity: 0.6;
-            pointer-events: none;
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-                gap: 0;
-            }
-            .welcome-card[style*="max-width: calc(50% - 12px)"] {
-                max-width: 100% !important;
-            }
-        }
-        /* Always reserve space for state/city dropdowns */
-        #state-container, #city-container {
-            position: relative;
-            min-height: 80px;
-            width: 100%;
-        }
-        #state-container[style*="display: none"], #city-container[style*="display: none"] {
-            visibility: hidden !important;
-            position: absolute !important;
-        }
-    </style>
-</head>
+    
 <body>
     <!-- New Navbar will be created by JavaScript -->
 
@@ -413,66 +42,66 @@
                         <h2>👤 Username & 🔐 Password</h2>
                         <p>Enter your account credentials</p>
                         
-                        <!-- Real Name and Email -->
+                        <!-- Name and Email -->
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="real-name" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500;">Real Name *</label>
+                                <label for="real-name" class="register-form-label">Name *</label>
                                 <input type="text" id="real-name" name="real_name" 
                                        minlength="2" maxlength="100" required 
                                        placeholder="Enter your full name"
-                                       style="width: 100%; max-width: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                                       class="register-form-input">
                                 <div class="error-message" id="real-name-error"></div>
-                                <small style="display: block; margin-top: 0.25rem; color: #6c757d; font-size: 0.85rem;">
+                                <small class="helper-text">
                                     Only letters are accepted (2-100 characters)
                                 </small>
                             </div>
                             <div class="form-group">
-                                <label for="email" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500;">Email *</label>
+                                <label for="email" class="register-form-label">Email *</label>
                                 <input type="email" id="email" name="email" 
                                        maxlength="25" required placeholder="your@email.com"
-                                       style="width: 100%; max-width: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                                       class="register-form-input">
                                 <div class="error-message" id="email-error"></div>
                                 <div class="success-message" id="email-success"></div>
                             </div>
                         </div>
 
                         <!-- Password -->
-                        <div style="margin-bottom: 16px; position: relative;">
-                            <label for="password" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500; position: relative;">
+                        <div class="form-group-wrapper">
+                            <label for="password" class="register-form-label" style="position: relative;">
                                 Password: *
-                                <button type="button" onclick="togglePasswordRequirements(event)" style="background: none; border: none; color: #667eea; cursor: pointer; margin-left: 8px; font-size: 16px; padding: 0; position: relative;" title="Show password requirements">
+                                <button type="button" class="info-button" id="password-info-btn" title="Show password requirements">
                                     <i class="fas fa-info-circle" id="password-info-icon"></i>
                                 </button>
-                                <div id="passwordRequirements" style="display: none; position: absolute; bottom: calc(100% + 8px); left: 0; z-index: 1000; background: #667eea; color: white; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.875rem; max-width: 400px; min-width: 280px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); line-height: 1.4;">
-                                    <div style="display: flex; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.5rem;">
-                                        <i class="fas fa-info-circle" style="font-size: 0.9rem; flex-shrink: 0; margin-top: 0.05rem;"></i>
+                                <div id="passwordRequirements" class="tooltip-popup">
+                                    <div class="tooltip-popup-content">
+                                        <i class="fas fa-info-circle tooltip-popup-icon"></i>
                                         <div>
-                                            <div style="font-weight: 600; margin-bottom: 0.5rem;">Password must contain:</div>
-                                            <ul style="margin: 0; padding-left: 1.2rem; list-style: none;">
-                                                <li id="length" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-                                                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #28a745;"></span>
+                                            <div class="tooltip-popup-title">Password must contain:</div>
+                                            <ul class="tooltip-popup-list">
+                                                <li id="length" class="tooltip-popup-item">
+                                                    <span class="tooltip-popup-indicator valid"></span>
                                                     <span>5-12 characters</span>
                                                 </li>
-                                                <li id="uppercase" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-                                                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #dc3545;"></span>
+                                                <li id="uppercase" class="tooltip-popup-item">
+                                                    <span class="tooltip-popup-indicator invalid"></span>
                                                     <span>At least one uppercase letter</span>
                                                 </li>
-                                                <li id="number" style="display: flex; align-items: center; gap: 0.5rem;">
-                                                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #28a745;"></span>
+                                                <li id="number" class="tooltip-popup-item">
+                                                    <span class="tooltip-popup-indicator valid"></span>
                                                     <span>At least one number</span>
                                                 </li>
                                             </ul>
                                         </div>
                                     </div>
-                                    <div style="position: absolute; top: 100%; left: 20px; border: 6px solid transparent; border-top-color: #667eea;"></div>
+                                    <div class="tooltip-popup-arrow"></div>
                                 </div>
                             </label>
                             <div class="password-input-container">
                                 <input type="password" id="password" name="password" 
                                        minlength="5" maxlength="12" required 
                                        placeholder="5-12 characters with uppercase and number"
-                                       style="width: 100%; max-width: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
-                                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password', 'password-eye')">
+                                       class="register-form-input">
+                                <button type="button" class="password-toggle" id="password-toggle-btn">
                                     <i class="fas fa-eye" id="password-eye"></i>
                                 </button>
                             </div>
@@ -480,14 +109,14 @@
                         </div>
 
                         <!-- Confirm Password -->
-                        <div style="margin-bottom: 20px;">
-                            <label for="confirm-password" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500;">Confirm Password *</label>
+                        <div class="form-group-wrapper form-group-wrapper-large">
+                            <label for="confirm-password" class="register-form-label">Confirm Password *</label>
                             <div class="password-input-container">
                                 <input type="password" id="confirm-password" name="confirmPassword" 
                                        minlength="5" maxlength="12" required 
                                        placeholder="Re-enter your password"
-                                       style="width: 100%; max-width: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
-                                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('confirm-password', 'confirm-password-eye')">
+                                       class="register-form-input">
+                                <button type="button" class="password-toggle" id="confirm-password-toggle-btn">
                                     <i class="fas fa-eye" id="confirm-password-eye"></i>
                                 </button>
                             </div>
@@ -501,27 +130,28 @@
                         
                         <!-- Birthdate and Gender -->
                         <div class="form-row">
-                            <div class="form-group" style="margin-bottom: 16px;">
-                                <label for="birthdate" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500;">Birthdate *</label>
+                            <div class="form-group form-group-wrapper">
+                                <label for="birthdate" class="register-form-label">Birthdate *</label>
                                 <input type="date" id="birthdate" name="birthdate" required
                                        placeholder="dd/mm/yyyy"
-                                       style="width: 100%; max-width: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                                       class="register-form-input">
                                 <div class="error-message" id="birthdate-error"></div>
                             </div>
-                            <div class="form-group" style="margin-bottom: 16px; position: relative;">
-                                <label for="gender" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500; position: relative;">
+                            <div class="form-group form-group-wrapper">
+                                <label for="gender" class="register-form-label" style="position: relative;">
                                     Gender: *
-                                    <button type="button" onclick="toggleGenderInfo(event)" style="background: none; border: none; color: #667eea; cursor: pointer; margin-left: 8px; font-size: 16px; padding: 0; position: relative;" title="Show gender information">
+                                    <button type="button" class="info-button" id="gender-info-btn" title="Show gender information">
                                         <i class="fas fa-info-circle" id="gender-info-icon"></i>
                                     </button>
-                                    <div id="genderInfo" style="display: none; position: absolute; bottom: calc(100% + 8px); left: 0; z-index: 1000; background: #667eea; color: white; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.875rem; max-width: 400px; min-width: 320px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); line-height: 1.4; align-items: flex-start; gap: 0.5rem;">
-                                        <i class="fas fa-info-circle" style="font-size: 0.9rem; flex-shrink: 0; margin-top: 0.05rem;"></i>
-                                        <span>Gender cannot be changed after registration. Contact support if you need assistance.</span>
-                                        <div style="position: absolute; top: 100%; left: 20px; border: 6px solid transparent; border-top-color: #667eea;"></div>
+                                    <div id="genderInfo" class="tooltip-popup tooltip-popup-wide">
+                                        <div class="tooltip-popup-content">
+                                            <i class="fas fa-info-circle tooltip-popup-icon"></i>
+                                            <span>Gender cannot be changed after registration. Contact support if you need assistance.</span>
+                                        </div>
+                                        <div class="tooltip-popup-arrow"></div>
                                     </div>
                                 </label>
-                                <select id="gender" name="gender" required
-                                        style="width: 100%; max-width: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                                <select id="gender" name="gender" required class="register-form-input">
                                     <option value="">Select Gender</option>
                                     <option value="male">Male</option>
                                     <option value="female">Female</option>
@@ -531,30 +161,27 @@
                         </div>
 
                         <!-- Country -->
-                        <div style="margin-bottom: 16px;">
-                            <label for="country" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500;">Country *</label>
-                            <select id="country" name="country" required
-                                    style="width: 100%; max-width: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                        <div class="form-group-wrapper">
+                            <label for="country" class="register-form-label">Country *</label>
+                            <select id="country" name="country" required class="register-form-input">
                                 <option value="">Loading countries...</option>
                             </select>
                             <div class="error-message" id="country-error"></div>
                         </div>
 
                         <!-- State -->
-                        <div id="state-container" style="display: none; margin-bottom: 16px;">
-                            <label for="state" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500;">State</label>
-                            <select id="state" name="state"
-                                    style="width: 100%; max-width: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                        <div id="state-container" class="form-group-wrapper" style="display: none;">
+                            <label for="state" class="register-form-label">State</label>
+                            <select id="state" name="state" class="register-form-input">
                                 <option value="">Select State First</option>
                             </select>
                             <div class="error-message" id="state-error"></div>
                         </div>
 
                         <!-- City -->
-                        <div id="city-container" style="display: none; margin-bottom: 20px;">
-                            <label for="city" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500;">City</label>
-                            <select id="city" name="city"
-                                    style="width: 100%; max-width: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                        <div id="city-container" class="form-group-wrapper form-group-wrapper-large" style="display: none;">
+                            <label for="city" class="register-form-label">City</label>
+                            <select id="city" name="city" class="register-form-input">
                                 <option value="">Select City First</option>
                             </select>
                             <div class="error-message" id="city-error"></div>
@@ -563,171 +190,32 @@
                 </div>
 
                 <!-- I'm looking for Section -->
-                <div class="welcome-card" style="max-width: calc(50% - 12px); margin-left: auto; margin-right: auto;">
+                <div class="welcome-card max-width-center">
                     <h2>💕 I'm looking for:</h2>
                     <p>Set your preferences for matches</p>
                     
                     <!-- Age Preferences -->
                     <div class="form-row">
-                        <div class="form-group" style="margin-bottom: 16px;">
-                            <label for="age_min" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500;">Minimum Age *</label>
-                            <select id="age_min" name="age_min" required
-                                    style="width: 100%; max-width: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
-                                <option value="">Select Minimum Age</option>
-                                <option value="18">18</option>
-                                <option value="19">19</option>
-                                <option value="20">20</option>
-                                <option value="21">21</option>
-                                <option value="22">22</option>
-                                <option value="23">23</option>
-                                <option value="24">24</option>
-                                <option value="25">25</option>
-                                <option value="26">26</option>
-                                <option value="27">27</option>
-                                <option value="28">28</option>
-                                <option value="29">29</option>
-                                <option value="30">30</option>
-                                <option value="31">31</option>
-                                <option value="32">32</option>
-                                <option value="33">33</option>
-                                <option value="34">34</option>
-                                <option value="35">35</option>
-                                <option value="36">36</option>
-                                <option value="37">37</option>
-                                <option value="38">38</option>
-                                <option value="39">39</option>
-                                <option value="40">40</option>
-                                <option value="41">41</option>
-                                <option value="42">42</option>
-                                <option value="43">43</option>
-                                <option value="44">44</option>
-                                <option value="45">45</option>
-                                <option value="46">46</option>
-                                <option value="47">47</option>
-                                <option value="48">48</option>
-                                <option value="49">49</option>
-                                <option value="50">50</option>
-                                <option value="51">51</option>
-                                <option value="52">52</option>
-                                <option value="53">53</option>
-                                <option value="54">54</option>
-                                <option value="55">55</option>
-                                <option value="56">56</option>
-                                <option value="57">57</option>
-                                <option value="58">58</option>
-                                <option value="59">59</option>
-                                <option value="60">60</option>
-                                <option value="61">61</option>
-                                <option value="62">62</option>
-                                <option value="63">63</option>
-                                <option value="64">64</option>
-                                <option value="65">65</option>
-                                <option value="66">66</option>
-                                <option value="67">67</option>
-                                <option value="68">68</option>
-                                <option value="69">69</option>
-                                <option value="70">70</option>
-                                <option value="71">71</option>
-                                <option value="72">72</option>
-                                <option value="73">73</option>
-                                <option value="74">74</option>
-                                <option value="75">75</option>
-                                <option value="76">76</option>
-                                <option value="77">77</option>
-                                <option value="78">78</option>
-                                <option value="79">79</option>
-                                <option value="80">80</option>
-                                <option value="81">81</option>
-                                <option value="82">82</option>
-                                <option value="83">83</option>
-                                <option value="84">84</option>
-                                <option value="85">85+</option>
-                            </select>
+                        <div class="form-group form-group-wrapper">
+                            <label for="age_min" class="register-form-label">Minimum Age *</label>
+                            <input type="number" id="age_min" name="age_min" required
+                                   min="18" max="100" placeholder="Min"
+                                   class="register-form-input">
                             <div class="error-message" id="age_min-error"></div>
                         </div>
-                        <div class="form-group" style="margin-bottom: 16px;">
-                            <label for="age_max" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500;">Maximum Age *</label>
-                            <select id="age_max" name="age_max" required
-                                    style="width: 100%; max-width: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
-                                <option value="">Select Maximum Age</option>
-                                <option value="18">18</option>
-                                <option value="19">19</option>
-                                <option value="20">20</option>
-                                <option value="21">21</option>
-                                <option value="22">22</option>
-                                <option value="23">23</option>
-                                <option value="24">24</option>
-                                <option value="25">25</option>
-                                <option value="26">26</option>
-                                <option value="27">27</option>
-                                <option value="28">28</option>
-                                <option value="29">29</option>
-                                <option value="30">30</option>
-                                <option value="31">31</option>
-                                <option value="32">32</option>
-                                <option value="33">33</option>
-                                <option value="34">34</option>
-                                <option value="35">35</option>
-                                <option value="36">36</option>
-                                <option value="37">37</option>
-                                <option value="38">38</option>
-                                <option value="39">39</option>
-                                <option value="40">40</option>
-                                <option value="41">41</option>
-                                <option value="42">42</option>
-                                <option value="43">43</option>
-                                <option value="44">44</option>
-                                <option value="45">45</option>
-                                <option value="46">46</option>
-                                <option value="47">47</option>
-                                <option value="48">48</option>
-                                <option value="49">49</option>
-                                <option value="50">50</option>
-                                <option value="51">51</option>
-                                <option value="52">52</option>
-                                <option value="53">53</option>
-                                <option value="54">54</option>
-                                <option value="55">55</option>
-                                <option value="56">56</option>
-                                <option value="57">57</option>
-                                <option value="58">58</option>
-                                <option value="59">59</option>
-                                <option value="60">60</option>
-                                <option value="61">61</option>
-                                <option value="62">62</option>
-                                <option value="63">63</option>
-                                <option value="64">64</option>
-                                <option value="65">65</option>
-                                <option value="66">66</option>
-                                <option value="67">67</option>
-                                <option value="68">68</option>
-                                <option value="69">69</option>
-                                <option value="70">70</option>
-                                <option value="71">71</option>
-                                <option value="72">72</option>
-                                <option value="73">73</option>
-                                <option value="74">74</option>
-                                <option value="75">75</option>
-                                <option value="76">76</option>
-                                <option value="77">77</option>
-                                <option value="78">78</option>
-                                <option value="79">79</option>
-                                <option value="80">80</option>
-                                <option value="81">81</option>
-                                <option value="82">82</option>
-                                <option value="83">83</option>
-                                <option value="84">84</option>
-                                <option value="85">85+</option>
-                            </select>
+                        <div class="form-group form-group-wrapper">
+                            <label for="age_max" class="register-form-label">Maximum Age *</label>
+                            <input type="number" id="age_max" name="age_max" required
+                                   min="18" max="100" placeholder="Max"
+                                   class="register-form-input">
                             <div class="error-message" id="age_max-error"></div>
                         </div>
                     </div>
 
                     <!-- Preferred Gender -->
-                    <div style="margin-bottom: 20px;">
-                        <label for="preferred_gender" style="display: block; margin-bottom: 6px; color: #333; font-weight: 500;">Preferred Gender *</label>
-                        <select id="preferred_gender" name="preferred_gender" required
-                                style="width: 100%; max-width: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                    <div class="form-group-wrapper form-group-wrapper-large">
+                        <label for="preferred_gender" class="register-form-label">Preferred Gender *</label>
+                        <select id="preferred_gender" name="preferred_gender" required class="register-form-input">
                             <option value="">Select Gender</option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
@@ -737,9 +225,8 @@
                 </div>
 
                 <div class="welcome-card">
-                    <div style="display: flex; gap: 12px; justify-content: center;">
-                        <button type="submit" id="submit-btn" 
-                                style="padding: 10px 24px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; max-width: 400px;">
+                    <div class="button-container">
+                        <button type="submit" id="submit-btn" class="submit-button">
                             Create Account
                         </button>
                     </div>
@@ -755,604 +242,10 @@
     <!-- Notification Container -->
     <div id="notificationContainer" class="notification-container"></div>
 
-    <script src="/assets/js/i-info-tooltip.js"></script>
+    <script src="/assets/js/new/components/i-info-tooltip.js"></script>
     <script src="/assets/js/shared/password-validator.js"></script>
+    <script src="/assets/js/shared/age-validation.js"></script>
 
-    <script>
-        // Custom Notification System
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `notification notification-${type}`;
-            
-            const icon = type === 'success' ? 'fas fa-check-circle' : 
-                        type === 'error' ? 'fas fa-exclamation-circle' : 
-                        type === 'warning' ? 'fas fa-exclamation-triangle' : 
-                        'fas fa-info-circle';
-            
-            notification.innerHTML = `
-                <div class="notification-content">
-                    <i class="${icon}"></i>
-                    <span class="notification-message">${message}</span>
-                </div>
-                <button class="notification-close" onclick="this.parentElement.remove()">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            
-            // Add to notification container
-            const container = document.getElementById('notificationContainer');
-            container.appendChild(notification);
-            
-            // Auto-remove after 5 seconds
-            setTimeout(() => {
-                if (notification.parentElement) {
-                    notification.remove();
-                }
-            }, 5000);
-            
-            // Add entrance animation
-            setTimeout(() => {
-                notification.classList.add('show');
-            }, 10);
-        }
-
-        // Password visibility toggle function
-        function togglePasswordVisibility(inputId, eyeId) {
-            const passwordInput = document.getElementById(inputId);
-            const passwordEye = document.getElementById(eyeId);
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                passwordEye.className = 'fas fa-eye-slash';
-            } else {
-                passwordInput.type = 'password';
-                passwordEye.className = 'fas fa-eye';
-            }
-        }
-
-        let countries = [];
-        // Removed real_nameCheckTimer - real_name doesn't need uniqueness checking
-        let emailCheckTimer = null;
-
-        // Initialize form
-        document.addEventListener('DOMContentLoaded', function() {
-            loadCountries();
-            setupEventListeners();
-            setDateLimits();
-            
-            // Initialize password validator
-            PasswordValidator.init({
-                passwordInputId: 'password',
-                requirementsId: 'passwordRequirements'
-            });
-        });
-        
-        // Wrapper function for inline onclick
-        function togglePasswordRequirements(event) {
-            PasswordValidator.toggleRequirements(event, 'passwordRequirements');
-        }
-
-        function setupEventListeners() {
-            // Real name validation
-            const realNameField = document.getElementById('real-name');
-            if (realNameField) {
-                // Prevent non-letter characters from being entered and capitalize first letter
-                realNameField.addEventListener('input', function(e) {
-                    // Remove any non-letter characters
-                    const originalValue = this.value;
-                    const filteredValue = originalValue.replace(/[^a-zA-Z]/g, '');
-                    
-                    let finalValue = filteredValue;
-                    // Capitalize first letter if there's any text (keep rest as typed)
-                    if (finalValue.length > 0) {
-                        finalValue = finalValue.charAt(0).toUpperCase() + finalValue.slice(1);
-                    }
-                    
-                    if (originalValue !== finalValue) {
-                        const cursorPos = this.selectionStart;
-                        this.value = finalValue;
-                        // Restore cursor position (adjust for removed characters)
-                        const lengthDiff = originalValue.length - finalValue.length;
-                        const newPos = Math.max(0, cursorPos - lengthDiff);
-                        this.setSelectionRange(newPos, newPos);
-                    }
-                    
-                    validateRealName();
-                });
-                
-                // Also prevent paste of non-letter characters and capitalize first letter
-                realNameField.addEventListener('paste', function(e) {
-                    e.preventDefault();
-                    const pastedText = (e.clipboardData || window.clipboardData).getData('text');
-                    let filteredText = pastedText.replace(/[^a-zA-Z]/g, '');
-                    const start = this.selectionStart;
-                    const end = this.selectionEnd;
-                    const currentValue = this.value;
-                    const newValue = currentValue.substring(0, start) + filteredText + currentValue.substring(end);
-                    // Capitalize first letter of the entire value (keep rest as typed)
-                    const finalValue = newValue.length > 0 ? newValue.charAt(0).toUpperCase() + newValue.slice(1) : newValue;
-                    this.value = finalValue;
-                    this.setSelectionRange(start + filteredText.length, start + filteredText.length);
-                    validateRealName();
-                });
-                
-                // Prevent typing non-letter characters
-                realNameField.addEventListener('keypress', function(e) {
-                    const char = String.fromCharCode(e.which || e.keyCode);
-                    if (!/^[a-zA-Z]$/.test(char)) {
-                        e.preventDefault();
-                    }
-                });
-            }
-            
-            // Email validation with real-time checking
-            document.getElementById('email').addEventListener('input', function() {
-                clearTimeout(emailCheckTimer);
-                emailCheckTimer = setTimeout(() => checkEmailAvailability(), 500);
-                validateEmail();
-            });
-            
-            // Password validation
-            document.getElementById('password').addEventListener('input', function() {
-                PasswordValidator.updateIndicators('password', 'passwordRequirements');
-                validatePasswordMatch();
-            });
-            
-            // Confirm password validation
-            document.getElementById('confirm-password').addEventListener('input', validatePasswordMatch);
-            
-            // Country/State/City cascading
-            document.getElementById('country').addEventListener('change', onCountryChange);
-            document.getElementById('state').addEventListener('change', onStateChange);
-            
-            // Form submission
-            document.getElementById('registerForm').addEventListener('submit', onFormSubmit);
-            
-            // Age validation
-            document.getElementById('age_min').addEventListener('change', validateAgeRange);
-            document.getElementById('age_max').addEventListener('change', validateAgeRange);
-        }
-
-        async function loadCountries() {
-            try {
-                const response = await fetch('/api/countries');
-                const data = await response.json();
-                
-                if (data.success) {
-                    countries = data.countries;
-                    populateCountrySelects();
-                } else {
-                    console.error('Failed to load countries:', data.error);
-                    showError('country', 'Failed to load countries');
-                }
-            } catch (error) {
-                console.error('Error loading countries:', error);
-                showError('country', 'Failed to load countries');
-            }
-        }
-
-        function populateCountrySelects() {
-            const countrySelect = document.getElementById('country');
-
-            // Clear existing options
-            countrySelect.innerHTML = '<option value="">Select Country</option>';
-
-            countries.forEach(country => {
-                const option1 = new Option(country.name, country.id);
-                countrySelect.add(option1);
-            });
-        }
-
-        async function onCountryChange() {
-            const countryId = document.getElementById('country').value;
-            const stateSelect = document.getElementById('state');
-            const citySelect = document.getElementById('city');
-            const stateContainer = document.getElementById('state-container');
-            const cityContainer = document.getElementById('city-container');
-
-            console.log('🌍 Country changed to:', countryId);
-
-            // Clear state and city
-            stateSelect.innerHTML = '<option value="">Select State First</option>';
-            citySelect.innerHTML = '<option value="">Select City First</option>';
-            stateContainer.style.display = 'none';
-            cityContainer.style.display = 'none';
-
-            if (countryId) {
-                try {
-                    console.log('🔄 Loading states for country:', countryId);
-                    stateSelect.innerHTML = '<option value="">Loading states...</option>';
-                    const response = await fetch(`/api/states?country_id=${countryId}`);
-                    const data = await response.json();
-
-                    console.log('📡 States API response:', data);
-
-                    if (data.success && data.states.length > 0) {
-                        stateSelect.innerHTML = '<option value="">Select State</option>';
-                        data.states.forEach(state => {
-                            stateSelect.add(new Option(state.name, state.id));
-                        });
-                        stateContainer.style.display = 'block';
-                        console.log('✅ States loaded successfully, showing state container');
-                    } else {
-                        stateSelect.innerHTML = '<option value="">No states available</option>';
-                        console.log('⚠️ No states found for country:', countryId);
-                    }
-                } catch (error) {
-                    console.error('❌ Error loading states:', error);
-                    stateSelect.innerHTML = '<option value="">Error loading states</option>';
-                }
-            }
-        }
-
-        async function onStateChange() {
-            const stateId = document.getElementById('state').value;
-            const citySelect = document.getElementById('city');
-            const cityContainer = document.getElementById('city-container');
-
-            citySelect.innerHTML = '<option value="">Select City First</option>';
-            cityContainer.style.display = 'none';
-
-            if (stateId) {
-                try {
-                    citySelect.innerHTML = '<option value="">Loading cities...</option>';
-                    const response = await fetch(`/api/cities?state_id=${stateId}`);
-                    const data = await response.json();
-
-                    if (data.success && data.cities.length > 0) {
-                        citySelect.innerHTML = '<option value="">Select City</option>';
-                        data.cities.forEach(city => {
-                            citySelect.add(new Option(city.name, city.id));
-                        });
-                        cityContainer.style.display = 'block';
-                    } else {
-                        citySelect.innerHTML = '<option value="">No cities available</option>';
-                    }
-                } catch (error) {
-                    console.error('Error loading cities:', error);
-                    citySelect.innerHTML = '<option value="">Error loading cities</option>';
-                }
-            }
-        }
-
-        async function checkEmailAvailability() {
-            const email = document.getElementById('email').value;
-            const emailField = document.getElementById('email');
-            const errorEl = document.getElementById('email-error');
-            const successEl = document.getElementById('email-success');
-            
-            if (!email || !email.includes('@')) return;
-            
-            try {
-                const response = await fetch(`/api/check-email?email=${encodeURIComponent(email)}`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    if (data.available) {
-                        emailField.classList.remove('error');
-                        emailField.classList.add('success');
-                        errorEl.textContent = '';
-                        successEl.textContent = 'Email is available!';
-                    } else {
-                        emailField.classList.remove('success');
-                        emailField.classList.add('error');
-                        successEl.textContent = '';
-                        errorEl.textContent = 'Email is already registered';
-                    }
-                }
-            } catch (error) {
-                console.error('Error checking email:', error);
-            }
-        }
-
-        function validateRealName() {
-            const realName = document.getElementById('real-name').value.trim();
-            const realNameField = document.getElementById('real-name');
-            const errorEl = document.getElementById('real-name-error');
-            
-            if (realName.length === 0) {
-                realNameField.classList.remove('error', 'success');
-                errorEl.textContent = '';
-                return;
-            }
-            
-            if (realName.length < 2 || realName.length > 100) {
-                realNameField.classList.add('error');
-                realNameField.classList.remove('success');
-                errorEl.textContent = 'Real name must be between 2 and 100 characters';
-            } else if (!/^[a-zA-Z]{2,100}$/.test(realName)) {
-                realNameField.classList.add('error');
-                realNameField.classList.remove('success');
-                errorEl.textContent = 'Name can only contain letters';
-            } else {
-                realNameField.classList.remove('error');
-                realNameField.classList.add('success');
-                errorEl.textContent = '';
-            }
-        }
-
-        function validateEmail() {
-            const email = document.getElementById('email').value;
-            const emailField = document.getElementById('email');
-            const errorEl = document.getElementById('email-error');
-            
-            if (email.length === 0) {
-                emailField.classList.remove('error', 'success');
-                errorEl.textContent = '';
-                return;
-            }
-            
-            if (email.length > 25 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                emailField.classList.add('error');
-                emailField.classList.remove('success');
-                errorEl.textContent = 'Please enter a valid email (max 25 characters)';
-            } else {
-                emailField.classList.remove('error');
-                errorEl.textContent = '';
-            }
-        }
-
-        function validatePassword() {
-            return PasswordValidator.updateIndicators('password', 'passwordRequirements');
-        }
-
-        function validatePasswordMatch() {
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            const confirmPasswordField = document.getElementById('confirm-password');
-            const errorEl = document.getElementById('confirm-password-error');
-            
-            if (confirmPassword.length === 0) {
-                confirmPasswordField.classList.remove('error', 'success');
-                errorEl.textContent = '';
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                confirmPasswordField.classList.add('error');
-                confirmPasswordField.classList.remove('success');
-                errorEl.textContent = 'Passwords do not match';
-            } else {
-                confirmPasswordField.classList.remove('error');
-                confirmPasswordField.classList.add('success');
-                errorEl.textContent = '';
-            }
-        }
-
-        function validateAgeRange() {
-            const minAge = parseInt(document.getElementById('age_min').value);
-            const maxAge = parseInt(document.getElementById('age_max').value);
-
-            if (minAge && maxAge && minAge > maxAge) {
-                showError('age_max', 'Maximum age must be greater than minimum age');
-            } else {
-                clearError('age_max');
-            }
-        }        function setDateLimits() {
-            const birthdateInput = document.getElementById('birthdate');
-            const today = new Date();
-            const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
-            const minDate = new Date(today.getFullYear() - 120, today.getMonth(), today.getDate());
-            
-            birthdateInput.max = maxDate.toISOString().split('T')[0];
-            birthdateInput.min = minDate.toISOString().split('T')[0];
-        }
-
-        async function onFormSubmit(e) {
-            e.preventDefault();
-            
-            const submitBtn = document.getElementById('submit-btn');
-            const originalText = submitBtn.textContent;
-            
-            // Disable submit button and show loading
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner"></span> Creating Account...';
-            
-            try {
-                if (!validateForm()) {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = originalText;
-                    return;
-                }
-                
-                const formData = new FormData(document.getElementById('registerForm'));
-                const data = Object.fromEntries(formData);
-                
-                const response = await fetch('/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    // Check if email verification is required
-                    if (result.requiresEmailVerification) {
-                        // Show email verification message
-                        const emailVerificationHTML = `
-                            <div style="max-width: 600px; margin: 50px auto; padding: 30px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center;">
-                                <div style="font-size: 48px; margin-bottom: 20px;">📧</div>
-                                <h2 style="color: #667eea; margin-bottom: 15px;">Check Your Email!</h2>
-                                <p style="color: #666; margin-bottom: 20px; line-height: 1.6;">
-                                    We've sent a verification email to <strong>${result.user.email}</strong>. 
-                                    Please click the link in the email to verify your account.
-                                </p>
-                                <p style="color: #667eea; font-size: 14px; margin-bottom: 15px; font-weight: 500;">
-                                    💡 You can log in and explore the app now. Email verification helps secure your account.
-                                </p>
-                                <p style="color: #999; font-size: 14px; margin-bottom: 30px;">
-                                    Didn't receive the email? Check your spam folder or click the button below to resend.
-                                </p>
-                                <button id="resendVerificationBtn" style="padding: 12px 30px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-right: 10px;">
-                                    Resend Verification Email
-                                </button>
-                                <a href="/login" style="display: inline-block; padding: 12px 30px; background: #f0f0f0; color: #333; text-decoration: none; border-radius: 5px; font-size: 16px;">
-                                    Go to Login
-                                </a>
-                            </div>
-                        `;
-                        
-                        // Replace form with verification message
-                        document.getElementById('registerForm').parentElement.innerHTML = emailVerificationHTML;
-                        
-                        // Add resend verification handler
-                        document.getElementById('resendVerificationBtn').addEventListener('click', async function() {
-                            const btn = this;
-                            const originalText = btn.textContent;
-                            btn.disabled = true;
-                            btn.textContent = 'Sending...';
-                            
-                            try {
-                                const resendResponse = await fetch('/api/resend-verification', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                    },
-                                    body: JSON.stringify({ email: result.user.email })
-                                });
-                                
-                                const resendResult = await resendResponse.json();
-                                
-                                if (resendResult.success) {
-                                    showNotification('Verification email sent! Please check your inbox.', 'success');
-                                } else {
-                                    showNotification('Failed to resend email: ' + (resendResult.error || 'Unknown error'), 'error');
-                                }
-                            } catch (error) {
-                                console.error('Resend verification error:', error);
-                                showNotification('Failed to resend email. Please try again later.', 'error');
-                            } finally {
-                                btn.disabled = false;
-                                btn.textContent = originalText;
-                            }
-                        });
-                        
-                        showNotification('Registration successful! Please check your email to verify your account.', 'success');
-                    } else {
-                        // Old behavior - auto-login (for backward compatibility)
-                        if (window.sessionManager) {
-                            if (result.sessionToken) {
-                                window.sessionManager.setToken(result.sessionToken, 60);
-                            }
-                            if (result.user) {
-                                window.sessionManager.setCurrentUser(result.user);
-                            }
-                        }
-                        
-                        showNotification('Registration successful! Welcome to Totilove!', 'success');
-                        setTimeout(() => {
-                            window.location.href = '/profile-full?token=' + encodeURIComponent(result.sessionToken);
-                        }, 1500);
-                    }
-                } else {
-                    if (result.errors) {
-                        result.errors.forEach(error => {
-                            console.error('Registration error:', error);
-                        });
-                        showNotification('Registration failed: ' + result.errors.join(', '), 'error');
-                    } else {
-                        showNotification('Registration failed: ' + (result.error || 'Unknown error'), 'error');
-                    }
-                }
-            } catch (error) {
-                console.error('Registration error:', error);
-                showNotification('Registration failed. Please try again.', 'error');
-            } finally {
-                // Re-enable submit button
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalText;
-            }
-        }
-
-        function validateForm() {
-            let isValid = true;
-            
-            // Clear all errors
-            document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
-            document.querySelectorAll('input, select').forEach(el => el.classList.remove('error'));
-            
-            // Check all required fields
-            const requiredFields = ['real_name', 'email', 'password', 'confirm-password', 'birthdate', 'gender', 'country', 'preferred_gender'];
-            requiredFields.forEach(field => {
-                const fieldElement = document.getElementById(field);
-                if (!fieldElement) {
-                    console.warn('Field not found:', field);
-                    return;
-                }
-                const value = fieldElement.value;
-                if (!value || (typeof value === 'string' && value.trim() === '')) {
-                    showError(field, 'This field is required');
-                    isValid = false;
-                }
-            });
-            
-            // Validate password match and requirements
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            if (password && confirmPassword && password !== confirmPassword) {
-                showError('confirm-password', 'Passwords do not match');
-                isValid = false;
-            }
-            
-            // Validate password requirements
-            if (password) {
-                const passwordError = PasswordValidator.validateWithMessage(password);
-                if (passwordError) {
-                    showError('password', passwordError);
-                    isValid = false;
-                }
-            }
-            
-            // Validate birthdate age
-            const birthdate = document.getElementById('birthdate').value;
-            if (birthdate) {
-                const age = calculateAge(new Date(birthdate));
-                if (age < 18) {
-                    showError('birthdate', 'You must be at least 18 years old');
-                    isValid = false;
-                }
-            }
-            
-            // Validate age preferences
-            const minAge = parseInt(document.getElementById('age_min').value);
-            const maxAge = parseInt(document.getElementById('age_max').value);
-            if (minAge > maxAge) {
-                showError('age_max', 'Maximum age must be greater than minimum age');
-                isValid = false;
-            }
-            
-            return isValid;
-        }
-
-        function showError(fieldId, message) {
-            const field = document.getElementById(fieldId);
-            const errorEl = document.getElementById(fieldId + '-error');
-            
-            if (field) field.classList.add('error');
-            if (errorEl) errorEl.textContent = message;
-        }
-
-        function clearError(fieldId) {
-            const field = document.getElementById(fieldId);
-            const errorEl = document.getElementById(fieldId + '-error');
-            
-            if (field) field.classList.remove('error');
-            if (errorEl) errorEl.textContent = '';
-        }
-
-        function calculateAge(birthDate) {
-            const today = new Date();
-            let age = today.getFullYear() - birthDate.getFullYear();
-            const monthDiff = today.getMonth() - birthDate.getMonth();
-            
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-                age--;
-            }
-            
-            return age;
-        }
-    </script></body>
+    <!-- Register Page JavaScript - Extracted from inline scripts - Phase 1 CSS/JS Extraction -->
+    <script src="/assets/js/new/pages/register.js"></script></body>
 </html>

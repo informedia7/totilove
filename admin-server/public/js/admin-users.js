@@ -6,11 +6,14 @@ let selectedUsers = new Set();
 let currentSort = { field: 'date_joined', order: 'DESC' };
 let currentUsersRequest = null; // For request cancellation
 let itemsPerPage = 50; // Default items per page
+let currentModalUser = null;
+let deleteModalUserId = null;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     loadUsers();
     setupEventListeners();
+    setupDeleteUserModal();
 });
 
 // Setup event listeners
@@ -87,9 +90,13 @@ function setupEventListeners() {
     });
 
     // Modal close
-    document.querySelector('.close')?.addEventListener('click', () => {
-        document.getElementById('userModal').style.display = 'none';
-    });
+    const userModalClose = document.querySelector('#userModal .close');
+    if (userModalClose) {
+        userModalClose.addEventListener('click', () => {
+            document.getElementById('userModal').style.display = 'none';
+            currentModalUser = null;
+        });
+    }
 
     // Sortable table headers
     document.querySelectorAll('.users-table th.sortable').forEach(header => {
@@ -342,6 +349,7 @@ function updateBulkActions() {
 
 // View user
 async function viewUser(userId) {
+    currentModalUser = null;
     const modal = document.getElementById('userModal');
     const modalBody = document.getElementById('userModalBody');
     modal.style.display = 'block';
@@ -356,6 +364,7 @@ async function viewUser(userId) {
         }
 
         const user = data.user;
+        currentModalUser = user;
         modalBody.innerHTML = `
             <h2>User Details: ${escapeHtml(user.real_name || user.username || 'N/A')}</h2>
             <div style="margin-top: 20px;">
@@ -782,35 +791,289 @@ async function blacklistUser(userId) {
     }
 }
 
-// Delete user account (hard delete) - calls DELETE endpoint which permanently deletes the account
-async function deactivateUserAccount(userId) {
-    const confirmMessage = `This action is PERMANENT and IRREVERSIBLE:\n\n` +
-        `This will:\n` +
-        `- Permanently delete the user account\n` +
-        `- Permanently delete ALL messages (sent and received)\n` +
-        `- Permanently delete ALL profile images\n` +
-        `- Permanently delete ALL user data (likes, favorites, matches, etc.)\n` +
-        `- Receivers will see "Account Deactivated" with real name\n\n` +
-        `This action CANNOT be undone. All data will be permanently removed from the database.`;
-    
-    const confirmed = await showConfirm(confirmMessage, '⚠️ HARD DELETE - Confirm Deletion', 'Delete Permanently', 'Cancel', 'danger');
-    if (!confirmed) return;
+// Delete user account (hard delete) using the same multi-step guard as the account page
+function deactivateUserAccount(userId) {
+    openDeleteUserModal(userId);
+}
+
+function setupDeleteUserModal() {
+    const modal = document.getElementById('adminDeleteUserModal');
+    if (!modal) return;
+
+    const closeButtons = modal.querySelectorAll('[data-action="close-delete-modal"]');
+    closeButtons.forEach((button) => button.addEventListener('click', closeDeleteUserModal));
+
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            closeDeleteUserModal();
+        }
+    });
+
+    const continueBtn = document.getElementById('adminDeleteContinueBtn');
+    if (continueBtn) {
+        continueBtn.addEventListener('click', () => {
+            const serverError = document.getElementById('adminDeleteServerError');
+            if (serverError) {
+                serverError.textContent = '';
+                serverError.style.display = 'none';
+            }
+            showDeleteUserStep(2);
+        });
+    }
+
+    const backBtn = document.getElementById('adminDeleteBackBtn');
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            showDeleteUserStep(1);
+        });
+    }
+
+    const confirmBtn = document.getElementById('adminDeleteConfirmBtn');
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', confirmAdminDelete);
+    }
+
+    const input = document.getElementById('adminDeleteConfirmInput');
+    if (input) {
+        input.addEventListener('input', handleDeleteUserInput);
+    }
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && modal.style.display === 'block') {
+            closeDeleteUserModal();
+        }
+    });
+}
+
+function openDeleteUserModal(userId) {
+    const modal = document.getElementById('adminDeleteUserModal');
+    if (!modal) return;
+
+    deleteModalUserId = userId;
+
+    const targetName = currentModalUser?.real_name || currentModalUser?.username || `User #${userId}`;
+    const targetEmail = currentModalUser?.email || 'Not provided';
+
+    const nameEl = document.getElementById('adminDeleteUserName');
+    if (nameEl) nameEl.textContent = targetName;
+
+    const emailEl = document.getElementById('adminDeleteUserEmail');
+    if (emailEl) emailEl.textContent = targetEmail;
+
+    const input = document.getElementById('adminDeleteConfirmInput');
+    if (input) {
+        input.value = '';
+    }
+
+    const inputError = document.getElementById('adminDeleteInputError');
+    if (inputError) {
+        inputError.style.display = 'none';
+    }
+
+    const serverError = document.getElementById('adminDeleteServerError');
+    if (serverError) {
+        serverError.textContent = '';
+        serverError.style.display = 'none';
+    }
+
+    const confirmBtn = document.getElementById('adminDeleteConfirmBtn');
+    if (confirmBtn) {
+        confirmBtn.disabled = true;
+    }
+
+    resetDeleteProcessingState();
+    showDeleteUserStep(1);
+    modal.style.display = 'block';
+}
+
+function closeDeleteUserModal() {
+    const modal = document.getElementById('adminDeleteUserModal');
+    if (!modal) return;
+
+    modal.style.display = 'none';
+    deleteModalUserId = null;
+
+    const input = document.getElementById('adminDeleteConfirmInput');
+    if (input) {
+        input.value = '';
+    }
+
+    const confirmBtn = document.getElementById('adminDeleteConfirmBtn');
+    if (confirmBtn) {
+        confirmBtn.disabled = true;
+    }
+
+    const inputError = document.getElementById('adminDeleteInputError');
+    if (inputError) {
+        inputError.style.display = 'none';
+    }
+
+    const serverError = document.getElementById('adminDeleteServerError');
+    if (serverError) {
+        serverError.textContent = '';
+        serverError.style.display = 'none';
+    }
+
+    showDeleteUserStep(1);
+}
+
+function showDeleteUserStep(step) {
+    const steps = {
+        1: document.getElementById('admin-delete-step1'),
+        2: document.getElementById('admin-delete-step2'),
+        3: document.getElementById('admin-delete-step3')
+    };
+
+    Object.entries(steps).forEach(([key, element]) => {
+        if (element) {
+            element.style.display = parseInt(key, 10) === step ? 'block' : 'none';
+        }
+    });
+
+    if (step === 2) {
+        const input = document.getElementById('adminDeleteConfirmInput');
+        if (input) {
+            input.focus();
+            input.select();
+        }
+    } else {
+        const inputError = document.getElementById('adminDeleteInputError');
+        if (inputError) {
+            inputError.style.display = 'none';
+        }
+        const serverError = document.getElementById('adminDeleteServerError');
+        if (serverError) {
+            serverError.textContent = '';
+            serverError.style.display = 'none';
+        }
+    }
+
+    if (step === 3) {
+        resetDeleteProcessingState();
+    }
+}
+
+function handleDeleteUserInput() {
+    const input = document.getElementById('adminDeleteConfirmInput');
+    const confirmBtn = document.getElementById('adminDeleteConfirmBtn');
+    const inputError = document.getElementById('adminDeleteInputError');
+    if (!input || !confirmBtn) return;
+
+    const value = (input.value || '').trim().toUpperCase();
+    const isValid = value === 'DELETE';
+
+    confirmBtn.disabled = !isValid;
+    if (inputError) {
+        inputError.style.display = !isValid && value.length > 0 ? 'block' : 'none';
+    }
+
+    const serverError = document.getElementById('adminDeleteServerError');
+    if (serverError) {
+        serverError.textContent = '';
+        serverError.style.display = 'none';
+    }
+}
+
+function resetDeleteProcessingState() {
+    const spinner = document.getElementById('adminDeleteSpinner');
+    if (spinner) {
+        spinner.style.display = 'block';
+    }
+
+    const title = document.getElementById('adminDeleteProcessingTitle');
+    if (title) {
+        title.textContent = 'Deleting Account...';
+    }
+
+    const text = document.getElementById('adminDeleteProcessingText');
+    if (text) {
+        text.textContent = 'Please wait while we permanently remove this account.';
+    }
+
+    const resultMessage = document.getElementById('adminDeleteResultMessage');
+    if (resultMessage) {
+        resultMessage.textContent = '';
+        resultMessage.classList.remove('success');
+    }
+}
+
+async function confirmAdminDelete() {
+    if (!deleteModalUserId) return;
+
+    const input = document.getElementById('adminDeleteConfirmInput');
+    if (!input || input.value.trim().toUpperCase() !== 'DELETE') {
+        const inputError = document.getElementById('adminDeleteInputError');
+        if (inputError) {
+            inputError.style.display = 'block';
+        }
+        return;
+    }
+
+    showDeleteUserStep(3);
+
+    const spinner = document.getElementById('adminDeleteSpinner');
+    const resultMessage = document.getElementById('adminDeleteResultMessage');
+    const title = document.getElementById('adminDeleteProcessingTitle');
+    const text = document.getElementById('adminDeleteProcessingText');
+
+    if (resultMessage) {
+        resultMessage.textContent = '';
+        resultMessage.classList.remove('success');
+    }
 
     try {
-        const response = await fetch(`/api/users/${userId}`, {
+        const response = await fetch(`/api/users/${deleteModalUserId}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' }
         });
 
-        const data = await response.json();
-        if (data.success) {
-            showSuccess('User account permanently deleted.\n\nAll user data has been removed. Receivers will see "Account Deactivated" in their conversation list.');
-            document.getElementById('userModal').style.display = 'none';
-            loadUsers();
-        } else {
-            showError('Error: ' + (data.error || 'Failed to delete account'));
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (jsonError) {
+            data = {};
         }
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.error || `Server error (${response.status})`);
+        }
+
+        if (spinner) {
+            spinner.style.display = 'none';
+        }
+
+        if (title) {
+            title.textContent = 'Account Deleted';
+        }
+
+        if (text) {
+            text.textContent = 'The user has been permanently removed.';
+        }
+
+        if (resultMessage) {
+            resultMessage.innerHTML = '✅ Account deleted. All user data has been purged.';
+            resultMessage.classList.add('success');
+        }
+
+        showSuccess('User account permanently deleted.');
+
+        setTimeout(() => {
+            closeDeleteUserModal();
+            const userModal = document.getElementById('userModal');
+            if (userModal) {
+                userModal.style.display = 'none';
+            }
+            currentModalUser = null;
+            loadUsers();
+        }, 1500);
     } catch (error) {
+        const serverError = document.getElementById('adminDeleteServerError');
+        if (serverError) {
+            serverError.textContent = `Failed to delete account: ${error.message}`;
+            serverError.style.display = 'block';
+        }
+        showDeleteUserStep(2);
+        handleDeleteUserInput();
         showError('Error: ' + error.message);
     }
 }

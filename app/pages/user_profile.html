@@ -590,8 +590,21 @@
             document.getElementById('profile-location').textContent = profile.location || 'Unknown location';
             document.getElementById('profile-age').textContent = profile.age ? `${profile.age} years old` : 'Unknown';
             
-            // Status
-            UserStatus.updateUserStatus('status-text', profile.id, {showLastSeen:true});
+            // Status (Presence-driven)
+            const statusElement = document.getElementById('status-text');
+            if (statusElement) {
+                if (window.Presence?.bindIndicator) {
+                    window.Presence.bindIndicator(statusElement, profile.id, {
+                        variant: 'pill',
+                        showLastSeen: true,
+                        onlineText: 'Online now',
+                        offlineText: 'Offline'
+                    });
+                } else {
+                    statusElement.textContent = profile.is_online ? 'Online now' : 'Offline';
+                    statusElement.style.display = 'inline-flex';
+                }
+            }
             
             // Info section
             document.getElementById('info-real_name').textContent = profile.real_name || profile.name || 'Unknown';
@@ -930,20 +943,11 @@
             }, 1000);
             
             loadProfile();
-            
-            // Initialize online tracking for user profile page
-            if (window.onlineTracker && window.currentUser?.id) {
-                console.log('👤 User Profile: Ensuring online tracking is active');
-                if (!window.onlineTracker.getStatus().isRunning) {
-                    window.onlineTracker.start();
-                }
-            }
         });
-    </script>
-            <script src="/assets/js/user-status.js"></script>
 
+        </script>
 
-    <style>
+        <style>
         /* Universal modal styles are included in the component */
         /* Animation for toasts */
         @keyframes slideInRight {

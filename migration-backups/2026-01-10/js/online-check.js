@@ -24,7 +24,7 @@
     // Request batching and rate limiting management
     const requestQueue = [];
     const statusCache = new Map();
-    const CACHE_DURATION = 30000; // 30 seconds
+    const CACHE_DURATION = 30010; // 30 seconds
     const BATCH_DELAY = 100; // 100ms delay between batches
     const MAX_RETRIES = 3;
     const RETRY_DELAYS = [1000, 2000, 4000]; // Exponential backoff delays

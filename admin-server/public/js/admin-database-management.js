@@ -211,6 +211,183 @@ document.addEventListener('DOMContentLoaded', function() {
         refreshTablesBtn.click();
     }
 
+    // Orphan Cleanup Elements
+    const cleanupBtn = document.getElementById('cleanup-orphans-btn');
+    const cleanupLoading = document.getElementById('orphan-cleanup-loading');
+    const cleanupResults = document.getElementById('orphan-cleanup-results');
+    const cleanupSummary = document.getElementById('orphan-cleanup-summary');
+    const cleanupTables = document.getElementById('orphan-cleanup-table-results');
+    const cleanupFiles = document.getElementById('orphan-cleanup-file-results');
+    const cleanupWarnings = document.getElementById('orphan-cleanup-warnings');
+
+    if (cleanupBtn) {
+        cleanupBtn.addEventListener('click', async function() {
+            const confirmed = typeof showConfirm === 'function'
+                ? await showConfirm(
+                    'This will permanently delete orphaned database rows and remove stray upload files. Only run this after ensuring recent deletions are complete.',
+                    'Clean Orphaned Data',
+                    'Clean & Remove',
+                    'Cancel',
+                    'danger'
+                )
+                : window.confirm('Clean orphaned records and files now?');
+
+            if (!confirmed) {
+                return;
+            }
+
+            const defaultLabel = cleanupBtn.textContent;
+            cleanupBtn.disabled = true;
+            cleanupBtn.textContent = 'Cleaning...';
+            cleanupLoading.style.display = 'block';
+            cleanupResults.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/corruption/cleanup-orphans', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+                cleanupLoading.style.display = 'none';
+
+                if (response.ok && data.success) {
+                    renderOrphanCleanupResults(data.summary);
+                    if (typeof showSuccess === 'function') {
+                        showSuccess('Orphaned data cleanup completed.');
+                    }
+                } else {
+                    const message = data.error || 'Failed to clean orphaned data';
+                    if (typeof showError === 'function') {
+                        showError(message);
+                    }
+                }
+            } catch (error) {
+                cleanupLoading.style.display = 'none';
+                console.error('Orphan cleanup error:', error);
+                if (typeof showError === 'function') {
+                    showError('Unexpected error while cleaning orphaned data.');
+                }
+            } finally {
+                cleanupBtn.disabled = false;
+                cleanupBtn.textContent = defaultLabel;
+            }
+        });
+    }
+
+    function renderOrphanCleanupResults(summary) {
+        if (!summary || !cleanupResults) {
+            return;
+        }
+
+        cleanupResults.style.display = 'block';
+
+        const runAt = summary.timestamp ? new Date(summary.timestamp).toLocaleString() : 'Just now';
+        const totalRows = summary.totalDeletedRecords || 0;
+        const fileCleanup = summary.fileCleanup || {};
+        const removedFiles = fileCleanup.removedFiles || 0;
+        const checkedFiles = fileCleanup.checkedFiles || 0;
+        const skippedRecent = fileCleanup.skippedRecent || 0;
+        const directories = fileCleanup.directoriesScanned || [];
+
+        cleanupSummary.innerHTML = `
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+                <div style="padding: 16px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #28a745;">
+                    <div style="font-size: 28px; font-weight: 700; color: #28a745;">${totalRows.toLocaleString()}</div>
+                    <div style="color: #666; font-size: 13px;">Orphaned DB rows removed</div>
+                </div>
+                <div style="padding: 16px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #e67e22;">
+                    <div style="font-size: 28px; font-weight: 700; color: #e67e22;">${removedFiles.toLocaleString()}</div>
+                    <div style="color: #666; font-size: 13px;">Stray upload files deleted</div>
+                </div>
+                <div style="padding: 16px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <div style="font-size: 20px; font-weight: 600; color: #667eea;">${runAt}</div>
+                    <div style="color: #666; font-size: 13px;">Last cleanup run</div>
+                </div>
+            </div>
+        `;
+
+        const tableRows = (summary.tableResults || []).map(result => {
+            const state = result.error ? 'Error'
+                : result.skipped ? 'Skipped'
+                : result.deleted > 0 ? 'Cleaned'
+                : 'No change';
+            const color = result.error ? '#dc3545' : result.skipped ? '#ffc107' : '#28a745';
+            return `
+                <tr>
+                    <td>${escapeHtml(result.table)}</td>
+                    <td>${escapeHtml(result.description)}</td>
+                    <td style="text-align:center; font-weight:600;">${result.deleted}</td>
+                    <td style="text-align:center; color:${color}; font-weight:600;">${state}</td>
+                </tr>
+            `;
+        }).join('') || '<tr><td colspan="4" style="text-align:center; color:#777;">No tables were processed.</td></tr>';
+
+        cleanupTables.innerHTML = `
+            <h4 style="margin-bottom: 8px;">Database Tables</h4>
+            <div style="overflow-x: auto;">
+                <table style="width:100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f0f2f5;">
+                            <th style="padding: 10px; text-align: left;">Table</th>
+                            <th style="padding: 10px; text-align: left;">Scope</th>
+                            <th style="padding: 10px; text-align: center; width: 140px;">Deleted Rows</th>
+                            <th style="padding: 10px; text-align: center; width: 120px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRows}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        const sampleFiles = (fileCleanup.sampleFilenames || []).map(file => `<li>${escapeHtml(file)}</li>`).join('');
+        const failures = (fileCleanup.failures || []).map(item => `<li>${escapeHtml(item.file || item.directory)} — ${escapeHtml(item.error)}</li>`).join('');
+
+        cleanupFiles.innerHTML = `
+            <h4 style="margin-bottom: 8px;">Uploads Directory</h4>
+            <div style="padding: 14px; border-radius: 8px; background: #f8f9fa; border-left: 4px solid #e67e22;">
+                <p style="margin: 0 0 8px 0; color: #444;">
+                    Checked <strong>${checkedFiles.toLocaleString()}</strong> files across
+                    <strong>${directories.length}</strong> directories.
+                    Skipped <strong>${skippedRecent}</strong> recent uploads to avoid deleting in-progress files.
+                </p>
+                <p style="margin: 0 0 8px 0; color: #444;">Directories scanned:</p>
+                <ul style="margin: 0 0 12px 20px; color: #666;">
+                    ${directories.length ? directories.map(dir => `<li>${escapeHtml(dir)}</li>`).join('') : '<li>No directories detected</li>'}
+                </ul>
+                ${sampleFiles ? `<p style="margin: 0 0 6px 0; color: #444;">Sample removed files:</p><ul style="margin: 0 0 0 20px; color: #666;">${sampleFiles}</ul>` : ''}
+                ${failures ? `<p style="margin: 12px 0 6px 0; color: #b23c17;">Files that could not be removed:</p><ul style="margin: 0 0 0 20px; color: #b23c17;">${failures}</ul>` : ''}
+            </div>
+        `;
+
+        if (cleanupWarnings) {
+            const warnings = summary.warnings?.filter(Boolean) || [];
+            if (warnings.length > 0) {
+                cleanupWarnings.style.display = 'block';
+                cleanupWarnings.innerHTML = `
+                    <strong>Warnings:</strong>
+                    <ul style="margin: 8px 0 0 18px;">
+                        ${warnings.map(w => `<li>${escapeHtml(w)}</li>`).join('')}
+                    </ul>
+                `;
+            } else {
+                cleanupWarnings.style.display = 'none';
+                cleanupWarnings.innerHTML = '';
+            }
+        }
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
     function displayTablesStats(tables) {
         if (!tables || tables.length === 0) {
             tablesStats.innerHTML = '<p style="color: #666;">No table statistics available</p>';

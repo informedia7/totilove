@@ -9,6 +9,8 @@ const { setupUserRoutes } = require('./api/users');
 const { setupActivityRoutes } = require('./api/activity');
 const { setupSearchRoutes } = require('./api/search');
 const { setupMonitoringRoutes } = require('./api/monitoring');
+const { setupPresenceRoutes } = require('./api/presence');
+const { setupStateRoutes } = require('./api/state');
 const { setupImageRoutes } = require('./images');
 
 // Route modules
@@ -25,28 +27,47 @@ const MatchesRoutes = require('../../routers/matchesRoutes');
 function setupRoutes(app, dependencies) {
     const {
         csrfMiddleware,
-        activityTracker,
         authMiddleware,
         controllers,
         db,
         redis,
         io,
         monitoringUtils,
-        blockRateLimiter
+        blockRateLimiter,
+        presenceService,
+        stateService
     } = dependencies;
     
     // Add CSRF validation middleware (must be before routes that need protection)
     app.use(csrfMiddleware.validate());
-    
-    // Add activity tracking middleware to all routes
-    app.use(activityTracker.trackActivity());
-    
-    // Add heartbeat endpoint for activity tracking
-    app.post('/api/heartbeat', activityTracker.heartbeat.bind(activityTracker));
+
+    // Attach optional auth early so downstream middleware can read req.user when a session exists
+    if (authMiddleware?.optionalAuth) {
+        app.use(authMiddleware.optionalAuth.bind(authMiddleware));
+    }
     
     // Apply rate limiting to user status endpoints
     const rateLimitMiddleware = createUserStatusRateLimit();
     app.use('/api/user-status', rateLimitMiddleware);
+    
+    // Debug middleware to log all requests
+    app.use((req, res, next) => {
+        if (req.path.startsWith('/api/user')) {
+            console.log(`[ROUTE DEBUG] ${req.method} ${req.path} - Route matching...`);
+        }
+        next();
+    });
+    
+    // Setup API routes FIRST (before other route modules to ensure proper route matching)
+    setupAuthRoutes(app, authMiddleware, csrfMiddleware);
+    setupUserRoutes(app, db, redis, io, blockRateLimiter);
+    
+    // Setup activity routes BEFORE authRoutes to avoid rate limiting conflicts
+    // Activity routes need their own lenient rate limiter
+    setupActivityRoutes(app, controllers.activityController);
+    
+    // Log after setupUserRoutes to verify it was called
+    console.log('[ROUTE DEBUG] setupUserRoutes completed');
     
     // Setup route modules
     const authRoutes = new AuthRoutes(controllers.authController, controllers.templateController, authMiddleware, io, redis);
@@ -57,19 +78,21 @@ function setupRoutes(app, dependencies) {
     // Admin routes (no authentication required for demo purposes)
     const adminRoutes = require('../../admin/routes/adminRoutes');
 
-    // Mount routes
-    app.use('/', authRoutes.getRouter());
+    // Mount routes - ORDER MATTERS!
+    // Mount message routes BEFORE authRoutes to ensure messageCountLimiter is applied first
     app.use('/api/messages', messageRoutes.getRouter());
+    
+    // Mount authRoutes (which includes accountRoutes with apiLimiter)
+    app.use('/', authRoutes.getRouter());
+    
+    // Mount other routes
     app.use('/api/matches', matchesRoutes.getRouter());
     app.use('/api/stats', matchesRoutes.setupStatsRoutes());
     app.use('/admin', adminRoutes);
-    
-    // Setup API routes
-    setupAuthRoutes(app, authMiddleware, csrfMiddleware);
-    setupUserRoutes(app, db, redis, io, blockRateLimiter);
-    setupActivityRoutes(app, controllers.activityController);
     setupSearchRoutes(app, controllers.searchController);
     setupMonitoringRoutes(app, monitoringUtils);
+    setupStateRoutes(app, { stateService, authMiddleware });
+    setupPresenceRoutes(app, { presenceService, authMiddleware, monitoringUtils });
     setupImageRoutes(app);
     
     // Template routes

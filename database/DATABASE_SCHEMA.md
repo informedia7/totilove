@@ -35,6 +35,7 @@ Main user accounts table.
 - `city_id` (INTEGER) - Foreign key to `city.id`
 - `date_joined` (TIMESTAMP)
 - `last_login` (TIMESTAMP)
+- `last_seen_at` (TIMESTAMP WITH TIME ZONE) - Last activity timestamp used for presence history
 - `previous_login` (TIMESTAMP) - Previous login timestamp (before last_login)
 - `email_verified` (BOOLEAN) - Email verification status
 - `profile_verified` (BOOLEAN) - Profile verification status

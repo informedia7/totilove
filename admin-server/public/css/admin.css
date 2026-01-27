@@ -1878,3 +1878,123 @@ body:has(.admin-layout) {
 .notification.hiding {
     animation: slideOutRight 0.3s ease-out forwards;
 }
+
+/* Delete User Modal */
+.delete-user-modal {
+    position: relative;
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.delete-user-modal .delete-step {
+    text-align: left;
+}
+
+.delete-user-modal h3 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.delete-user-modal p {
+    margin-bottom: 16px;
+    color: #555;
+    line-height: 1.4;
+}
+
+.delete-subtext {
+    font-size: 14px;
+    color: #888;
+    margin-top: -8px;
+}
+
+.delete-warning {
+    background: #fff3cd;
+    border: 1px solid #ffeeba;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    color: #856404;
+    font-size: 14px;
+}
+
+.delete-warning ul {
+    margin: 8px 0 0 18px;
+}
+
+.delete-warning li {
+    margin-bottom: 6px;
+}
+
+.delete-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.delete-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.delete-input:focus {
+    outline: none;
+    border-color: #dc3545;
+}
+
+.delete-error {
+    color: #dc3545;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.delete-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid #eee;
+    border-top-color: #667eea;
+    border-radius: 50%;
+    margin: 10px auto 20px;
+    animation: adminDeleteSpin 1s linear infinite;
+}
+
+.delete-result-message {
+    margin-top: 16px;
+    font-size: 15px;
+    color: #555;
+    text-align: center;
+}
+
+.delete-result-message.success {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.delete-user-modal .delete-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+}
+
+.delete-user-modal .delete-modal-close:hover {
+    color: #333;
+}
+
+@keyframes adminDeleteSpin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}

@@ -1,10 +1,18 @@
 const CompatibilityEngine = require('./matchCompatibilityEngine');
+const { hydratePresenceStatuses, normalizeLastSeen } = require('../../utils/presenceStatusHelper');
 
 class MatchesController {
-    constructor(db, redis = null, config = {}) {
+    constructor(db, redis = null, config = {}, presenceService = null) {
         this.db = db;
         this.redis = redis;
         this.compatibilityEngine = new CompatibilityEngine(db, redis);
+        this.presenceService = presenceService;
+        this.optionalTables = {
+            userContactCountries: null
+        };
+        this.optionalColumns = {
+            usersLastSeenAt: null
+        };
         
         // Configuration with defaults
         this.config = {
@@ -59,8 +67,9 @@ class MatchesController {
      * Implements the 10-stage matches system flow as documented in MATCHES_SYSTEM_FLOW.md
      */
     async getMatches(req, res) {
+        let userId;
         try {
-            const userId = parseInt(req.params.userId);
+            userId = parseInt(req.params.userId);
             const sessionToken = req.query.token || req.headers['x-session-token'] || 
                                 req.headers.authorization?.replace('Bearer ', '');
             
@@ -154,6 +163,43 @@ class MatchesController {
                 compatibilityCacheExists = false;
             }
 
+            if (this.optionalTables.userContactCountries === null) {
+                try {
+                    const tableCheck = await this.db.query(`
+                        SELECT to_regclass('public.user_contact_countries') as table_name
+                    `);
+                    this.optionalTables.userContactCountries = Boolean(tableCheck.rows[0]?.table_name);
+                } catch (error) {
+                    this.optionalTables.userContactCountries = false;
+                }
+                if (this.optionalTables.userContactCountries === false && !this.optionalTables._contactCountriesWarned) {
+                    console.warn('user_contact_countries table missing - skipping contact country filter');
+                    this.optionalTables._contactCountriesWarned = true;
+                }
+            }
+            const hasUserContactCountries = Boolean(this.optionalTables.userContactCountries);
+
+            if (this.optionalColumns.usersLastSeenAt === null) {
+                try {
+                    const columnCheck = await this.db.query(`
+                        SELECT EXISTS (
+                            SELECT 1 FROM information_schema.columns
+                            WHERE table_schema = 'public'
+                              AND table_name = 'users'
+                              AND column_name = 'last_seen_at'
+                        ) as exists
+                    `);
+                    this.optionalColumns.usersLastSeenAt = Boolean(columnCheck.rows[0]?.exists);
+                } catch (error) {
+                    this.optionalColumns.usersLastSeenAt = false;
+                }
+                if (!this.optionalColumns.usersLastSeenAt && !this.optionalColumns._lastSeenWarned) {
+                    console.warn('users.last_seen_at column missing - presence timestamps disabled');
+                    this.optionalColumns._lastSeenWarned = true;
+                }
+            }
+            const hasUsersLastSeenAt = Boolean(this.optionalColumns.usersLastSeenAt);
+
             // Check if current user has a profile image (for FILTER 6)
             let currentUserHasPhoto = false;
             try {
@@ -201,15 +247,7 @@ class MatchesController {
                         l1.created_at,
                         u.date_joined
                     ) as match_date,
-                    CASE 
-                        WHEN EXISTS (
-                            SELECT 1 FROM user_sessions 
-                            WHERE user_id = u.id 
-                                AND is_active = true 
-                                AND last_activity > NOW() - INTERVAL '${this.config.onlineStatus.intervalMinutes} minutes'
-                        ) THEN true
-                        ELSE false
-                    END as is_online,
+                    ${hasUsersLastSeenAt ? 'u.last_seen_at' : 'NULL::timestamptz'} as last_seen_at,
                     -- Flag to indicate if this person liked the user
                     CASE WHEN l2.liked_by IS NOT NULL THEN true ELSE false END as liked_by_user,
                     -- Flag to indicate if the user liked this person
@@ -220,7 +258,10 @@ class MatchesController {
                         ELSE false
                     END as is_mutual_like,
                     -- Compatibility score from cache (if available)
-                    ${compatibilityCacheExists ? 'comp_cache.score as cached_compatibility_score' : 'NULL::INTEGER as cached_compatibility_score'}
+                    ${compatibilityCacheExists ? 'comp_cache.score as cached_compatibility_score' : 'NULL::INTEGER as cached_compatibility_score'},
+                    upref.preferred_gender,
+                    upref.age_min as preferred_age_min,
+                    upref.age_max as preferred_age_max
                 FROM users u
                 LEFT JOIN city c ON u.city_id = c.id
                 LEFT JOIN country co ON u.country_id = co.id
@@ -232,6 +273,7 @@ class MatchesController {
                 LEFT JOIN users_likes l1 ON l1.liked_by = $1 AND l1.liked_user_id = u.id
                 LEFT JOIN users_likes l2 ON l2.liked_by = u.id AND l2.liked_user_id = $1
                 LEFT JOIN user_profile_settings ups ON ups.user_id = u.id
+                LEFT JOIN user_preferences upref ON upref.user_id = u.id
                 ${compatibilityCacheExists ? `LEFT JOIN user_compatibility_cache comp_cache ON 
                     comp_cache.user_id = $1 
                     AND comp_cache.target_user_id = u.id` : ''}
@@ -301,22 +343,24 @@ class MatchesController {
                 paramIndex++;
             }
 
-            // FILTER 5: Matched user's country restrictions
-            matchesQuery += `
-                AND (
-                    NOT EXISTS (SELECT 1 FROM user_contact_countries WHERE user_id = u.id)
-                    OR EXISTS (
-                        SELECT 1 FROM user_contact_countries ucc
-                        WHERE ucc.user_id = u.id AND ucc.is_all_countries = true
+            // FILTER 5: Matched user's country restrictions (skip if table missing)
+            if (hasUserContactCountries) {
+                matchesQuery += `
+                    AND (
+                        NOT EXISTS (SELECT 1 FROM user_contact_countries WHERE user_id = u.id)
+                        OR EXISTS (
+                            SELECT 1 FROM user_contact_countries ucc
+                            WHERE ucc.user_id = u.id AND ucc.is_all_countries = true
+                        )
+                        OR EXISTS (
+                            SELECT 1 FROM user_contact_countries ucc
+                            WHERE ucc.user_id = u.id AND ucc.country_id = $${paramIndex}
+                        )
                     )
-                    OR EXISTS (
-                        SELECT 1 FROM user_contact_countries ucc
-                        WHERE ucc.user_id = u.id AND ucc.country_id = $${paramIndex}
-                    )
-                )
-            `;
-            queryParams.push(currentUser.country_id);
-            paramIndex++;
+                `;
+                queryParams.push(currentUser.country_id ?? null);
+                paramIndex++;
+            }
 
             // FILTER 6: Matched user's photo requirement
             matchesQuery += `
@@ -378,7 +422,6 @@ class MatchesController {
                 is_mutual_like DESC,
                 liked_by_user DESC,
                 user_liked_them DESC,
-                is_online DESC,
                 cached_compatibility_score DESC NULLS LAST,
                 match_date DESC NULLS LAST
                 LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
@@ -547,8 +590,15 @@ class MatchesController {
                     location: match.location,
                     profile_image: this.formatProfileImage(match.profile_image),
                     avatar: this.formatProfileImage(match.profile_image),
+                    preferred_gender: match.preferred_gender || null,
+                    seeking_gender: match.preferred_gender || match.seeking_gender || null,
+                    preferred_age_min: match.preferred_age_min ?? null,
+                    preferred_age_max: match.preferred_age_max ?? null,
+                    seeking_age_min: match.preferred_age_min ?? match.seeking_age_min ?? null,
+                    seeking_age_max: match.preferred_age_max ?? match.seeking_age_max ?? null,
                     match_date: match.match_date,
-                    is_online: match.is_online || false,
+                    is_online: false,
+                    last_seen_at: normalizeLastSeen(match.last_seen_at),
                     liked_by_user: match.liked_by_user || false,
                     user_liked_them: match.user_liked_them || false,
                     is_mutual_like: match.is_mutual_like || false,
@@ -556,6 +606,21 @@ class MatchesController {
                     compatibility_badge: badge
                 };
             }));
+
+            await hydratePresenceStatuses(this.presenceService, matches, {
+                idSelector: (row) => row.user_id,
+                assign: (record, status) => {
+                    const isOnline = Boolean(status?.isOnline);
+                    record.is_online = isOnline;
+                    if (status?.lastSeen) {
+                        record.last_seen_at = normalizeLastSeen(status.lastSeen);
+                    } else if (record.last_seen_at) {
+                        record.last_seen_at = normalizeLastSeen(record.last_seen_at);
+                    } else {
+                        record.last_seen_at = null;
+                    }
+                }
+            });
 
             // ============================================================
             // STAGE 9: Pagination & Sorting (already applied in SQL query)
@@ -600,6 +665,13 @@ class MatchesController {
             });
 
         } catch (error) {
+            console.error('MatchesController.getMatches error', {
+                userId: userId || req?.params?.userId,
+                message: error?.message,
+                detail: error?.detail,
+                code: error?.code,
+                stack: error?.stack
+            });
             res.status(500).json({
                 success: false,
                 error: 'Failed to get matches',

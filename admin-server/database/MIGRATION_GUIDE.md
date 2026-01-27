@@ -182,7 +182,7 @@ Total Errors: 0
 Per Table Results:
   Users: 15000 rows, 0 errors
   Orders: 50000 rows, 0 errors
-  Products: 30000 rows, 0 errors
+  Products: 30010 rows, 0 errors
   Categories: 500 rows, 0 errors
   Reviews: 29500 rows, 0 errors
 ============================================================

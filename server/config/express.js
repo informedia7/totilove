@@ -11,9 +11,21 @@ const path = require('path');
 /**
  * Configure Express app with middleware and security headers
  * @param {Object} app - Express application instance
- * @param {Object} sessionTracker - Session tracker instance
  */
-function configureExpress(app, sessionTracker) {
+function configureExpress(app) {
+    // Ensure Express trusts upstream proxies (needed for accurate req.ip)
+    const trustProxyValue = process.env.TRUST_PROXY;
+    if (trustProxyValue !== undefined) {
+        const normalized = trustProxyValue === 'true'
+            ? true
+            : trustProxyValue === 'false'
+                ? false
+                : Number(trustProxyValue);
+        app.set('trust proxy', Number.isNaN(normalized) ? trustProxyValue : normalized);
+    } else {
+        app.set('trust proxy', 1);
+    }
+
     // High performance Express configuration
     app.use(cors({
         origin: "*",
@@ -105,8 +117,8 @@ function configureExpress(app, sessionTracker) {
             // In development, also allow localhost variations
             if (process.env.NODE_ENV !== 'production') {
                 expectedOrigins.push(
-                    `http://localhost:${req.socket.localPort || 3000}`,
-                    `http://127.0.0.1:${req.socket.localPort || 3000}`
+                    `http://localhost:${req.socket.localPort || 3001}`,
+                    `http://127.0.0.1:${req.socket.localPort || 3001}`
                 );
             }
             
@@ -121,18 +133,6 @@ function configureExpress(app, sessionTracker) {
         next();
     });
     
-    // Session activity tracking middleware
-    app.use((req, res, next) => {
-        // Track user activity if user is authenticated
-        const userId = req.headers['x-user-id'] || req.session?.userId;
-        if (userId && sessionTracker) {
-            // Update user activity asynchronously to not block the request
-            sessionTracker.updateUserActivity(userId, req).catch(() => {
-                // Failed to update user activity - non-critical
-            });
-        }
-        next();
-    });
 }
 
 module.exports = { configureExpress };

@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
+const PORT = 3001;
 
 console.log('Server file loaded at', new Date().toISOString());
 
@@ -558,7 +558,7 @@ app.get('/contact', (req, res) => {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Contact - Totilove</title>
             <link rel="stylesheet" href="/assets/css/vendor/font-awesome.min.css">
-            <link rel="stylesheet" href="/components/navbar.css">
+            <!-- Navbar CSS now loaded via main.css or components.css -->
             <style>
                 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
                 .container { max-width: 600px; margin: 100px auto; padding: 50px; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1); }

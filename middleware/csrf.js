@@ -163,16 +163,17 @@ class CSRFMiddleware {
             // Activity tracking endpoints (frequent, low-risk, already authenticated)
             const activityEndpoints = [
                 '/api/heartbeat',
-                '/api/user-online',
+                '/api/presence/heartbeat',
                 '/api/user-offline',
-                '/api/users-online-status',
+                '/metrics/presence-client',
                 '/api/user-logout'
             ];
 
             // API endpoints that are GET-only and don't need CSRF
             const getOnlyEndpoints = [
                 '/api/matches',
-                '/api/stats'
+                '/api/stats',
+                '/api/user' // User data endpoints (GET only)
             ];
 
             // Check if this endpoint should be excluded

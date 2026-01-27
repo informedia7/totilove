@@ -1,10 +1,15 @@
 const { requireEmailVerification } = require('../../utils/emailVerificationCheck');
+const { hydratePresenceStatuses, normalizeLastSeen } = require('../../utils/presenceStatusHelper');
 
 class MessageController {
-    constructor(db, messageService, io) {
+    constructor(db, messageService, io, presenceService = null) {
         this.db = db;
         this.messageService = messageService;
         this.io = io;
+        this.presenceService = presenceService;
+        this.optionalColumns = {
+            usersLastSeenAt: null
+        };
         
         // Message validation constants
         this.MESSAGE_CONFIG = {
@@ -1451,6 +1456,32 @@ class MessageController {
                 });
             }
 
+            if (this.optionalColumns.usersLastSeenAt === null) {
+                try {
+                    const columnCheck = await this.db.query(`
+                        SELECT EXISTS (
+                            SELECT 1 FROM information_schema.columns
+                            WHERE table_schema = 'public'
+                              AND table_name = 'users'
+                              AND column_name = 'last_seen_at'
+                        ) as exists
+                    `);
+                    this.optionalColumns.usersLastSeenAt = Boolean(columnCheck.rows[0]?.exists);
+                } catch (columnError) {
+                    this.optionalColumns.usersLastSeenAt = false;
+                }
+
+                if (!this.optionalColumns.usersLastSeenAt && !this.optionalColumns._lastSeenWarned) {
+                    console.warn('users.last_seen_at column missing - skipping last seen data in conversations list');
+                    this.optionalColumns._lastSeenWarned = true;
+                }
+            }
+
+            const hasUsersLastSeenAt = Boolean(this.optionalColumns.usersLastSeenAt);
+            const otherLastSeenSelect = hasUsersLastSeenAt
+                ? '                            MAX(u.last_seen_at) as other_last_seen_at,\n'
+                : '                            NULL::timestamptz as other_last_seen_at,\n';
+
             // Get all conversations for the user (both sent and received) with profile images
             // Also include deleted users (where real_name = 'Deleted User' or 'Account Deactivated')
             let result;
@@ -1466,7 +1497,9 @@ class MessageController {
                             u.email as other_email,
                             COALESCE(ui.file_name, NULL) as profile_image,
                             MAX(m.timestamp) as last_message_time,
-                            COUNT(CASE 
+                            MAX(CASE WHEN m.sender_id = $1 THEN m.timestamp END) as last_sent_time,
+                            MAX(CASE WHEN m.receiver_id = $1 THEN m.timestamp END) as last_received_time,
+${otherLastSeenSelect}                            COUNT(CASE 
                                 WHEN m.receiver_id = $1 
                                 AND m.read_at IS NULL 
                                 AND COALESCE(m.deleted_by_receiver, false) = false
@@ -1529,8 +1562,11 @@ class MessageController {
                             ud.email as other_email,
                             '/assets/images/account_deactivated.svg' as profile_image,
                             ud.created_at as last_message_time,
+                            NULL::timestamptz as last_sent_time,
+                            NULL::timestamptz as last_received_time,
                             0 as unread_count,
-                            true as is_deleted_user
+                            true as is_deleted_user,
+                            NULL::timestamptz as other_last_seen_at
                         FROM users_deleted ud
                         INNER JOIN users_deleted_receivers udr ON (
                             udr.deleted_user_id = ud.deleted_user_id
@@ -1543,8 +1579,11 @@ class MessageController {
                         final.other_email,
                         final.profile_image,
                         final.last_message_time,
+                        final.last_sent_time,
+                        final.last_received_time,
                         final.unread_count,
                         final.is_deleted_user,
+                        final.other_last_seen_at,
                         -- OPTIMIZATION: Get last message content in the same query using LATERAL
                         CASE 
                             WHEN final.is_deleted_user = true THEN 'Account Deactivated'
@@ -1563,8 +1602,11 @@ class MessageController {
                                 ELSE ac.profile_image
                             END as profile_image,
                             ac.last_message_time,
+                            ac.last_sent_time,
+                            ac.last_received_time,
                             ac.unread_count,
-                            ac.is_deleted_user
+                            ac.is_deleted_user,
+                            ac.other_last_seen_at
                         FROM active_conversations ac
                         LEFT JOIN deleted_users_cte duc ON duc.other_user_id = ac.other_user_id
                         WHERE duc.other_user_id IS NULL
@@ -1575,8 +1617,11 @@ class MessageController {
                             duc.other_email,
                             duc.profile_image,
                             duc.last_message_time,
+                            duc.last_sent_time,
+                            duc.last_received_time,
                             duc.unread_count,
-                            true as is_deleted_user
+                            true as is_deleted_user,
+                            duc.other_last_seen_at
                         FROM deleted_users_cte duc
                     ) final
                     -- KEY OPTIMIZATION: LEFT JOIN LATERAL gets the last message for each conversation
@@ -1604,7 +1649,10 @@ class MessageController {
                         ORDER BY timestamp DESC 
                         LIMIT 1
                     ) last_msg ON true
-                    ORDER BY final.last_message_time DESC NULLS LAST
+                    ORDER BY 
+                        COALESCE(final.last_sent_time, 'epoch'::timestamptz) DESC,
+                        COALESCE(final.last_received_time, 'epoch'::timestamptz) DESC,
+                        final.last_message_time DESC NULLS LAST
                 `, [userIdInt]);
             } catch (e) {
                 // If table doesn't exist, fall back to active conversations only
@@ -1616,8 +1664,11 @@ class MessageController {
                             conv.other_email,
                             conv.profile_image,
                             conv.last_message_time,
+                            conv.last_sent_time,
+                            conv.last_received_time,
                             conv.unread_count,
                             false as is_deleted_user,
+                            conv.other_last_seen_at,
                             -- OPTIMIZATION: Get last message content using LATERAL
                             CASE 
                                 WHEN last_msg.message IS NULL THEN 'No messages yet'
@@ -1635,7 +1686,9 @@ class MessageController {
                                 u.email as other_email,
                                 COALESCE(ui.file_name, NULL) as profile_image,
                                 MAX(m.timestamp) as last_message_time,
-                                COUNT(CASE 
+                                MAX(CASE WHEN m.sender_id = $1 THEN m.timestamp END) as last_sent_time,
+                                MAX(CASE WHEN m.receiver_id = $1 THEN m.timestamp END) as last_received_time,
+${otherLastSeenSelect}                                COUNT(CASE 
                                     WHEN m.receiver_id = $1 
                                     AND m.read_at IS NULL 
                                     AND COALESCE(m.deleted_by_receiver, false) = false
@@ -1676,7 +1729,10 @@ class MessageController {
                             ORDER BY timestamp DESC 
                             LIMIT 1
                         ) last_msg ON true
-                        ORDER BY conv.last_message_time DESC NULLS LAST
+                        ORDER BY 
+                            COALESCE(conv.last_sent_time, 'epoch'::timestamptz) DESC,
+                            COALESCE(conv.last_received_time, 'epoch'::timestamptz) DESC,
+                            conv.last_message_time DESC NULLS LAST
                     `, [userIdInt]);
                 } else {
                     throw e;
@@ -1695,8 +1751,10 @@ class MessageController {
                     || row.profile_image === '/assets/images/account_deactivated.svg'
                     || (row.profile_image && row.profile_image.includes('account_deactivated'));
                 
-                // Last message content is now included in the query result (from LATERAL join)
                 const lastMessageContent = row.last_message_content || 'No messages yet';
+                const rawLastSeen = row.other_last_seen_at || row.last_seen_at || null;
+                const normalizedLastSeen = rawLastSeen ? normalizeLastSeen(rawLastSeen) : null;
+                const initialLastSeenTimestamp = normalizedLastSeen ? (new Date(normalizedLastSeen).getTime() || 0) : 0;
                 
                 // Get user avatar - use profile image if available, otherwise use first letter
                 let avatar;
@@ -1756,6 +1814,8 @@ class MessageController {
                 
                 // Ensure timestamp is always a valid number (never NaN or undefined)
                 const finalTimestamp = (typeof timestamp === 'number' && !isNaN(timestamp)) ? timestamp : 0;
+                const lastSentTimestamp = row.last_sent_time ? (new Date(row.last_sent_time).getTime() || 0) : 0;
+                const lastReceivedTimestamp = row.last_received_time ? (new Date(row.last_received_time).getTime() || 0) : 0;
 
                 const conversation = {
                     id: row.other_user_id.toString(),
@@ -1767,7 +1827,11 @@ class MessageController {
                     lastMessageTime: timeDisplay,
                     lastMessageTimestamp: finalTimestamp, // MUST be a number, never undefined
                     partnerId: row.other_user_id,
-                    isDeleted: isDeletedUser
+                    isDeleted: isDeletedUser,
+                    lastSeenAt: normalizedLastSeen,
+                    lastSeenTimestamp: initialLastSeenTimestamp,
+                    lastSentTimestamp,
+                    lastReceivedTimestamp
                 };
                 
                 // Verify timestamp is set and is a valid number
@@ -1777,15 +1841,66 @@ class MessageController {
                 
                 // Double-check it's a number
                 conversation.lastMessageTimestamp = Number(conversation.lastMessageTimestamp) || 0;
+                if (conversation.lastSentTimestamp === undefined || conversation.lastSentTimestamp === null || isNaN(conversation.lastSentTimestamp)) {
+                    conversation.lastSentTimestamp = 0;
+                }
+                conversation.lastSentTimestamp = Number(conversation.lastSentTimestamp) || 0;
+                if (conversation.lastReceivedTimestamp === undefined || conversation.lastReceivedTimestamp === null || isNaN(conversation.lastReceivedTimestamp)) {
+                    conversation.lastReceivedTimestamp = 0;
+                }
+                conversation.lastReceivedTimestamp = Number(conversation.lastReceivedTimestamp) || 0;
                 
                 conversations.push(conversation);
             }
 
             // Get real online status for all conversation partners (excluding deleted users)
-            const activeUserIds = conversations
-                .filter(conv => !conv.isDeleted)
-                .map(conv => parseInt(conv.partnerId));
-            if (activeUserIds.length > 0) {
+            const presenceCandidates = conversations.filter(conv => !conv.isDeleted && conv.partnerId);
+            const activeUserIds = [...new Set(presenceCandidates
+                .map(conv => parseInt(conv.partnerId))
+                .filter(id => Number.isInteger(id)))];
+
+            let presenceHydrated = false;
+            const canUsePresenceService = Boolean(
+                this.presenceService &&
+                typeof this.presenceService.getStatuses === 'function' &&
+                (typeof this.presenceService.isEnabled !== 'function' || this.presenceService.isEnabled())
+            );
+
+            if (canUsePresenceService && presenceCandidates.length > 0) {
+                try {
+                    await hydratePresenceStatuses(this.presenceService, presenceCandidates, {
+                        idSelector: (record) => record.partnerId,
+                        assign: (record, status) => {
+                            const isOnline = Boolean(status?.isOnline);
+                            record.is_online = isOnline;
+                            record.status = isOnline ? 'Online' : 'Offline';
+
+                            if (status?.lastSeen) {
+                                const normalized = normalizeLastSeen(status.lastSeen);
+                                record.lastSeenAt = normalized;
+                                record.lastSeenTimestamp = normalized ? new Date(normalized).getTime() : 0;
+                            } else if (!isOnline) {
+                                if (record.lastSeenAt) {
+                                    const normalized = normalizeLastSeen(record.lastSeenAt);
+                                    record.lastSeenAt = normalized;
+                                    record.lastSeenTimestamp = normalized ? new Date(normalized).getTime() : 0;
+                                } else {
+                                    record.lastSeenAt = null;
+                                    record.lastSeenTimestamp = 0;
+                                }
+                            } else {
+                                record.lastSeenAt = null;
+                                record.lastSeenTimestamp = 0;
+                            }
+                        }
+                    });
+                    presenceHydrated = true;
+                } catch (presenceError) {
+                    presenceHydrated = false;
+                }
+            }
+
+            if (!presenceHydrated && activeUserIds.length > 0) {
                 try {
                     // Cleanup old sessions first
                     await this.db.query(`
@@ -1793,52 +1908,81 @@ class MessageController {
                         SET is_active = false 
                         WHERE last_activity < NOW() - INTERVAL '2 minutes'
                     `);
-                    
-                    // Get online status for all users (only active users, not deleted)
+
                     const statusQuery = `
                         SELECT 
                             u.id,
-                            CASE
-                                WHEN us.is_active = true AND us.last_activity > NOW() - INTERVAL '2 minutes' THEN true
-                                ELSE false
-                            END as is_online
+                            COALESCE(BOOL_OR(us.is_active = true AND us.last_activity > NOW() - INTERVAL '2 minutes'), false) as is_online,
+                            MAX(us.last_activity) as last_activity
                         FROM users u
-                        LEFT JOIN user_sessions us ON u.id = us.user_id AND us.is_active = true
+                        LEFT JOIN user_sessions us ON u.id = us.user_id
                         WHERE u.id = ANY($1)
+                        GROUP BY u.id
                     `;
-                    
+
                     const statusResult = await this.db.query(statusQuery, [activeUserIds]);
-                    
-                    // Create a status map for quick lookup
+
                     const statusMap = {};
                     statusResult.rows.forEach(row => {
-                        statusMap[row.id] = row.is_online;
+                        statusMap[row.id] = {
+                            is_online: row.is_online === true || row.is_online === 'true' || row.is_online === 't' || row.is_online === 1,
+                            last_activity: row.last_activity
+                        };
                     });
-                    
-                    // Update conversation status based on real online status
+
                     conversations.forEach(conv => {
                         if (conv.isDeleted) {
-                            // Deleted users are always offline
                             conv.status = 'Offline';
                             conv.is_online = false;
-                        } else {
-                            const isOnline = statusMap[parseInt(conv.partnerId)] === true;
-                            conv.status = isOnline ? 'Online' : 'Offline';
-                            conv.is_online = isOnline;
+                            if (!conv.lastSeenAt) {
+                                conv.lastSeenAt = null;
+                                conv.lastSeenTimestamp = 0;
+                            }
+                            return;
+                        }
+
+                        const statusInfo = statusMap[parseInt(conv.partnerId)];
+                        const isOnline = statusInfo ? statusInfo.is_online === true : false;
+                        conv.status = isOnline ? 'Online' : 'Offline';
+                        conv.is_online = isOnline;
+
+                        if (!isOnline && statusInfo && statusInfo.last_activity) {
+                            const lastActivityDate = new Date(statusInfo.last_activity);
+                            if (!isNaN(lastActivityDate)) {
+                                conv.lastSeenAt = lastActivityDate.toISOString();
+                                conv.lastSeenTimestamp = lastActivityDate.getTime();
+                            } else if (!conv.lastSeenAt) {
+                                conv.lastSeenAt = null;
+                                conv.lastSeenTimestamp = 0;
+                            }
+                        } else if (!isOnline && !conv.lastSeenAt) {
+                            conv.lastSeenAt = null;
+                            conv.lastSeenTimestamp = 0;
+                        } else if (isOnline) {
+                            conv.lastSeenAt = null;
+                            conv.lastSeenTimestamp = 0;
                         }
                     });
                 } catch (statusError) {
-                    // Keep default 'Offline' status if there's an error
                     conversations.forEach(conv => {
-                        if (!conv.status) conv.status = 'Offline';
+                        conv.status = conv.status || 'Offline';
                         if (conv.is_online === undefined) conv.is_online = false;
+                        if (!conv.lastSeenAt) {
+                            conv.lastSeenAt = null;
+                            conv.lastSeenTimestamp = 0;
+                        }
                     });
                 }
-            } else {
-                // No active users, set all to offline
+            }
+
+            if (activeUserIds.length === 0 && !presenceHydrated) {
                 conversations.forEach(conv => {
                     conv.status = 'Offline';
                     conv.is_online = false;
+                    if (!conv.lastSeenAt) {
+                        conv.lastSeenAt = null;
+                        conv.lastSeenTimestamp = 0;
+                    }
                 });
             }
             
@@ -1849,6 +1993,26 @@ class MessageController {
                 }
                 // Double-check it's a number
                 conv.lastMessageTimestamp = Number(conv.lastMessageTimestamp) || 0;
+                
+                if (conv.lastSeenAt) {
+                    const normalized = normalizeLastSeen(conv.lastSeenAt);
+                    conv.lastSeenAt = normalized;
+                    conv.lastSeenTimestamp = normalized ? (new Date(normalized).getTime() || 0) : 0;
+                } else if (conv.lastSeenTimestamp === undefined || conv.lastSeenTimestamp === null || isNaN(conv.lastSeenTimestamp)) {
+                    conv.lastSeenTimestamp = 0;
+                } else {
+                    conv.lastSeenTimestamp = Number(conv.lastSeenTimestamp) || 0;
+                }
+                if (conv.lastSentTimestamp === undefined || conv.lastSentTimestamp === null || isNaN(conv.lastSentTimestamp)) {
+                    conv.lastSentTimestamp = 0;
+                } else {
+                    conv.lastSentTimestamp = Number(conv.lastSentTimestamp) || 0;
+                }
+                if (conv.lastReceivedTimestamp === undefined || conv.lastReceivedTimestamp === null || isNaN(conv.lastReceivedTimestamp)) {
+                    conv.lastReceivedTimestamp = 0;
+                } else {
+                    conv.lastReceivedTimestamp = Number(conv.lastReceivedTimestamp) || 0;
+                }
             });
             
             res.json({

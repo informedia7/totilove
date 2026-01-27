@@ -1,50 +1,5 @@
-<!-- Account Page -->
-<style>
-    .account-section {
-        overflow-x: hidden;
-        max-width: 100%;
-        box-sizing: border-box;
-    }
-    
-    .profile-content {
-        overflow-x: hidden;
-        max-width: 100%;
-    }
-    
-    .profile-card {
-        overflow-x: hidden;
-        max-width: 100%;
-        box-sizing: border-box;
-        border: 1px solid #e9ecef;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        border-radius: 15px;
-    }
-    
-    .profile-card > div {
-        overflow-x: hidden;
-        max-width: 100%;
-        box-sizing: border-box;
-    }
-    
-    .profile-card * {
-        max-width: 100%;
-        box-sizing: border-box;
-        word-wrap: break-word;
-    }
-    
-    .profile-card input,
-    .profile-card button,
-    .profile-card a {
-        max-width: 100%;
-        box-sizing: border-box;
-    }
-    
-    @media (max-width: 768px) {
-        .profile-content {
-            grid-template-columns: 1fr !important;
-        }
-    }
-</style>
+<!-- Extracted CSS from account.html - Phase 1 CSS Extraction -->
+<link rel="stylesheet" href="/assets/css/new/05-pages/_account.css">
 <div class="account-section">
     <div class="card-header">
         <div class="card-title">
@@ -53,15 +8,15 @@
             </div>
             <span>My Account:</span>
         </div>
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <i class="fas fa-calendar-alt" style="color: var(--muted-color); font-size: 1rem;"></i>
-            <span style="font-weight: 600; color: var(--dark-color); font-size: 0.9rem;">Account Created</span>
-            <span style="font-size: 0.9rem; color: var(--muted-color);" id="account-created-date">Loading...</span>
+        <div class="flex-align-center-gap-0-5">
+            <i class="fas fa-calendar-alt muted-color-icon"></i>
+            <span class="font-weight-600-dark-0-9">Account Created</span>
+            <span class="muted-0-9" id="account-created-date">Loading...</span>
         </div>
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <i class="fas fa-clock" style="color: var(--muted-color); font-size: 1rem;"></i>
-            <span style="font-weight: 600; color: var(--dark-color); font-size: 0.9rem;">Last Login</span>
-            <span style="font-size: 0.9rem; color: var(--muted-color);" id="last-login-date">Loading...</span>
+        <div class="flex-align-center-gap-0-5">
+            <i class="fas fa-clock muted-color-icon"></i>
+            <span class="font-weight-600-dark-0-9">Last Login</span>
+            <span class="muted-0-9" id="last-login-date">Loading...</span>
         </div>
     </div>
 
@@ -74,146 +29,83 @@
                 </div>
                 <div class="card-title">Email Verification</div>
             </div>
-            <div style="padding: 0;">
+            <div class="padding-0">
                 <!-- Verified State -->
                 <div id="email-verified-section" style="display: none;">
-                    <div style="padding: 0.75rem 1rem; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border-radius: 12px; color: white; text-align: left;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-                            <i class="fas fa-check-circle" style="font-size: 1.1rem;"></i>
-                            <h3 style="margin: 0; font-size: 0.95rem; font-weight: 700;">Email Verified</h3>
+                    <div class="email-verified-section">
+                        <div class="flex-align-center-gap-0-5-mb-0-25">
+                            <i class="fas fa-check-circle font-size-1-1"></i>
+                            <h3 class="margin-0-font-0-95-weight-700">Email Verified</h3>
                         </div>
-                        <p style="margin: 0; opacity: 0.9; font-size: 0.8rem;">Your email address has been successfully verified!</p>
-                        <div style="margin-top: 0.25rem; padding-top: 0.25rem; border-top: 1px solid rgba(255,255,255,0.2);">
-                            <div style="font-size: 0.7rem; opacity: 0.9;" id="verified-email-display"></div>
+                        <p class="margin-0-opacity-0-9-font-0-8">Your email address has been successfully verified!</p>
+                        <div class="mt-0-25-pt-0-25-border-top-white-0-2">
+                            <div class="font-size-0-7-opacity-0-9" id="verified-email-display"></div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Not Verified State -->
                 <div id="email-not-verified-section" style="display: none;">
-                    <div style="padding: 0.75rem 1rem; background: #fff3cd; border: 2px solid #ffc107; border-radius: 12px; cursor: pointer;" id="email-verification-card" onclick="toggleEmailVerificationDetails()">
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <div style="font-size: 1.5rem; color: #f59e0b; flex-shrink: 0;">
+                    <div class="email-not-verified-card" id="email-verification-card" onclick="toggleEmailVerificationDetails()">
+                        <div class="flex-align-center-gap-0-75">
+                            <div class="font-size-1-5-color-orange-flex-shrink-0">
                                 <i class="fas fa-exclamation-triangle"></i>
                             </div>
-                            <div style="flex: 1; min-width: 0;">
-                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem;">
-                                    <h3 style="margin: 0; color: #856404; font-size: 1rem; font-weight: 700;">Email Not Verified</h3>
-                                    <i class="fas fa-chevron-down" id="email-verification-chevron" style="color: #856404; font-size: 0.9rem; transition: transform 0.3s ease; flex-shrink: 0; margin-left: 0.5rem;"></i>
+                            <div class="flex-1-min-width-0">
+                                <div class="flex-align-center-justify-between-mb-0-25">
+                                    <h3 class="margin-0-color-856404-font-1-weight-700">Email Not Verified</h3>
+                                    <i class="fas fa-chevron-down color-856404-font-0-9-transition-transform" id="email-verification-chevron"></i>
                                 </div>
-                                <p style="margin: 0; color: #856404; font-size: 0.85rem; line-height: 1.4;">
+                                <p class="margin-0-color-856404-font-0-85-line-height-1-4">
                                     Please verify your email address to unlock all features including messaging, profile viewing, likes, and favourites.
                                 </p>
                                 
                                 <!-- Expandable Content -->
-                                <div id="email-verification-details" style="display: none; margin-top: 0.75rem;">
-                                    <div style="background: white; padding: 0.75rem; border-radius: 8px; margin-bottom: 0.75rem;">
-                                        <div style="font-weight: 600; color: #856404; margin-bottom: 0.4rem; font-size: 0.85rem;">How to verify:</div>
-                                        <ol style="margin: 0; padding-left: 1.2rem; color: #856404; font-size: 0.85rem; line-height: 1.6;">
-                                            <li style="margin-bottom: 0.25rem;">Check your inbox at <strong id="user-email-display">{{userEmail}}</strong></li>
-                                            <li style="margin-bottom: 0.25rem;"><strong>Method 1:</strong> Click the verification link in the email (easiest)</li>
+                                <div id="email-verification-details" style="display: none;" class="mt-0-75">
+                                    <div class="bg-white-padding-0-75-border-radius-8-mb-0-75">
+                                        <div class="font-weight-600-color-856404-mb-0-4-font-0-85">How to verify:</div>
+                                        <ol class="margin-0-padding-left-1-2-color-856404-font-0-85-line-height-1-6">
+                                            <li class="margin-bottom-0-25">Check your inbox at <strong id="user-email-display">{{userEmail}}</strong></li>
+                                            <li class="margin-bottom-0-25"><strong>Method 1:</strong> Click the verification link in the email (easiest)</li>
                                             <li><strong>Method 2:</strong> Enter the 6-digit code from the email below</li>
                                         </ol>
                                     </div>
 
                                     <!-- Code Verification Section -->
-                                    <div style="background: #f0f7ff; padding: 0.75rem; border-radius: 8px; margin-bottom: 0.75rem; border: 2px solid #4a90e2;">
-                                        <h4 style="margin: 0 0 0.5rem 0; color: #4a90e2; font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; gap: 0.4rem;">
+                                    <div class="bg-blue-light-padding-0-75-border-radius-8-mb-0-75-border-2-solid-blue">
+                                        <h4 class="margin-0-0-0-5-0-color-blue-font-0-9-weight-700-flex-align-center-gap-0-4">
                                             <i class="fas fa-key"></i> Verify with Code
                                         </h4>
-                                        <p style="margin: 0 0 0.5rem 0; color: #4a90e2; font-size: 0.8rem;">
+                                        <p class="margin-0-0-0-5-0-color-blue-font-0-8">
                                             Enter the 6-digit verification code from your email:
                                         </p>
-                                        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                                        <div class="display-flex-gap-0-5-align-center-flex-wrap">
                                             <input type="text" 
                                                    id="verification-code-input" 
+                                                   class="verification-code-input"
                                                    placeholder="000000" 
                                                    maxlength="6" 
                                                    pattern="[0-9]{6}"
-                                                   style="
-                                                       flex: 1;
-                                                       min-width: 0;
-                                                       padding: 0.6rem 0.75rem;
-                                                       border: 2px solid #4a90e2;
-                                                       border-radius: 8px;
-                                                       font-size: 1.2rem;
-                                                       font-weight: 700;
-                                                       text-align: center;
-                                                       letter-spacing: 0.4rem;
-                                                       font-family: 'Courier New', monospace;
-                                                       color: #4a90e2;
-                                                       box-sizing: border-box;
-                                                       max-width: 100%;
-                                                   "
                                                    onclick="event.stopPropagation();">
                                             <button id="verify-code-btn" 
+                                                    class="verify-code-btn"
                                                     disabled
-                                                    style="
-                                                        background: #4a90e2;
-                                                        color: white;
-                                                        border: none;
-                                                        padding: 0.6rem 1rem;
-                                                        border-radius: 8px;
-                                                        font-weight: 600;
-                                                        cursor: not-allowed;
-                                                        font-size: 0.85rem;
-                                                        opacity: 0.6;
-                                                        transition: all 0.3s ease;
-                                                        display: flex;
-                                                        align-items: center;
-                                                        gap: 0.4rem;
-                                                        flex-shrink: 0;
-                                                    " 
                                                     onclick="event.stopPropagation();">
                                                 <i class="fas fa-check"></i> Verify
                                             </button>
                                         </div>
-                                        <div id="code-verification-message" style="margin-top: 0.5rem; padding: 0.5rem; border-radius: 6px; display: none; font-size: 0.8rem;"></div>
+                                        <div id="code-verification-message" class="mt-0-5-padding-0-5-border-radius-6-font-0-8" style="display: none;"></div>
                                     </div>
 
-                                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                                        <button id="resend-verification-btn" style="
-                                            background: var(--secondary);
-                                            color: white;
-                                            border: none;
-                                            padding: 0.6rem 1rem;
-                                            border-radius: 8px;
-                                            font-weight: 600;
-                                            cursor: pointer;
-                                            font-size: 0.85rem;
-                                            display: flex;
-                                            align-items: center;
-                                            gap: 0.4rem;
-                                            transition: all 0.3s ease;
-                                            flex: 1;
-                                            min-width: 0;
-                                            max-width: 100%;
-                                            box-sizing: border-box;
-                                        " onclick="event.stopPropagation();">
-                                            <i class="fas fa-paper-plane"></i> <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Resend Verification Email</span>
+                                    <div class="display-flex-gap-0-5-flex-wrap">
+                                        <button id="resend-verification-btn" class="resend-verification-btn" onclick="event.stopPropagation();">
+                                            <i class="fas fa-paper-plane"></i> <span class="white-space-nowrap-overflow-hidden-text-overflow-ellipsis">Resend Verification Email</span>
                                         </button>
-                                        <button id="checkEmailVerificationBtn" style="
-                                            background: white;
-                                            color: #856404;
-                                            border: 2px solid #ffc107;
-                                            padding: 0.6rem 1rem;
-                                            border-radius: 8px;
-                                            font-weight: 600;
-                                            cursor: pointer;
-                                            font-size: 0.85rem;
-                                            display: flex;
-                                            align-items: center;
-                                            gap: 0.4rem;
-                                            transition: all 0.3s ease;
-                                            flex: 1;
-                                            min-width: 0;
-                                            max-width: 100%;
-                                            box-sizing: border-box;
-                                        " onclick="event.stopPropagation();">
-                                            <i class="fas fa-sync-alt"></i> <span style="white-space: nowrap;">Refresh Status</span>
+                                        <button id="checkEmailVerificationBtn" class="check-email-verification-btn" onclick="event.stopPropagation();">
+                                            <i class="fas fa-sync-alt"></i> <span class="white-space-nowrap">Refresh Status</span>
                                         </button>
                                     </div>
-                                    <div id="verification-message" style="margin-top: 0.5rem; padding: 0.5rem; border-radius: 6px; display: none; font-size: 0.8rem;"></div>
+                                    <div id="verification-message" class="mt-0-5-padding-0-5-border-radius-6-font-0-8" style="display: none;"></div>
                                 </div>
                             </div>
                         </div>
@@ -221,11 +113,11 @@
                 </div>
 
                 <!-- Loading State -->
-                <div id="email-verification-loading" style="padding: 0.75rem 1rem; text-align: center;">
-                    <div style="font-size: 1.2rem; color: var(--muted-color); margin-bottom: 0.5rem;">
+                <div id="email-verification-loading" class="email-verification-loading">
+                    <div class="font-size-1-2-color-muted-mb-0-5">
                         <i class="fas fa-spinner fa-spin"></i>
                     </div>
-                    <p style="color: var(--muted-color); margin: 0; font-size: 0.85rem;">Checking verification status...</p>
+                    <p class="color-muted-margin-0-font-size-0-85">Checking verification status...</p>
                 </div>
             </div>
         </div>
@@ -238,38 +130,24 @@
                 </div>
                 <div class="card-title">Password Security</div>
             </div>
-            <div style="padding: 1.5rem 0;">
-                <div style="padding: 1.5rem; background: #fff3cd; border: 2px solid #ffc107; border-radius: 12px; margin-bottom: 1.5rem;">
-                    <div style="display: flex; align-items: start; gap: 1rem;">
-                        <div style="font-size: 2rem; color: #f59e0b;">
+            <div class="padding-1-5-0">
+                <div class="padding-1-5-bg-yellow-light-border-2-solid-yellow-border-radius-12-mb-1-5">
+                    <div class="display-flex-align-start-gap-1">
+                        <div class="font-size-2-color-orange">
                             <i class="fas fa-shield-alt"></i>
                         </div>
-                        <div style="flex: 1;">
-                            <h3 style="margin: 0 0 0.5rem 0; color: #856404; font-size: 1.2rem; font-weight: 700;">Password Security</h3>
-                            <p style="margin: 0 0 1rem 0; color: #856404; font-size: 0.95rem; line-height: 1.6;">
+                        <div class="flex-1-min-width-0">
+                            <h3 class="margin-0-0-0-5-0-color-dark-yellow-font-1-2-weight-700">Password Security</h3>
+                            <p class="margin-0-0-1-0-color-dark-yellow-font-0-95-line-height-1-6">
                                 Keep your account secure by regularly updating your password.
                             </p>
-                            <div style="background: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-                                    <div style="flex: 1; min-width: 0; overflow: hidden;">
-                                        <div style="font-weight: 600; color: #856404; margin-bottom: 0.25rem; font-size: 0.9rem;">Password</div>
-                                        <div style="font-size: 0.9rem; color: #856404; word-break: break-word; overflow-wrap: break-word;">Last changed: <span id="password-last-changed">Unknown</span></div>
+                            <div class="bg-white-padding-1-border-radius-8-mb-1">
+                                <div class="display-flex-justify-between-align-center-flex-wrap-gap-0-5">
+                                    <div class="flex-1-min-width-0-overflow-hidden">
+                                        <div class="font-weight-600-color-856404-mb-0-25-font-0-9">Password</div>
+                                        <div class="font-size-0-9-color-856404-word-break">Last changed: <span id="password-last-changed">Unknown</span></div>
                                     </div>
-                                    <button id="changePasswordBtn" style="
-                                        flex-shrink: 0;
-                                        background: var(--secondary);
-                                        color: white;
-                                        border: none;
-                                        padding: 0.75rem 1.5rem;
-                                        border-radius: 8px;
-                                        font-weight: 600;
-                                        cursor: pointer;
-                                        font-size: 0.95rem;
-                                        display: flex;
-                                        align-items: center;
-                                        gap: 0.5rem;
-                                        transition: all 0.3s ease;
-                                    ">
+                                    <button id="changePasswordBtn" class="change-password-btn">
                                         <i class="fas fa-key"></i> Change Password
                                     </button>
                                 </div>
@@ -288,49 +166,22 @@
                 </div>
                 <div class="card-title">Quick Actions</div>
             </div>
-            <div style="padding: 1.5rem 0;">
-                <div style="padding: 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; margin-bottom: 1.5rem;">
-                    <div style="display: flex; align-items: start; gap: 1rem;">
-                        <div style="font-size: 2rem; color: white;">
+            <div class="padding-1-5-0">
+                <div class="padding-1-5-bg-gradient-purple-border-radius-12-mb-1-5">
+                    <div class="display-flex-align-start-gap-1">
+                        <div class="font-size-2-color-white">
                             <i class="fas fa-bolt"></i>
                         </div>
-                        <div style="flex: 1;">
-                            <h3 style="margin: 0 0 0.5rem 0; color: white; font-size: 1.2rem; font-weight: 700;">Quick Actions</h3>
-                            <p style="margin: 0 0 1rem 0; color: white; font-size: 0.95rem; line-height: 1.6; opacity: 0.9;">
+                        <div class="flex-1-min-width-0">
+                            <h3 class="margin-0-0-0-5-0-color-white-font-1-2-weight-700">Quick Actions</h3>
+                            <p class="margin-0-0-1-0-color-white-font-0-95-line-height-1-6-opacity-0-9">
                                 Manage your profile and account settings quickly.
                             </p>
-                            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                                <a href="/profile-edit?token={{sessionToken}}" style="
-                                    background: white;
-                                    color: #667eea;
-                                    border: none;
-                                    padding: 0.75rem 1.5rem;
-                                    border-radius: 8px;
-                                    font-weight: 600;
-                                    cursor: pointer;
-                                    font-size: 0.95rem;
-                                    display: flex;
-                                    align-items: center;
-                                    gap: 0.5rem;
-                                    transition: all 0.3s ease;
-                                    text-decoration: none;
-                                ">
+                            <div class="display-flex-gap-0-75-flex-wrap">
+                                <a href="/profile-edit" class="edit-profile-link">
                                     <i class="fas fa-edit"></i> Edit Profile
                                 </a>
-                                <button id="pauseAccountBtn" style="
-                                    background: rgba(255,255,255,0.2);
-                                    color: white;
-                                    border: 2px solid white;
-                                    padding: 0.75rem 1.5rem;
-                                    border-radius: 8px;
-                                    font-weight: 600;
-                                    cursor: pointer;
-                                    font-size: 0.95rem;
-                                    display: flex;
-                                    align-items: center;
-                                    gap: 0.5rem;
-                                    transition: all 0.3s ease;
-                                ">
+                                <button id="pauseAccountBtn" class="pause-account-btn">
                                     <i class="fas fa-pause"></i> Pause Account
                                 </button>
                             </div>
@@ -348,68 +199,40 @@
                 </div>
                 <div class="card-title">Profile Management</div>
             </div>
-            <div style="padding: 1.5rem 0;">
-                <div style="padding: 1.5rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 12px; margin-bottom: 1.5rem;">
-                    <div style="display: flex; align-items: start; gap: 1rem;">
-                        <div style="font-size: 2rem; color: white;">
+            <div class="padding-1-5-0">
+                <div class="padding-1-5-bg-gradient-pink-border-radius-12-mb-1-5">
+                    <div class="display-flex-align-start-gap-1">
+                        <div class="font-size-2-color-white">
                             <i class="fas fa-user-edit"></i>
                         </div>
-                        <div style="flex: 1;">
-                            <h3 style="margin: 0 0 0.5rem 0; color: white; font-size: 1.2rem; font-weight: 700;">Profile Management</h3>
-                            <p style="margin: 0 0 1rem 0; color: white; font-size: 0.95rem; line-height: 1.6; opacity: 0.9;">
+                        <div class="flex-1-min-width-0">
+                            <h3 class="margin-0-0-0-5-0-color-white-font-1-2-weight-700">Profile Management</h3>
+                            <p class="margin-0-0-1-0-color-white-font-0-95-line-height-1-6-opacity-0-9">
                                 Manage your photos and view your complete profile.
                             </p>
-                            <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                                    <a href="/profile-photos?token={{sessionToken}}" style="
-                                        background: white;
-                                        color: #f5576c;
-                                        border: none;
-                                        padding: 0.75rem 1.5rem;
-                                        border-radius: 8px;
-                                        font-weight: 600;
-                                        cursor: pointer;
-                                        font-size: 0.95rem;
-                                        display: flex;
-                                        align-items: center;
-                                        gap: 0.5rem;
-                                        transition: all 0.3s ease;
-                                        text-decoration: none;
-                                    ">
+                            <div class="bg-rgba-white-0-2-padding-1-border-radius-8-mb-1">
+                                <div class="display-flex-gap-0-75-flex-wrap">
+                                    <a href="/profile-photos" class="manage-photos-link">
                                         <i class="fas fa-images"></i> Manage Photos
                                     </a>
-                                    <a href="/profile-full?token={{sessionToken}}" style="
-                                        background: rgba(255,255,255,0.2);
-                                        color: white;
-                                        border: 2px solid white;
-                                        padding: 0.75rem 1.5rem;
-                                        border-radius: 8px;
-                                        font-weight: 600;
-                                        cursor: pointer;
-                                        font-size: 0.95rem;
-                                        display: flex;
-                                        align-items: center;
-                                        gap: 0.5rem;
-                                        transition: all 0.3s ease;
-                                        text-decoration: none;
-                                    ">
+                                    <a href="/profile-full" class="view-full-profile-link">
                                         <i class="fas fa-eye"></i> View Full Profile
                                     </a>
                                 </div>
                             </div>
-                            <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px; color: white;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                            <div class="bg-rgba-white-0-2-padding-1-border-radius-8-color-white">
+                                <div class="display-flex-justify-between-align-center-mb-0-75">
                                     <div>
-                                        <div style="font-weight: 600; margin-bottom: 0.25rem; font-size: 1rem;">Profile Completion</div>
-                                        <div style="font-size: 0.85rem; opacity: 0.9;">Complete your profile to get more matches</div>
+                                        <div class="font-weight-600-mb-0-25-font-size-1">Profile Completion</div>
+                                        <div class="font-size-0-85-opacity-0-9">Complete your profile to get more matches</div>
                                     </div>
-                                    <div style="text-align: center;">
-                                        <div style="font-size: 2rem; font-weight: 700;" id="profile-completion-percentage">0%</div>
-                                        <div style="font-size: 0.75rem; opacity: 0.9;" id="profile-completion-label">Loading...</div>
+                                    <div class="text-align-center">
+                                        <div class="font-size-2-font-weight-700" id="profile-completion-percentage">0%</div>
+                                        <div class="font-size-0-75-opacity-0-9" id="profile-completion-label">Loading...</div>
                                     </div>
                                 </div>
-                                <div style="background: rgba(255,255,255,0.2); border-radius: 4px; height: 8px; overflow: hidden;">
-                                    <div id="profile-completion-bar" style="background: white; height: 100%; width: 0%; transition: width 0.3s ease; border-radius: 4px;"></div>
+                                <div class="bg-rgba-white-0-2-border-radius-4-height-8-overflow-hidden">
+                                    <div id="profile-completion-bar" class="profile-completion-bar"></div>
                                 </div>
                             </div>
                         </div>
@@ -426,48 +249,32 @@
                 </div>
                 <div class="card-title">Billing & Subscription</div>
             </div>
-            <div style="padding: 1.5rem 0;">
-                <div style="padding: 1.5rem; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 12px; margin-bottom: 1.5rem;">
-                    <div style="display: flex; align-items: start; gap: 1rem;">
-                        <div style="font-size: 2rem; color: white;">
+            <div class="padding-1-5-0">
+                <div class="padding-1-5-bg-gradient-primary-secondary-border-radius-12-mb-1-5">
+                    <div class="display-flex-align-start-gap-1">
+                        <div class="font-size-2-color-white">
                             <i class="fas fa-credit-card"></i>
                         </div>
-                        <div style="flex: 1;">
-                            <h3 style="margin: 0 0 0.5rem 0; color: white; font-size: 1.2rem; font-weight: 700;">Subscription Plan</h3>
-                            <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                        <div class="flex-1-min-width-0">
+                            <h3 class="margin-0-0-0-5-0-color-white-font-1-2-weight-700">Subscription Plan</h3>
+                            <div class="bg-rgba-white-0-2-padding-1-border-radius-8-mb-1">
+                                <div class="display-flex-justify-between-align-center-mb-0-75">
                                     <div>
-                                        <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.5rem; color: white;">Current Plan</div>
-                                        <div style="font-size: 1.5rem; font-weight: 700; color: white;" id="current-plan-name-display">Loading...</div>
+                                        <div class="font-size-0-9-opacity-0-9-mb-0-5-color-white">Current Plan</div>
+                                        <div class="font-size-1-5-font-weight-700-color-white" id="current-plan-name-display">Loading...</div>
                                     </div>
-                                    <div style="background: rgba(255, 255, 255, 0.3); padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.9rem; color: white;" id="current-plan-badge-display">
+                                    <div class="bg-rgba-white-0-3-padding-0-5-1-border-radius-20-font-weight-600-font-0-9-color-white" id="current-plan-badge-display">
                                         FREE
                                     </div>
                                 </div>
-                                <div style="font-size: 0.9rem; opacity: 0.9; color: white; margin-bottom: 0.75rem;" id="current-plan-description-display">
+                                <div class="font-size-0-9-opacity-0-9-color-white-mb-0-75" id="current-plan-description-display">
                                     Loading plan details...
                                 </div>
-                                <div style="display: none; font-size: 0.85rem; opacity: 0.8; color: white;" id="current-plan-expiry-display">
+                                <div class="font-size-0-85-opacity-0-8-color-white" id="current-plan-expiry-display" style="display: none;">
                                     <i class="fas fa-calendar"></i> Expires: <span id="current-plan-expiry-date">--</span>
                                 </div>
                             </div>
-                            <a href="/billing.html?token={{sessionToken}}" style="
-                                background: white;
-                                color: var(--primary);
-                                border: none;
-                                padding: 0.75rem 1.5rem;
-                                border-radius: 8px;
-                                font-weight: 600;
-                                cursor: pointer;
-                                font-size: 0.95rem;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                gap: 0.5rem;
-                                text-decoration: none;
-                                transition: all 0.3s ease;
-                            " 
-                               ">
+                            <a href="/billing.html" class="manage-billing-link">
                                 <i class="fas fa-arrow-right"></i> Manage Billing & Subscription
                             </a>
                         </div>
@@ -484,46 +291,46 @@
                 </div>
                 <div class="card-title">Activity & Statistics</div>
             </div>
-            <div style="padding: 1.5rem 0;">
-                <div style="padding: 1.5rem; background: #f0f7ff; border: 2px solid #4a90e2; border-radius: 12px; margin-bottom: 1.5rem;">
-                    <div style="display: flex; align-items: start; gap: 1rem;">
-                        <div style="font-size: 2rem; color: #4a90e2;">
+            <div class="padding-1-5-0">
+                <div class="padding-1-5-bg-blue-light-border-2-solid-blue-border-radius-12-mb-1-5">
+                    <div class="display-flex-align-start-gap-1">
+                        <div class="font-size-2-color-blue">
                             <i class="fas fa-chart-line"></i>
                         </div>
-                        <div style="flex: 1;">
-                            <h3 style="margin: 0 0 0.5rem 0; color: #4a90e2; font-size: 1.2rem; font-weight: 700;">Your Activity Statistics</h3>
-                            <p style="margin: 0 0 1rem 0; color: #4a90e2; font-size: 0.95rem; line-height: 1.6;">
+                        <div class="flex-1-min-width-0">
+                            <h3 class="margin-0-0-0-5-0-color-blue-font-1-2-weight-700">Your Activity Statistics</h3>
+                            <p class="margin-0-0-1-0-color-blue-font-0-95-line-height-1-6">
                                 Track your profile performance and engagement.
                             </p>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; overflow: hidden;">
-                                <div style="padding: 1rem; background: white; border-radius: 8px; text-align: center; border: 2px solid #4a90e2; min-width: 0; overflow: hidden;">
-                                    <i class="fas fa-eye" style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #4a90e2;"></i>
-                                    <div style="font-size: 1.5rem; font-weight: 700; color: #4a90e2; word-break: break-word;" id="stat-profile-views">0</div>
-                                    <div style="font-size: 0.85rem; color: #856404; word-break: break-word; overflow-wrap: break-word;">Profile Views</div>
+                            <div class="display-grid-grid-template-columns-repeat-auto-fit-minmax-120px-1fr-gap-1-overflow-hidden">
+                                <div class="padding-1-bg-white-border-radius-8-text-align-center-border-2-solid-blue-min-width-0-overflow-hidden">
+                                    <i class="fas fa-eye font-size-1-5-mb-0-5-color-blue"></i>
+                                    <div class="font-size-1-5-font-weight-700-color-blue-word-break" id="stat-profile-views">0</div>
+                                    <div class="font-size-0-85-color-dark-yellow-word-break">Profile Views</div>
                                 </div>
                                 
-                                <div style="padding: 1rem; background: white; border-radius: 8px; text-align: center; border: 2px solid #4a90e2; min-width: 0; overflow: hidden;">
-                                    <i class="fas fa-heart" style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #4a90e2;"></i>
-                                    <div style="font-size: 1.5rem; font-weight: 700; color: #4a90e2; word-break: break-word;" id="stat-likes-received">0</div>
-                                    <div style="font-size: 0.85rem; color: #856404; word-break: break-word; overflow-wrap: break-word;">Likes Received</div>
+                                <div class="padding-1-bg-white-border-radius-8-text-align-center-border-2-solid-blue-min-width-0-overflow-hidden">
+                                    <i class="fas fa-heart font-size-1-5-mb-0-5-color-blue"></i>
+                                    <div class="font-size-1-5-font-weight-700-color-blue-word-break" id="stat-likes-received">0</div>
+                                    <div class="font-size-0-85-color-dark-yellow-word-break">Likes Received</div>
                                 </div>
                                 
-                                <div style="padding: 1rem; background: white; border-radius: 8px; text-align: center; border: 2px solid #4a90e2; min-width: 0; overflow: hidden;">
-                                    <i class="fas fa-envelope" style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #4a90e2;"></i>
-                                    <div style="font-size: 1.5rem; font-weight: 700; color: #4a90e2; word-break: break-word;" id="stat-messages-sent">0</div>
-                                    <div style="font-size: 0.85rem; color: #856404; word-break: break-word; overflow-wrap: break-word;">Messages Sent</div>
+                                <div class="padding-1-bg-white-border-radius-8-text-align-center-border-2-solid-blue-min-width-0-overflow-hidden">
+                                    <i class="fas fa-envelope font-size-1-5-mb-0-5-color-blue"></i>
+                                    <div class="font-size-1-5-font-weight-700-color-blue-word-break" id="stat-messages-sent">0</div>
+                                    <div class="font-size-0-85-color-dark-yellow-word-break">Messages Sent</div>
                                 </div>
                                 
-                                <div style="padding: 1rem; background: white; border-radius: 8px; text-align: center; border: 2px solid #4a90e2; min-width: 0; overflow: hidden;">
-                                    <i class="fas fa-inbox" style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #4a90e2;"></i>
-                                    <div style="font-size: 1.5rem; font-weight: 700; color: #4a90e2; word-break: break-word;" id="stat-messages-received">0</div>
-                                    <div style="font-size: 0.85rem; color: #856404; word-break: break-word; overflow-wrap: break-word;">Messages Received</div>
+                                <div class="padding-1-bg-white-border-radius-8-text-align-center-border-2-solid-blue-min-width-0-overflow-hidden">
+                                    <i class="fas fa-inbox font-size-1-5-mb-0-5-color-blue"></i>
+                                    <div class="font-size-1-5-font-weight-700-color-blue-word-break" id="stat-messages-received">0</div>
+                                    <div class="font-size-0-85-color-dark-yellow-word-break">Messages Received</div>
                                 </div>
                                 
-                                <div style="padding: 1rem; background: white; border-radius: 8px; text-align: center; border: 2px solid #4a90e2; min-width: 0; overflow: hidden;">
-                                    <i class="fas fa-users" style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #4a90e2;"></i>
-                                    <div style="font-size: 1.5rem; font-weight: 700; color: #4a90e2; word-break: break-word;" id="stat-matches">0</div>
-                                    <div style="font-size: 0.85rem; color: #856404; word-break: break-word; overflow-wrap: break-word;">Matches</div>
+                                <div class="padding-1-bg-white-border-radius-8-text-align-center-border-2-solid-blue-min-width-0-overflow-hidden">
+                                    <i class="fas fa-users font-size-1-5-mb-0-5-color-blue"></i>
+                                    <div class="font-size-1-5-font-weight-700-color-blue-word-break" id="stat-matches">0</div>
+                                    <div class="font-size-0-85-color-dark-yellow-word-break">Matches</div>
                                 </div>
                             </div>
                         </div>
@@ -540,61 +347,33 @@
                 </div>
                 <div class="card-title">Data Management</div>
             </div>
-            <div style="padding: 1.5rem 0;">
-                <div style="padding: 1.5rem; background: #fff3cd; border: 2px solid #ffc107; border-radius: 12px; margin-bottom: 1.5rem;">
-                    <div style="display: flex; align-items: start; gap: 1rem;">
-                        <div style="font-size: 2rem; color: #f59e0b;">
+            <div class="padding-1-5-0">
+                <div class="padding-1-5-bg-yellow-light-border-2-solid-yellow-border-radius-12-mb-1-5">
+                    <div class="display-flex-align-start-gap-1">
+                        <div class="font-size-2-color-orange">
                             <i class="fas fa-database"></i>
                         </div>
-                        <div style="flex: 1;">
-                            <h3 style="margin: 0 0 0.5rem 0; color: #856404; font-size: 1.2rem; font-weight: 700;">Data Management</h3>
-                            <p style="margin: 0 0 1rem 0; color: #856404; font-size: 0.95rem; line-height: 1.6;">
+                        <div class="flex-1-min-width-0">
+                            <h3 class="margin-0-0-0-5-0-color-dark-yellow-font-1-2-weight-700">Data Management</h3>
+                            <p class="margin-0-0-1-0-color-dark-yellow-font-0-95-line-height-1-6">
                                 Manage your account data and privacy settings.
                             </p>
-                            <div style="background: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #e9ecef; flex-wrap: wrap; gap: 0.5rem;">
-                                    <div style="flex: 1; min-width: 0; overflow: hidden;">
-                                        <div style="font-weight: 600; color: #856404; margin-bottom: 0.25rem; font-size: 0.9rem;">Download Account Data</div>
-                                        <div style="font-size: 0.9rem; color: #856404; word-break: break-word; overflow-wrap: break-word;">Export all your account data (GDPR compliant)</div>
+                            <div class="bg-white-padding-1-border-radius-8-mb-1">
+                                <div class="display-flex-justify-between-align-center-padding-0-75-0-border-bottom-1-solid-light-gray-flex-wrap-gap-0-5">
+                                    <div class="flex-1-min-width-0-overflow-hidden">
+                                        <div class="font-weight-600-color-856404-mb-0-25-font-0-9">Download Account Data</div>
+                                        <div class="font-size-0-9-color-856404-word-break">Export all your account data (GDPR compliant)</div>
                                     </div>
-                                    <button id="downloadAccountDataBtn" style="
-                                        flex-shrink: 0;
-                                        background: var(--secondary);
-                                        color: white;
-                                        border: none;
-                                        padding: 0.75rem 1.5rem;
-                                        border-radius: 8px;
-                                        font-weight: 600;
-                                        cursor: pointer;
-                                        font-size: 0.95rem;
-                                        display: flex;
-                                        align-items: center;
-                                        gap: 0.5rem;
-                                        transition: all 0.3s ease;
-                                    ">
+                                    <button id="downloadAccountDataBtn" class="download-account-data-btn">
                                         <i class="fas fa-download"></i> Download
                                     </button>
                                 </div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; flex-wrap: wrap; gap: 0.5rem;">
-                                    <div style="flex: 1; min-width: 0; overflow: hidden;">
-                                        <div style="font-weight: 600; color: #856404; margin-bottom: 0.25rem; font-size: 0.9rem;">Delete Account</div>
-                                        <div style="font-size: 0.9rem; color: #856404; word-break: break-word; overflow-wrap: break-word;">⚠️ Permanently delete your account - This cannot be undone</div>
+                                <div class="display-flex-justify-between-align-center-padding-0-75-0-flex-wrap-gap-0-5">
+                                    <div class="flex-1-min-width-0-overflow-hidden">
+                                        <div class="font-weight-600-color-856404-mb-0-25-font-0-9">Delete Account</div>
+                                        <div class="font-size-0-9-color-856404-word-break">⚠️ Permanently delete your account - This cannot be undone</div>
                                     </div>
-                                    <button id="deleteAccountBtn" style="
-                                        flex-shrink: 0;
-                                        background: var(--danger-color);
-                                        color: white;
-                                        border: none;
-                                        padding: 0.75rem 1.5rem;
-                                        border-radius: 8px;
-                                        font-weight: 600;
-                                        cursor: pointer;
-                                        font-size: 0.95rem;
-                                        display: flex;
-                                        align-items: center;
-                                        gap: 0.5rem;
-                                        transition: all 0.3s ease;
-                                    ">
+                                    <button id="deleteAccountBtn" class="delete-account-btn">
                                         <i class="fas fa-trash"></i> Delete Account
                                     </button>
                                 </div>
@@ -608,953 +387,126 @@
 </div>
 
 <!-- Change Password Modal -->
-<div id="change-password-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10001; align-items: center; justify-content: center;">
-    <div style="background: white; border-radius: 16px; padding: 2rem; max-width: 500px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-        <div style="text-align: center; margin-bottom: 1.5rem;">
-            <div style="width: 64px; height: 64px; background: #e3f2fd; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
-                <i class="fas fa-key" style="font-size: 2rem; color: var(--primary);"></i>
+<div id="change-password-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="text-align-center-mb-1-5">
+            <div class="width-64-height-64-bg-blue-light-border-radius-50-display-flex-align-center-justify-center-margin-0-auto-1">
+                <i class="fas fa-key font-size-2-color-primary"></i>
             </div>
-            <h3 style="margin: 0 0 0.5rem 0; color: var(--dark-color); font-size: 1.5rem;">Change Password</h3>
-            <p style="margin: 0; color: var(--muted-color); font-size: 0.95rem;">Enter your current password and choose a new one</p>
+            <h3 class="margin-0-0-0-5-0-color-dark-color-font-size-1-5">Change Password</h3>
+            <p class="margin-0-color-muted-font-size-0-95">Enter your current password and choose a new one</p>
         </div>
         
         <form id="change-password-form" onsubmit="handleChangePassword(event)">
-            <div style="margin-bottom: 1rem;">
-                <label for="current-password-input" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--dark-color);">Current Password</label>
-                <input type="password" id="current-password-input" required style="
-                    width: 100%;
-                    padding: 0.75rem;
-                    border: 2px solid #dee2e6;
-                    border-radius: 8px;
-                    font-size: 1rem;
-                    box-sizing: border-box;
-                ">
+            <div class="margin-bottom-1">
+                <label for="current-password-input" class="display-block-mb-0-5-font-weight-600-color-dark-color">Current Password</label>
+                <input type="password" id="current-password-input" class="width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-box-sizing-border-box" required>
             </div>
             
-            <div style="margin-bottom: 1rem;">
-                <label for="new-password-input" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--dark-color); position: relative;">
+            <div class="margin-bottom-1">
+                <label for="new-password-input" class="display-block-mb-0-5-font-weight-600-color-dark-color-position-relative">
                     New Password
-                    <button type="button" onclick="togglePasswordRequirements(event)" style="background: none; border: none; color: #667eea; cursor: pointer; margin-left: 8px; font-size: 16px; padding: 0; position: relative;" title="Show password requirements">
+                    <button type="button" onclick="togglePasswordRequirements(event)" class="bg-none-border-none-color-purple-cursor-pointer-ml-8-font-16-padding-0-position-relative" title="Show password requirements">
                         <i class="fas fa-info-circle" id="password-info-icon"></i>
                     </button>
-                    <div id="passwordRequirements" style="display: none; position: absolute; bottom: calc(100% + 8px); left: 0; z-index: 1000; background: #667eea; color: white; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.875rem; max-width: 400px; min-width: 280px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); line-height: 1.4;">
-                        <div style="display: flex; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.5rem;">
-                            <i class="fas fa-info-circle" style="font-size: 0.9rem; flex-shrink: 0; margin-top: 0.05rem;"></i>
+                    <div id="passwordRequirements" class="password-requirements-tooltip" style="display: none;">
+                        <div class="display-flex-align-items-flex-start-gap-0-5-mb-0-5">
+                            <i class="fas fa-info-circle font-size-0-9-flex-shrink-0-mt-0-05"></i>
                             <div>
-                                <div style="font-weight: 600; margin-bottom: 0.5rem;">Password must contain:</div>
-                                <ul style="margin: 0; padding-left: 1.2rem; list-style: none;">
-                                    <li id="length" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-                                        <span style="width: 8px; height: 8px; border-radius: 50%; background: #dc3545;"></span>
+                                <div class="font-weight-600-mb-0-5">Password must contain:</div>
+                                <ul class="margin-0-padding-left-1-2-list-style-none">
+                                    <li id="length" class="display-flex-align-center-gap-0-5-mb-0-25">
+                                        <span class="width-8-height-8-border-radius-50-bg-red"></span>
                                         <span>5-12 characters</span>
                                     </li>
-                                    <li id="uppercase" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-                                        <span style="width: 8px; height: 8px; border-radius: 50%; background: #dc3545;"></span>
+                                    <li id="uppercase" class="display-flex-align-center-gap-0-5-mb-0-25">
+                                        <span class="width-8-height-8-border-radius-50-bg-red"></span>
                                         <span>At least one uppercase letter</span>
                                     </li>
-                                    <li id="number" style="display: flex; align-items: center; gap: 0.5rem;">
-                                        <span style="width: 8px; height: 8px; border-radius: 50%; background: #dc3545;"></span>
+                                    <li id="number" class="display-flex-align-center-gap-0-5">
+                                        <span class="width-8-height-8-border-radius-50-bg-red"></span>
                                         <span>At least one number</span>
                                     </li>
                                 </ul>
                             </div>
                         </div>
-                        <div style="position: absolute; top: 100%; left: 20px; border: 6px solid transparent; border-top-color: #667eea;"></div>
+                        <div class="position-absolute-top-100-left-20-border-6-solid-transparent-border-top-color-purple"></div>
                     </div>
                 </label>
-                <input type="password" id="new-password-input" required minlength="5" maxlength="12" style="
-                    width: 100%;
-                    padding: 0.75rem;
-                    border: 2px solid #dee2e6;
-                    border-radius: 8px;
-                    font-size: 1rem;
-                    box-sizing: border-box;
-                ">
+                <input type="password" id="new-password-input" class="width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-box-sizing-border-box" required minlength="5" maxlength="12">
             </div>
             
-            <div style="margin-bottom: 1.5rem;">
-                <label for="confirm-password-input" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--dark-color);">Confirm New Password</label>
-                <input type="password" id="confirm-password-input" required minlength="5" maxlength="12" style="
-                    width: 100%;
-                    padding: 0.75rem;
-                    border: 2px solid #dee2e6;
-                    border-radius: 8px;
-                    font-size: 1rem;
-                    box-sizing: border-box;
-                ">
+            <div class="margin-bottom-1-5">
+                <label for="confirm-password-input" class="display-block-mb-0-5-font-weight-600-color-dark-color">Confirm New Password</label>
+                <input type="password" id="confirm-password-input" class="width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-box-sizing-border-box" required minlength="5" maxlength="12">
             </div>
             
-            <div id="password-change-message" style="
-                margin-bottom: 1rem;
-                padding: 0.75rem;
-                border-radius: 8px;
-                display: none;
-                font-size: 0.9rem;
-            "></div>
+            <div id="password-change-message" class="margin-bottom-1-bg-padding-0-75-border-radius-8-font-size-0-9" style="display: none;"></div>
             
-            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                <button type="button" id="closeChangePasswordModalBtn" style="
-                    background: #f8f9fa;
-                    color: var(--dark-color);
-                    border: 1px solid #dee2e6;
-                    padding: 0.75rem 1.5rem;
-                    border-radius: 8px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    font-size: 0.95rem;
-                ">Cancel</button>
-                <button type="submit" id="change-password-submit-btn" style="
-                    background: var(--primary);
-                    color: white;
-                    border: none;
-                    padding: 0.75rem 1.5rem;
-                    border-radius: 8px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    font-size: 0.95rem;
-                ">Change Password</button>
+            <div class="display-flex-gap-1-justify-content-flex-end">
+                <button type="button" id="closeChangePasswordModalBtn" class="bg-light-gray-color-dark-color-border-1-solid-light-gray-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-pointer-font-size-0-95">Cancel</button>
+                <button type="submit" id="change-password-submit-btn" class="bg-primary-color-white-border-none-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-pointer-font-size-0-95">Change Password</button>
             </div>
         </form>
     </div>
 </div>
 
 <!-- Delete Account Confirmation Modal -->
-<div id="delete-account-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10001; align-items: center; justify-content: center;">
-    <div style="background: white; border-radius: 16px; padding: 2rem; max-width: 500px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+<div id="delete-account-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
         <!-- Step 1: Initial Confirmation -->
         <div id="delete-confirm-step1">
-            <div style="text-align: center; margin-bottom: 1.5rem;">
-                <div style="width: 64px; height: 64px; background: #fee; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #dc3545;"></i>
+            <div class="text-align-center-mb-1-5">
+                <div class="width-64-height-64-bg-red-light-border-radius-50-display-flex-align-items-center-justify-content-center-margin-0-auto-1">
+                    <i class="fas fa-exclamation-triangle font-size-2-color-red"></i>
                 </div>
-                <h3 style="margin: 0 0 0.5rem 0; color: var(--dark-color); font-size: 1.5rem;">Delete Account</h3>
-                <p style="margin: 0; color: var(--muted-color); font-size: 0.95rem;">⚠️ This action is permanent and cannot be undone</p>
+                <h3 class="margin-0-0-0-5-0-color-dark-color-font-size-1-5">Delete Account</h3>
+                <p class="margin-0-color-muted-font-size-0-95">⚠️ This action is permanent and cannot be undone</p>
             </div>
             
-            <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
-                <div style="font-weight: 600; color: #856404; text-align: center;">⚠️ This action is PERMANENT and cannot be undone</div>
+            <div class="bg-yellow-light-border-1-solid-yellow-border-radius-8-padding-1-mb-1-5">
+                <div class="font-weight-600-color-dark-yellow-text-align-center">⚠️ This action is PERMANENT and cannot be undone</div>
             </div>
             
-            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                <button id="closeDeleteAccountModalBtn" style="
-                    background: #f8f9fa;
-                    color: var(--dark-color);
-                    border: 1px solid #dee2e6;
-                    padding: 0.75rem 1.5rem;
-                    border-radius: 8px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    font-size: 0.95rem;
-                ">Cancel</button>
-                <button id="showDeleteConfirmStep2Btn" style="
-                    background: var(--danger-color);
-                    color: white;
-                    border: none;
-                    padding: 0.75rem 1.5rem;
-                    border-radius: 8px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    font-size: 0.95rem;
-                ">Continue</button>
+            <div class="display-flex-gap-1-justify-content-flex-end">
+                <button id="closeDeleteAccountModalBtn" class="bg-light-gray-color-dark-color-border-1-solid-light-gray-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-pointer-font-size-0-95">Cancel</button>
+                <button id="showDeleteConfirmStep2Btn" class="bg-primary-color-white-border-none-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-pointer-font-size-0-95" style="background: var(--danger-color);">Continue</button>
             </div>
         </div>
         
         <!-- Step 2: Type DELETE Confirmation -->
         <div id="delete-confirm-step2" style="display: none;">
-            <div style="text-align: center; margin-bottom: 1.5rem;">
-                <div style="width: 64px; height: 64px; background: #fee; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
-                    <i class="fas fa-trash-alt" style="font-size: 2rem; color: #dc3545;"></i>
+            <div class="text-align-center-mb-1-5">
+                <div class="width-64-height-64-bg-red-light-border-radius-50-display-flex-align-items-center-justify-content-center-margin-0-auto-1">
+                    <i class="fas fa-trash-alt font-size-2-color-red"></i>
                 </div>
-                <h3 style="margin: 0 0 0.5rem 0; color: var(--dark-color); font-size: 1.5rem;">Final Confirmation</h3>
-                <p style="margin: 0; color: var(--muted-color); font-size: 0.95rem;">⚠️ Type "DELETE" to permanently delete your account</p>
+                <h3 class="margin-0-0-0-5-0-color-dark-color-font-size-1-5">Final Confirmation</h3>
+                <p class="margin-0-color-muted-font-size-0-95">⚠️ Type "DELETE" to permanently delete your account</p>
             </div>
             
-            <div style="margin-bottom: 1.5rem;">
-                <input type="text" id="delete-confirm-input" placeholder="Type DELETE here" style="
-                    width: 100%;
-                    padding: 0.75rem;
-                    border: 2px solid #dee2e6;
-                    border-radius: 8px;
-                    font-size: 1rem;
-                    text-align: center;
-                    text-transform: uppercase;
-                    box-sizing: border-box;
-                " id="delete-confirm-input">
-                <div id="delete-confirm-error" style="
-                    color: #dc3545;
-                    font-size: 0.85rem;
-                    margin-top: 0.5rem;
-                    text-align: center;
-                    display: none;
-                ">Please type "DELETE" exactly to confirm</div>
+            <div class="margin-bottom-1-5">
+                <input type="text" id="delete-confirm-input" placeholder="Type DELETE here" class="width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-text-align-center-text-transform-uppercase-box-sizing-border-box">
+                <div id="delete-confirm-error" class="color-red-font-size-0-85-mt-0-5-text-align-center" style="display: none;">Please type "DELETE" exactly to confirm</div>
             </div>
             
-            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                <button id="showDeleteConfirmStep1Btn" style="
-                    background: #f8f9fa;
-                    color: var(--dark-color);
-                    border: 1px solid #dee2e6;
-                    padding: 0.75rem 1.5rem;
-                    border-radius: 8px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    font-size: 0.95rem;
-                ">Back</button>
-                <button id="delete-confirm-btn" disabled style="
-                    background: #ccc;
-                    color: white;
-                    border: none;
-                    padding: 0.75rem 1.5rem;
-                    border-radius: 8px;
-                    font-weight: 600;
-                    cursor: not-allowed;
-                    font-size: 0.95rem;
-                ">Delete Account</button>
+            <div class="display-flex-gap-1-justify-content-flex-end">
+                <button id="showDeleteConfirmStep1Btn" class="bg-light-gray-color-dark-color-border-1-solid-light-gray-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-pointer-font-size-0-95">Back</button>
+                <button id="delete-confirm-btn" class="bg-gray-color-white-border-none-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-not-allowed-font-size-0-95" disabled>Delete Account</button>
             </div>
         </div>
         
         <!-- Step 3: Processing -->
-        <div id="delete-confirm-step3" style="display: none; text-align: center;">
-            <div style="margin-bottom: 1.5rem;">
-                <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--primary);"></i>
+        <div id="delete-confirm-step3" class="text-align-center" style="display: none;">
+            <div class="margin-bottom-1-5">
+                <i class="fas fa-spinner fa-spin font-size-3-color-primary"></i>
             </div>
-            <h3 style="margin: 0 0 0.5rem 0; color: var(--dark-color);">Deleting Account...</h3>
-            <p style="margin: 0; color: var(--muted-color);">Please wait while we process your request</p>
+            <h3 class="margin-0-0-0-5-0-color-dark-color">Deleting Account...</h3>
+            <p class="margin-0-color-muted">Please wait while we process your request</p>
         </div>
     </div>
 </div>
 
+<!-- Account Page JavaScript - Moved to new structure (Phase 1 CSS/JS Extraction) -->
 <script src="/assets/js/shared/password-validator.js"></script>
-<script src="/assets/js/account-delete.js"></script>
-<script>
-    // Load account data on page load
-    document.addEventListener('DOMContentLoaded', async function() {
-        await loadAccountData();
-        await loadProfileCompletion();
-        await checkEmailVerification();
-        await loadCurrentPlan();
-        
-        // Initialize password validator
-        PasswordValidator.init({
-            passwordInputId: 'new-password-input',
-            requirementsId: 'passwordRequirements'
-        });
-        
-        // Close modals when clicking outside
-        const passwordModal = document.getElementById('change-password-modal');
-        if (passwordModal) {
-            passwordModal.addEventListener('click', function(event) {
-                if (event.target === passwordModal) {
-                    closeChangePasswordModal();
-                }
-            });
-        }
-        
-    });
-
-    async function loadAccountData() {
-        try {
-            // Cookie-based auth - cookies sent automatically
-            const response = await fetch('/api/account/info', {
-                method: 'GET',
-                credentials: 'same-origin'
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                // Update account dates
-                if (data.accountCreated) {
-                    const createdDate = new Date(data.accountCreated);
-                    document.getElementById('account-created-date').textContent = createdDate.toLocaleDateString('en-US', { 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                    });
-                }
-                
-                if (data.lastLogin) {
-                    const loginDate = new Date(data.lastLogin);
-                    const now = new Date();
-                    const diffMs = now - loginDate;
-                    const diffMins = Math.floor(diffMs / 60000);
-                    const diffHours = Math.floor(diffMs / 3600000);
-                    const diffDays = Math.floor(diffMs / 86400000);
-                    
-                    let timeAgo = '';
-                    if (diffMins < 1) {
-                        // Show actual time instead of "Just now"
-                        timeAgo = loginDate.toLocaleDateString('en-US', { 
-                            year: 'numeric', 
-                            month: 'short', 
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        });
-                    } else if (diffMins < 60) {
-                        timeAgo = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-                    } else if (diffHours < 24) {
-                        timeAgo = `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-                    } else if (diffDays < 7) {
-                        timeAgo = `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-                    } else {
-                        timeAgo = loginDate.toLocaleDateString('en-US', { 
-                            year: 'numeric', 
-                            month: 'short', 
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        });
-                    }
-                    
-                    document.getElementById('last-login-date').textContent = timeAgo;
-                } else {
-                    // No last login available (first time user or no sessions)
-                    document.getElementById('last-login-date').textContent = 'Never';
-                }
-            }
-        } catch (error) {
-            console.error('Error loading account data:', error);
-            const lastLoginElement = document.getElementById('last-login-date');
-            if (lastLoginElement) {
-                const errorMessage = error.message && error.message.includes('HTTP error') 
-                    ? 'Unable to load (network error)' 
-                    : 'Unable to load';
-                lastLoginElement.textContent = errorMessage;
-            }
-        }
-    }
-
-
-    async function loadProfileCompletion() {
-        try {
-            // Use existing stats-count.js if available
-            if (window.statsCount && window.statsCount.calculateAndUpdate) {
-                await window.statsCount.calculateAndUpdate();
-                
-                // Update completion display
-                setTimeout(() => {
-                    const percentage = document.getElementById('completion-percentage');
-                    const label = document.getElementById('completion-label');
-                    
-                    if (percentage && label) {
-                        document.getElementById('profile-completion-percentage').textContent = percentage.textContent;
-                        document.getElementById('profile-completion-label').textContent = label.textContent;
-                        const percentageValue = parseInt(percentage.textContent) || 0;
-                        document.getElementById('profile-completion-bar').style.width = percentageValue + '%';
-                    }
-                }, 500);
-            }
-        } catch (error) {
-            console.error('Error loading profile completion:', error);
-            // Silently fail - profile completion is not critical
-            // The completion bar will just not update, which is acceptable
-        }
-    }
-
-    async function checkEmailVerification() {
-        const loadingSection = document.getElementById('email-verification-loading');
-        const verifiedSection = document.getElementById('email-verified-section');
-        const notVerifiedSection = document.getElementById('email-not-verified-section');
-        const messageDiv = document.getElementById('verification-message');
-        
-        // Show loading
-        loadingSection.style.display = 'block';
-        verifiedSection.style.display = 'none';
-        notVerifiedSection.style.display = 'none';
-        if (messageDiv) messageDiv.style.display = 'none';
-        
-        try {
-            // Cookie-based auth - cookies sent automatically
-            const response = await fetch(`/api/account/info?t=${Date.now()}`, {
-                method: 'GET',
-                credentials: 'same-origin',
-                cache: 'no-cache'
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                // Hide loading
-                loadingSection.style.display = 'none';
-                
-                if (data.emailVerified) {
-                    // Show verified state
-                    verifiedSection.style.display = 'block';
-                    notVerifiedSection.style.display = 'none';
-                    
-                    // Update verified email display
-                    const verifiedEmailDisplay = document.getElementById('verified-email-display');
-                    if (verifiedEmailDisplay && data.email) {
-                        verifiedEmailDisplay.textContent = data.email;
-                    }
-                } else {
-                    // Show not verified state
-                    verifiedSection.style.display = 'none';
-                    notVerifiedSection.style.display = 'block';
-                    
-                    // Update user email display
-                    const userEmailDisplay = document.getElementById('user-email-display');
-                    if (userEmailDisplay && data.email) {
-                        userEmailDisplay.textContent = data.email;
-                    }
-                }
-            } else {
-                // Error state
-                loadingSection.style.display = 'none';
-                notVerifiedSection.style.display = 'block';
-                verifiedSection.style.display = 'none';
-                
-                if (messageDiv) {
-                    messageDiv.style.display = 'block';
-                    messageDiv.style.background = '#fee';
-                    messageDiv.style.color = '#dc3545';
-                    messageDiv.style.border = '1px solid #dc3545';
-                    messageDiv.textContent = 'Error checking verification status. Please try again.';
-                }
-            }
-        } catch (error) {
-            console.error('Error checking email verification:', error);
-            loadingSection.style.display = 'none';
-            notVerifiedSection.style.display = 'block';
-            verifiedSection.style.display = 'none';
-            
-            if (messageDiv) {
-                messageDiv.style.display = 'block';
-                messageDiv.style.background = '#fee';
-                messageDiv.style.color = '#dc3545';
-                messageDiv.style.border = '1px solid #dc3545';
-                const errorMessage = error.message && error.message.includes('HTTP error') 
-                    ? 'Network error. Please check your connection and try again.' 
-                    : 'Error checking verification status. Please try again.';
-                messageDiv.textContent = errorMessage;
-            }
-        }
-    }
-
-    function changePassword() {
-        document.getElementById('change-password-modal').style.display = 'flex';
-        document.getElementById('change-password-form').reset();
-        document.getElementById('password-change-message').style.display = 'none';
-        document.getElementById('passwordRequirements').style.display = 'none';
-        document.getElementById('current-password-input').focus();
-    }
-    
-    // Wrapper function for inline onclick
-    function togglePasswordRequirements(event) {
-        PasswordValidator.toggleRequirements(event, 'passwordRequirements');
-    }
-
-    function closeChangePasswordModal() {
-        document.getElementById('change-password-modal').style.display = 'none';
-        document.getElementById('change-password-form').reset();
-        document.getElementById('password-change-message').style.display = 'none';
-        document.getElementById('passwordRequirements').style.display = 'none';
-    }
-
-    async function handleChangePassword(event) {
-        event.preventDefault();
-        
-        const currentPassword = document.getElementById('current-password-input').value;
-        const newPassword = document.getElementById('new-password-input').value;
-        const confirmPassword = document.getElementById('confirm-password-input').value;
-        const messageDiv = document.getElementById('password-change-message');
-        const submitBtn = document.getElementById('change-password-submit-btn');
-        
-        // Clear previous messages
-        messageDiv.style.display = 'none';
-        
-        // Validation
-        if (!currentPassword || !newPassword || !confirmPassword) {
-            messageDiv.textContent = 'Please fill in all fields';
-            messageDiv.style.background = '#ffe6e6';
-            messageDiv.style.color = '#dc3545';
-            messageDiv.style.display = 'block';
-            return;
-        }
-        
-        // Validate password requirements
-        const passwordError = PasswordValidator.validateWithMessage(newPassword);
-        if (passwordError) {
-            messageDiv.textContent = passwordError;
-            messageDiv.style.background = '#ffe6e6';
-            messageDiv.style.color = '#dc3545';
-            messageDiv.style.display = 'block';
-            return;
-        }
-        
-        if (newPassword !== confirmPassword) {
-            messageDiv.textContent = 'New password and confirm password do not match';
-            messageDiv.style.background = '#ffe6e6';
-            messageDiv.style.color = '#dc3545';
-            messageDiv.style.display = 'block';
-            return;
-        }
-        
-        // Disable button
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Changing...';
-        
-        try {
-            const token = getSessionToken();
-            if (!token) {
-                alert('Session token not found. Please log in again.');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Change Password';
-                return;
-            }
-            
-            const response = await fetch('/api/account/change-password', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify({
-                    currentPassword,
-                    newPassword,
-                    confirmPassword
-                })
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                messageDiv.textContent = 'Password changed successfully!';
-                messageDiv.style.background = '#e8f5e9';
-                messageDiv.style.color = '#28a745';
-                messageDiv.style.display = 'block';
-                
-                // Reset form
-                document.getElementById('change-password-form').reset();
-                
-                // Close modal after 2 seconds
-                setTimeout(() => {
-                    closeChangePasswordModal();
-                }, 2000);
-            } else {
-                messageDiv.textContent = data.error || 'Failed to change password';
-                messageDiv.style.background = '#ffe6e6';
-                messageDiv.style.color = '#dc3545';
-                messageDiv.style.display = 'block';
-            }
-        } catch (error) {
-            console.error('Error changing password:', error);
-            const errorMessage = error.message && error.message.includes('HTTP error') 
-                ? 'Network error. Please check your connection and try again.' 
-                : 'An error occurred. Please try again.';
-            messageDiv.textContent = errorMessage;
-            messageDiv.style.background = '#ffe6e6';
-            messageDiv.style.color = '#dc3545';
-            messageDiv.style.display = 'block';
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Change Password';
-        }
-    }
-
-    async function resendVerificationEmail() {
-        const resendBtn = document.getElementById('resend-verification-btn');
-        const messageDiv = document.getElementById('verification-message');
-        
-        // Disable button and show loading
-        const originalBtnContent = resendBtn.innerHTML;
-        resendBtn.disabled = true;
-        resendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-        resendBtn.style.opacity = '0.6';
-        resendBtn.style.cursor = 'not-allowed';
-        
-        if (messageDiv) {
-            messageDiv.style.display = 'none';
-        }
-        
-        try {
-            // Get user email from account info (cookie-based auth)
-            const accountResponse = await fetch('/api/account/info', {
-                method: 'GET',
-                credentials: 'same-origin'
-            });
-            const accountData = await accountResponse.json();
-            
-            if (!accountData.success || !accountData.email) {
-                throw new Error('Unable to get email address');
-            }
-            
-            // Send resend verification request
-            const response = await fetch('/api/resend-verification', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email: accountData.email })
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                // Show success message
-                if (messageDiv) {
-                    messageDiv.style.display = 'block';
-                    messageDiv.style.background = '#d4edda';
-                    messageDiv.style.color = '#155724';
-                    messageDiv.style.border = '1px solid #c3e6cb';
-                    messageDiv.innerHTML = '<i class="fas fa-check-circle"></i> Verification email sent! Please check your inbox (and spam folder).';
-                }
-                
-                // Re-enable button after 3 seconds
-                setTimeout(() => {
-                    resendBtn.disabled = false;
-                    resendBtn.innerHTML = originalBtnContent;
-                    resendBtn.style.opacity = '1';
-                    resendBtn.style.cursor = 'pointer';
-                }, 3000);
-            } else {
-                // Show error message
-                if (messageDiv) {
-                    messageDiv.style.display = 'block';
-                    messageDiv.style.background = '#fee';
-                    messageDiv.style.color = '#dc3545';
-                    messageDiv.style.border = '1px solid #dc3545';
-                    messageDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + (data.error || 'Failed to send verification email. Please try again.');
-                }
-                
-                // Re-enable button
-                resendBtn.disabled = false;
-                resendBtn.innerHTML = originalBtnContent;
-                resendBtn.style.opacity = '1';
-                resendBtn.style.cursor = 'pointer';
-            }
-        } catch (error) {
-            console.error('Error resending verification email:', error);
-            
-            // Show user-friendly error message
-            if (messageDiv) {
-                messageDiv.style.display = 'block';
-                messageDiv.style.background = '#fee';
-                messageDiv.style.color = '#dc3545';
-                messageDiv.style.border = '1px solid #dc3545';
-                const errorMessage = error.message && error.message.includes('HTTP error') 
-                    ? 'Network error. Please check your connection and try again.' 
-                    : 'Failed to send verification email. Please try again later.';
-                messageDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${errorMessage}`;
-            }
-            
-            // Re-enable button
-            resendBtn.disabled = false;
-            resendBtn.innerHTML = originalBtnContent;
-            resendBtn.style.opacity = '1';
-            resendBtn.style.cursor = 'pointer';
-        }
-    }
-
-    async function downloadAccountData() {
-        if (!confirm('This will download all your account data. Continue?')) return;
-        
-        try {
-            // Cookie-based auth - cookies sent automatically
-            const response = await fetch('/api/account/export', {
-                method: 'GET',
-                credentials: 'same-origin'
-            });
-            
-            if (response.ok) {
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `account-data-${new Date().toISOString().split('T')[0]}.json`;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-            } else {
-                alert('Failed to download account data');
-            }
-        } catch (error) {
-            console.error('Error downloading account data:', error);
-            const errorMessage = error.message && error.message.includes('HTTP error') 
-                ? 'Network error. Please check your connection and try again.' 
-                : 'Failed to download account data. Please try again later.';
-            alert(errorMessage);
-        }
-    }
-
-    function pauseAccount() {
-        if (!confirm('Are you sure you want to pause your account? You will be hidden from search results and matches.')) {
-            return;
-        }
-        
-        // TODO: Implement pause account API
-        alert('Account pause functionality will be implemented soon');
-    }
-
-    async function loadCurrentPlan() {
-        try {
-            // Cookie-based auth - cookies sent automatically
-            const response = await fetch('/api/account/subscription', {
-                method: 'GET',
-                credentials: 'same-origin'
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            if (data.success && data.subscription) {
-                const subscription = data.subscription;
-                const planName = document.getElementById('current-plan-name-display');
-                const planBadge = document.getElementById('current-plan-badge-display');
-                const planDesc = document.getElementById('current-plan-description-display');
-                const planExpiry = document.getElementById('current-plan-expiry-display');
-                const planExpiryDate = document.getElementById('current-plan-expiry-date');
-                
-                // Map plan types to display names
-                const planMap = {
-                    'free': { name: 'Free Plan', badge: 'FREE', desc: 'Basic features included', color: '#6c757d' },
-                    'basic': { name: 'Premium Basic', badge: 'BASIC', desc: 'Enhanced dating experience', color: '#007bff' },
-                    'premium': { name: 'Premium Plus', badge: 'PREMIUM', desc: 'Maximum matching power', color: '#28a745' },
-                    'vip': { name: 'VIP Elite', badge: 'VIP', desc: 'Ultimate dating experience', color: '#ffc107' }
-                };
-                
-                const planType = subscription.plan || 'free';
-                const planInfo = planMap[planType] || planMap.free;
-                
-                planName.textContent = planInfo.name;
-                planBadge.textContent = planInfo.badge;
-                planBadge.style.background = planType === 'free' ? 'rgba(255, 255, 255, 0.2)' : `rgba(255, 255, 255, 0.3)`;
-                planDesc.textContent = planInfo.desc;
-                
-                // Show expiry if subscription has an end date
-                if (subscription.expiresAt) {
-                    const expiryDate = new Date(subscription.expiresAt);
-                    planExpiryDate.textContent = expiryDate.toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-                    planExpiry.style.display = 'block';
-                } else {
-                    planExpiry.style.display = 'none';
-                }
-            } else {
-                // Default to free plan if no subscription found
-                document.getElementById('current-plan-name-display').textContent = 'Free Plan';
-                document.getElementById('current-plan-badge-display').textContent = 'FREE';
-                document.getElementById('current-plan-description-display').textContent = 'Basic features included';
-            }
-        } catch (error) {
-            console.error('Error loading current plan:', error);
-            // Default to free plan on error
-            const planNameElement = document.getElementById('current-plan-name-display');
-            const planBadgeElement = document.getElementById('current-plan-badge-display');
-            const planDescElement = document.getElementById('current-plan-description-display');
-            
-            if (planNameElement) planNameElement.textContent = 'Free Plan';
-            if (planBadgeElement) planBadgeElement.textContent = 'FREE';
-            if (planDescElement) planDescElement.textContent = 'Basic features included';
-            
-            // Log error but don't show to user - defaulting to free plan is acceptable
-        }
-    }
-
-    function getSessionToken() {
-        // CSRF implementation moves token from URL to cookie, so check cookie first
-        const cookies = document.cookie.split(';');
-        for (let cookie of cookies) {
-            const trimmed = cookie.trim();
-            const equalIndex = trimmed.indexOf('=');
-            if (equalIndex === -1) continue;
-            
-            const name = trimmed.substring(0, equalIndex).trim();
-            const value = trimmed.substring(equalIndex + 1).trim();
-            
-            if (name === 'sessionToken') {
-                return decodeURIComponent(value);
-            }
-        }
-        
-        // Fallback to URL (in case CSRF hasn't run yet)
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlToken = urlParams.get('token');
-        if (urlToken) {
-            return urlToken;
-        }
-        
-        // Try sessionManager if available
-        if (window.sessionManager && typeof window.sessionManager.getToken === 'function') {
-            const token = window.sessionManager.getToken();
-            if (token) {
-                return token;
-            }
-        }
-        
-        return null;
-    }
-
-    function toggleEmailVerificationDetails() {
-        const detailsSection = document.getElementById('email-verification-details');
-        const chevron = document.getElementById('email-verification-chevron');
-        
-        if (detailsSection && chevron) {
-            if (detailsSection.style.display === 'none' || detailsSection.style.display === '') {
-                detailsSection.style.display = 'block';
-                chevron.style.transform = 'rotate(180deg)';
-            } else {
-                detailsSection.style.display = 'none';
-                chevron.style.transform = 'rotate(0deg)';
-            }
-        }
-    }
-
-    async function verifyEmailByCode() {
-        const codeInput = document.getElementById('verification-code-input');
-        const verifyBtn = document.getElementById('verify-code-btn');
-        const messageDiv = document.getElementById('code-verification-message');
-        
-        const code = codeInput.value.trim();
-        
-        if (!code || code.length !== 6) {
-            if (messageDiv) {
-                messageDiv.style.display = 'block';
-                messageDiv.style.background = '#fee';
-                messageDiv.style.color = '#dc3545';
-                messageDiv.style.border = '1px solid #dc3545';
-                messageDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please enter a valid 6-digit code.';
-            }
-            return;
-        }
-        
-        // Disable button and show loading
-        const originalBtnContent = verifyBtn.innerHTML;
-        verifyBtn.disabled = true;
-        verifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
-        verifyBtn.style.opacity = '0.6';
-        verifyBtn.style.cursor = 'not-allowed';
-        
-        if (messageDiv) {
-            messageDiv.style.display = 'none';
-        }
-        
-        try {
-            // Get current user ID from account info (cookie-based auth)
-            const accountResponse = await fetch('/api/account/info', {
-                method: 'GET',
-                credentials: 'same-origin'
-            });
-            const accountData = await accountResponse.json();
-            
-            if (!accountData.success || !accountData.userId) {
-                throw new Error('Unable to get user ID');
-            }
-            
-            // Verify by code
-            const response = await fetch('/api/verify-email-code', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ 
-                    code: code,
-                    userId: accountData.userId
-                })
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                // Show success message
-                if (messageDiv) {
-                    messageDiv.style.display = 'block';
-                    messageDiv.style.background = '#d4edda';
-                    messageDiv.style.color = '#155724';
-                    messageDiv.style.border = '1px solid #c3e6cb';
-                    messageDiv.innerHTML = '<i class="fas fa-check-circle"></i> Email verified successfully! Refreshing...';
-                }
-                
-                // Clear input
-                codeInput.value = '';
-                
-                // Refresh verification status after 1 second
-                setTimeout(() => {
-                    checkEmailVerification();
-                }, 1000);
-            } else {
-                // Show error message
-                if (messageDiv) {
-                    messageDiv.style.display = 'block';
-                    messageDiv.style.background = '#fee';
-                    messageDiv.style.color = '#dc3545';
-                    messageDiv.style.border = '1px solid #dc3545';
-                    messageDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + (data.error || 'Invalid or expired code. Please try again.');
-                }
-                
-                // Re-enable button
-                verifyBtn.disabled = false;
-                verifyBtn.innerHTML = originalBtnContent;
-                verifyBtn.style.opacity = '1';
-                verifyBtn.style.cursor = 'pointer';
-                
-                // Clear input for retry
-                codeInput.value = '';
-                codeInput.focus();
-            }
-        } catch (error) {
-            console.error('Error verifying email by code:', error);
-            
-            // Show user-friendly error message
-            if (messageDiv) {
-                messageDiv.style.display = 'block';
-                messageDiv.style.background = '#fee';
-                messageDiv.style.color = '#dc3545';
-                messageDiv.style.border = '1px solid #dc3545';
-                const errorMessage = error.message && error.message.includes('HTTP error') 
-                    ? 'Network error. Please check your connection and try again.' 
-                    : 'Failed to verify code. Please try again.';
-                messageDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${errorMessage}`;
-            }
-            
-            // Re-enable button
-            verifyBtn.disabled = false;
-            verifyBtn.innerHTML = originalBtnContent;
-            verifyBtn.style.opacity = '1';
-            verifyBtn.style.cursor = 'pointer';
-        }
-    }
-
-
-</script>
-<script>
-document.addEventListener('DOMContentLoaded',function(){
-document.getElementById('verify-code-btn')?.addEventListener('click',verifyEmailByCode);
-document.getElementById('resend-verification-btn')?.addEventListener('click',resendVerificationEmail);
-document.getElementById('checkEmailVerificationBtn')?.addEventListener('click',checkEmailVerification);
-document.getElementById('changePasswordBtn')?.addEventListener('click',changePassword);
-document.getElementById('pauseAccountBtn')?.addEventListener('click',pauseAccount);
-document.getElementById('downloadAccountDataBtn')?.addEventListener('click',downloadAccountData);
-document.getElementById('closeChangePasswordModalBtn')?.addEventListener('click',closeChangePasswordModal);
-const verifyInput=document.getElementById('verification-code-input');if(verifyInput){verifyInput.addEventListener('input',function(){this.value=this.value.replace(/[^0-9]/g,'').slice(0,6);const btn=document.getElementById('verify-code-btn');if(this.value.length===6){btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';}else{btn.disabled=true;btn.style.opacity='0.6';btn.style.cursor='not-allowed';}});verifyInput.addEventListener('keypress',function(e){if(e.key==='Enter'&&this.value.length===6)verifyEmailByCode();});}
-const changePwdForm=document.getElementById('change-password-form');if(changePwdForm){changePwdForm.addEventListener('submit',function(e){e.preventDefault();handleChangePassword(e);});}
-});
-</script>
-
+<script src="/assets/js/new/pages/account-delete.js"></script>
+<script src="/assets/js/new/pages/account.js"></script>

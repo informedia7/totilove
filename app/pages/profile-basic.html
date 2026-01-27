@@ -1,9 +1,9 @@
 <!-- Profile tabs with sub-navigation -->
 <div class="profile-tabs">
-    <a href="/profile-basic?token={{sessionToken}}" class="tab-btn active" id="tab-basic">Basic Info</a>
-<a href="/profile-full?token={{sessionToken}}" class="tab-btn" id="tab-full">Full Info</a>
-    <a href="/profile-photos?token={{sessionToken}}" class="tab-btn" id="tab-photos">My Photos</a>
-    <a href="/profile-edit?token={{sessionToken}}" class="tab-btn" id="tab-edit">Edit Profile</a>
+    <a href="/profile-basic" class="tab-btn active" id="tab-basic">Basic Info</a>
+<a href="/profile-full" class="tab-btn" id="tab-full">Full Info</a>
+    <a href="/profile-photos" class="tab-btn" id="tab-photos">My Photos</a>
+    <a href="/profile-edit" class="tab-btn" id="tab-edit">Edit Profile</a>
 </div>
 
 <div id="tab-panel-basic">
@@ -34,11 +34,16 @@
     </div>
 </div>
 
+<!-- Extracted CSS from profile-basic.html - Phase 1 CSS Extraction -->
+<link rel="stylesheet" href="/assets/css/new/05-pages/_profile-basic.css">
+
+<!-- Set currentUser from template variables (must be inline for server-side template rendering) -->
 <script>
-    // Set currentUser for photo loading
     window.currentUser = {
         id: parseInt('{{userId}}') || null,
         gender: '{{userGender}}' || ''
     };
 </script>
-<script src="/assets/js/profile-basic.js"></script>
+
+<!-- Profile Basic Page JavaScript - Moved to new structure (Phase 1 CSS/JS Extraction) -->
+<script src="/assets/js/new/pages/profile-basic.js"></script>

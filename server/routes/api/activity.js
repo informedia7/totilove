@@ -3,29 +3,32 @@
  * Handles activity-related endpoints (favorites, likes, viewers, etc.)
  */
 
+const { activityLimiter } = require('../../../routers/middleware/rateLimiter');
+
 /**
  * Setup activity-related routes
  * @param {Object} app - Express application instance
  * @param {Object} activityController - Activity controller instance
  */
 function setupActivityRoutes(app, activityController) {
-    // Activity routes
-    app.get('/api/activity/viewers', (req, res) => {
+    // Activity routes with rate limiting applied per route
+    // Apply activity rate limiter to each GET endpoint individually to ensure proper order
+    app.get('/api/activity/viewers', activityLimiter, (req, res) => {
         activityController.getViewers(req, res);
     });
-    app.get('/api/activity/favorites', (req, res) => {
+    app.get('/api/activity/favorites', activityLimiter, (req, res) => {
         activityController.getFavorites(req, res);
     });
-    app.get('/api/activity/messages', (req, res) => {
+    app.get('/api/activity/messages', activityLimiter, (req, res) => {
         activityController.getMessages(req, res);
     });
-    app.get('/api/activity/likes', (req, res) => {
+    app.get('/api/activity/likes', activityLimiter, (req, res) => {
         activityController.getLikes(req, res);
     });
-    app.get('/api/activity/who-liked-me', (req, res) => {
+    app.get('/api/activity/who-liked-me', activityLimiter, (req, res) => {
         activityController.getWhoLikedMe(req, res);
     });
-    app.get('/api/activity/who-i-like', (req, res) => {
+    app.get('/api/activity/who-i-like', activityLimiter, (req, res) => {
         activityController.getWhoILike(req, res);
     });
     app.post('/api/favorites', (req, res) => {

@@ -123,18 +123,15 @@ const DEFAULT_IMAGES = {
     renderBadges(profile) {
       const badges = [];
       
-      if (profile.is_online) {
-        badges.push('<div class="uc-badge uc-badge-online" title="Online Now"></div>');
+      if (profile.id) {
+        const visibility = profile.is_online ? '' : ' style="display:none;"';
+        badges.push(`
+          <div class="uc-badge uc-badge-online online-dot-results" data-user-id="${profile.id}"${visibility} title="Online Now" aria-hidden="true"></div>
+        `);
       }
       
       if (profile.is_new_match) {
         badges.push('<div class="uc-badge uc-badge-new" title="New Match"><i class="fas fa-bolt"></i> NEW</div>');
-      }
-      
-      if (profile.match_score >= 80) {
-        badges.push(`<div class="uc-badge uc-badge-compatibility" title="${profile.match_score}% Match">
-          <i class="fas fa-heart"></i> ${profile.match_score}%
-        </div>`);
       }
       
       if (profile.is_verified) {
@@ -180,26 +177,72 @@ const DEFAULT_IMAGES = {
     }
     
     renderInfoSection(profile) {
+      const hasSeekingData = Boolean(
+        profile.seeking_gender ||
+        profile.preferred_gender ||
+        profile.seeking_age_min !== undefined ||
+        profile.seeking_age_max !== undefined ||
+        profile.age_min !== undefined ||
+        profile.age_max !== undefined
+      );
+
       return `
         <div class="uc-info">
           ${this.renderName(profile)}
           ${this.renderLocation(profile)}
-          ${(profile.seeking_gender || profile.preferred_gender) && (profile.seeking_age_min !== undefined || profile.age_min !== undefined) && (profile.seeking_age_max !== undefined || profile.age_max !== undefined) ? this.renderSeeking(profile) : ''}
+          ${hasSeekingData ? this.renderSeeking(profile) : ''}
           ${profile.interests?.length ? this.renderInterests(profile.interests) : ''}
           ${profile.about ? this.renderAbout(profile.about) : ''}
+        </div>
+      `;
+    }
+
+    renderCompatibilityRing(profile, variant = 'stacked') {
+      const matchScore = Number(profile.match_score || profile.compatibility_score || 0);
+      if (!matchScore) {
+        return '';
+      }
+
+      const clampedScore = Math.max(0, Math.min(100, Math.round(matchScore)));
+      const badgeData = profile.compatibility_badge || {};
+      const safeLabel = 'Match';
+      const badgeLevel = typeof badgeData.level === 'string'
+        ? badgeData.level.replace(/[^a-z0-9_-]/gi, '')
+        : '';
+      const badgeClass = badgeLevel ? ` uc-match-ring-${badgeLevel}` : '';
+      const variantClass = variant === 'inline' ? ' uc-match-ring-inline' : '';
+      const showLabel = variant !== 'inline';
+      const colorSource = badgeData.color || this.getCompatibilityColor(clampedScore);
+      const safeColor = this.escapeHtml(colorSource || '#4caf50');
+
+      return `
+        <div class="uc-match-ring${badgeClass}${variantClass}" 
+             style="--uc-match-progress: ${clampedScore}; --uc-match-color: ${safeColor};"
+             role="img"
+             aria-label="${clampedScore}% compatibility match">
+          <svg viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+            <circle class="uc-ring-bg" cx="60" cy="60" r="52"></circle>
+            <circle class="uc-ring-progress" cx="60" cy="60" r="52"></circle>
+          </svg>
+          <div class="uc-ring-content">
+            <div class="uc-ring-value${variant === 'inline' ? ' uc-ring-value-inline' : ''}">${clampedScore}%${variant === 'inline' ? ' Match' : ''}</div>
+            ${showLabel ? `<div class="uc-ring-label">${safeLabel}</div>` : ''}
+          </div>
         </div>
       `;
     }
     
     renderName(profile) {
       const genderIcon = profile.gender ? this.renderGenderIcon(profile.gender) : '';
-      const ageBadge = profile.age ? `<span class="uc-age">${profile.age}</span>` : '';
+      const ageBadge = profile.age ? `<span class="uc-age" title="Age ${profile.age}" aria-label="Age ${profile.age}">${profile.age}</span>` : '';
+      const compatibilityRing = this.renderCompatibilityRing(profile, 'inline');
       
       return `
         <h3 class="uc-name">
-          ${profile.name}
+          <span class="uc-name-text">${profile.name}</span>
           ${genderIcon}
           ${ageBadge}
+          ${compatibilityRing}
         </h3>
       `;
     }
@@ -237,20 +280,42 @@ const DEFAULT_IMAGES = {
         'm': 'Male',
         'f': 'Female'
       };
-      
-      // Get seeking gender from multiple possible fields
+
       const seekingGenderRaw = profile.seeking_gender || profile.preferred_gender || '';
       const seekingGender = genderMap[seekingGenderRaw?.toLowerCase()] || seekingGenderRaw || 'Anyone';
-      
-      // Get age range
-      const ageMin = profile.seeking_age_min || profile.age_min || 18;
-      const ageMax = profile.seeking_age_max || profile.age_max || 99;
-      
+
+      const resolvedMin = this.normalizeAgeValue(
+        profile.seeking_age_min ?? profile.preferred_age_min ?? profile.age_min
+      );
+      const resolvedMax = this.normalizeAgeValue(
+        profile.seeking_age_max ?? profile.preferred_age_max ?? profile.age_max
+      );
+
+      let ageText = '';
+      if (resolvedMin !== null && resolvedMax !== null) {
+        ageText = `${resolvedMin}-${resolvedMax}`;
+      } else if (resolvedMin !== null) {
+        ageText = `${resolvedMin}+`;
+      } else if (resolvedMax !== null) {
+        ageText = `Up to ${resolvedMax}`;
+      }
+
+      const seekingText = ageText ? `${seekingGender}, ${ageText}` : seekingGender;
+
       return `
-        <div class="uc-seeking">
-          Seeking: ${seekingGender}, ${ageMin}-${ageMax}
+        <div class="uc-seeking" title="Preferred match criteria">
+          <i class="fas fa-user-friends" aria-hidden="true"></i>
+          <span>Seeking: ${seekingText}</span>
         </div>
       `;
+    }
+
+    normalizeAgeValue(value) {
+      if (value === undefined || value === null) {
+        return null;
+      }
+      const parsed = parseInt(value, 10);
+      return Number.isNaN(parsed) ? null : parsed;
     }
     
     renderInterests(interests) {
@@ -274,6 +339,22 @@ const DEFAULT_IMAGES = {
     renderAbout(about) {
       return `<p class="uc-about">${about}</p>`;
     }
+
+    getCompatibilityColor(score) {
+      if (score >= 90) {
+        return '#00b894';
+      }
+      if (score >= 80) {
+        return '#4c6ef5';
+      }
+      if (score >= 65) {
+        return '#74b9ff';
+      }
+      if (score >= 50) {
+        return '#fbc531';
+      }
+      return '#ff7675';
+    }
     
     // ===== UTILITY FUNCTIONS =====
     sanitizeProfile(profile) {
@@ -292,9 +373,9 @@ const DEFAULT_IMAGES = {
         is_verified: !!profile.is_verified,
         match_score: profile.match_score || profile.compatibility_score || 0,
         photo_count: profile.photo_count || 0,
-        seeking_gender: profile.preferred_gender || '',
-        seeking_age_min: profile.age_min || 0,
-        seeking_age_max: profile.age_max || 0,
+        seeking_gender: profile.seeking_gender || profile.preferred_gender || profile.gender_preference || '',
+        seeking_age_min: profile.seeking_age_min ?? profile.preferred_age_min ?? profile.age_min ?? null,
+        seeking_age_max: profile.seeking_age_max ?? profile.preferred_age_max ?? profile.age_max ?? null,
         can_block: !!profile.has_received_messages,
         can_report: !!profile.has_received_messages,
         profile_image: profile.profile_image || profile.profileImage || profile.image || null, // Preserve image field
@@ -416,7 +497,6 @@ const DEFAULT_IMAGES = {
           }
         );
         
-        console.log('Face detection initialized');
       } catch (error) {
         console.warn('Failed to initialize face detection:', error);
         this.config.faceDetection = false;
@@ -628,7 +708,6 @@ const DEFAULT_IMAGES = {
     
     nextImage(container) {
       // Implement if multi-image support is needed
-      console.log('Next image requested for', container.dataset.profileId);
     }
     
     // ===== ACTION HANDLERS =====
@@ -751,7 +830,7 @@ const DEFAULT_IMAGES = {
   
   // Handle events
   window.addEventListener('like-profile', (e) => {
-    console.log('Like profile:', e.detail.profileId);
+    // Like profile event handled
   });
   
   // Cleanup when done
@@ -771,8 +850,7 @@ const DEFAULT_IMAGES = {
      });
      
      // Legacy compatibility functions for existing code
-     window.renderResultsUserCard = function(profile) {
-       const columns = 4; // Default, can be overridden
+     window.renderResultsUserCard = function(profile, columns = 4) {
        return defaultUserCard.render(profile, columns);
      };
      
@@ -851,8 +929,9 @@ const DEFAULT_IMAGES = {
            }
          });
          
-         // Mobile: Tap-to-toggle quick actions
-         const isMobileDevice = window.innerWidth <= 768 || ('ontouchstart' in window);
+         // Use CSS media queries instead of device detection
+         // Mobile-first: ≤768px = mobile behavior, >768px = desktop behavior
+         const isMobileWidth = () => window.matchMedia('(max-width: 768px)').matches;
          let touchStartTime = 0;
          let touchStartContainer = null;
          
@@ -876,8 +955,11 @@ const DEFAULT_IMAGES = {
              return;
            }
            
+           // Check current screen width (supports window resizing)
+           const isMobile = isMobileWidth();
+           
            // Prevent double-toggling on mobile (touchstart + click)
-           if (e.type === 'click' && isMobileDevice && touchStartContainer === container) {
+           if (e.type === 'click' && isMobile && touchStartContainer === container) {
              const timeSinceTouch = Date.now() - touchStartTime;
              if (timeSinceTouch < 500) {
                // Click happened soon after touchstart, ignore it
@@ -886,8 +968,8 @@ const DEFAULT_IMAGES = {
              }
            }
            
-           // On mobile, toggle quick actions and prevent card click
-           if (isMobileDevice) {
+           // On mobile (≤768px), toggle quick actions and prevent card click
+           if (isMobile) {
              e.stopPropagation(); // Prevent card click from firing
              container.classList.toggle('uc-show-actions');
              if (e.type === 'touchstart') {
@@ -897,16 +979,23 @@ const DEFAULT_IMAGES = {
              return;
            }
            
-           // On desktop, toggle on click (hover will also work)
-           container.classList.toggle('uc-show-actions');
+           // On desktop (>768px), open profile modal instead of toggling quick actions
+           e.stopPropagation(); // Prevent card click from firing (we handle it here)
+           const card = container.closest('.uc-card');
+           if (card) {
+             const profileId = parseInt(card.dataset.profileId);
+             if (profileId && window.viewProfile) {
+               window.viewProfile(profileId);
+             }
+           }
          };
          
          // Add event listeners with capture phase to fire before card click
-         if (isMobileDevice) {
-           // Mobile: Use touchstart for immediate response
+         // Mobile: Use touchstart for immediate response (if touch is available)
+         if ('ontouchstart' in window) {
            grid.addEventListener('touchstart', handleImageTap, { capture: true, passive: false });
          }
-         // Always add click handler (works on all devices, including mobile as fallback)
+         // Always add click handler (works on all devices)
          grid.addEventListener('click', handleImageTap, { capture: true });
          
          // View profile click handler
@@ -917,10 +1006,10 @@ const DEFAULT_IMAGES = {
                return;
              }
              
-             // Don't open profile if clicking on image container on mobile (quick actions handle it)
-             const isMobile = window.innerWidth <= 768 || ('ontouchstart' in window);
-             if (isMobile && e.target.closest('.uc-image-container')) {
-               // Quick actions toggle is handled above, don't open profile
+             // Don't open profile if clicking on image container
+             // - On mobile: quick actions handle it
+             // - On desktop: handleImageTap opens profile modal
+             if (e.target.closest('.uc-image-container')) {
                return;
              }
              
@@ -954,8 +1043,9 @@ const DEFAULT_IMAGES = {
            btn.addEventListener('click', function(e) {
              e.stopPropagation();
              const username = this.dataset.username;
+             const profileId = parseInt(this.dataset.profileId || this.closest('.uc-card')?.dataset.profileId);
              if (window.messageProfile && username) {
-               window.messageProfile(username);
+               window.messageProfile(username, profileId);
              }
            });
          });

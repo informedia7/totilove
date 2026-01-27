@@ -115,7 +115,7 @@ class TemplateController {
                         pageTitle: 'Profile',
                         currentPage: 'profile',
                         activeTab: req.query.tab || 'basic',
-                        sessionToken: sessionToken
+                        sessionToken: ''
                     };
                 }
             }
@@ -200,7 +200,7 @@ class TemplateController {
                         userAvatar: dbUser.profile_image ? `/uploads/profile_images/${dbUser.profile_image}` : '/assets/images/default_profile.svg',
                         memberSince: this.templateUtils.getRelativeTime(dbUser.date_joined),
                         lastActive: this.templateUtils.getRelativeTime(dbUser.last_login || dbUser.date_joined),
-                        sessionToken: sessionToken
+                        sessionToken: ''
                     };
                 } else {
                     console.log('No user found in database for userId:', userId);

@@ -1,6 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
+const TEMPLATE_DEBUG = (
+    process.env.TEMPLATE_DEBUG === 'true' ||
+    process.env.DEBUG_TEMPLATES === 'true'
+);
+
 class TemplateUtils {
     constructor() {}
 
@@ -33,7 +38,7 @@ class TemplateUtils {
             const replacementValue = (value !== undefined && value !== null) ? String(value) : '';
             content = content.replace(regex, replacementValue);
             const afterCount = (content.match(regex) || []).length;
-            if (beforeCount > 0) {
+            if (beforeCount > 0 && TEMPLATE_DEBUG) {
                 console.log(`[TEMPLATE] Replaced ${beforeCount} instances of {{${key}}} with:`, JSON.stringify(replacementValue));
             }
         });

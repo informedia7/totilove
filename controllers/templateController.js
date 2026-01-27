@@ -26,8 +26,10 @@ class TemplateController {
 
             let userData = {};
             if (userId) {
-                userData = await this.loadUserData(userId, templateName, req.query.tab || 'basic', sessionToken);
+                userData = await this.loadUserData(userId, templateName, req.query.tab || 'basic');
             }
+            // Ensure legacy templates that still reference {{sessionToken}} receive a blank value
+            userData.sessionToken = '';
 
             pageContent = await this.templateUtils.processTemplateIncludes(pageContent, userData);
             pageContent = this.templateUtils.processTemplateVariables(pageContent, userData);
@@ -35,12 +37,22 @@ class TemplateController {
             layoutContent = layoutContent.replace('{{content}}', pageContent);
             
             // Inject feature flags into template
+            const presenceFlags = typeof featureFlags.getPresenceFlags === 'function'
+                ? featureFlags.getPresenceFlags()
+                : {
+                      redisEnabled: true,
+                      streamingEnabled: true,
+                      sseFallbackEnabled: true,
+                      monitoringEnabled: false
+                  };
+
             const featureFlagsData = {
                 useNewCSS: featureFlags.useNewCSS || featureFlags.enableAll,
                 useNewJS: featureFlags.useNewJS || featureFlags.enableAll,
                 useNewComponents: featureFlags.useNewComponents || featureFlags.enableAll,
                 enableAll: featureFlags.enableAll,
-                newArchitecturePages: featureFlags.newArchitecturePages || []
+                newArchitecturePages: featureFlags.newArchitecturePages || [],
+                presence: presenceFlags
             };
             
             // Add feature flags to userData for template processing
@@ -68,7 +80,7 @@ class TemplateController {
         }
     }
 
-    async loadUserData(userId, templateName, activeTab, sessionToken) {
+    async loadUserData(userId, templateName, activeTab) {
         const result = await this.db.query(
             `
                     SELECT u.id, u.real_name, u.email, u.birthdate, u.gender,
@@ -305,31 +317,43 @@ class TemplateController {
                 ? `${preferredHeightCm} cm (${preferredHeightMeters} m / ${preferredHeightFeet}'${preferredHeightInches}")`
                 : 'Not specified');
 
+        const normalizedTemplate = (templateName || '').toLowerCase();
+        const isProfilePage = normalizedTemplate.includes('profile');
+        const isMatchesPage = normalizedTemplate.startsWith('matches');
+        const isSearchPage = normalizedTemplate === 'search';
+        const isResultsPage = normalizedTemplate === 'results';
+        const isMessagesPage = normalizedTemplate === 'messages';
+        const isTalkPage = normalizedTemplate === 'talk';
+        const isActivityPage = normalizedTemplate === 'activity';
+        const isBillingPage = normalizedTemplate === 'billing';
+        const isSettingsPage = normalizedTemplate === 'settings';
+        const isAccountPage = normalizedTemplate === 'account';
+
                     const navStates = {
-                        homeActive: templateName === 'home' ? 'active' : '',
-                        loginActive: templateName === 'login' ? 'active' : '',
-                        registerActive: templateName === 'register' ? 'active' : '',
-                        profileActive: templateName.includes('profile') ? 'active' : '',
-                        matchesActive: templateName === 'matches' ? 'active' : '',
-                        searchActive: (templateName === 'search' || templateName === 'results') ? 'active' : '',
-                        messagesActive: templateName === 'messages' ? 'active' : '',
-                        talkActive: templateName === 'talk' ? 'active' : '',
-                        activityActive: templateName === 'activity' ? 'active' : '',
-                        billingActive: templateName === 'billing' ? 'active' : '',
-                        settingsActive: templateName === 'settings' ? 'active' : '',
-                        accountActive: templateName === 'account' ? 'active' : ''
+                        homeActive: normalizedTemplate === 'home' ? 'active' : '',
+                        loginActive: normalizedTemplate === 'login' ? 'active' : '',
+                        registerActive: normalizedTemplate === 'register' ? 'active' : '',
+                        profileActive: isProfilePage ? 'active' : '',
+                        matchesActive: isMatchesPage ? 'active' : '',
+                        searchActive: (isSearchPage || isResultsPage) ? 'active' : '',
+                        messagesActive: isMessagesPage ? 'active' : '',
+                        talkActive: isTalkPage ? 'active' : '',
+                        activityActive: isActivityPage ? 'active' : '',
+                        billingActive: isBillingPage ? 'active' : '',
+                        settingsActive: isSettingsPage ? 'active' : '',
+                        accountActive: isAccountPage ? 'active' : ''
                     };
 
         const pageTitle = (() => {
-            if (templateName === 'matches') return 'Matches';
-            if (templateName === 'search') return 'Search';
-            if (templateName === 'results') return 'Search Results';
-            if (templateName === 'messages') return 'Messages';
-            if (templateName === 'talk') return 'Talk';
-            if (templateName === 'activity') return 'Activity';
-            if (templateName === 'billing') return 'Billing & Subscription';
-            if (templateName === 'settings') return 'Settings';
-            if (templateName === 'account') return 'My Account';
+            if (isMatchesPage) return 'Matches';
+            if (isSearchPage) return 'Search';
+            if (isResultsPage) return 'Search Results';
+            if (isMessagesPage) return 'Messages';
+            if (isTalkPage) return 'Talk';
+            if (isActivityPage) return 'Activity';
+            if (isBillingPage) return 'Billing & Subscription';
+            if (isSettingsPage) return 'Settings';
+            if (isAccountPage) return 'My Account';
             return 'Profile';
         })();
 
@@ -404,7 +428,6 @@ class TemplateController {
             pageTitle,
                         currentPage: 'profile',
             activeTab,
-            sessionToken,
             accountIconColor: '#28a745',
       height: heightDisplay,
             heightFullDisplay: heightFullDisplay,
@@ -707,8 +730,9 @@ class TemplateController {
             let userData = {};
 
             if (userId) {
-                userData = await this.loadUserData(userId, templateName, req.query.tab || 'basic', null);
+                userData = await this.loadUserData(userId, templateName, req.query.tab || 'basic');
             }
+            userData.sessionToken = '';
 
             templateContent = this.templateUtils.processTemplateVariables(templateContent, userData);
 
@@ -728,8 +752,9 @@ class TemplateController {
             let talkContent = fs.readFileSync(talkTemplatePath, 'utf8');
             let userData = {};
             if (userId) {
-                userData = await this.loadUserData(userId, 'talk', 'talk', sessionToken);
-                }
+                userData = await this.loadUserData(userId, 'talk', 'talk');
+            }
+            userData.sessionToken = '';
 
             talkContent = await this.templateUtils.processTemplateIncludes(talkContent, userData);
             talkContent = this.templateUtils.processTemplateVariables(talkContent, userData);

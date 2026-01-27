@@ -154,28 +154,8 @@ export class Form extends BaseComponent {
         }
         
         // Validate age range if present
-        const ageMinInput = this.form.querySelector('[name="preferred_age_min"]');
-        const ageMaxInput = this.form.querySelector('[name="preferred_age_max"]');
-        if (ageMinInput && ageMaxInput) {
-            const ageMin = parseInt(ageMinInput.value);
-            const ageMax = parseInt(ageMaxInput.value);
-            
-            if (ageMinInput.value && ageMaxInput.value) {
-                if (isNaN(ageMin) || ageMin < 18 || ageMin > 100) {
-                    errors.push('Age minimum must be between 18 and 100');
-                }
-                if (isNaN(ageMax) || ageMax < 18 || ageMax > 100) {
-                    errors.push('Age maximum must be between 18 and 100');
-                }
-                if (!isNaN(ageMin) && !isNaN(ageMax) && ageMin > ageMax) {
-                    errors.push('Age minimum cannot be greater than age maximum');
-                }
-            } else if (ageMinInput.value && (isNaN(ageMin) || ageMin < 18 || ageMin > 100)) {
-                errors.push('Age minimum must be between 18 and 100');
-            } else if (ageMaxInput.value && (isNaN(ageMax) || ageMax < 18 || ageMax > 100)) {
-                errors.push('Age maximum must be between 18 and 100');
-            }
-        }
+        // Age validation is handled by age-validation.js module
+        // No need to duplicate validation here
         
         // Custom validator
         if (this.validator) {
@@ -334,4 +314,6 @@ export class Form extends BaseComponent {
 if (typeof window !== 'undefined') {
     window.Form = Form;
 }
+
+
 

@@ -68,7 +68,7 @@ class GlobalNavbar {
             // Re-check authentication every 30 seconds to handle session changes
             setInterval(() => {
                 this.checkAuthStatus();
-            }, 30000);
+            }, 30010);
 
             this.startRealtimeUpdates();
             this.initializeAnalytics();
@@ -210,10 +210,14 @@ class GlobalNavbar {
 
         // Insert navbar at the beginning of body
         document.body.insertAdjacentHTML('afterbegin', navbarHTML);
-        setTimeout(()=>{
-            document.getElementById('selectedLanguage')?.addEventListener('click',toggleLanguageDropdown);
-            document.querySelectorAll('[data-lang]').forEach(el=>{el.addEventListener('click',function(){selectLanguage(this.dataset.lang,this);});});
-        },100);
+        
+        // Setup language switcher functions first
+        this.setupLanguageSwitcher();
+        
+        // Attach event listeners after a short delay to ensure DOM is ready
+        setTimeout(() => {
+            this.attachLanguageSwitcherListeners();
+        }, 100);
     }
 
     renderNavItems() {
@@ -269,7 +273,7 @@ class GlobalNavbar {
             </div>
         `;
 
-        // Check if we're on the homepage
+        // Language switcher should be available on all pages
         const isHomepage = this.currentPage === 'home' || window.location.pathname === '/' || window.location.pathname === '/index.html';
 
         // Only show user section if authenticated (like PHP if ($loggedIn))
@@ -282,7 +286,7 @@ class GlobalNavbar {
             return `
                 <div class="global-user-info">
                     <span>Welcome, ${displayName}</span>
-                    ${isHomepage ? languageSwitcherHTML : ''}
+                    ${languageSwitcherHTML}
                     <div class="global-user-menu">
                         <div class="global-user-avatar global-online-indicator" id="globalUserAvatar">
                             <i class="fas fa-user"></i>
@@ -327,7 +331,7 @@ class GlobalNavbar {
                         <i class="fas fa-user-plus"></i>
                         <span>Register</span>
                     </a>
-                    ${isHomepage ? languageSwitcherHTML : ''}
+                    ${languageSwitcherHTML}
                 </div>
             `;
         }
@@ -419,22 +423,10 @@ class GlobalNavbar {
     }
 
     setupLanguageSwitcher() {
-        // Check if we're on the homepage - only setup language switcher on homepage
-        const isHomepage = this.currentPage === 'home' || window.location.pathname === '/' || window.location.pathname === '/index.html';
-
-        if (!isHomepage) {
-            // Not on homepage, skipping language switcher setup
-            return;
-        }
-
-                    // Homepage detected, setting up language switcher
-
-        // Remove existing global functions to prevent conflicts
-        if (window.selectLanguage) {
-            delete window.selectLanguage;
-        }
-        if (window.toggleLanguageDropdown) {
-            delete window.toggleLanguageDropdown;
+        // Language switcher should work on all pages, not just homepage
+        // Only setup functions once to prevent conflicts
+        if (window.selectLanguage && window.toggleLanguageDropdown) {
+            return; // Already set up
         }
 
         // Add global language switcher functions
@@ -460,49 +452,89 @@ class GlobalNavbar {
                     this.trackAnalytics('language_switch', lang);
                 }
 
-                        // Store language preference (no localStorage)
-
                 // Switch language using i18n system if available
                 if (window.simpleI18n && typeof window.simpleI18n.switchLanguage === 'function') {
                     try {
                         await window.simpleI18n.switchLanguage(lang);
-                        // Language switched via i18n system
                     } catch (error) {
                         console.error('❌ Failed to switch language via i18n:', error);
                     }
-                } else {
-                    // i18n system not available, language preference saved
                 }
-
-                // Language switched
             }
         };
 
-        window.toggleLanguageDropdown = () => {
+        window.toggleLanguageDropdown = (e) => {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
             const languageOptions = document.getElementById('languageOptions');
             const selectedElement = document.getElementById('selectedLanguage');
 
             if (languageOptions && selectedElement) {
-                languageOptions.classList.toggle('select-hide');
-                selectedElement.classList.toggle('select-arrow-active');
-                // Language dropdown toggled
+                const isHidden = languageOptions.classList.contains('select-hide');
+                if (isHidden) {
+                    languageOptions.classList.remove('select-hide');
+                    selectedElement.classList.add('select-arrow-active');
+                } else {
+                    languageOptions.classList.add('select-hide');
+                    selectedElement.classList.remove('select-arrow-active');
+                }
             }
         };
 
-        // Close language dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            const languageOptions = document.getElementById('languageOptions');
-            const selectedElement = document.getElementById('selectedLanguage');
+        // Close language dropdown when clicking outside (only add once)
+        if (!window._languageDropdownOutsideClickAdded) {
+            document.addEventListener('click', (e) => {
+                const languageOptions = document.getElementById('languageOptions');
+                const selectedElement = document.getElementById('selectedLanguage');
 
-            if (languageOptions && selectedElement &&
-                !e.target.closest('.language-switcher')) {
-                languageOptions.classList.add('select-hide');
-                selectedElement.classList.remove('select-arrow-active');
+                if (languageOptions && selectedElement &&
+                    !e.target.closest('.language-switcher')) {
+                    languageOptions.classList.add('select-hide');
+                    selectedElement.classList.remove('select-arrow-active');
+                }
+            });
+            window._languageDropdownOutsideClickAdded = true;
+        }
+    }
+
+    attachLanguageSwitcherListeners() {
+        const selectedLanguage = document.getElementById('selectedLanguage');
+        const languageOptions = document.querySelectorAll('#languageOptions [data-lang]');
+        
+        if (selectedLanguage && window.toggleLanguageDropdown) {
+            // Remove existing listener if any, then add new one
+            const newHandler = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.toggleLanguageDropdown(e);
+            };
+            if (selectedLanguage._languageToggleHandler) {
+                selectedLanguage.removeEventListener('click', selectedLanguage._languageToggleHandler);
             }
-        });
+            selectedLanguage._languageToggleHandler = newHandler;
+            selectedLanguage.addEventListener('click', newHandler);
+        }
+        
+        if (languageOptions.length > 0 && window.selectLanguage) {
+            languageOptions.forEach(el => {
+                // Remove existing listener if any, then add new one
+                const newHandler = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.selectLanguage(el.dataset.lang, el);
+                };
+                if (el._languageSelectHandler) {
+                    el.removeEventListener('click', el._languageSelectHandler);
+                }
+                el._languageSelectHandler = newHandler;
+                el.addEventListener('click', newHandler);
+            });
+        }
+    }
 
-        // No saved language preference (no localStorage)
-    }    // Public method to update authentication state
+    // Public method to update authentication state
     setAuthenticationState(user) {
         // Setting authentication state
         if (user) {
@@ -528,16 +560,29 @@ class GlobalNavbar {
             const scrollY = window.scrollY;
 
             navbar.innerHTML = this.renderNavItems();
-            navbar.querySelector('#selectedLanguage[data-action="toggleLanguage"]')?.addEventListener('click',toggleLanguageDropdown);
-            navbar.querySelectorAll('[data-lang]').forEach(el=>{el.addEventListener('click',function(){selectLanguage(this.dataset.lang,this);});});
+            
+            // Setup language switcher functions before attaching listeners
+            this.setupLanguageSwitcher();
+            
+            // Attach language dropdown listeners after a short delay
+            setTimeout(() => {
+                this.attachLanguageSwitcherListeners();
+            }, 50);
+            
             // Restore scroll position
             window.scrollTo(0, scrollY);
         }
 
         if (userSection) {
             userSection.innerHTML = this.renderUserSection();
-            userSection.querySelector('#selectedLanguage[data-action="toggleLanguage"]')?.addEventListener('click',toggleLanguageDropdown);
-            userSection.querySelectorAll('[data-lang]').forEach(el=>{el.addEventListener('click',function(){selectLanguage(this.dataset.lang,this);});});
+            
+            // Setup language switcher functions before attaching listeners
+            this.setupLanguageSwitcher();
+            
+            // Attach language dropdown listeners after a short delay
+            setTimeout(() => {
+                this.attachLanguageSwitcherListeners();
+            }, 50);
         }
 
         // Reattach event listeners without full re-render
@@ -587,7 +632,7 @@ class GlobalNavbar {
             if (this.isAuthenticated) {
                 this.loadNotifications();
             }
-        }, 30000);
+        }, 30010);
 
         // Enhanced Socket.IO integration for real-time updates
         if (window.io && this.isAuthenticated) {
@@ -793,7 +838,6 @@ class GlobalNavbar {
                 });
             } catch (e) {}
             
-            if (window.onlineTracker?.handleLogout) await window.onlineTracker.handleLogout();
             if (window.sessionManager?.clearSession) window.sessionManager.clearSession();
             else sessionStorage.clear();
             
@@ -1490,7 +1534,7 @@ GlobalNavbar.prototype.showToast = function (message, type = 'info') {
                 toast.parentNode.removeChild(toast);
             }
         }, 300);
-    }, 3000);
+    }, 3001);
 };
 
 GlobalNavbar.prototype.showModal = function (title, content) {

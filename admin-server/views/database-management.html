@@ -20,8 +20,36 @@
         </div>
         
         <div class="content">
+            <!-- Orphaned Data Cleanup Section -->
+            <div class="welcome-card" id="orphan-cleanup-card" style="margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
+                    <div style="flex: 1 1 320px;">
+                        <h2 style="margin-bottom: 8px;">🧹 Orphaned Data Cleanup</h2>
+                        <p style="color: #666; margin: 0;">
+                            Quickly purge orphaned rows and stray uploads to guarantee a clean slate after bulk deletions.
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <button id="cleanup-orphans-btn"
+                                style="padding: 10px 24px; background: #e67e22; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                            Run Cleanup
+                        </button>
+                    </div>
+                </div>
+                <div id="orphan-cleanup-loading" style="display: none; margin-top: 16px; padding: 16px; text-align: center; color: #666;">
+                    <div style="margin-bottom: 10px; display: inline-block; width: 48px; height: 48px; border: 4px solid #f3f3f3; border-top: 4px solid #e67e22; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                    <p style="margin: 0;">Scanning tables and uploads...</p>
+                </div>
+                <div id="orphan-cleanup-results" style="display: none; margin-top: 16px;">
+                    <div id="orphan-cleanup-summary" style="margin-bottom: 16px;"></div>
+                    <div id="orphan-cleanup-table-results" style="margin-bottom: 16px;"></div>
+                    <div id="orphan-cleanup-file-results" style="margin-bottom: 16px;"></div>
+                    <div id="orphan-cleanup-warnings" style="display: none; padding: 12px; border-left: 4px solid #ffc107; background: #fff8e1; border-radius: 6px;"></div>
+                </div>
+            </div>
+
             <!-- Database Integrity Checker Section -->
-            <div class="welcome-card" style="margin-bottom: 24px;">
+            <div class="welcome-card" id="database-tools" style="margin-bottom: 24px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                     <div>
                         <h2 style="margin-bottom: 8px;">🔍 Database Integrity Checker</h2>

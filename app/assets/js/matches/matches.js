@@ -550,6 +550,10 @@ function updatePagination(totalPages) {
 
 // Toggle view
 function toggleView(view) {
+    const cardsPerRowSelect = document.getElementById('cardsPerRow');
+    if (cardsPerRowSelect) {
+        cardsPerRowSelect.disabled = (view === 'list');
+    }
     currentView = view;
     document.querySelectorAll('.view-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.view === view);
@@ -869,12 +873,6 @@ function getSessionToken() {
         return urlToken;
     }
     
-    // Fallback to localStorage
-    const localToken = localStorage.getItem('sessionToken');
-    if (localToken) {
-        return localToken;
-    }
-    
     return null;
 }
 
@@ -944,7 +942,7 @@ function processToastQueue() {
         toast.remove();
         toastActive = false;
         processToastQueue(); // Process next toast in queue
-    }, 3000);
+    }, 3001);
 }
 
 // Setup cards per row control (like reference)
@@ -961,6 +959,10 @@ function setupCardsPerRowControl() {
     const defaultPreference = '4';
     cardsPerRowSelect.value = defaultPreference;
     updateGridColumns(defaultPreference);
+    
+    // Disable if currently in list view
+    const isListView = matchesGrid.classList.contains('list-view');
+    cardsPerRowSelect.disabled = isListView;
     
     cardsPerRowSelect.addEventListener('change', function(e) {
         updateGridColumns(e.target.value);
@@ -1110,19 +1112,8 @@ function setupMatchCardEventDelegation() {
 
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {
-    // Adjust items per page based on screen size (with localStorage persistence)
+    // Adjust items per page based on screen size (session-only persistence)
     function adjustItemsPerPage() {
-        // Try to load from localStorage first
-        const saved = localStorage.getItem('matchesItemsPerPage');
-        if (saved) {
-            const savedValue = parseInt(saved, 10);
-            if (savedValue > 0) {
-                itemsPerPage = savedValue;
-                currentPage = 1;
-                return;
-            }
-        }
-        
         // Otherwise, calculate based on screen size
         if (window.innerWidth <= 480) {
             itemsPerPage = 6; // Very small screens
@@ -1132,8 +1123,6 @@ document.addEventListener('DOMContentLoaded', function() {
             itemsPerPage = 12; // Desktop
         }
         
-        // Save to localStorage
-        localStorage.setItem('matchesItemsPerPage', itemsPerPage.toString());
         currentPage = 1;
     }
     
@@ -1143,7 +1132,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup event delegation for match cards (CSP-safe)
     setupMatchCardEventDelegation();
     
-    // Update on window resize (debounced with localStorage persistence)
+    // Update on window resize (debounced, no localStorage persistence)
     let resizeTimeout;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
@@ -1152,7 +1141,6 @@ document.addEventListener('DOMContentLoaded', function() {
             adjustItemsPerPage();
             // Only reload if items per page actually changed
             if (oldItemsPerPage !== itemsPerPage) {
-                localStorage.setItem('matchesItemsPerPage', itemsPerPage.toString());
                 renderMatches();
             }
         }, 250);

@@ -174,7 +174,7 @@
                 likeBtn.innerHTML = '<i class="fas fa-thumbs-up"></i> <span class="like-btn-text">Liked</span>';
                 likeBtn.style.background = 'linear-gradient(90deg, #f39c12, #e67e22)';
                 // Show notification for 3 seconds
-                showNotificationWithDuration(`You already liked ${real_name}`, 'info', 3000);
+                showNotificationWithDuration(`You already liked ${real_name}`, 'info', 3001);
             } else {
                 // Reset to original state on error
                 likeBtn.innerHTML = originalText;
@@ -275,7 +275,7 @@
                 favouriteBtn.innerHTML = '<i class="fas fa-heart"></i> <span class="favourite-btn-text">Added</span>';
                 favouriteBtn.style.background = 'linear-gradient(90deg, #e74c3c, #c44569)';
                 // Show notification for 3 seconds
-                showNotificationWithDuration(data.message || 'Already in your favourites', 'info', 3000);
+                showNotificationWithDuration(data.message || 'Already in your favourites', 'info', 3001);
             } else {
                 // Reset to original state on error
                 favouriteBtn.innerHTML = originalText;

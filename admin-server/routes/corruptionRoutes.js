@@ -18,6 +18,9 @@ router.get('/check', corruptionController.checkCorruption.bind(corruptionControl
 // Corruption fix route
 router.post('/fix', corruptionController.fixCorruption.bind(corruptionController));
 
+// Orphan cleanup route
+router.post('/cleanup-orphans', corruptionController.cleanupOrphanedRecords.bind(corruptionController));
+
 module.exports = router;
 
 

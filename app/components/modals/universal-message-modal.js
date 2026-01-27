@@ -2,7 +2,7 @@
 // This script provides message modal functionality that can be used across different pages
 
 // Include shared emoji picker utility
-// <script src="/assets/js/emoji-picker.js"></script>
+// <script src="/assets/js/new/components/emoji-picker.js"></script>
 
 // Global variables for the modal
 let currentReplyMessageId = null;

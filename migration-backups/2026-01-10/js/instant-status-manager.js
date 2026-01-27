@@ -6,7 +6,7 @@ class InstantStatusManager {
         this.batchDelay = options.batchDelay || 200; // 200ms
         this.cacheTTL = options.cacheTTL || 60000; // 60s
         this.retryDelay = options.initialRetryDelay || 1000;
-        this.maxRetryDelay = options.maxRetryDelay || 30000;
+        this.maxRetryDelay = options.maxRetryDelay || 30010;
 
         // Internal state
         this.socket = null;

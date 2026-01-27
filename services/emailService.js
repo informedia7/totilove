@@ -49,7 +49,7 @@ class EmailService {
             return { success: false, error: 'Email service not configured' };
         }
 
-        const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+        const baseUrl = process.env.BASE_URL || 'http://localhost:3001';
         const confirmationUrl = `${baseUrl}/api/verify-email?token=${token}`;
 
         const mailOptions = {
@@ -151,7 +151,7 @@ class EmailService {
             return { success: false, error: 'Email service not configured' };
         }
 
-        const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+        const baseUrl = process.env.BASE_URL || 'http://localhost:3001';
         const resetUrl = `${baseUrl}/reset-password?token=${token}`;
 
         const mailOptions = {

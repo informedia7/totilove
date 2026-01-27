@@ -321,6 +321,131 @@
     min-height: 0;
   }
   
+  .uc-match-ring {
+    --uc-ring-size: 96px;
+    --uc-ring-stroke: 8;
+    --uc-ring-radius: 52;
+    --uc-ring-circumference: 327;
+    --uc-match-progress: 0;
+    position: relative;
+    width: var(--uc-ring-size);
+    height: var(--uc-ring-size);
+    margin: 0.5rem auto 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .uc-match-ring-inline {
+    --uc-ring-size: 42px;
+    --uc-ring-stroke: 5;
+    --uc-ring-circumference: 327;
+    margin: 0 0 0 0.35rem;
+    display: inline-flex;
+    vertical-align: middle;
+    flex: 0 0 auto;
+  }
+  
+  .uc-match-ring-inline .uc-ring-label {
+    display: none;
+  }
+  
+  .uc-match-ring-inline .uc-ring-value,
+  .uc-ring-value-inline {
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  .uc-match-ring svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+
+  .uc-match-ring circle {
+    fill: none;
+    stroke-width: var(--uc-ring-stroke);
+  }
+
+  .uc-ring-bg {
+    stroke: rgba(0, 0, 0, 0.08);
+  }
+
+  .uc-ring-progress {
+    stroke: var(--uc-match-color, #4caf50);
+    stroke-linecap: round;
+    stroke-dasharray: var(--uc-ring-circumference);
+    stroke-dashoffset: calc(var(--uc-ring-circumference) - (var(--uc-ring-circumference) * var(--uc-match-progress, 0)) / 100);
+    transition: stroke-dashoffset 0.6s ease, stroke 0.3s ease;
+  }
+
+  .uc-ring-content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .uc-ring-value {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #111;
+    line-height: 1;
+  }
+
+  .uc-ring-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #666;
+    margin-top: 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .uc-match-ring-strong .uc-ring-value,
+  .uc-match-ring-exceptional .uc-ring-value,
+  .uc-match-ring-good .uc-ring-value {
+    color: var(--uc-match-color, #4caf50);
+  }
+
+  .uc-match-ring-low .uc-ring-value {
+    color: #ff7675;
+  }
+
+  .uc-card[data-columns="5"] .uc-match-ring,
+  .uc-card[data-columns="6"] .uc-match-ring {
+    --uc-ring-size: 84px;
+  }
+  
+  .uc-card[data-columns="6"] .uc-match-ring {
+    --uc-ring-size: 76px;
+  }
+
+  @media (max-width: 480px) {
+    .uc-match-ring {
+      --uc-ring-size: 84px;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .uc-ring-value {
+      color: #f5f5f5;
+    }
+    .uc-ring-label {
+      color: #bbb;
+    }
+    .uc-ring-bg {
+      stroke: rgba(255, 255, 255, 0.15);
+    }
+  }
+  
   .uc-name {
     font-size: 1.08rem;
     font-weight: 600;
@@ -332,6 +457,11 @@
     justify-content: center;
     margin-bottom: 0;
     margin-top: 0;
+  }
+  
+  .uc-name-text {
+    display: inline-flex;
+    align-items: center;
   }
   
   .uc-gender-icon {
@@ -369,6 +499,15 @@
     text-align: center;
     margin-top: 0;
     margin-bottom: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+  }
+
+  .uc-seeking i {
+    color: #ff7675;
+    font-size: 0.85rem;
   }
   
   .uc-interests {
@@ -569,3 +708,82 @@
       color: #aaa;
     }
   }
+
+/* ========================================
+   LEGACY COMPATIBILITY ALIASES
+   For backward compatibility with existing pages
+   ======================================== */
+
+/* .online-user-card is a legacy class name used by results.html and matches.html */
+/* It maps to .uc-card for universal user card component */
+.online-user-card,
+.results-grid .online-user-card,
+.online-users-grid .online-user-card {
+  /* Inherit all uc-card styles */
+  background: white;
+  border-radius: var(--uc-radius-md);
+  overflow: hidden;
+  box-shadow: var(--uc-shadow-sm);
+  transition: all var(--uc-transition-medium);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  cursor: pointer;
+  contain: layout paint;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+.online-user-card:hover,
+.results-grid .online-user-card:hover,
+.online-users-grid .online-user-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--uc-shadow-md);
+}
+
+/* Map legacy class names to uc-* classes */
+.online-user-card .user-image-container,
+.results-grid .online-user-card .user-image-container,
+.online-users-grid .online-user-card .user-image-container {
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--uc-radius-md) var(--uc-radius-md) 0 0;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 200px;
+  aspect-ratio: 1 / 1.25;
+  flex-shrink: 0;
+}
+
+.online-user-card .user-avatar,
+.results-grid .online-user-card .user-avatar,
+.online-users-grid .online-user-card .user-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
+  display: block;
+  box-sizing: border-box;
+}
+
+.online-user-card .user-info,
+.results-grid .online-user-card .user-info,
+.online-users-grid .online-user-card .user-info {
+  padding: var(--uc-space-sm) var(--uc-space-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex-grow: 1;
+  justify-content: space-between;
+  gap: 0.2rem;
+  min-height: 0;
+}

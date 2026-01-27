@@ -90,7 +90,7 @@
                 </button>
             </div>
         </div>
-        
+
         <div class="nav-cards">
             <a href="/users" class="nav-card">
                 <h3>👥 User Management</h3>
@@ -144,8 +144,55 @@
             
             <a href="/database-management" class="nav-card">
                 <h3>🗄️ Database Management</h3>
-                <p>Check database integrity, fix corruption issues, and manage database health.</p>
             </a>
+        </div>
+
+        <!-- Presence Diagnostics Section -->
+        <div class="welcome-card presence-tests-card" id="presence-tests-card">
+            <div class="presence-card-header">
+                <div>
+                    <h2 style="margin-bottom: 8px;">🛰️ Presence Diagnostics</h2>
+                    <p style="color: #666; margin: 0;">Run the same presence feature checks that previously lived in CLI scripts.</p>
+                </div>
+                <div class="presence-card-actions">
+                    <div class="presence-tests-meta">
+                        <span class="presence-last-run-label">Last run:</span>
+                        <span id="presence-tests-last-run" class="presence-last-run-value">Never</span>
+                        <span id="presence-tests-status" class="presence-status-chip presence-status-idle">Idle</span>
+                    </div>
+                    <button id="run-presence-tests" class="presence-tests-run-btn">▶ Run Diagnostics</button>
+                </div>
+            </div>
+            <div id="presence-tests-alert" class="presence-tests-alert" style="display: none;"></div>
+            <div id="presence-tests-summary" class="presence-tests-summary">
+                <div class="presence-metric">
+                    <span class="presence-metric-value" data-summary="total">0</span>
+                    <span class="presence-metric-label">Total Tests</span>
+                </div>
+                <div class="presence-metric">
+                    <span class="presence-metric-value" data-summary="passed">0</span>
+                    <span class="presence-metric-label">Passing</span>
+                </div>
+                <div class="presence-metric">
+                    <span class="presence-metric-value" data-summary="failed">0</span>
+                    <span class="presence-metric-label">Failing</span>
+                </div>
+                <div class="presence-metric">
+                    <span class="presence-metric-value" data-summary="usersTested">—</span>
+                    <span class="presence-metric-label">Users Tested*</span>
+                </div>
+                <div class="presence-metric">
+                    <span class="presence-metric-value" data-summary="usersPassing">—</span>
+                    <span class="presence-metric-label">Users Passing</span>
+                </div>
+            </div>
+            <p style="color:#8a93b8; font-size:12px; margin-top:-12px; margin-bottom:18px;">*Active sessions sampled within the last 5 minutes.</p>
+            <div id="presence-tests-results" class="presence-tests-grid">
+                <div class="presence-placeholder">
+                    <h3>No diagnostics yet</h3>
+                    <p>Click "Run Diagnostics" to execute the presence service checks from this dashboard.</p>
+                </div>
+            </div>
         </div>
 
         <!-- Page Analysis Section -->
@@ -213,6 +260,48 @@
                 </div>
             </div>
         </div>
+
+        <!-- Rate Limiter Violations Section -->
+        <div class="welcome-card" style="margin-top: 32px;">
+            <h2>🚨 Rate Limiter Violations</h2>
+            <p>Recent chat message rate limit violations (last 100):</p>
+            <form id="rate-limiter-search-form" style="margin-bottom:16px; display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+                <input type="text" name="searchUserId" placeholder="User ID" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-size:14px;">
+                <input type="text" name="searchType" placeholder="Type" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-size:14px;">
+                <input type="text" name="searchIp" placeholder="IP Address" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-size:14px;">
+                <input type="text" name="searchAgent" placeholder="User Agent" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-size:14px;">
+                <button type="submit" style="padding:8px 18px; background:#667eea; color:white; border:none; border-radius:6px; cursor:pointer; font-size:14px; font-weight:500;">Search/Filter</button>
+                <button type="button" id="export-violations-btn" style="padding:8px 18px; background:#28a745; color:white; border:none; border-radius:6px; cursor:pointer; font-size:14px; font-weight:500;">Export CSV</button>
+            </form>
+            <table id="rate-limiter-violations-table" style="width:100%; border-collapse:collapse; margin-top:16px;">
+                <thead>
+                    <tr style="background:#f8f9fa;">
+                        <th style="padding:8px; border-bottom:1px solid #ddd;">User ID</th>
+                        <th style="padding:8px; border-bottom:1px solid #ddd;">Type</th>
+                        <th style="padding:8px; border-bottom:1px solid #ddd;">Details</th>
+                        <th style="padding:8px; border-bottom:1px solid #ddd;">Time</th>
+                        <th style="padding:8px; border-bottom:1px solid #ddd;">IP</th>
+                        <th style="padding:8px; border-bottom:1px solid #ddd;">User Agent</th>
+                    </tr>
+                </thead>
+                <tbody id="rate-limiter-violations-body">
+                    <% if (rateLimiterViolations && rateLimiterViolations.length) { %>
+                        <% rateLimiterViolations.forEach(function(v) { %>
+                            <tr>
+                                <td style="padding:8px; border-bottom:1px solid #eee;"><%= v.user_id %></td>
+                                <td style="padding:8px; border-bottom:1px solid #eee;"><%= v.violation_type %></td>
+                                <td style="padding:8px; border-bottom:1px solid #eee;"><%= v.details %></td>
+                                <td style="padding:8px; border-bottom:1px solid #eee;"><%= v.occurred_at %></td>
+                                <td style="padding:8px; border-bottom:1px solid #eee;"><%= v.ip_address %></td>
+                                <td style="padding:8px; border-bottom:1px solid #eee;"><%= v.user_agent %></td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr><td colspan="6" style="padding:12px; text-align:center; color:#888;">No violations found.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
         </div>
     </div>
 
@@ -256,9 +345,238 @@
             background: #f0f8ff;
             border-left-color: #17a2b8;
         }
+        .presence-tests-card {
+            margin-top: 32px;
+        }
+        .presence-card-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .presence-card-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px;
+        }
+        .presence-tests-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #555;
+        }
+        .presence-status-chip {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .presence-status-idle {
+            background: #f0f0f0;
+            color: #666;
+        }
+        .presence-status-pass {
+            background: #e6f4ea;
+            color: #1e7e34;
+        }
+        .presence-status-fail {
+            background: #fdecea;
+            color: #c0392b;
+        }
+        .presence-status-partial {
+            background: #fff4e5;
+            color: #c07600;
+        }
+        .presence-tests-run-btn {
+            padding: 10px 20px;
+            background: #222bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .presence-tests-run-btn:disabled {
+            background: #a0a3ff;
+            cursor: not-allowed;
+        }
+        .presence-tests-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+        .presence-metric {
+            background: #f9fafc;
+            border-radius: 8px;
+            border: 1px solid #eef0f7;
+            padding: 12px;
+            text-align: center;
+        }
+        .presence-metric-value {
+            display: block;
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1f36;
+        }
+        .presence-metric-label {
+            color: #67718c;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+        .presence-tests-alert {
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+        .presence-alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        .presence-alert-error {
+            background: #fdecea;
+            color: #c62828;
+            border: 1px solid #f5c6cb;
+        }
+        .presence-alert-info {
+            background: #eef2ff;
+            color: #3949ab;
+            border: 1px solid #c5cae9;
+        }
+        .presence-tests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+        .presence-test-card {
+            border: 1px solid #e4e8f0;
+            border-radius: 10px;
+            padding: 16px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .presence-test-card.pass {
+            border-left: 4px solid #28a745;
+        }
+        .presence-test-card.fail {
+            border-left: 4px solid #c0392b;
+        }
+        .presence-test-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .presence-test-status {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        .presence-test-meta {
+            font-size: 12px;
+            color: #67718c;
+        }
+        .presence-test-pre {
+            background: #0f172a;
+            color: #e2e8f0;
+            font-size: 12px;
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+        .presence-test-error {
+            background: #fff5f5;
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-size: 13px;
+            color: #b02a37;
+        }
+        .presence-test-description {
+            color: #4b5563;
+            margin: 0;
+        }
+        .presence-placeholder {
+            padding: 40px 20px;
+            text-align: center;
+            border: 1px dashed #d6daf0;
+            border-radius: 10px;
+            grid-column: 1 / -1;
+        }
+        .presence-loading {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 32px;
+        }
+        .presence-loading-spinner {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 4px solid #e0e0ff;
+            border-top-color: #222bff;
+            margin: 0 auto 12px;
+            animation: spin 1s linear infinite;
+        }
+        @media (max-width: 640px) {
+            .presence-card-actions {
+                align-items: flex-start;
+            }
+        }
     </style>
 
     <script src="/js/page-analysis.js"></script>
+    <script>
+        // Client-side filter and export logic for Rate Limiter Violations
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('rate-limiter-search-form');
+            const tableBody = document.getElementById('rate-limiter-violations-body');
+            const exportBtn = document.getElementById('export-violations-btn');
+            if (form && tableBody && exportBtn) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const userId = form.searchUserId.value.trim();
+                    const type = form.searchType.value.trim().toLowerCase();
+                    const ip = form.searchIp.value.trim();
+                    const agent = form.searchAgent.value.trim().toLowerCase();
+                    Array.from(tableBody.children).forEach(row => {
+                        let show = true;
+                        if (userId && !row.children[0].textContent.includes(userId)) show = false;
+                        if (type && !row.children[1].textContent.toLowerCase().includes(type)) show = false;
+                        if (ip && !row.children[4].textContent.includes(ip)) show = false;
+                        if (agent && !row.children[5].textContent.toLowerCase().includes(agent)) show = false;
+                        row.style.display = show ? '' : 'none';
+                    });
+                });
+                exportBtn.addEventListener('click', function() {
+                    let csv = 'User ID,Type,Details,Time,IP,User Agent\n';
+                    Array.from(tableBody.children).forEach(row => {
+                        if (row.style.display !== 'none') {
+                            const cols = Array.from(row.children).map(td => '"' + td.textContent.replace(/"/g, '""') + '"');
+                            csv += cols.join(',') + '\n';
+                        }
+                    });
+                    const blob = new Blob([csv], { type: 'text/csv' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'rate_limiter_violations.csv';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+            }
+        });
+        </script>
 </body>
 </html>
 

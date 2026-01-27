@@ -16,6 +16,7 @@ const messageRoutes = require('./messageRoutes');
 const backupRestoreRoutes = require('./backupRestoreRoutes');
 const corruptionRoutes = require('./corruptionRoutes');
 const pageAnalysisRoutes = require('./pageAnalysisRoutes');
+const presenceTestRoutes = require('./presenceTestRoutes');
 
 // Mount routes
 router.use('/', authRoutes);
@@ -31,6 +32,7 @@ router.use('/api/messages', messageRoutes);
 router.use('/', backupRestoreRoutes);
 router.use('/api/corruption', corruptionRoutes);
 router.use('/api/page-analysis', pageAnalysisRoutes);
+router.use('/api/presence-tests', presenceTestRoutes);
 
 // User management page (HTML)
 router.get('/users', requireAuth, (req, res) => {

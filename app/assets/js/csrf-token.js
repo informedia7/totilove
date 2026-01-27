@@ -63,7 +63,10 @@
   }
 
   function isFetchableUrl(url) {
-    return typeof url === 'string' && url.length >= 2 && (url.startsWith('/') || url.startsWith('http'));
+    return typeof url === 'string' && (
+      url.startsWith('/') ||
+      url.startsWith(window.location.origin)
+    );
   }
 
 
@@ -161,36 +164,83 @@
   const nativeFetch = window.fetch.bind(window);
 
   window.fetch = async function (input, options = {}) {
-    options = { ...options };
+    let normalizedOptions = { ...options };
 
-    let url = '';
-    const method = (options.method || 'GET').toUpperCase();
+    if (input instanceof Request) {
+      const clonedOptions = {
+        method: input.method,
+        headers: Object.fromEntries(input.headers.entries()),
+        body: input.body,
+        mode: input.mode,
+        credentials: input.credentials,
+        cache: input.cache,
+        redirect: input.redirect,
+        referrer: input.referrer,
+        referrerPolicy: input.referrerPolicy,
+        integrity: input.integrity,
+        keepalive: input.keepalive,
+        signal: input.signal
+      };
 
-    // Determine URL string
-    if (typeof input === 'string') url = input;
-    else if (input instanceof Request) url = input.url;
-    else if (input && typeof input === 'object' && input.url) url = input.url;
+      if (options && Object.keys(options).length) {
+        const overrideHeaders = options.headers instanceof Headers
+          ? Object.fromEntries(options.headers.entries())
+          : options.headers || {};
+        normalizedOptions = {
+          ...clonedOptions,
+          ...options,
+          headers: {
+            ...clonedOptions.headers,
+            ...overrideHeaders
+          }
+        };
+      } else {
+        normalizedOptions = clonedOptions;
+      }
 
-    if (!isFetchableUrl(url)) return nativeFetch(input, options);
-
-    if (isSameOrigin(url) && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
-      options.headers = options.headers instanceof Headers
-        ? Object.fromEntries(options.headers.entries())
-        : options.headers || {};
-
-      options.headers[CSRF_HEADER] = await getCSRFToken();
-      options.credentials = 'same-origin';
-    } else if (isSameOrigin(url)) {
-      options.credentials = options.credentials || 'same-origin';
+      input = input.url;
     }
 
-    const response = await nativeFetch(input, options);
+    let url = '';
+    if (typeof input === 'string') url = input;
+    else if (input && typeof input === 'object' && input.url) url = input.url;
 
-    // Auto-refresh token if server rejects it
+    if (!isFetchableUrl(url)) {
+      return nativeFetch(input, normalizedOptions);
+    }
+
+    const method = (normalizedOptions.method || 'GET').toUpperCase();
+    const needsCsrfHeader = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method);
+
+    if (isSameOrigin(url) && needsCsrfHeader) {
+      const headerMap = normalizedOptions.headers instanceof Headers
+        ? Object.fromEntries(normalizedOptions.headers.entries())
+        : normalizedOptions.headers || {};
+
+      headerMap[CSRF_HEADER] = await getCSRFToken();
+      normalizedOptions.headers = headerMap;
+      normalizedOptions.credentials = 'same-origin';
+    } else if (isSameOrigin(url)) {
+      normalizedOptions.credentials = normalizedOptions.credentials || 'same-origin';
+    }
+
+    const response = await nativeFetch(input, normalizedOptions);
+
+    // Auto-refresh token if server rejects it and retry once with fresh token
     if ([403, 419].includes(response.status) && isSameOrigin(url)) {
       csrfToken = null;
       tokenExpiry = null;
       await getCSRFToken(true);
+
+      if (needsCsrfHeader) {
+        const retryHeaders = normalizedOptions.headers instanceof Headers
+          ? Object.fromEntries(normalizedOptions.headers.entries())
+          : normalizedOptions.headers || {};
+        retryHeaders[CSRF_HEADER] = csrfToken;
+        normalizedOptions.headers = retryHeaders;
+      }
+
+      return nativeFetch(input, normalizedOptions);
     }
 
     return response;

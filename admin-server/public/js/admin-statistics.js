@@ -22,7 +22,7 @@ function setupEventListeners() {
         if (currentTab === 'overview') {
             loadDashboardStats();
         }
-    }, 300000);
+    }, 300100);
 }
 
 // Cleanup function

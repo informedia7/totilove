@@ -1,11 +1,28 @@
 const { performance } = require('perf_hooks');
 
+const redisManager = require('../config/redis');
+
 class WebSocketHandler {
-    constructor(io, messageService, monitoringUtils, db) {
+    constructor(io, messageService, monitoringUtils, db, presenceService = null, adapterEnabled = false) {
         this.io = io;
         this.messageService = messageService;
         this.monitoring = monitoringUtils;
         this.db = db;
+        this.redis = redisManager;
+        this.presenceService = presenceService;
+        this.adapterEnabled = adapterEnabled;
+        this.presenceInstanceId = this.presenceService?.getInstanceId?.() || null;
+        this.presenceEventListener = null;
+        if (!this.redis.isConnected) {
+            this.redis.connect().catch(error => {
+                console.error('[WebSocketHandler] Redis connection failed:', error.message);
+            });
+        }
+
+        if (this.isPresenceAvailable() && typeof this.presenceService.on === 'function') {
+            this.presenceEventListener = (payload) => this.broadcastPresenceUpdate(payload);
+            this.presenceService.on('presence:update', this.presenceEventListener);
+        }
         this.setupWebSocket();
     }
 
@@ -27,6 +44,7 @@ class WebSocketHandler {
                     socket.userId = data.userId;
                     socket.real_name = data.real_name;
                     socket.join(`user_${data.userId}`);
+                    await this.touchPresence(socket.userId, 'socket-auth');
                     socket.emit('authenticated', { 
                         status: 'success',
                         serverLoad: this.monitoring.isHighLoad ? 'high' : 'normal',
@@ -42,6 +60,7 @@ class WebSocketHandler {
                 try {
                     socket.userId = userId;
                     socket.join(`user_${userId}`);
+                    await this.touchPresence(socket.userId, 'socket-join-room');
                     socket.emit('authenticated', { 
                         status: 'success',
                         serverLoad: this.monitoring.isHighLoad ? 'high' : 'normal',
@@ -71,31 +90,42 @@ class WebSocketHandler {
                         return;
                     }
                     
-                    // Adaptive rate limiting based on server load
-                    const userKey = `msg_${senderId}`;
-                    const userLimit = this.monitoring.rateLimitMap.get(userKey) || { 
-                        count: 0, 
-                        resetTime: Date.now() + 60000 
-                    };
-                    
-                    if (Date.now() > userLimit.resetTime) {
-                        userLimit.count = 0;
-                        userLimit.resetTime = Date.now() + 60000;
+                    // Redis-based rate limiting
+                    const userKey = `msg_rate_${senderId}`;
+                    const rateLimit = this.monitoring.isHighLoad ? 10 : 25; // 10/min under high load, 25/min normal
+                    let userCount = 0;
+                    try {
+                        userCount = await this.redis.getClient().incr(userKey);
+                        if (userCount === 1) {
+                            // Set expiry for 60 seconds on first increment
+                            await this.redis.getClient().expire(userKey, 60);
+                        }
+                    } catch (err) {
+                        console.error('Redis rate limit error:', err);
                     }
-                    
-                    // Adaptive rate limits based on load
-                    const rateLimit = this.monitoring.isHighLoad ? 100 : 200; // Reduce rate limit under high load
-                    
-                    if (userLimit.count >= rateLimit) {
-                        socket.emit('error', { 
+                    if (userCount > rateLimit) {
+                        socket.emit('error', {
                             message: `Message rate limit exceeded (${rateLimit}/min)`,
                             serverLoad: this.monitoring.isHighLoad ? 'high' : 'normal'
                         });
+                        // Log violation in database
+                        try {
+                            await this.db.query(
+                                `INSERT INTO admin_rate_limiter_violations (user_id, violation_type, details, occurred_at, ip_address, user_agent)
+                                 VALUES ($1, $2, $3, NOW(), $4, $5)`,
+                                [
+                                    senderId,
+                                    'chat_message_rate_limit',
+                                    `Count: ${userCount}, Limit: ${rateLimit}`,
+                                    socket.handshake?.address || null,
+                                    socket.handshake?.headers['user-agent'] || null
+                                ]
+                            );
+                        } catch (dbErr) {
+                            console.error('Failed to log rate limiter violation:', dbErr);
+                        }
                         return;
                     }
-                    
-                    userLimit.count++;
-                    this.monitoring.rateLimitMap.set(userKey, userLimit);
                     
                     // INSTANT delivery (optimistic) - but only if not under extreme load
                     const tempId = `temp_${Date.now()}_${Math.random()}`;
@@ -151,20 +181,12 @@ class WebSocketHandler {
             socket.on('heartbeat', async (data) => {
                 if (socket.userId) {
                     try {
-                        // Update last_login to current time
-                        await this.db.query(
-                            'UPDATE users SET last_login = NOW() WHERE id = $1',
-                            [socket.userId]
-                        );
+                        await this.legacyHeartbeatPersist(socket.userId);
                         
-                        // Ensure session is active
-                        await this.db.query(
-                            'UPDATE user_sessions SET is_active = true, last_activity = NOW() WHERE user_id = $1',
-                            [socket.userId]
-                        );
-                        
-                        // Broadcast online status
-                        this.handleUserStatusChange(socket.userId, true);
+                        const handledInPresence = await this.touchPresence(socket.userId, 'socket-heartbeat');
+                        if (!handledInPresence) {
+                            this.handleUserStatusChange(socket.userId, true);
+                        }
                         
                         // Heartbeat from user - status updated
                     } catch (error) {
@@ -317,12 +339,15 @@ class WebSocketHandler {
                 }
             });
 
-            socket.on('disconnect', () => {
+            socket.on('disconnect', async () => {
                 // Client disconnected
                 
                 if (socket.userId) {
-                    // Mark user as offline immediately
-                    this.handleUserStatusChange(socket.userId, false);
+                    const handledInPresence = await this.setPresenceOffline(socket.userId, 'socket-disconnect');
+                    if (!handledInPresence) {
+                        // Mark user as offline immediately
+                        this.handleUserStatusChange(socket.userId, false);
+                    }
                     
                     // Update the most recent user_sessions record to mark as inactive
                     this.db.query(
@@ -387,6 +412,39 @@ class WebSocketHandler {
         // User status change - Broadcasting
     }
 
+    broadcastPresenceUpdate(payload) {
+        if (!payload || typeof payload.userId === 'undefined') {
+            return;
+        }
+
+        const userId = parseInt(payload.userId, 10);
+        if (!Number.isInteger(userId)) {
+            return;
+        }
+
+        const origin = payload.origin;
+        const shouldBroadcast = !this.adapterEnabled || !this.presenceInstanceId || !origin || origin === this.presenceInstanceId;
+        if (!shouldBroadcast) {
+            return;
+        }
+
+        const isOnline = Boolean(payload.isOnline ?? (payload.status === 'online'));
+        const normalizedPayload = {
+            userId,
+            status: payload.status || (isOnline ? 'online' : 'offline'),
+            isOnline,
+            lastSeen: payload.lastSeen || null,
+            lastHeartbeat: payload.lastHeartbeat || null,
+            source: payload.source || 'redis',
+            meta: payload.meta || null,
+            timestamp: payload.timestamp || Date.now(),
+            origin: origin || null
+        };
+
+        this.handleUserStatusChange(userId, isOnline);
+        this.io.emit('presence:update', normalizedPayload);
+    }
+
     // Update user's last seen timestamp in database
     async updateUserLastSeen(userId) {
         try {
@@ -444,6 +502,70 @@ class WebSocketHandler {
         console.error('Message save failed:', error);
         this.io.emit('message_error', { tempId, error: 'Failed to save', serverLoad: this.monitoring.isHighLoad ? 'high' : 'normal' });
         socket.emit('message_error', { tempId, error: 'Failed to save' });
+    }
+
+    async legacyHeartbeatPersist(userId) {
+        await this.db.query(
+            'UPDATE users SET last_login = NOW() WHERE id = $1',
+            [userId]
+        );
+
+        await this.db.query(
+            'UPDATE user_sessions SET is_active = true, last_activity = NOW() WHERE user_id = $1',
+            [userId]
+        );
+    }
+
+    async touchPresence(userId, context = 'socket-event') {
+        if (!this.isPresenceAvailable()) {
+            return false;
+        }
+
+        const normalizedId = parseInt(userId, 10);
+        if (!Number.isInteger(normalizedId)) {
+            return false;
+        }
+
+        try {
+            await this.presenceService.markOnline(normalizedId, {
+                source: 'socket',
+                meta: { context }
+            });
+            return true;
+        } catch (error) {
+            console.warn('[WebSocketHandler] Presence online update failed:', error.message);
+            return false;
+        }
+    }
+
+    async setPresenceOffline(userId, context = 'socket-event') {
+        if (!this.isPresenceAvailable()) {
+            return false;
+        }
+
+        const normalizedId = parseInt(userId, 10);
+        if (!Number.isInteger(normalizedId)) {
+            return false;
+        }
+
+        try {
+            await this.presenceService.markOffline(normalizedId, {
+                source: 'socket',
+                meta: { context }
+            });
+            return true;
+        } catch (error) {
+            console.warn('[WebSocketHandler] Presence offline update failed:', error.message);
+            return false;
+        }
+    }
+
+    isPresenceAvailable() {
+        return Boolean(
+            this.presenceService &&
+            typeof this.presenceService.isEnabled === 'function' &&
+            this.presenceService.isEnabled()
+        );
     }
 }
 

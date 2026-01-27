@@ -82,7 +82,7 @@ class OnlineStatusManager {
         window.addEventListener('blur', () => this.handleWindowBlur());
 
         // Add periodic connection quality check
-        setInterval(() => this.checkConnectionQuality(), 30000);
+        setInterval(() => this.checkConnectionQuality(), 30010);
     }
 
     startHeartbeat() {
@@ -223,7 +223,7 @@ class OnlineStatusManager {
         this.isReconnecting = true;
         this.reconnectAttempts++;
         
-        const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000); // Exponential backoff
+        const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30010); // Exponential backoff
         
         console.log(`🔄 Attempting WebSocket reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts}) in ${delay}ms`);
         
@@ -269,7 +269,7 @@ class OnlineStatusManager {
                 // Update connection quality based on response time
                 if (responseTime < 1000) {
                     this.connectionQuality = 'good';
-                } else if (responseTime < 3000) {
+                } else if (responseTime < 3001) {
                     this.connectionQuality = 'fair';
                 } else {
                     this.connectionQuality = 'poor';

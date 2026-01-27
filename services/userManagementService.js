@@ -336,51 +336,78 @@ class UserManagementService {
             
             // 5e. Get and delete user profile image files BEFORE deleting database records
             const userImagesResult = await client.query(
-                'SELECT file_name FROM user_images WHERE user_id = $1',
+                'SELECT file_name, thumbnail_path FROM user_images WHERE user_id = $1',
                 [userId]
             );
             
             // Delete physical profile image files
-            const profileImagesDir = path.join(__dirname, '..', 'app', 'uploads', 'profile_images');
+            const appDir = path.join(__dirname, '..', 'app');
+            const profileImagesDir = path.join(appDir, 'uploads', 'profile_images');
             let deletedCount = 0;
             let errorCount = 0;
             
+            const recordDelete = async (targetPath) => {
+                if (!targetPath) return;
+                try {
+                    await fs.unlink(targetPath);
+                    deletedCount++;
+                } catch (deleteError) {
+                    if (deleteError.code !== 'ENOENT') {
+                        errorCount++;
+                    }
+                }
+            };
+
+            const normalizeProfileImagePath = (inputPath) => {
+                if (!inputPath) return null;
+                const sanitized = inputPath.replace(/\\/g, '/').replace(/^\/+/, '');
+                if (!sanitized) return null;
+                const segments = sanitized.split('/').filter(Boolean);
+                const profileIdx = segments.lastIndexOf('profile_images');
+                const relativeSegments = profileIdx >= 0 ? segments.slice(profileIdx + 1) : segments;
+                if (relativeSegments.length === 0) {
+                    return null;
+                }
+                return path.join(profileImagesDir, relativeSegments.join(path.sep));
+            };
+            
             for (const image of userImagesResult.rows) {
                 if (image.file_name) {
-                    try {
-                        const imagePath = path.join(profileImagesDir, image.file_name);
-                        
-                        // Check if file exists before attempting deletion
-                        try {
-                            await fs.access(imagePath);
-                            // File exists, delete it
-                            await fs.unlink(imagePath);
-                            deletedCount++;
-                        } catch (fileError) {
-                            if (fileError.code !== 'ENOENT') {
-                                errorCount++;
-                            }
+                    const imagePath = path.join(profileImagesDir, image.file_name);
+                    await recordDelete(imagePath);
+
+                    const ext = path.extname(image.file_name);
+                    const fallbackExt = ext || '.jpg';
+                    const baseName = path.basename(image.file_name, ext);
+
+                    const thumbnailCandidates = new Set();
+                    const addThumbCandidate = (candidate) => {
+                        const normalizedPath = normalizeProfileImagePath(candidate);
+                        if (normalizedPath) {
+                            thumbnailCandidates.add(normalizedPath);
                         }
-                        
-                        // Also try to delete thumbnail if it exists (common naming patterns)
-                        const thumbnailPatterns = [
-                            image.file_name.replace(/(\.[^.]+)$/, '_thumb$1'),
-                            image.file_name.replace(/(\.[^.]+)$/, '_thumbnail$1'),
-                            image.file_name.replace(/(\.[^.]+)$/, '.thumb$1')
-                        ];
-                        
-                        for (const thumbPattern of thumbnailPatterns) {
-                            try {
-                                const thumbPath = path.join(profileImagesDir, thumbPattern);
-                                await fs.access(thumbPath);
-                                await fs.unlink(thumbPath);
-                                deletedCount++;
-                            } catch (thumbError) {
-                                // Ignore if thumbnail doesn't exist
-                            }
-                        }
-                    } catch (fileError) {
-                        errorCount++;
+                    };
+
+                    [
+                        `${baseName}_thumb_small${fallbackExt}`,
+                        `${baseName}_thumb_small.jpg`,
+                        `${baseName}_thumb_medium${fallbackExt}`,
+                        `${baseName}_thumb_medium.jpg`,
+                        `${baseName}_thumb${fallbackExt}`,
+                        `${baseName}_thumbnail${fallbackExt}`,
+                        `${baseName}.thumb${fallbackExt}`,
+                        image.file_name.replace(/(\.[^.]+)$/, '_thumb$1'),
+                        image.file_name.replace(/(\.[^.]+)$/, '_thumbnail$1'),
+                        image.file_name.replace(/(\.[^.]+)$/, '.thumb$1')
+                    ].forEach(addThumbCandidate);
+
+                    if (image.thumbnail_path) {
+                        addThumbCandidate(image.thumbnail_path);
+                        addThumbCandidate(path.basename(image.thumbnail_path));
+                    }
+
+                    for (const thumbPath of thumbnailCandidates) {
+                        await recordDelete(thumbPath);
                     }
                 }
             }

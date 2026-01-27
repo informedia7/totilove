@@ -84,10 +84,26 @@ router.post('/logout', requireAuth, (req, res) => {
 });
 
 // Dashboard (protected)
-router.get('/dashboard', requireAuth, (req, res) => {
-    res.render('dashboard.html', {
-        admin: req.admin
-    });
+router.get('/dashboard', requireAuth, async (req, res) => {
+    try {
+        // Get latest 100 rate limiter violations
+        const result = await query(
+            `SELECT user_id, violation_type, details, occurred_at, ip_address, user_agent
+             FROM admin_rate_limiter_violations
+             ORDER BY occurred_at DESC
+             LIMIT 100`
+        );
+        res.render('dashboard.html', {
+            admin: req.admin,
+            rateLimiterViolations: result.rows || []
+        });
+    } catch (error) {
+        res.render('dashboard.html', {
+            admin: req.admin,
+            rateLimiterViolations: [],
+            error: 'Failed to load rate limiter violations.'
+        });
+    }
 });
 
 // Change password endpoint
