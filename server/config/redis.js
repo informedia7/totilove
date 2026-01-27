@@ -12,18 +12,22 @@ const CSRFMiddleware = require('../../middleware/csrf');
  */
 async function setupRedis() {
     const redisClient = redis.createClient({
-        host: process.env.REDIS_HOST || 'localhost',
-        port: process.env.REDIS_PORT || 6379,
+        socket: {
+            host: process.env.REDIS_HOST || 'localhost',
+            port: parseInt(process.env.REDIS_PORT || '6379', 10),
+            connectTimeout: 2000,
+            keepAlive: true,
+            noDelay: true,
+            family: 4
+        },
+        password: process.env.REDIS_PASSWORD || undefined,
+        username: process.env.REDIS_USER || undefined,
         lazyConnect: true,
         maxRetriesPerRequest: 1,
         retryDelayOnFailover: 50,
         enableReadyCheck: false,
         maxLoadingTimeout: 2000,
-        connectTimeout: 2000,
-        commandTimeout: 1000,
-        family: 4,
-        keepAlive: true,
-        noDelay: true
+        commandTimeout: 1000
     });
 
     redisClient.on('error', (err) => {
