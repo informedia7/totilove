@@ -1,6 +1,47 @@
 // Centralized configuration for Lightning Server
 require('dotenv').config();
 
+function parseRedisConfig() {
+    const redisUrl =
+        process.env.REDIS_URL ||
+        process.env.RAILWAY_REDIS_URL ||
+        process.env.UPSTASH_REDIS_URL ||
+        process.env.REDIS_TLS_URL;
+
+    const baseConfig = {
+        username: process.env.REDIS_USER || undefined,
+        password: process.env.REDIS_PASSWORD || undefined,
+        database: process.env.REDIS_DB ? Number(process.env.REDIS_DB) : undefined,
+        name: process.env.REDIS_NAME || undefined
+    };
+
+    if (redisUrl) {
+        const isTls = process.env.REDIS_USE_TLS === 'true';
+        const normalizedUrl = isTls && redisUrl.startsWith('redis://')
+            ? redisUrl.replace('redis://', 'rediss://')
+            : redisUrl;
+
+        return {
+            ...baseConfig,
+            url: normalizedUrl
+        };
+    }
+
+    const socketOptions = {
+        host: process.env.REDIS_HOST || '127.0.0.1',
+        port: Number(process.env.REDIS_PORT || '6379')
+    };
+
+    if (process.env.REDIS_USE_TLS === 'true') {
+        socketOptions.tls = true;
+    }
+
+    return {
+        ...baseConfig,
+        socket: socketOptions
+    };
+}
+
 module.exports = {
     // Server Configuration
     server: {
@@ -26,15 +67,7 @@ module.exports = {
     },
 
     // Redis Configuration
-    redis: {
-        host: process.env.REDIS_HOST || 'localhost',
-        port: process.env.REDIS_PORT || 6379,
-        password: process.env.REDIS_PASSWORD || null,
-        db: process.env.REDIS_DB || 0,
-        retryDelayOnFailover: 100,
-        enableReadyCheck: false,
-        maxRetriesPerRequest: null
-    },
+    redis: parseRedisConfig(),
 
     // WebSocket Configuration
     websocket: {
