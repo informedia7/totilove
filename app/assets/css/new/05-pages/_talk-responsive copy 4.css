@@ -1779,6 +1779,22 @@
             justify-content: center !important;
         }
         
+        /* Full-width time filter calendar in portrait */
+        #timeFilterContent {
+            width: 100vw !important;
+            max-width: 100vw !important;
+            min-width: 100vw !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            border-radius: 0 !important;
+            border-left: 0 !important;
+            border-right: 0 !important;
+            padding-left: var(--spacing-xl) !important;
+            padding-right: var(--spacing-xl) !important;
+            padding-left: max(var(--spacing-xl), env(safe-area-inset-left)) !important;
+            padding-right: max(var(--spacing-xl), env(safe-area-inset-right)) !important;
+        }
+
         /* iPhone Notch/Punch-hole Safe Areas */
         @supports (padding: max(0px)) {
             .header,
