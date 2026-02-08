@@ -234,8 +234,8 @@
     overflow: hidden;
   }
 
-  /* MOBILE PORTRAIT LAYOUT */
-  @media (max-width: 767px) and (orientation: portrait) {
+  /* MOBILE LAYOUT */
+  @media (max-width: 767px) {
     body[data-nav-state="NAV_CONVERSATIONS_LIST"] .sidebar {
       visibility: visible;
       opacity: 1;
@@ -285,7 +285,6 @@
     body[data-nav-state="NAV_CHAT"] .chat-back-btn-mobile {
       display: inline-flex;
     }
-
   }
 
   /* TABLET & DESKTOP LAYOUT */
@@ -422,7 +421,7 @@
     background: transparent;
   }
 
-  /* CHAT BACK BUTTON (Mobile Portrait Only) */
+  /* CHAT BACK BUTTON (Mobile Only) */
   .chat-back-btn-mobile {
     display: none;
     width: 38px;
@@ -1025,7 +1024,7 @@
     transition: transform 0.3s ease, opacity 0.2s ease;
   }
 
-  @media (max-width: 768px) and (orientation: portrait) {
+  @media (max-width: 768px) {
     .search-panel { top: 86px; }
   }
 
@@ -1684,8 +1683,8 @@
    7. RESPONSIVE STYLES
 ------------------------------- */
 @layer responsive {
-  /* MOBILE PORTRAIT (Default for all phones) */
-  @media (max-width: 767px) and (orientation: portrait) {
+  /* MOBILE (Default for all phones) */
+  @media (max-width: 767px) {
     body {
       padding: 0 !important;
       margin: 0 !important;
@@ -1697,10 +1696,23 @@
       box-shadow: none !important;
       height: 100dvh;
       min-height: -webkit-fill-available;
+      background: var(--color-white) !important;
+    }
+
+    body.dark-mode .app-container {
+      background: #0a0a0a !important;
+    }
+
+    body.dark-mode {
+      background: #0a0a0a !important;
+    }
+
+    body.dark-mode body {
+      background: #0a0a0a !important;
     }
 
     /* iPhone 12 & small mobile (390px and below) */
-    @media (max-width: 390px) and (orientation: portrait) {
+    @media (max-width: 390px) {
       .app-container {
         height: 100dvh !important;
         min-height: 100dvh !important;
@@ -1710,6 +1722,11 @@
         width: 100% !important;
         max-width: 100% !important;
         box-shadow: none !important;
+        background: var(--color-white) !important;
+      }
+
+      body.dark-mode .app-container {
+        background: #0a0a0a !important;
       }
 
       .header {
@@ -1724,8 +1741,8 @@
       }
 
       body.dark-mode .header {
-        background: var(--color-white) !important;
-        border-bottom: 0 !important;
+        background: #0a0a0a !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
       }
 
       .avatar-img {
@@ -1796,10 +1813,19 @@
         border-radius: 0 !important;
       }
 
+      body.dark-mode .sidebar {
+        background: #0a0a0a !important;
+      }
+
       .sidebar-header {
         padding: var(--spacing-sm) !important;
         background: var(--color-white) !important;
         border-radius: 0 !important;
+      }
+
+      body.dark-mode .sidebar-header {
+        background: #0a0a0a !important;
+        border-bottom-color: rgba(255, 255, 255, 0.12) !important;
       }
 
       .search-input {
@@ -1814,11 +1840,19 @@
         background: var(--color-white) !important;
       }
 
+      body.dark-mode .conversations {
+        background: #0a0a0a !important;
+      }
+
       .conversation-item {
         padding: var(--spacing-sm) var(--spacing-xs) !important;
         margin-bottom: var(--spacing-xs) !important;
         background: var(--color-white) !important;
         border-radius: 9px !important;
+      }
+
+      body.dark-mode .conversation-item {
+        background: #0a0a0a !important;
       }
 
       .conversation-avatar {
@@ -1856,6 +1890,11 @@
         padding: 0 var(--spacing-sm) !important;
         background: var(--color-white) !important;
         border-radius: 0 !important;
+      }
+
+      body.dark-mode .chat-header {
+        background: #0a0a0a !important;
+        border-bottom-color: rgba(255, 255, 255, 0.12) !important;
       }
 
       .chat-avatar {
@@ -1902,6 +1941,10 @@
         -webkit-overflow-scrolling: touch !important;
       }
 
+      body.dark-mode .messages-area {
+        background: #0a0a0a !important;
+      }
+
       .message-bubble {
         max-width: 70% !important;
         padding: var(--spacing-sm) var(--spacing-md) !important;
@@ -1936,6 +1979,10 @@
         background: var(--color-white) !important;
       }
 
+      body.dark-mode .search-panel {
+        background: #0a0a0a !important;
+      }
+
       .search-panel-header {
         padding: var(--spacing-sm) !important;
         background: var(--color-white) !important;
@@ -1943,9 +1990,18 @@
         border-radius: 0 !important;
       }
 
+      body.dark-mode .search-panel-header {
+        background: #0a0a0a !important;
+        border-bottom-color: rgba(255, 255, 255, 0.12) !important;
+      }
+
       .search-panel-content {
         padding: var(--spacing-sm) !important;
         background: var(--color-white) !important;
+      }
+
+      body.dark-mode .search-panel-content {
+        background: #0a0a0a !important;
       }
 
       #timeFilterContent {
@@ -1975,6 +2031,10 @@
         border-radius: 12px !important;
       }
 
+      body.dark-mode .block-confirm-modal .block-confirm-content {
+        background: #0a0a0a !important;
+      }
+
       @supports (padding: max(0px)) {
         .header,
         .chat-header {
@@ -1997,7 +2057,7 @@
     }
 
     /* Extra small mobile (391px to 480px) */
-    @media (max-width: 480px) and (min-width: 391px) and (orientation: portrait) {
+    @media (max-width: 480px) and (min-width: 391px) {
       .app-container {
         height: 100dvh !important;
         min-height: 100dvh !important;
@@ -2006,12 +2066,21 @@
         border-radius: 0 !important;
         width: 100% !important;
         box-shadow: none !important;
+        background: var(--color-white) !important;
+      }
+
+      body.dark-mode .app-container {
+        background: #0a0a0a !important;
       }
 
       body {
         padding: 0 !important;
         margin: 0 !important;
         overflow: hidden !important;
+      }
+
+      body.dark-mode {
+        background: #0a0a0a !important;
       }
 
       .header {
@@ -2021,6 +2090,12 @@
         border-radius: 0 !important;
         flex-wrap: nowrap !important;
         overflow: visible !important;
+        background: var(--color-white) !important;
+      }
+
+      body.dark-mode .header {
+        background: #0a0a0a !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
       }
 
       .avatar-img {
@@ -2081,6 +2156,12 @@
       .chat-header {
         height: 52px !important;
         border-radius: 0 !important;
+        background: var(--color-white) !important;
+      }
+
+      body.dark-mode .chat-header {
+        background: #0a0a0a !important;
+        border-bottom-color: rgba(255, 255, 255, 0.12) !important;
       }
 
       .chat-avatar {
@@ -2105,6 +2186,10 @@
         border-radius: 9px !important;
       }
 
+      body.dark-mode .conversation-item {
+        background: #0a0a0a !important;
+      }
+
       .conversation-avatar {
         width: var(--avatar-size-conversation) !important;
         height: var(--avatar-size-conversation) !important;
@@ -2116,6 +2201,11 @@
         max-width: 100% !important;
         height: calc(100dvh - 48px) !important;
         border-radius: 0 !important;
+        background: var(--color-white) !important;
+      }
+
+      body.dark-mode .sidebar {
+        background: #0a0a0a !important;
       }
 
       .conversations {
@@ -2123,6 +2213,11 @@
         margin: 0 !important;
         height: calc(100dvh - 48px - 64px) !important;
         overflow-y: auto !important;
+        background: var(--color-white) !important;
+      }
+
+      body.dark-mode .conversations {
+        background: #0a0a0a !important;
       }
 
       .conversation-info {
@@ -2152,15 +2247,15 @@
 
       body.dark-mode .filters .filter-btn,
       body.dark-mode .sidebar-header .filter-btn,
-      body-dark-mode .sidebar .filter-btn,
-      body-dark-mode .conversation-filters .filter-btn {
+      body.dark-mode .sidebar .filter-btn,
+      body.dark-mode .conversation-filters .filter-btn {
         background: rgba(0, 0, 0, 0.85) !important;
         border-color: rgba(var(--color-white-rgb), 0.22) !important;
         color: rgba(var(--color-white-rgb), 0.67) !important;
       }
 
-      body-dark-mode .filters .filter-btn.active,
-      body-dark-mode .conversation-filters .filter-btn.active {
+      body.dark-mode .filters .filter-btn.active,
+      body.dark-mode .conversation-filters .filter-btn.active {
         background: rgba(0, 0, 0, 0.98) !important;
         border-color: rgba(var(--color-white-rgb), 0.45) !important;
         color: rgba(var(--color-white-rgb), 0.7) !important;
@@ -2323,23 +2418,6 @@
       height: var(--btn-size-md);
       min-width: var(--btn-size-md);
       font-size: var(--font-size-lg);
-    }
-
-  }
-
-  /* Tablet landscape specific */
-  @media (min-width: 768px) and (orientation: landscape) {
-    .app-container {
-      height: 85vh;
-    }
-
-    .sidebar {
-      width: var(--sidebar-width-desktop);
-      flex: 0 0 var(--sidebar-width-desktop);
-    }
-
-    .messages-area {
-      padding: var(--spacing-md);
     }
   }
 
