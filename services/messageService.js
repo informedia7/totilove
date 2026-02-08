@@ -11,6 +11,20 @@ class MessageService {
         this.BATCH_SIZE = 50;
         this.CACHE_TTL = 300; // 5 minutes
         this.MAX_MESSAGE_LENGTH = 1000;
+        this.appRoot = path.resolve(__dirname, '..', 'app');
+    }
+
+    buildAttachmentPathCandidates(relativePath) {
+        if (!relativePath) {
+            return [];
+        }
+        const sanitized = relativePath.replace(/^\//, '');
+        const candidates = [
+            path.join(this.appRoot, sanitized),
+            path.join(process.cwd(), 'app', sanitized),
+            path.join(process.cwd(), sanitized)
+        ];
+        return [...new Set(candidates)];
     }
 
     // Validate that attachment files exist on the filesystem
@@ -20,20 +34,25 @@ class MessageService {
         }
 
         try {
-            // Check if the main image file exists
-            const fullPath = path.join(process.cwd(), 'app', attachment.file_path.replace(/^\//, ''));
-            const fileExists = fs.existsSync(fullPath);
+            const fileExists = this.buildAttachmentPathCandidates(attachment.file_path)
+                .some(candidate => fs.existsSync(candidate));
 
-            // Also check thumbnail if specified
-            if (attachment.thumbnail_path) {
-                const thumbPath = path.join(process.cwd(), 'app', attachment.thumbnail_path.replace(/^\//, ''));
-                const thumbExists = fs.existsSync(thumbPath);
-                
-                // Both must exist for the attachment to be valid
-                return fileExists && thumbExists;
+            if (!fileExists) {
+                console.warn(`[MessageService] Missing chat image file: ${attachment.file_path}`);
+                return false;
             }
 
-            return fileExists;
+            if (attachment.thumbnail_path) {
+                const thumbExists = this.buildAttachmentPathCandidates(attachment.thumbnail_path)
+                    .some(candidate => fs.existsSync(candidate));
+
+                if (!thumbExists) {
+                    console.warn(`[MessageService] Missing chat image thumbnail: ${attachment.thumbnail_path}`);
+                    return false;
+                }
+            }
+
+            return true;
         } catch (error) {
             console.error('Error validating attachment:', error);
             return false;
