@@ -158,6 +158,11 @@ body.dark-mode .header-btn:hover {
     color: var(--color-white);
 }
 
+body.dark-mode .message-time,
+body.dark-mode .message.sent .message-time {
+    color: rgba(255, 255, 255, 0.85);
+}
+
 /* High contrast mode */
 @media (prefers-contrast: high) {
     :root {
@@ -682,14 +687,14 @@ body[data-nav-state="NAV_CHAT"] .chat-back-btn-mobile {
     margin-left: var(--spacing-xs);
     font-weight: 600;
     letter-spacing: 0.01em;
-    color: var(--color-gray-400);
+    color: var(--color-gray-900);
 }
 
 .message.sent .message-time {
     margin-left: 0;
     margin-right: var(--spacing-xs);
     text-align: right;
-    color: rgba(var(--color-white-rgb), 0.85);
+    color: var(--color-gray-900);
 }
 
 /* Message links */
