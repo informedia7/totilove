@@ -32,7 +32,6 @@ All middleware files have been created and tested:
    - `authLimiter` - 5 requests per 15 minutes
    - `apiLimiter` - 100 requests per 15 minutes
    - `strictLimiter` - 5 requests per hour
-   - `validationLimiter` - 10 requests per minute
 
 5. ✅ `routers/middleware/requestLogger.js`
    - `createRequestLogger()` - Create custom logger

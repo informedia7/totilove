@@ -10,7 +10,6 @@
 const express = require('express');
 const router = express.Router();
 const { asyncHandler, ApiError } = require('../middleware/errorHandler');
-const { validationLimiter } = require('../middleware/rateLimiter');
 const { requestLogger } = require('../middleware/requestLogger');
 const { isValidEmail } = require('../middleware/validationMiddleware');
 
@@ -24,8 +23,7 @@ function createValidationRoutes(db) {
         throw new Error('Database connection is required for validation routes');
     }
 
-    // Apply rate limiting and logging to all routes
-    router.use(validationLimiter);
+    // Apply logging to all routes
     router.use(requestLogger);
 
     /**
