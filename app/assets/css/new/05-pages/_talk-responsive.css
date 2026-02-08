@@ -220,7 +220,12 @@
   .app-container {
     background: var(--color-white);
     width: 100%;
+    height: 100vh;
+    height: 100svh;
     height: 100dvh;
+    min-height: 100vh;
+    min-height: 100svh;
+    min-height: 100dvh;
     max-width: 100%;
     margin: 0;
     overflow: hidden;
@@ -274,6 +279,8 @@
 
     .app-container > .main-content {
       flex-direction: column;
+      height: calc(100vh - var(--header-height-mobile));
+      height: calc(100svh - var(--header-height-mobile));
       height: calc(100dvh - var(--header-height-mobile));
     }
 
@@ -1714,8 +1721,14 @@
     /* iPhone 12 & small mobile (390px and below) */
     @media (max-width: 390px) {
       .app-container {
+        height: 100vh !important;
+        height: 100svh !important;
         height: 100dvh !important;
+        min-height: 100vh !important;
+        min-height: 100svh !important;
         min-height: 100dvh !important;
+        max-height: 100vh !important;
+        max-height: 100svh !important;
         max-height: 100dvh !important;
         margin: 0 !important;
         border-radius: 0 !important;
@@ -1802,12 +1815,16 @@
       }
 
       .app-container > .main-content {
+        height: calc(100vh - 86px) !important;
+        height: calc(100svh - 86px) !important;
         height: calc(100dvh - 86px) !important;
       }
 
       .sidebar {
         width: 100% !important;
         max-width: 100% !important;
+        height: calc(100vh - 86px) !important;
+        height: calc(100svh - 86px) !important;
         height: calc(100dvh - 86px) !important;
         background: var(--color-white) !important;
         border-radius: 0 !important;
@@ -2059,8 +2076,14 @@
     /* Extra small mobile (391px to 480px) */
     @media (max-width: 480px) and (min-width: 391px) {
       .app-container {
+        height: 100vh !important;
+        height: 100svh !important;
         height: 100dvh !important;
+        min-height: 100vh !important;
+        min-height: 100svh !important;
         min-height: 100dvh !important;
+        max-height: 100vh !important;
+        max-height: 100svh !important;
         max-height: 100dvh !important;
         margin: 0 !important;
         border-radius: 0 !important;
@@ -2150,6 +2173,8 @@
       }
 
       .app-container > .main-content {
+        height: calc(100vh - 70px) !important;
+        height: calc(100svh - 70px) !important;
         height: calc(100dvh - 70px) !important;
       }
 
@@ -2199,6 +2224,8 @@
       .sidebar {
         width: 100% !important;
         max-width: 100% !important;
+        height: calc(100vh - 48px) !important;
+        height: calc(100svh - 48px) !important;
         height: calc(100dvh - 48px) !important;
         border-radius: 0 !important;
         background: var(--color-white) !important;
@@ -2211,6 +2238,8 @@
       .conversations {
         padding: var(--spacing-xs) !important;
         margin: 0 !important;
+        height: calc(100vh - 48px - 64px) !important;
+        height: calc(100svh - 48px - 64px) !important;
         height: calc(100dvh - 48px - 64px) !important;
         overflow-y: auto !important;
         background: var(--color-white) !important;
@@ -2238,7 +2267,7 @@
       }
 
       body.dark-mode .conversation-name {
-        color: rgba(var(--color-white-rgb), 0.95) !important;
+        color: rgba(var(--color-white-rgb), 0.67) !important;
       }
 
       body.dark-mode .conversation-preview {
