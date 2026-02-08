@@ -1698,7 +1698,7 @@
         }
 
         .message-input {
-            font-size: var(--font-size-md) !important;
+            font-size: calc(var(--font-size-md) * 1.4) !important;
             min-height: 44px !important;
             max-height: 120px !important;
         }
