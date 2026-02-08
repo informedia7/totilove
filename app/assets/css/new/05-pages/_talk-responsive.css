@@ -138,6 +138,26 @@ body.dark-mode {
     --color-link-hover: #b8dcff;
 }
 
+/* Dark mode structural overrides */
+body.dark-mode .header {
+    background: var(--color-gray-100);
+    color: var(--color-text-primary);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.65);
+}
+
+body.dark-mode .header .username {
+    color: var(--color-text-primary);
+}
+
+body.dark-mode .header-btn {
+    color: var(--color-text-primary);
+}
+
+body.dark-mode .header-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--color-white);
+}
+
 /* High contrast mode */
 @media (prefers-contrast: high) {
     :root {
