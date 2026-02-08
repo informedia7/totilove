@@ -93,7 +93,7 @@ module.exports = {
     // Session Configuration
     session: {
         secret: process.env.SESSION_SECRET || 'lightning-secret-key',
-        duration: 60 * 60 * 1000, // 1 hour
+        duration: 2 * 60 * 60 * 1000, // 2 hours
         cleanupInterval: 5 * 60 * 1000 // 5 minutes
     },
 

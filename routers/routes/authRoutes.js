@@ -20,6 +20,8 @@ const { asyncHandler } = require('../middleware/errorHandler');
 const { authLimiter } = require('../middleware/rateLimiter');
 const { requestLogger } = require('../middleware/requestLogger');
 const { extractSessionToken, validateSession } = require('../middleware/authMiddleware');
+const config = require('../../config/config');
+const SESSION_DURATION_MS = config.session.duration;
 
 /**
  * Create authentication routes
@@ -116,7 +118,7 @@ function createAuthRoutes(authController, authMiddleware) {
             }
 
             // Extend session
-            session.expiresAt = Date.now() + (60 * 60 * 1000); // 1 hour
+            session.expiresAt = Date.now() + SESSION_DURATION_MS;
             
             res.json({
                 success: true,

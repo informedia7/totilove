@@ -281,6 +281,26 @@ async function selectConversation(conversationId, event) {
         if (window.currentReply && typeof cancelReply === 'function') {
             cancelReply();
         }
+
+        // Drop any pending image uploads when hopping to another chat
+        if (typeof window.clearImagePreviews === 'function') {
+            window.clearImagePreviews();
+        } else if (Array.isArray(window.selectedImages)) {
+            window.selectedImages.length = 0;
+            const previewList = document.getElementById('imagePreviewList');
+            if (previewList) {
+                previewList.innerHTML = '';
+            }
+            const previewArea = document.getElementById('imagePreviewArea');
+            if (previewArea) {
+                previewArea.style.display = 'none';
+            }
+        }
+
+        const imageInput = document.getElementById('imageInput');
+        if (imageInput) {
+            imageInput.value = '';
+        }
     }
 
     // Update state

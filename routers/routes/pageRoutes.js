@@ -23,6 +23,8 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const fs = require('fs');
+const config = require('../../config/config');
+const SESSION_DURATION_MS = config.session.duration;
 const { asyncHandler, ApiError } = require('../middleware/errorHandler');
 const { requestLogger } = require('../middleware/requestLogger');
 const { optionalAuth } = require('../middleware/authMiddleware');
@@ -111,7 +113,7 @@ function createPageRoutes(templateController, authMiddleware) {
     /**
      * Helper function to render template with authentication
      */
-    async function renderTemplatePage(req, res, templateName, sessionDuration = 60 * 60 * 1000) {
+    async function renderTemplatePage(req, res, templateName, sessionDuration = SESSION_DURATION_MS) {
         const token = req.query.token || req.headers['x-session-token'] || req.cookies?.sessionToken;
         
         if (token && templateController && authMiddleware) {
@@ -228,7 +230,7 @@ function createPageRoutes(templateController, authMiddleware) {
         }
 
         // Extend session
-        session.expiresAt = Date.now() + (60 * 60 * 1000); // 1 hour
+        session.expiresAt = Date.now() + SESSION_DURATION_MS;
         
         // Render profile-basic template for viewing other users
         // Note: renderTemplate signature is (req, res, templateName, userId, user, token)

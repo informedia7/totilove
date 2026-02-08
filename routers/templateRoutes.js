@@ -1,6 +1,8 @@
 const express = require('express');
 const path = require('path');
 const router = express.Router();
+const config = require('../config/config');
+const SESSION_DURATION_MS = config.session.duration;
 
 class TemplateRoutes {
     constructor(templateController, authMiddleware) {
@@ -38,7 +40,7 @@ class TemplateRoutes {
                 }
 
                 // Extend session
-                session.expiresAt = Date.now() + (60 * 60 * 1000); // 1 hour
+                session.expiresAt = Date.now() + SESSION_DURATION_MS;
                 
                 // Use the independent talk page renderer
                 const userId = session.user.id;
@@ -99,7 +101,7 @@ class TemplateRoutes {
                 }
 
                 // Extend session
-                session.expiresAt = Date.now() + (60 * 60 * 1000); // 1 hour
+                session.expiresAt = Date.now() + SESSION_DURATION_MS;
                 
                 // Use authenticated user's data
                 const userId = session.user.id;

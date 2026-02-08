@@ -1,4 +1,5 @@
 const config = require('../config/config');
+const SESSION_DURATION_MS = config.session.duration;
 
 class AuthMiddleware {
     constructor(sessions) {
@@ -30,8 +31,8 @@ class AuthMiddleware {
             });
         }
 
-        // Extend session
-        session.expiresAt = Date.now() + (60 * 60 * 1000); // 1 hour
+        // Extend session using configured duration
+        session.expiresAt = Date.now() + SESSION_DURATION_MS;
         
         req.session = session;
         req.user = session.user;
@@ -54,7 +55,7 @@ class AuthMiddleware {
         this.sessions.set(sessionToken, {
             user: { ...user },
             createdAt: Date.now(),
-            expiresAt: Date.now() + (60 * 60 * 1000) // 1 hour
+            expiresAt: Date.now() + SESSION_DURATION_MS
         });
         return sessionToken;
     }

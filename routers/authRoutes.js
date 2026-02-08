@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
+const config = require('../config/config');
+const SESSION_DURATION_MS = config.session.duration;
 
 // Import route modules
 const createLocationRoutes = require('./routes/locationRoutes');
@@ -62,7 +64,7 @@ class AuthRoutes {
             return null;
         }
 
-        session.expiresAt = Date.now() + (60 * 60 * 1000);
+        session.expiresAt = Date.now() + SESSION_DURATION_MS;
         return session;
     }
 
@@ -155,7 +157,7 @@ class AuthRoutes {
                 if (token && this.templateController && this.authMiddleware) {
                     const session = this.authMiddleware.sessions.get(token);
                     if (session && session.expiresAt > Date.now()) {
-                        session.expiresAt = Date.now() + (60 * 60 * 1000);
+                        session.expiresAt = Date.now() + SESSION_DURATION_MS;
                         await this.templateController.renderTemplate(req, res, routeName, session.user.id, session.user, token);
                     } else {
                         res.redirect('/login?message=' + encodeURIComponent('Your session has expired. Please log in again.'));
@@ -201,7 +203,7 @@ class AuthRoutes {
             if (token && this.templateController && this.authMiddleware) {
                 const session = this.authMiddleware.sessions.get(token);
                 if (session && session.expiresAt > Date.now()) {
-                    session.expiresAt = Date.now() + (60 * 60 * 1000);
+                    session.expiresAt = Date.now() + SESSION_DURATION_MS;
                     await this.templateController.renderTemplate(req, res, 'profile-basic', userId, session.user, token);
                 } else {
                     res.redirect('/login?message=' + encodeURIComponent('Your session has expired. Please log in again.'));

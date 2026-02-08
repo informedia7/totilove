@@ -1,3 +1,6 @@
+const config = require('../../config/config');
+const SESSION_DURATION_MS = config.session.duration;
+
 /**
  * Authentication Middleware
  * Handles session validation and user extraction
@@ -39,8 +42,8 @@ function validateSession(sessionToken, sessions) {
         return null;
     }
 
-    // Extend session
-    session.expiresAt = Date.now() + (60 * 60 * 1000); // 1 hour
+    // Extend session using configured duration
+    session.expiresAt = Date.now() + SESSION_DURATION_MS;
     return session;
 }
 

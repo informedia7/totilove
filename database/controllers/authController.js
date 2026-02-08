@@ -3,6 +3,8 @@ const crypto = require('crypto');
 const ActivityRateLimiter = require('../../utils/activityRateLimiter');
 const emailService = require('../../services/emailService');
 const { requireEmailVerification } = require('../../utils/emailVerificationCheck');
+const config = require('../../config/config');
+const SESSION_DURATION_MS = config.session.duration;
 
 const REAL_NAME_REGEX = /^[A-Za-z]{2,100}$/;
 
@@ -161,7 +163,7 @@ class AuthController {
                 httpOnly: true, // Prevents XSS attacks
                 secure: isProduction, // HTTPS only in production
                 sameSite: 'strict', // CSRF protection
-                maxAge: 60 * 60 * 1000, // 1 hour
+                maxAge: SESSION_DURATION_MS,
                 path: '/'
             });
             

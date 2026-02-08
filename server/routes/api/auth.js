@@ -4,6 +4,8 @@
  */
 
 const { createCSRFRateLimit } = require('../middleware');
+const config = require('../../../config/config');
+const SESSION_DURATION_MS = config.session.duration;
 
 /**
  * Setup authentication-related routes
@@ -33,7 +35,7 @@ function setupAuthRoutes(app, authMiddleware, csrfMiddleware) {
             
             if (session && session.expiresAt > Date.now()) {
                 // Extend session
-                session.expiresAt = Date.now() + (60 * 60 * 1000); // 1 hour
+                session.expiresAt = Date.now() + SESSION_DURATION_MS;
                 
                 res.json({
                     success: true,
@@ -91,7 +93,7 @@ function setupAuthRoutes(app, authMiddleware, csrfMiddleware) {
             res.json({
                 success: true,
                 csrfToken: csrfToken,
-                expiresIn: 3600000 // 1 hour in milliseconds
+                expiresIn: SESSION_DURATION_MS
             });
         } catch (error) {
             res.status(500).json({
