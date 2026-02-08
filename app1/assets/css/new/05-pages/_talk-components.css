@@ -1,0 +1,1266 @@
+/* Confirmation Modal Styles */
+.confirmation-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(4px);
+}
+
+    .confirmation-modal.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+.confirmation-content {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 400px !important;
+    width: 90% !important;
+    min-width: 300px !important;
+    box-sizing: border-box !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    transform: scale(0.95) translateY(20px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.confirmation-modal.show .confirmation-content {
+    transform: scale(1) translateY(0);
+}
+
+.confirmation-icon {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 3rem;
+    opacity: 0.8;
+}
+
+.confirmation-body {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+/* Chat location styles */
+.chat-location {
+    font-size: 0.85rem;
+    color: #3498db;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.2rem;
+}
+
+.chat-location i {
+    font-size: 0.8rem;
+}
+.message.received .thumbnail-message-container,
+.message.received .thumbnail-message-container * {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Ensure message attachments inside thumbnail container have no bubble styling */
+.thumbnail-message-container .message-attachments,
+.message.received .thumbnail-message-container .message-attachments,
+.message.sent .thumbnail-message-container .message-attachments {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    max-width: 100% !important;
+}
+
+/* Override any inherited styles from message-bubble */
+.thumbnail-message-container,
+.thumbnail-message-container * {
+    max-width: none !important;
+}
+
+.thumbnail-message-container {
+    max-width: 100% !important;
+}
+
+/* Image container - ONLY for image messages */
+.message.image-message .message-images-container,
+.message-images-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-width: 400px;
+    /* Isolated from text message styles */
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Clean thumbnail wrapper - completely borderless and shadowless */
+.message-image-wrapper {
+    position: relative;
+    display: inline-block;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    box-sizing: border-box;
+}
+
+/* Clean thumbnail image - completely borderless and shadowless */
+.message-image-clean {
+    max-width: 450px; /* Increased by 50% from 300px */
+    max-height: 600px; /* Increased by 50% from 400px */
+    width: auto;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    border-radius: 8px;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-sizing: border-box;
+}
+
+.message-image-wrapper.loading {
+    background: transparent !important;
+    display: inline-block;
+    min-width: 0;
+    min-height: 0;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+}
+
+    .message-image-wrapper.loading::after {
+        content: "ðŸ“·";
+        font-size: 24px;
+        opacity: 0.5;
+        animation: pulse 1.5s infinite;
+    }
+
+.image-error-clean {
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    text-align: center;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.message-timestamp-clean {
+    font-size: 22px; /* Increased by 100% from 11px */
+    color: #6c757d;
+    margin-top: 4px;
+    opacity: 0.7;
+}
+
+.message.image-message.sent .message-timestamp-clean {
+    text-align: right;
+}
+
+.message.image-message.received .message-timestamp-clean {
+    text-align: left;
+}
+
+.status-sent {
+    color: #6c757d;
+    opacity: 0.7;
+}
+
+.status-read {
+    color: var(--primary-color);
+    animation: fadeIn 0.3s ease;
+}
+
+.typing-indicator-container {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    --slide-from-y: 10px;
+    animation: slideIn var(--animation-fast) ease;
+    position: relative;
+}
+
+.typing-indicator {
+    background: #e9ecef;
+    color: var(--text-muted);
+    padding: 8px 15px;
+    border-radius: 18px;
+    margin: 8px 0;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    max-width: 200px;
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    z-index: 100;
+    position: relative;
+    transform: translateY(0);
+    transition: all 0.3s ease;
+}
+
+.typing-dots {
+    display: flex;
+    gap: 3px;
+    margin-left: 8px;
+}
+
+.typing-dot {
+    width: 4px;
+    height: 4px;
+    background: #6c757d;
+    border-radius: 50%;
+    animation: typingBounce 1.4s infinite both;
+}
+
+    .typing-dot:nth-child(1) {
+        animation-delay: -0.32s;
+    }
+
+    .typing-dot:nth-child(2) {
+        animation-delay: -0.16s;
+    }
+
+    .typing-dot:nth-child(3) {
+        animation-delay: 0s;
+    }
+
+
+.conversation-avatar {
+    position: relative;
+}
+
+/* Connection status styles removed - using toast notifications instead (see line 1090) */
+
+
+/* Enhanced toast notification styles (same as settings page) */
+.toast {
+    --slide-from-x: 100%;
+    --slide-from-y: 0;
+    animation: slideIn var(--animation-fast) ease-out;
+}
+
+/* Legacy notification styles (kept for compatibility) */
+.success-message {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.error-message {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.warning-message {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.info-message {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Advanced Message Features */
+.message-actions {
+    position: absolute;
+    top: -30px;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 20px;
+    padding: 4px 8px;
+    gap: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 10;
+    display: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+}
+
+/* Position actions above for sent messages */
+.message.sent .message-actions {
+    right: 10px;
+}
+
+/* Position actions above for received messages */
+.message.received .message-actions {
+    left: 10px;
+}
+
+.message-action-btn {
+    background: none;
+    border: none;
+    font-size: 21px; /* Increased by 50% from 14px */
+    padding: 4px 6px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    .message-action-btn:hover {
+        background: #f8f9fa;
+        transform: scale(1.1);
+    }
+
+.reaction-btn:hover {
+    background: #fff3cd;
+}
+
+.reply-btn:hover {
+    background: #d1ecf1;
+}
+
+.forward-btn:hover {
+    background: #d4edda;
+}
+
+.recall-btn:hover {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.save-btn:hover {
+    background: #e2e3e5;
+    color: #495057;
+}
+
+.unsave-btn {
+    background: none;
+    border: none;
+    font-size: 14px;
+    padding: 4px 6px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    .unsave-btn:hover {
+        background: #dc3545;
+        color: white;
+        transform: scale(1.1);
+    }
+
+.reaction-picker {
+    animation: popIn 0.2s ease;
+}
+
+
+.reply-preview {
+    animation: slideDown 0.3s ease;
+}
+
+.reply-preview-header,
+.reply-to-text {
+    font-size: 16.128px; /* Same size as recalled message text */
+}
+
+.reply-preview-header {
+    font-weight: 500;
+    color: #007bff;
+}
+
+.reply-to-text {
+    font-weight: inherit;
+    color: inherit;
+}
+
+
+/* Message positioning for actions */
+    .message:hover .message-actions {
+        display: flex !important;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+/* Performance optimizations */
+.messages-area {
+    contain: layout style paint;
+    will-change: scroll-position;
+}
+
+.message-bubble {
+    contain: layout style paint;
+}
+
+.loading-placeholder {
+    padding: 15px;
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.loading-text {
+    font-size: 14px;
+}
+
+/* Message Image Container Styles - NO BORDERS for image messages */
+.message.image-message .message-image-container,
+.message-image-container {
+    position: relative;
+    margin: 0;
+    border-radius: 0;
+    overflow: hidden !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .message-image-container.loading {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+    }
+
+.message-image {
+    max-width: 450px; /* Increased by 50% from 300px */
+    max-height: 600px; /* Increased by 50% from 400px */
+    width: auto;
+    height: auto;
+    border-radius: 8px;
+    cursor: pointer;
+    display: block;
+    object-fit: cover;
+}
+
+/* Image Error States */
+.image-error {
+    padding: 20px;
+    text-align: center;
+    background: #f8d7da;
+    color: #721c24;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+}
+
+.retry-btn {
+    margin-top: 8px;
+    padding: 6px 12px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+    .retry-btn:hover {
+        background: #0056b3;
+        transform: translateY(-1px);
+    }
+
+/* Enhanced Message Attachments - only for text messages with images */
+.message-bubble .message-attachments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    margin-top: 8px;
+    padding: 0;
+    border-radius: 0;
+    overflow: hidden !important;
+}
+
+/* Enhanced Image Container Styles */
+.message-image-container.single-image {
+    max-width: 400px;
+    max-height: 500px;
+}
+
+.message-image-container.grid-image {
+    max-width: 200px;
+    max-height: 200px;
+    flex: 1;
+    min-width: 150px;
+}
+
+/* Image Count Overlay */
+.image-count-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .image-count-overlay:hover {
+        background: rgba(0, 0, 0, 0.8);
+        transform: scale(1.05);
+    }
+
+/* Enhanced Loading Placeholder */
+.enhanced-loading-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+    border: 2px dashed rgba(0, 0, 0, 0.1);
+    min-height: 120px;
+    width: 100%;
+}
+
+.loading-animation {
+    margin-bottom: 12px;
+}
+
+.loading-dots {
+    display: flex;
+    gap: 4px;
+}
+
+    .loading-dots span {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #007bff;
+        animation: loading-dots 1.4s infinite ease-in-out;
+    }
+
+        .loading-dots span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .loading-dots span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+
+.loading-text-enhanced {
+    font-size: 14px;
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 4px;
+}
+
+.loading-subtext {
+    font-size: 12px;
+    color: #6c757d;
+    opacity: 0.8;
+}
+
+/* Enhanced Error States */
+.image-error-enhanced {
+    padding: 20px;
+    text-align: center;
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.error-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+    opacity: 0.8;
+}
+
+.error-text {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 12px;
+}
+
+.error-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.retry-btn-enhanced {
+    padding: 8px 16px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+    .retry-btn-enhanced:hover {
+        background: #0056b3;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,123,255,0.3);
+    }
+
+.reload-btn {
+    padding: 8px 16px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+    .reload-btn:hover {
+        background: #5a6268;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(108,117,125,0.3);
+    }
+
+/* Message Link Styles */
+.message-link {
+    color: #007bff;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+    .message-link:hover {
+        color: #0056b3;
+        border-bottom-color: #0056b3;
+    }
+
+/* Enhanced Image Viewer Styles */
+.enhanced-image-viewer {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.image-viewer-container {
+    position: relative;
+    max-width: 95%;
+    max-height: 95%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.image-viewer-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+}
+
+    .image-viewer-close:hover {
+        background: rgba(255,255,255,0.3);
+        transform: scale(1.1);
+    }
+
+.image-viewer-filename {
+    color: white;
+    margin-top: 16px;
+    font-size: 14px;
+    opacity: 0.8;
+    text-align: center;
+    max-width: 100%;
+    word-break: break-word;
+}
+
+/* Responsive Design Improvements */
+
+
+/* Dark Mode Support */
+
+/* High Contrast Mode Support */
+
+/* Prevent scroll bars on all image containers */
+.message-image-container,
+.message-attachments,
+.message-images-container,
+.message-image-wrapper,
+.image-message {
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+    .message-image-container::-webkit-scrollbar,
+    .message-attachments::-webkit-scrollbar,
+    .message-images-container::-webkit-scrollbar,
+    .message-image-wrapper::-webkit-scrollbar,
+    .image-message::-webkit-scrollbar {
+        display: none !important; /* Chrome, Safari and Opera */
+    }
+
+/* Scroll position preservation - DO NOT use scroll-behavior: smooth here
+ * It causes lag with large DOMs and breaks manual scroll restore
+ */
+.messages-area {
+    overscroll-behavior: contain;
+    will-change: scroll-position;
+    /* overflow-anchor is controlled via JavaScript during prepend */
+}
+
+/* ============================================ */
+/* Loading */
+/* ============================================ */
+.skeleton,
+.loading-skeleton {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background: linear-gradient(
+        90deg,
+        var(--skeleton-base, #f1f3f5) 25%,
+        var(--skeleton-highlight, #e9ecef) 50%,
+        var(--skeleton-base, #f1f3f5) 75%
+    );
+    background-size: 200% 100%;
+    animation: loading var(--skeleton-speed, 1.5s) ease-in-out infinite;
+    contain: paint;
+}
+
+.skeleton-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.skeleton-text {
+    width: 100%;
+    height: 14px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+}
+
+.skeleton-text--short {
+    width: 40%;
+}
+
+
+/* Empty State */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 40px;
+    text-align: center;
+    color: #6c757d;
+}
+
+.empty-state-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+    animation: float 3s ease-in-out infinite;
+}
+
+.empty-state-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #495057;
+}
+
+.empty-state-text {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Message Status */
+.message-status {
+    font-size: 10px;
+    margin-left: 4px;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+    .message-status.sending {
+        --talk-message-status-color: #6c757d;
+        animation: pulse 1.5s infinite;
+    }
+
+    .message-status.sent {
+        --talk-message-status-color: #28a745;
+    }
+
+    .message-status.delivered {
+        --talk-message-status-color: #007bff;
+    }
+
+    .message-status.failed {
+        --talk-message-status-color: #dc3545;
+        cursor: pointer;
+    }
+
+/* Scrollbar Styling */
+.conversations::-webkit-scrollbar,
+.messages-area::-webkit-scrollbar {
+    width: 8px;
+}
+
+.conversations::-webkit-scrollbar-track,
+.messages-area::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.conversations::-webkit-scrollbar-thumb,
+.messages-area::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border-radius: 4px;
+}
+
+    .conversations::-webkit-scrollbar-thumb:hover,
+    .messages-area::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+    }
+
+/* ============================================ */
+/* Responsive */
+/* ============================================ */
+
+
+
+/* Image Preview Styles */
+.image-preview-area {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    display: none;
+    animation: slideDown 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+    .image-preview-area.show {
+        display: block !important;
+    }
+
+.image-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.image-preview-title {
+    font-weight: 600;
+    color: #495057;
+    font-size: 14px;
+}
+
+.image-preview-clear {
+    background: none;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+    .image-preview-clear:hover {
+        background: #e9ecef;
+        color: #dc3545;
+    }
+
+.image-preview-list {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    min-height: 80px;
+    align-items: flex-start;
+}
+
+.image-preview-item {
+    position: relative;
+    width: 120px; /* Increased by 50% from 80px */
+    height: 120px; /* Increased by 50% from 80px */
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid #e9ecef;
+    background: white;
+    transition: all 0.2s ease;
+    animation: fadeInScale 0.3s ease;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+    .image-preview-item:hover {
+        transform: scale(1.05);
+        border-color: #007bff;
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    }
+
+.image-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.image-preview-remove {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+    .image-preview-remove:hover {
+        background: #c82333;
+        transform: scale(1.1);
+    }
+
+.image-preview-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.image-preview-send {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    .image-preview-send:hover {
+        background: #0056b3;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    }
+
+/* ============================================ */
+/* Animations */
+/* ============================================ */
+
+
+/* ============================================ */
+/* Utilities */
+/* ============================================ */
+.dynamic-filter-controls {
+    margin-top: 20px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.filter-controls-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.filter-controls-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.filter-control-btn {
+    padding: 8px 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 20px;
+    background: white;
+    color: #495057;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+    .filter-control-btn:hover {
+        background: #007bff;
+        color: white;
+        border-color: #007bff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    }
+
+    .filter-control-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+    }
+
+/* Enhanced filter dropdown animations */
+.filter-dropdown {
+    animation: fadeInScale 0.3s ease-out;
+}
+
+.filter-dropdown-content {
+    animation: slideDown 0.2s ease-out;
+}
+
+/* Responsive design for filter controls */
+
+/* ============================================ */
+/* Message Types */
+/* ============================================ */
+
+/* TODO: Remove legacy `.message.sent` selectors once templates emit `.message--sent`. */
+.message--sent .message-content,
+.message.sent .message-content {
+    background: #D4C8DB;
+    color: #000000;
+    border-radius: 18px 18px 4px 18px;
+    padding: 12px 16px;
+    max-width: 70%;
+    word-wrap: break-word;
+    position: relative;
+}
+
+/* TODO: Remove legacy `.message.system` selectors once `.message--system` is live. */
+.message--system .message-content,
+.message.system .message-content {
+    background: #f8f9fa;
+    color: #6c757d;
+    border-radius: 12px;
+    padding: 8px 12px;
+    max-width: 80%;
+    text-align: center;
+    font-style: italic;
+    font-size: 14px;
+    margin: 8px auto;
+    border: 1px solid #e9ecef;
+}
+
+/* Recalled image message styling - NO BORDERS for image messages */
+/* TODO: Remove `.message.image-message` when `.message--image` + `.message__image-clean` ship. */
+.message--image .message__image-clean,
+.message--image .recalled-image-placeholder,
+.message.image-message .recalled-image-placeholder,
+.message__image-clean,
+.recalled-image-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    background: transparent !important;
+    border-radius: 0;
+    border: none !important;
+    box-shadow: none !important;
+    min-height: auto;
+}
+
+.message__image-clean .recalled-content,
+.recalled-image-placeholder .recalled-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    color: #6c757d;
+}
+
+.message__image-clean .recalled-icon,
+.recalled-image-placeholder .recalled-icon {
+    font-size: 27.648px; /* Increased by 20% from 23.04px */
+    opacity: 0.7;
+}
+
+.message__image-clean .recalled-text,
+.recalled-image-placeholder .recalled-text {
+    font-size: 16.128px; /* Increased by 20% from 13.44px */
+    font-weight: 500;
+}
+
+/* ============================================ */
+/* Message States */
+/* ============================================ */
+
+/* Page-specific styles extracted from inline <style> block in talk.html */
+.message-deleted-user {
+    filter: blur(3px);
+    opacity: 0.6;
+    cursor: pointer;
+    transition: filter 0.3s, opacity 0.3s;
+    position: relative;
+}
+
+.message-deleted-user:hover {
+    filter: blur(1px);
+    opacity: 0.8;
+}
+
+.message-deleted-user::after {
+    content: 'ðŸ‘¤ Account Deactivated';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: nowrap;
+}
+
+.message-deleted-user:hover::after {
+    opacity: 1;
+}
+
+/* Conversation list item for deleted users */
+.conversation-item-deleted {
+    opacity: 0.7;
+    border-left: 3px solid #ff9800;
+}
+
+.conversation-item-deleted .conversation-preview {
+    filter: blur(2px);
+}
+
+/* Hide message button in user profile modal on talk page */
+#userProfileModal .modal-message-btn {
+    display: none;
+}
+
+/* Make action buttons display in one row with just icons on mobile in talk.html */
+
+
+/* Additional static inline styles extracted from talk.html */
+
+/* Main content layout */
+.main-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Chat location styles */
+.chat-location {
+    font-size: 0.85rem;
+    color: #3498db;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.2rem;
+}
+
+.chat-location i {
+    font-size: 0.8rem;
+}
+
+/* Message pagination styles */
+.message-pagination {
+    padding: 10px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.pagination-info {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.pagination-numbers {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+
+/* ============================================ */
+/* Print */
+/* ============================================ */

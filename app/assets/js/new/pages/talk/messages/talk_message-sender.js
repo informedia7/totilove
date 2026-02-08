@@ -13,6 +13,52 @@
  * - Global variables: conversations, currentConversation, currentUserId, currentReply, selectedImages
  */
 
+let emailVerificationScriptPromise = null;
+
+function ensureEmailVerificationScriptLoaded() {
+    if (typeof window.checkEmailVerificationStatus === 'function') {
+        return Promise.resolve();
+    }
+    if (emailVerificationScriptPromise) {
+        return emailVerificationScriptPromise;
+    }
+
+    emailVerificationScriptPromise = new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = '/assets/js/new/shared/email-verification-check.js';
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => resolve();
+        document.head.appendChild(script);
+    }).finally(() => {
+        emailVerificationScriptPromise = null;
+    });
+
+    return emailVerificationScriptPromise;
+}
+
+async function requireEmailVerificationForMessaging() {
+    try {
+        await ensureEmailVerificationScriptLoaded();
+
+        if (typeof window.checkEmailVerificationStatus === 'function') {
+            const isVerified = await window.checkEmailVerificationStatus();
+            if (!isVerified) {
+                if (typeof window.showVerificationMessage === 'function') {
+                    window.showVerificationMessage();
+                } else {
+                    showNotification('Please verify your email address to use messaging features.', 'warning');
+                }
+                return false;
+            }
+        }
+    } catch (error) {
+        console.warn('Email verification pre-check failed:', error);
+    }
+
+    return true;
+}
+
 async function sendMessage() {
     const input = document.getElementById('messageInput');
     const text = input.value;
@@ -21,6 +67,11 @@ async function sendMessage() {
     const currentUserId = TalkState ? TalkState.getCurrentUserId() : (window.currentUser?.id || null);
     if (!currentUserId) {
         showNotification('User not authenticated', 'error');
+        return;
+    }
+
+    const canSend = await requireEmailVerificationForMessaging();
+    if (!canSend) {
         return;
     }
 
@@ -169,6 +220,11 @@ async function sendImagesWithPreviews() {
 
     if (!currentConversation) {
         showNotification('No conversation selected', 'error');
+        return;
+    }
+
+    const canSend = await requireEmailVerificationForMessaging();
+    if (!canSend) {
         return;
     }
 

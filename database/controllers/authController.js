@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const ActivityRateLimiter = require('../../utils/activityRateLimiter');
 const emailService = require('../../services/emailService');
+const { requireEmailVerification } = require('../../utils/emailVerificationCheck');
 
 const REAL_NAME_REGEX = /^[A-Za-z]{2,100}$/;
 
@@ -1395,21 +1396,48 @@ class AuthController {
 
     async getUserProfile(req, res) {
         const { userId } = req.params;
-        const currentUserId = req.headers['x-user-id'] || req.query.currentUser;
+        const requestedProfileId = parseInt(userId, 10);
+        const rawViewerId = req.user?.id ?? req.headers['x-user-id'] ?? req.query.currentUser;
+        const parsedViewerId = rawViewerId !== undefined && rawViewerId !== null && rawViewerId !== ''
+            ? parseInt(rawViewerId, 10)
+            : NaN;
+        const currentUserId = Number.isFinite(parsedViewerId) ? parsedViewerId : null;
         
-        console.log(`👤 Loading detailed profile for user: ${userId} (requested by: ${currentUserId})`);
+        console.log(`👤 Loading detailed profile for user: ${userId} (requested by: ${currentUserId ?? 'unknown'})`);
         console.log(`🔍 Request params:`, req.params);
         console.log(`🔍 Request query:`, req.query);
         console.log(`🔍 Request headers:`, req.headers);
             
+        if (!Number.isFinite(requestedProfileId)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid user ID'
+            });
+        }
+
         try {
+            if (!Number.isInteger(currentUserId)) {
+                return res.status(401).json({
+                    success: false,
+                    error: 'Authentication required',
+                    code: 'AUTH_REQUIRED'
+                });
+            }
+
+            if (requestedProfileId !== currentUserId) {
+                const verificationError = await requireEmailVerification(this.db, currentUserId);
+                if (verificationError) {
+                    return res.status(403).json(verificationError);
+                }
+            }
+            
             // Log profile view to users_profile_views table (only if viewing someone else's profile)
             // Use UPSERT to update timestamp if view already exists (only latest view kept)
             // Use rate limiting to prevent rapid-fire updates (5 second window)
-            if (currentUserId && currentUserId != userId) {
+            if (currentUserId && currentUserId !== requestedProfileId) {
                 try {
-                    const viewerId = parseInt(currentUserId);
-                    const viewedUserId = parseInt(userId);
+                    const viewerId = currentUserId;
+                    const viewedUserId = requestedProfileId;
                     
                     // Check if viewer is blocked by viewed user or vice versa
                     const blockCheck = await this.db.query(`
@@ -1543,7 +1571,7 @@ class AuthController {
             
             console.log(`🔍 Executing profile query with userId: ${userId}, currentUserId: ${currentUserId}`);
             // Pass currentUserId as second parameter for has_received_messages check
-            const profileResult = await this.db.query(profileQuery, [userId, currentUserId || userId]);
+            const profileResult = await this.db.query(profileQuery, [requestedProfileId, currentUserId || requestedProfileId]);
             console.log(`✅ Profile query result:`, profileResult.rows.length, 'rows found');
             
             if (profileResult.rows.length === 0) {
@@ -1564,7 +1592,7 @@ class AuthController {
             `;
             
             console.log(`🔍 Executing images query with userId: ${userId}`);
-            const imagesResult = await this.db.query(imagesQuery, [userId]);
+            const imagesResult = await this.db.query(imagesQuery, [requestedProfileId]);
             console.log(`✅ Images query result:`, imagesResult.rows.length, 'images found');
             
             // Fetch interests from user_interests_multiple
@@ -1577,7 +1605,7 @@ class AuthController {
                     WHERE uim.user_id = $1
                     ORDER BY c.name
                 `;
-                const interestsResult = await this.db.query(interestsQuery, [userId]);
+                const interestsResult = await this.db.query(interestsQuery, [requestedProfileId]);
                 interests = interestsResult.rows || [];
                 console.log(`✅ Interests query result:`, interests.length, 'interests found');
             } catch (interestsError) {
@@ -1594,7 +1622,7 @@ class AuthController {
                     WHERE uh.user_id = $1
                     ORDER BY hr.name
                 `;
-                const hobbiesResult = await this.db.query(hobbiesQuery, [userId]);
+                const hobbiesResult = await this.db.query(hobbiesQuery, [requestedProfileId]);
                 hobbies = hobbiesResult.rows || [];
                 console.log(`✅ Hobbies query result:`, hobbies.length, 'hobbies found');
             } catch (hobbiesError) {

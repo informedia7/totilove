@@ -29,6 +29,61 @@
         
         return '';
     }
+
+    let activityVerificationScriptPromise = null;
+
+    function ensureActivityVerificationScriptLoaded() {
+        if (typeof window.checkEmailVerificationStatus === 'function') {
+            return Promise.resolve();
+        }
+
+        if (activityVerificationScriptPromise) {
+            return activityVerificationScriptPromise;
+        }
+
+        activityVerificationScriptPromise = new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = '/assets/js/new/shared/email-verification-check.js';
+            script.async = true;
+            script.onload = () => resolve();
+            script.onerror = (error) => {
+                console.error('Failed to load email verification script', error);
+                activityVerificationScriptPromise = null;
+                reject(error);
+            };
+            document.head.appendChild(script);
+        });
+
+        return activityVerificationScriptPromise;
+    }
+
+    async function requireEmailVerificationForActivity(actionDescription) {
+        try {
+            await ensureActivityVerificationScriptLoaded();
+        } catch (error) {
+            return true;
+        }
+
+        if (typeof window.checkEmailVerificationStatus !== 'function') {
+            return true;
+        }
+
+        const isVerified = await window.checkEmailVerificationStatus();
+        if (!isVerified) {
+            if (typeof window.showVerificationMessage === 'function') {
+                window.showVerificationMessage();
+            } else if (window.ActivityManager && typeof window.ActivityManager.showToast === 'function') {
+                window.ActivityManager.showToast(`Please verify your email to ${actionDescription}.`, 'warning');
+            } else if (typeof window.showToast === 'function') {
+                window.showToast(`Please verify your email to ${actionDescription}.`, 'warning');
+            } else {
+                alert(`Please verify your email to ${actionDescription}.`);
+            }
+            return false;
+        }
+
+        return true;
+    }
     
     // Load ProfileModalActions module
     function loadProfileModalActions() {
@@ -1153,6 +1208,11 @@
         
         async likeUser(userId) {
             try {
+                const isVerified = await requireEmailVerificationForActivity('like users');
+                if (!isVerified) {
+                    return;
+                }
+
                 const response = await fetch('/api/likes', {
                     method: 'POST',
                     headers: { 

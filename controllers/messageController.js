@@ -235,13 +235,14 @@ class MessageController {
                     const isImageOnly = (req.files && req.files.length > 0);
 
                     const baseMessageId = result.message?.id || result.messageId;
+                    const messageTimestamp = result.message?.timestamp || Date.now();
                     const messageForSocket = {
                         id: baseMessageId,
                         senderId: parseInt(senderId),
                         receiverId: parseInt(finalReceiverId),
                         // If image-only, send a single-space content to avoid rendering a visible placeholder
                         content: isImageOnly ? ' ' : content,
-                        timestamp: Date.now(),
+                        timestamp: messageTimestamp,
                         sender_real_name: result.message?.sender_real_name || 'Unknown', // Field name kept for API compatibility, but value is real_name
                         sender_real_name: result.message?.sender_real_name || 'Unknown',
                         is_read: false,
@@ -276,6 +277,7 @@ class MessageController {
                 success: true,
                 message: result,
                 messageId: result.message?.id || result.messageId || result.id,
+                timestamp: result.message?.timestamp || Date.now(),
                 attachments: attachments.length > 0 ? attachments : undefined,
                 replyTo: replyData ? {
                     id: replyData.id,

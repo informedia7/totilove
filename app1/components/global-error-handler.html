@@ -1,0 +1,29 @@
+<!-- Global Error Handler Component -->
+<!-- Include this in any HTML page to enable comprehensive error logging and display -->
+
+<script src="/assets/js/new/core/global-error-handler.js"></script>
+
+<!-- Optional: Add custom error handling for specific pages -->
+<script>
+// Page-specific error handling can be added here
+// The global error handler is automatically initialized
+
+// Example: Add page-specific context to errors
+if (typeof window.pageContext === 'undefined') {
+    window.pageContext = {
+        pageName: document.title || 'Unknown Page',
+        pagePath: window.location.pathname
+    };
+}
+
+// Override the global captureError to add page context
+if (window.ErrorDisplay && window.ErrorDisplay.captureError) {
+    const originalCaptureError = window.ErrorDisplay.captureError;
+    window.ErrorDisplay.captureError = function(error, context = '') {
+        const pageContext = window.pageContext ? `[${window.pageContext.pageName}] ` : '';
+        return originalCaptureError.call(this, error, pageContext + context);
+    };
+}
+</script>
+
+

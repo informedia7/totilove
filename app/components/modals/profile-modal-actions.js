@@ -7,6 +7,61 @@
 (function() {
     'use strict';
 
+    let verificationScriptPromise = null;
+
+    function ensureEmailVerificationScriptLoaded() {
+        if (typeof window.checkEmailVerificationStatus === 'function') {
+            return Promise.resolve();
+        }
+
+        if (verificationScriptPromise) {
+            return verificationScriptPromise;
+        }
+
+        verificationScriptPromise = new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = '/assets/js/new/shared/email-verification-check.js';
+            script.async = true;
+            script.dataset.emailVerification = 'true';
+            script.onload = () => resolve();
+            script.onerror = (error) => {
+                console.error('Failed to load email verification script', error);
+                verificationScriptPromise = null;
+                reject(error);
+            };
+            document.head.appendChild(script);
+        });
+
+        return verificationScriptPromise;
+    }
+
+    async function ensureUserVerified(actionDescription) {
+        try {
+            await ensureEmailVerificationScriptLoaded();
+        } catch (error) {
+            // Fall back to backend enforcement if the script fails to load
+            return true;
+        }
+
+        if (typeof window.checkEmailVerificationStatus !== 'function') {
+            return true;
+        }
+
+        const isVerified = await window.checkEmailVerificationStatus();
+        if (!isVerified) {
+            if (typeof window.showVerificationMessage === 'function') {
+                window.showVerificationMessage();
+            } else if (config.showNotification) {
+                config.showNotification(`Please verify your email to ${actionDescription}.`, 'warning');
+            } else {
+                alert(`Please verify your email to ${actionDescription}.`);
+            }
+            return false;
+        }
+
+        return true;
+    }
+
     // Default configuration
     let config = {
         getCurrentUserId: null,
@@ -114,13 +169,9 @@
             return;
         }
 
-        // Check email verification before allowing like action
-        if (window.checkEmailVerificationStatus) {
-            const isVerified = await window.checkEmailVerificationStatus();
-            if (!isVerified) {
-                window.showVerificationMessage();
-                return; // Don't proceed with like action
-            }
+        const isVerified = await ensureUserVerified('like profiles');
+        if (!isVerified) {
+            return;
         }
 
         // Get like button and check current state
@@ -213,13 +264,9 @@
             return;
         }
 
-        // Check email verification before allowing favourite action
-        if (window.checkEmailVerificationStatus) {
-            const isVerified = await window.checkEmailVerificationStatus();
-            if (!isVerified) {
-                window.showVerificationMessage();
-                return; // Don't proceed with favourite action
-            }
+        const isVerified = await ensureUserVerified('add favourites');
+        if (!isVerified) {
+            return;
         }
 
         // Get favorite button and check current state

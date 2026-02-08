@@ -90,6 +90,57 @@ function registerUserCardFallbackHandlers() {
     };
 }
 
+let emailVerificationScriptPromise = null;
+
+function ensureMatchesVerificationScriptLoaded() {
+    if (typeof window.checkEmailVerificationStatus === 'function') {
+        return Promise.resolve();
+    }
+
+    if (emailVerificationScriptPromise) {
+        return emailVerificationScriptPromise;
+    }
+
+    emailVerificationScriptPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = '/assets/js/new/shared/email-verification-check.js';
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = (error) => {
+            console.error('Failed to load email verification script', error);
+            emailVerificationScriptPromise = null;
+            reject(error);
+        };
+        document.head.appendChild(script);
+    });
+
+    return emailVerificationScriptPromise;
+}
+
+async function requireEmailVerificationForMatches(actionDescription) {
+    try {
+        await ensureMatchesVerificationScriptLoaded();
+    } catch (error) {
+        return true;
+    }
+
+    if (typeof window.checkEmailVerificationStatus !== 'function') {
+        return true;
+    }
+
+    const isVerified = await window.checkEmailVerificationStatus();
+    if (!isVerified) {
+        if (typeof window.showVerificationMessage === 'function') {
+            window.showVerificationMessage();
+        } else {
+            showToast(`Please verify your email to ${actionDescription}.`, 'warning');
+        }
+        return false;
+    }
+
+    return true;
+}
+
 function resolveMatchIdByName(name) {
     if (!name) {
         return null;
@@ -1055,6 +1106,11 @@ async function likeUser(userId) {
             showToast('Authentication required', 'error');
             return;
         }
+
+        const isVerified = await requireEmailVerificationForMatches('like users');
+        if (!isVerified) {
+            return;
+        }
         
         const sessionToken = getSessionToken();
         
@@ -1099,6 +1155,11 @@ async function addFavorite(userId) {
         
         if (!currentUserId) {
             showToast('Authentication required', 'error');
+            return;
+        }
+
+        const isVerified = await requireEmailVerificationForMatches('add favourites');
+        if (!isVerified) {
             return;
         }
         

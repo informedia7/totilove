@@ -1,0 +1,200 @@
+<!-- Include Universal Message Modal -->
+{{include:modals/universal-message-modal}}
+
+<!-- Include User Profile Modal -->
+{{include:modals/user-profile-modal}}
+
+<!-- Include User Report Modal -->
+{{include:modals/user-report-modal}}
+
+<!-- Shared component styles -->
+<link rel="stylesheet" href="/assets/css/new/02-components/components.css">
+
+<!-- Search Header with Quick Stats -->
+<div class="search-header">
+    <div class="search-title">
+        <h2><i class="fas fa-search"></i> Smart Matching System</h2>
+        <p class="search-subtitle">Find your perfect match with our advanced search filters</p>
+    </div>
+    <div class="search-stats">
+        <div class="stat-card">
+            <i class="fas fa-users"></i>
+            <div class="stat-content">
+                <span class="stat-number" id="total-users">1,247</span>
+                <span class="stat-label">Active Users</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-heart"></i>
+            <div class="stat-content">
+                <span class="stat-number" id="matches-today">0</span>
+                <span class="stat-label">Matches Today</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-heart"></i>
+            <div class="stat-content">
+                <span class="stat-number" id="total-matches">0</span>
+                <span class="stat-label">Total Matches</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-circle"></i>
+            <div class="stat-content">
+                <span class="stat-number" id="online-matches">0</span>
+                <span class="stat-label">Online Now</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Matches Section -->
+<div class="matches-section">
+    <!-- Matches Header -->
+    <div class="matches-header">
+        <div class="header-left">
+            <h3>
+                <i class="fas fa-users"></i>
+                <span>Your Matches</span>
+                <span class="matches-count" id="matches-count">(0)</span>
+            </h3>
+            <div class="matches-info">
+                <p>Based on your preferences and compatibility score</p>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="view-controls">
+                <label for="cardsPerRow">Cards per row:</label>
+                <select id="cardsPerRow" name="cardsPerRow">
+                    <option value="3">3</option>
+                    <option value="4" selected>4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                </select>
+            </div>
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="grid" title="Grid View">
+                    <i class="fas fa-th"></i>
+                </button>
+                <button class="view-btn" data-view="list" title="List View">
+                    <i class="fas fa-list"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="matches-filters">
+        <div class="filter-group">
+            <label for="search-matches">
+                <i class="fas fa-search"></i>
+            </label>
+            <input type="text" id="search-matches" placeholder="Search by location...">
+        </div>
+        <div class="filter-group">
+            <label for="sort-matches">Sort by:</label>
+            <select id="sort-matches">
+                <option value="compatibility" selected>Highest Match</option>
+                <option value="recent">Most Recent</option>
+                <option value="oldest">Oldest First</option>
+                <option value="age-asc">Age (Youngest)</option>
+                <option value="age-desc">Age (Oldest)</option>
+                <option value="online">Online First</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>
+                <input type="checkbox" id="filter-online-only">
+                Show only online
+            </label>
+        </div>
+        <div class="filter-group">
+            <label>
+                <input type="checkbox" id="filter-with-photos">
+                With photos only
+            </label>
+        </div>
+        <div class="filter-group match-score-filter">
+            <label for="match-score-slider" style="margin-right: 0.5rem;">Match score:</label>
+            <div class="match-score-slider-container">
+                <input type="range" 
+                       class="match-score-slider" 
+                       id="match-score-slider" 
+                       min="1" 
+                       max="100" 
+                       value="1"
+                       step="1">
+                <div class="match-score-display">
+                    <span class="match-score-value" id="match-score-value">1%+ (All)</span>
+                    <button type="button" class="match-score-reset-btn" id="match-score-reset" title="Reset to all matches">×</button>
+                </div>
+            </div>
+        </div>
+        <button class="filter-reset-btn" id="reset-filters">
+            <i class="fas fa-redo"></i> Reset
+        </button>
+    </div>
+
+    <!-- Bulk Actions -->
+    <div class="bulk-actions" id="bulk-actions" style="display: none;">
+        <span class="selected-count" id="selected-count">0 selected</span>
+        <button class="bulk-btn" id="bulk-like">
+            <i class="fas fa-heart"></i> Like All
+        </button>
+        <button class="bulk-btn" id="bulk-message">
+            <i class="fas fa-envelope"></i> Message All
+        </button>
+        <button class="bulk-btn danger" id="bulk-dismiss">
+            <i class="fas fa-times"></i> Dismiss All
+        </button>
+    </div>
+
+    <!-- Matches Grid -->
+    <div class="online-users-grid results-grid" id="matches-users">
+        <!-- Matches will be dynamically loaded here -->
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state-wrapper" id="empty-state" style="display: none;">
+        <div class="empty-state-container">
+            <div class="empty-state-content">
+                <div class="empty-icon-wrapper">
+                    <i class="fas fa-heart-broken"></i>
+                </div>
+                <h2 class="empty-title">No Matches Found</h2>
+                <p class="empty-description">
+                    We couldn't find any matches based on your current filters. Try adjusting your search criteria or check back later!
+                </p>
+                <div class="empty-actions">
+                    <button class="empty-btn-primary" id="reset-filters-empty">
+                        <i class="fas fa-redo"></i> Reset Filters
+                    </button>
+                    <a href="/search" class="empty-btn-secondary">
+                        <i class="fas fa-search"></i> Browse All Users
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" id="pagination" style="display: none;">
+        <button class="page-btn" id="prev-page" disabled>
+            <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        <span class="page-info" id="page-info">Page 1 of 1</span>
+        <button class="page-btn" id="next-page" disabled>
+            Next <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+</div>
+
+<!-- User Card Component -->
+<!-- User Card CSS now loaded via main.css or components.css -->
+<script src="/components/user-card/user-card.js"></script>
+
+<!-- Matches Page JavaScript - Moved to new structure (Phase 1 CSS/JS Extraction) -->
+<script src="/assets/js/new/pages/matches.js"></script>
+
+<!-- Extracted CSS from matches.html - Phase 1 CSS Extraction -->
+<link rel="stylesheet" href="/assets/css/new/05-pages/_matches.css">

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Railway File Uploader</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Railway File Uploader</h1>
+        <p>Drag & drop .js, .css, .html, or .sql files to push them to your Railway app.</p>
+    </header>
+
+    <section class="controls">
+        <label>
+            Railway Service Name (for SQL uploads)
+            <input type="text" id="serviceInput" placeholder="totilove" />
+        </label>
+        <label>
+            Commit Message (for JS/CSS/HTML)
+            <input type="text" id="commitMessageInput" placeholder="Upload via Railway UI" />
+        </label>
+    </section>
+
+    <section class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" multiple />
+        <p>Drop files here or <button id="browseBtn" type="button">Browse</button></p>
+        <small>Supported types: .js, .css, .html, .sql</small>
+    </section>
+
+    <section>
+        <h2>Pending Uploads</h2>
+        <ul id="pendingList" class="list"></ul>
+        <button id="uploadBtn" type="button" class="primary">Start Upload</button>
+    </section>
+
+    <section>
+        <h2>Activity Log</h2>
+        <ul id="logList" class="log"></ul>
+    </section>
+
+    <section>
+        <h2>Recent History</h2>
+        <ul id="historyList" class="history"></ul>
+    </section>
+
+    <script src="renderer.js"></script>
+</body>
+</html>

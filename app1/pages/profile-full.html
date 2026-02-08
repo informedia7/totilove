@@ -1,0 +1,406 @@
+<!-- Profile tabs with sub-navigation -->
+<div class="profile-tabs">
+    <a href="/profile-basic" class="tab-btn" id="tab-basic">Basic Info</a>
+    <a href="/profile-full" class="tab-btn active" id="tab-full">Full Info</a>
+    <a href="/profile-photos" class="tab-btn" id="tab-photos">My Photos</a>
+    <a href="/profile-edit" class="tab-btn" id="tab-edit">Edit Profile</a>
+</div>
+
+<!-- Full Profile Information -->
+<div id="tab-panel-full">
+    <div class="profile-cards-container">
+        <!-- About Me Card -->
+        <div class="profile-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-user"></i>
+                    About Me
+                </h3>
+            </div>
+            <div class="card-content">
+                <div class="about-me-section">
+                    <h4 class="section-title">Short Intro</h4>
+                    <div class="about-me-text">{{aboutMe}}</div>
+                </div>
+                
+                <!-- Personal Information -->
+                <h4 class="subsection-title">
+                    <i class="fas fa-user-circle"></i>
+                    Personal Information
+                </h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Age</span>
+                        <span class="info-value">{{userAge}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Gender</span>
+                        <span class="info-value">{{userGender}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Location</span>
+                        <span class="info-value">{{userLocation}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Star Sign</span>
+                        <span class="info-value" id="star-sign-value" data-dob="{{userBirthdate}}">Not specified</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Chinese Zodiac</span>
+                        <span class="info-value" id="chinese-zodiac-value" data-dob="{{userBirthdate}}">Not specified</span>
+                    </div>
+                </div>
+                
+                <!-- Physical Appearance -->
+                <h4 class="subsection-title">
+                    <i class="fas fa-user"></i>
+                    Physical Appearance
+                </h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Height</span>
+                        <span class="info-value">{{heightFullDisplay}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Weight</span>
+                        <span class="info-value">{{weightDisplay}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Body Type</span>
+                        <span class="info-value">{{bodyTypeName}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Eye Color</span>
+                        <span class="info-value">{{eyeColorName}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Hair Color</span>
+                        <span class="info-value">{{hairColorName}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Ethnicity</span>
+                        <span class="info-value">{{ethnicityName}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Body Art</span>
+                        <span class="info-value">{{bodyArtName}}</span>
+                    </div>
+                </div>
+                
+                <!-- Career & Education -->
+                <h4 class="subsection-title">
+                    <i class="fas fa-graduation-cap"></i>
+                    Career & Education
+                </h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Education</span>
+                        <span class="info-value">{{educationName}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Occupation</span>
+                        <span class="info-value">{{occupationName}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Income</span>
+                        <span class="info-value">{{incomeName}}</span>
+                    </div>
+                </div>
+                
+                <!-- Lifestyle & Habits -->
+                <h4 class="subsection-title">
+                    <i class="fas fa-heart"></i>
+                    Lifestyle & Habits
+                </h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Smoking</span>
+                        <span class="info-value">{{smokingName}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Drinking</span>
+                        <span class="info-value">{{drinkingName}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Exercise</span>
+                        <span class="info-value">{{exerciseName}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Living Situation</span>
+                        <span class="info-value">{{livingSituationName}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Lifestyle</span>
+                        <span class="info-value">{{lifestyleName}}</span>
+                    </div>
+                </div>
+                
+                <!-- Family & Status -->
+                <h4 class="subsection-title">
+                    <i class="fas fa-users"></i>
+                    Family & Status
+                </h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">About Children</span>
+                        <span class="info-value">{{haveChildrenName}}</span>
+                    </div>
+                    {{if:numberOfChildrenId}}
+                    <div class="info-item">
+                        <span class="info-label">Number of Children</span>
+                        <span class="info-value">{{numberOfChildrenName}}</span>
+                    </div>
+                    {{/if}}
+                    <div class="info-item">
+                        <span class="info-label">Marital Status</span>
+                        <span class="info-value">{{maritalStatusName}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Relocation</span>
+                        <span class="info-value">{{relocationName}}</span>
+                    </div>
+                </div>
+                
+                <!-- Additional -->
+                <h4 class="subsection-title">
+                    <i class="fas fa-sliders-h"></i>
+                    Additional
+                </h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Religion</span>
+                        <span class="info-value">{{religionName}}</span>
+                    </div>
+                </div>
+                
+                <!-- Interests & Activities -->
+                <h4 class="subsection-title">
+                    <i class="fas fa-star"></i>
+                    Interests & Activities
+                </h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Interests</span>
+                        <span class="info-value">{{interests}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Hobbies</span>
+                        <span class="info-value">{{hobbies}}</span>
+                    </div>
+                </div>
+                
+                <!-- Languages I Speak -->
+                <h4 class="subsection-title">
+                    <i class="fas fa-language"></i>
+                    Languages I Speak
+                </h4>
+                <div class="info-grid">
+                    <div class="info-item languages-item">
+                        <span class="info-label">Languages I Speak</span>
+                        <span class="info-value">
+                            <div id="current-languages-display" class="current-languages-display"></div>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">English Ability</span>
+                        <span class="info-value">{{englishAbilityName}}</span>
+                    </div>
+                </div>
+                
+                <div class="member-info">
+                    <div class="info-item">
+                        <span class="info-label">Member Since</span>
+                        <span class="info-value">{{memberSince}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Person I'm Looking For Card -->
+        <div class="profile-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-search"></i>
+                    Person I'm Looking For
+                </h3>
+            </div>
+            <div class="card-content">
+                <div class="about-me-section">
+                    <h4 class="section-title">About the Person I'm Looking For</h4>
+                    <div class="about-me-text">{{partnerPreferences}}</div>
+                </div>
+                
+                <!-- Basic Criteria -->
+                <h4 class="subsection-title">
+                    <i class="fas fa-filter"></i>
+                    Basic Criteria
+                </h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Age</span>
+                        <span class="info-value">{{preferredAgeDisplay}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Gender</span>
+                        <span class="info-value">{{preferredGender}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Relationship Type</span>
+                        <span class="info-value">{{relationshipType}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Distance (km/miles)</span>
+                        <span class="info-value">{{preferredDistanceDisplay}}</span>
+                    </div>
+                </div>
+                
+                <!-- Physical Appearance -->
+                <h4 class="subsection-title">
+                    <i class="fas fa-user"></i>
+                    Physical Appearance
+                </h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Height</span>
+                        <span class="info-value">{{preferredHeightFullDisplay}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Weight</span>
+                        <span class="info-value">{{preferredWeightDisplay}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Body Type</span>
+                        <span class="info-value">{{preferredBodyType}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Eye Color</span>
+                        <span class="info-value">{{preferredEyeColor}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Hair Color</span>
+                        <span class="info-value">{{preferredHairColor}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Ethnicity</span>
+                        <span class="info-value">{{preferredEthnicity}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Body Art</span>
+                        <span class="info-value">{{preferredBodyArt}}</span>
+                    </div>
+                </div>
+                
+                <!-- Career & Education -->
+                <h4 class="subsection-title">
+                    <i class="fas fa-graduation-cap"></i>
+                    Career & Education
+                </h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Education</span>
+                        <span class="info-value">{{preferredEducation}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Occupation</span>
+                        <span class="info-value">{{preferredOccupation}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Income</span>
+                        <span class="info-value">{{preferredIncome}}</span>
+                    </div>
+                </div>
+                
+                <!-- Lifestyle & Habits -->
+                <h4 class="subsection-title">
+                    <i class="fas fa-heart"></i>
+                    Lifestyle & Habits
+                </h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Smoking</span>
+                        <span class="info-value">{{preferredSmoking}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Drinking</span>
+                        <span class="info-value">{{preferredDrinking}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Exercise</span>
+                        <span class="info-value">{{preferredExercise}}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Lifestyle</span>
+                        <span class="info-value">{{preferredLifestyle}}</span>
+                    </div>
+                </div>
+                
+                <!-- Family & Status -->
+                <h4 class="subsection-title">
+                    <i class="fas fa-users"></i>
+                    Family & Status
+                </h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Children Status</span>
+                        <span class="info-value">{{preferredChildren}}</span>
+                    </div>
+                    {{if:preferredNumberOfChildren}}
+                    <div class="info-item">
+                        <span class="info-label">How many children</span>
+                        <span class="info-value">{{preferredNumberOfChildren}}</span>
+                    </div>
+                    {{/if}}
+                    <div class="info-item">
+                        <span class="info-label">Marital Status</span>
+                        <span class="info-value">{{preferredMaritalStatus}}</span>
+                    </div>
+                </div>
+                
+                <!-- Additional -->
+                <h4 class="subsection-title">
+                    <i class="fas fa-sliders-h"></i>
+                    Additional
+                </h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Religion</span>
+                        <span class="info-value">{{preferredReligion}}</span>
+                    </div>
+                    <!-- Lifestyle moved to Lifestyle & Habits section -->
+                </div>
+                
+                <!-- Languages -->
+                <h4 class="subsection-title">
+                    <i class="fas fa-language"></i>
+                    Languages
+                </h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">English Ability</span>
+                        <span class="info-value">{{preferredEnglishAbility}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Extracted CSS from profile-full.html - Phase 1 CSS Extraction -->
+<link rel="stylesheet" href="/assets/css/new/05-pages/_profile-full.css">
+
+<!-- Star sign & Chinese zodiac calculation -->
+<script src="/assets/js/new/shared/star-sign-zodiac.js"></script>
+
+<!-- Profile Full Page JavaScript - Moved to new structure (Phase 1 CSS/JS Extraction) -->
+<script src="/assets/js/new/pages/profile-full.js"></script>
+
+
+
+
+
+
+
+
+
+
+

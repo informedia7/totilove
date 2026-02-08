@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const config = require('../config/config');
 
 let ResendClient = null;
 try {
@@ -14,14 +15,25 @@ class EmailService {
         this.isConfigured = false;
         this.provider = 'none';
         this.emailDisabled = false;
-        this.fromName = process.env.SMTP_FROM_NAME || 'Totilove';
-        this.fromEmail = process.env.SMTP_USER || process.env.RESEND_FROM_EMAIL || '';
+        this.emailSettings = (config && config.email) || {};
+        this.fromName = process.env.SMTP_FROM_NAME || this.emailSettings?.smtp?.fromName || this.emailSettings?.fromName || 'Totilove';
+        this.fromEmail = this.resolveFromEmail();
+        this.baseUrl = process.env.BASE_URL || this.emailSettings.baseUrl || 'http://localhost:3001';
         this.init();
     }
 
+    resolveFromEmail() {
+        return process.env.SMTP_FROM_EMAIL ||
+            process.env.SMTP_USER ||
+            process.env.RESEND_FROM_EMAIL ||
+            this.emailSettings?.smtp?.fromEmail ||
+            this.emailSettings?.smtp?.user ||
+            'no-reply@totilove.local';
+    }
+
     init() {
-        if (String(process.env.EMAIL_ENABLED).toLowerCase() === 'false') {
-            console.info('ℹ️ Email service disabled via EMAIL_ENABLED=false');
+        if (!this.isEmailEnabled()) {
+            console.info('ℹ️ Email service disabled via configuration (EMAIL_ENABLED=false)');
             this.provider = 'disabled';
             this.emailDisabled = true;
             return;
@@ -64,31 +76,102 @@ class EmailService {
     }
 
     configureSmtpTransport() {
-        // Email configuration from environment variables
-        const emailConfig = {
-            host: process.env.SMTP_HOST || 'smtp.gmail.com',
-            port: parseInt(process.env.SMTP_PORT || '587'),
-            secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
-            auth: {
-                user: process.env.SMTP_USER || '',
-                pass: process.env.SMTP_PASSWORD || ''
-            }
-        };
+        const { transportOptions, fromEmail } = this.buildSmtpTransportOptions();
 
-        // Only create transporter if credentials are provided
-        if (emailConfig.auth.user && emailConfig.auth.pass) {
-            try {
-                this.transporter = nodemailer.createTransport(emailConfig);
-                this.isConfigured = true;
-                this.provider = 'smtp';
-                this.fromEmail = emailConfig.auth.user;
-                console.log('✅ Email service configured via SMTP');
-            } catch (error) {
-                console.error('❌ Failed to configure SMTP email service:', error.message);
-                this.isConfigured = false;
-            }
+        if (!transportOptions) {
             return;
         }
+
+        try {
+            this.transporter = nodemailer.createTransport(transportOptions);
+            this.isConfigured = true;
+            this.provider = 'smtp';
+            this.fromEmail = fromEmail;
+            console.log(`✅ Email service configured via SMTP (${transportOptions.host}:${transportOptions.port})`);
+        } catch (error) {
+            console.error('❌ Failed to configure SMTP email service:', error.message);
+            this.isConfigured = false;
+        }
+    }
+
+    buildSmtpTransportOptions() {
+        const smtpConfig = this.emailSettings?.smtp || {};
+        const host = process.env.SMTP_HOST || smtpConfig.host || 'smtp.gmail.com';
+        const port = parseInt(process.env.SMTP_PORT || smtpConfig.port || '587', 10);
+        const secure = this.parseBoolean(process.env.SMTP_SECURE, smtpConfig.secure ?? port === 465);
+        const ignoreTLS = this.parseBoolean(process.env.SMTP_IGNORE_TLS, smtpConfig.ignoreTLS);
+        const requireTLS = this.parseBoolean(process.env.SMTP_REQUIRE_TLS, smtpConfig.requireTLS);
+        const allowUnauthorized = this.parseBoolean(process.env.SMTP_ALLOW_UNAUTHORIZED, smtpConfig.allowUnauthorized);
+        const user = process.env.SMTP_USER || smtpConfig.user || '';
+        const pass = process.env.SMTP_PASSWORD || smtpConfig.password || '';
+
+        const transportOptions = {
+            host,
+            port,
+            secure
+        };
+
+        if (typeof ignoreTLS === 'boolean') {
+            transportOptions.ignoreTLS = ignoreTLS;
+        }
+
+        if (typeof requireTLS === 'boolean') {
+            transportOptions.requireTLS = requireTLS;
+        }
+
+        if (allowUnauthorized) {
+            transportOptions.tls = { rejectUnauthorized: false };
+        }
+
+        if (user || pass) {
+            transportOptions.auth = {
+                user,
+                pass
+            };
+        }
+
+        const fromEmail = this.resolveFromEmail();
+
+        if (!fromEmail) {
+            console.warn('⚠️ Email service missing from email address; configure SMTP_FROM_EMAIL or SMTP_USER');
+        }
+
+        return { transportOptions, fromEmail };
+    }
+
+    isEmailEnabled() {
+        if (process.env.EMAIL_ENABLED !== undefined) {
+            return this.parseBoolean(process.env.EMAIL_ENABLED, true);
+        }
+
+        if (typeof this.emailSettings?.enabled === 'boolean') {
+            return this.emailSettings.enabled;
+        }
+
+        return true;
+    }
+
+    parseBoolean(value, defaultValue = undefined) {
+        if (typeof value === 'boolean') {
+            return value;
+        }
+
+        if (typeof value === 'number') {
+            if (value === 1) return true;
+            if (value === 0) return false;
+        }
+
+        if (typeof value === 'string') {
+            const normalized = value.trim().toLowerCase();
+            if (['true', '1', 'yes', 'on'].includes(normalized)) {
+                return true;
+            }
+            if (['false', '0', 'no', 'off'].includes(normalized)) {
+                return false;
+            }
+        }
+
+        return defaultValue;
     }
 
     getFromAddress() {
@@ -160,8 +243,7 @@ class EmailService {
      * @returns {Promise<Object>}
      */
     async sendVerificationEmail(to, real_name, token, verificationCode = null) {
-        const baseUrl = process.env.BASE_URL || 'http://localhost:3001';
-        const confirmationUrl = `${baseUrl}/api/verify-email?token=${token}`;
+        const confirmationUrl = `${this.baseUrl}/api/verify-email?token=${token}`;
 
         const emailPayload = {
             to,
@@ -250,8 +332,7 @@ class EmailService {
      * @returns {Promise<Object>}
      */
     async sendPasswordResetEmail(to, real_name, token) {
-        const baseUrl = process.env.BASE_URL || 'http://localhost:3001';
-        const resetUrl = `${baseUrl}/reset-password?token=${token}`;
+        const resetUrl = `${this.baseUrl}/reset-password?token=${token}`;
 
         const emailPayload = {
             to,

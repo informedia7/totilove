@@ -1,0 +1,175 @@
+/**
+ * Design Tokens - Totilove Dating App
+ * 
+ * Single source of truth for colors, spacing, typography, etc.
+ * Mobile-first values (desktop enhancements in responsive.css)
+ * 
+ * Extracted from:
+ * - app/components/layouts/layout.html (existing CSS variables)
+ * - app/assets/css/style.css (hardcoded values)
+ * - app/components/user-card/user-card.css (component tokens)
+ * 
+ * Migration Phase 1: Week 2 - Token Extraction
+ */
+
+:root {
+  /* ===== COLORS ===== */
+  /* Primary Brand Colors */
+  --primary: #667eea;
+  --primary-color: #667eea; /* Alias for compatibility */
+  --primary-dark: #5568d3;
+  --secondary: #764ba2;
+  --secondary-color: #764ba2; /* Alias for compatibility */
+  --accent: #e74c3c;
+  
+  /* Semantic Colors */
+  --success: #00b894;
+  --success-color: #00b894; /* Alias */
+  --danger: #d63031;
+  --danger-color: #d63031; /* Alias */
+  --warning: #ffc107;
+  --info: #17a2b8;
+  
+  /* Neutral Colors */
+  --white: #fff;
+  --black: #000;
+  --dark: #2c3e50;
+  --dark-color: #2d3436;
+  --gray: #868e96;
+  --muted: #888;
+  --muted-color: #636e72;
+  --light-color: #f5f6fa;
+  
+  /* Text Colors */
+  --text-color: #333;
+  --text: #333;
+  --text-muted: #777;
+  --text-light: #fff;
+  
+  /* Background Colors */
+  --bg: #fff;
+  --card: #fff;
+  --bg-dark: #121212;
+  --card-dark: #1c1c1c;
+  --bg-hover: #f5f5f5;
+  --bg-light: #f8f9fa;
+  
+  /* Border Colors */
+  --border-color: #e0e0e0;
+  --border-light: #f0f0f0;
+  --border-dark: #ddd;
+  
+  /* ===== SPACING (Mobile-First) ===== */
+  --xs: 0.25rem;    /* 4px */
+  --sm: 0.5rem;     /* 8px */
+  --md: 1rem;       /* 16px */
+  --lg: 1.5rem;     /* 24px */
+  --xl: 2rem;       /* 32px */
+  --2xl: 3rem;      /* 48px */
+  
+  /* Spacing Aliases (for compatibility) */
+  --spacing-xs: var(--xs);
+  --spacing-sm: var(--sm);
+  --spacing-md: var(--md);
+  --spacing-lg: var(--lg);
+  --spacing-xl: var(--xl);
+  
+  /* ===== BORDER RADIUS ===== */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 15px;     /* Common in user cards */
+  --r-xl: 16px;
+  --r-2xl: 20px;
+  --r-3xl: 24px;
+  --r-full: 9999px;
+  
+  /* Border Radius Aliases */
+  --border-radius: 10px; /* From layout.html */
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+  
+  /* ===== TYPOGRAPHY ===== */
+  /* Font Sizes (Mobile-First) */
+  --f-xs: 0.75rem;     /* 12px */
+  --f-sm: 0.875rem;    /* 14px */
+  --f-md: 1rem;        /* 16px */
+  --f-lg: 1.125rem;    /* 18px */
+  --f-xl: 1.25rem;     /* 20px */
+  --f-2xl: 1.5rem;     /* 24px */
+  --f-3xl: 1.8rem;     /* 28.8px */
+  --f-4xl: 2rem;       /* 32px */
+  
+  /* Font Aliases */
+  --font-sm: var(--f-sm);
+  --font-md: var(--f-md);
+  --font-lg: var(--f-lg);
+  --font-xl: var(--f-xl);
+  
+  /* Font Family */
+  --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-family-alt: 'Poppins', sans-serif;
+  
+  /* Line Height */
+  --line-height: 1.6;
+  --line-height-tight: 1.2;
+  --line-height-loose: 1.8;
+  
+  /* ===== SHADOWS ===== */
+  --shadow-sm: 0 2px 8px rgba(31, 38, 135, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 12px 32px rgba(0, 0, 0, 0.25);
+  
+  /* Shadow from layout.html */
+  --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.13);
+  
+  /* ===== TRANSITIONS & ANIMATIONS ===== */
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.3s ease;
+  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Transition Aliases */
+  --transition-base: var(--transition-medium);
+  
+  /* ===== TOUCH TARGETS (Mobile) ===== */
+  --touch-target: 44px;       /* Minimum touch target (iOS/Android) */
+  --touch-target-lg: 48px;    /* Larger touch target */
+  
+  /* ===== Z-INDEX LAYERS ===== */
+  --z-base: 1;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-popover: 600;
+  --z-tooltip: 700;
+  
+  /* ===== GRADIENTS ===== */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-danger: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  --gradient-success: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+  --gradient-light: linear-gradient(45deg, #fff, #f8f9fa);
+  
+  /* ===== ASPECT RATIOS ===== */
+  --aspect-square: 1 / 1;
+  --aspect-portrait: 1 / 1.25;
+  --aspect-landscape: 16 / 9;
+  
+  /* ===== CONTAINER WIDTHS ===== */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1200px;
+  --container-2xl: 1400px;
+  
+  /* ===== BREAKPOINTS (for reference, use in media queries) ===== */
+  /* Mobile: default (no media query) */
+  /* Tablet: 768px+ */
+  /* Desktop: 1024px+ */
+  /* Large Desktop: 1440px+ */
+}

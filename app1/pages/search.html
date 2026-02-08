@@ -1,0 +1,408 @@
+<!-- Enhanced Search Page with Advanced Filters and Smart Matching -->
+
+<!-- Extracted CSS from search.html - Phase 1 CSS Extraction -->
+<link rel="stylesheet" href="/assets/css/new/05-pages/_search.css">
+
+<!-- Block Confirmation Modal -->
+<div id="blockConfirmModal" class="block-confirm-modal" style="display: none;">
+    <div class="block-confirm-overlay"></div>
+    <div class="block-confirm-content">
+        <div class="block-confirm-icon">
+            <i class="fas fa-ban"></i>
+        </div>
+        <h3 class="block-confirm-title">Block User?</h3>
+        <p class="block-confirm-message">Are you sure you want to block <strong id="blockUsername">this user</strong>?
+            They will no longer be able to contact you or see your profile in search results.</p>
+        <div class="block-confirm-actions">
+            <button class="block-confirm-cancel" id="searchBlockCancelBtn">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+            <button class="block-confirm-yes" id="searchBlockYesBtn">
+                <i class="fas fa-ban"></i> Block User
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="search-page-container" data-user-id="{{userId}}" data-user-name="{{realName}}"
+    data-user-gender="{{userGenderRaw}}" data-session-token="{{sessionToken}}">
+    <!-- Search Header with Quick Stats -->
+    <div class="search-header">
+        <div class="search-title">
+            <h2><i class="fas fa-search"></i> Smart Matching System</h2>
+            <p class="search-subtitle">Find your perfect match with our advanced search filters</p>
+        </div>
+        <div class="search-stats">
+            <div class="stat-card">
+                <i class="fas fa-users"></i>
+                <div class="stat-content">
+                    <span class="stat-number" id="total-users">1,247</span>
+                    <span class="stat-label">Active Users</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-heart"></i>
+                <div class="stat-content">
+                    <span class="stat-number" id="matches-today">43</span>
+                    <span class="stat-label">Matches Today</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-circle"></i>
+                <div class="stat-content">
+                    <span class="stat-number" id="online-now">156</span>
+                    <span class="stat-label">Online Now</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Search Filters -->
+    <div class="search-filters-container">
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-tab="basic">
+                <i class="fas fa-sliders-h"></i> Basic Filters
+            </button>
+            <button class="filter-tab" data-tab="advanced">
+                <i class="fas fa-cog"></i> Advanced Filters
+            </button>
+        </div>
+        <!-- Basic Filters Tab -->
+        <div class="filter-content active" id="basic-filters">
+            <div class="search-filters">
+                <div class="filter-section">
+                    <h4><i class="fas fa-user"></i> Demographics</h4>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="search-age-min">Age Range</label>
+                            <div class="age-range-container">
+                                <input type="number" id="search-age-min" class="filter-input age-input" min="18"
+                                    max="100" value="18" placeholder="Min">
+                                <span class="range-separator">to</span>
+                                <input type="number" id="search-age-max" class="filter-input age-input" min="18"
+                                    max="100" value="45" placeholder="Max">
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <label for="search-gender"><i class="fas fa-heart"></i> Looking For</label>
+                            <select id="search-gender" class="filter-input">
+                                <option value="male">Men</option>
+                                <option value="female">Women</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="search-relationship">Relationship Type</label>
+                            <select id="search-relationship" class="filter-input">
+                                <option value="">Any</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <h4><i class="fas fa-map-marker-alt"></i> Location</h4>
+                    <div class="filter-row">
+                        <div class="filter-group" style="flex: 1;">
+                            <label for="search-country">Country (<span id="selected-countries-count">All</span>)</label>
+                            <div style="margin-bottom: 0.5rem;">
+                                <div id="selected-countries"
+                                    style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem; min-height: 30px;">
+                                    <!-- Selected countries will be populated here -->
+                                </div>
+                                <select id="search-country" class="filter-input">
+                                    <option value="">Select a country...</option>
+                                </select>
+                                <p style="font-size: 0.85rem; color: var(--muted-color); margin-top: 0.25rem;">Select
+                                    countries from the dropdown above</p>
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <div class="quality-option">
+                                <input type="checkbox" id="use-preferred-countries">
+                                <label for="use-preferred-countries">
+                                    <i class="fas fa-globe"></i>
+                                    My preferred countries
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="filter-section">
+                    <h4><i class="fas fa-image"></i> Profile Quality</h4>
+                    <div class="filter-row">
+                        <div class="filter-group quality-filters">
+                            <div class="quality-option">
+                                <input type="checkbox" id="with-images" checked>
+                                <label for="with-images">
+                                    <i class="fas fa-camera"></i>
+                                    Has profile photos
+                                </label>
+                            </div>
+                            <div class="quality-option">
+                                <input type="checkbox" id="verified-profiles">
+                                <label for="verified-profiles">
+                                    <i class="fas fa-shield-check"></i>
+                                    Verified profiles only
+                                </label>
+                            </div>
+                            <div class="quality-option">
+                                <input type="checkbox" id="online-recently">
+                                <label for="online-recently">
+                                    <i class="fas fa-clock"></i>
+                                    Active in last 7 days
+                                </label>
+                            </div>
+                            <div class="quality-option">
+                                <input type="checkbox" id="online-now-filter">
+                                <label for="online-now-filter">
+                                    <i class="fas fa-circle" style="color: #00b894;"></i>
+                                    Online now
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Filters Tab -->
+        <div class="filter-content" id="advanced-filters">
+            <div class="search-filters">
+                <!-- Career & Education Section -->
+                <div class="filter-section">
+                    <h4><i class="fas fa-graduation-cap"></i> Career & Education</h4>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="education-level">Education Level</label>
+                            <select id="education-level" class="filter-input">
+                                <option value="">Any Education</option>
+                                <option value="high_school">High School</option>
+                                <option value="some_college">Some College</option>
+                                <option value="bachelors">Bachelor's Degree</option>
+                                <option value="masters">Master's Degree</option>
+                                <option value="phd">PhD/Doctorate</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="occupation">Occupation</label>
+                            <select id="occupation" class="filter-input">
+                                <option value="">Any occupation</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="income-range">Income Range</label>
+                            <select id="income-range" class="filter-input">
+                                <option value="">Any income</option>
+                                <option value="0-30k">Under $30,000</option>
+                                <option value="30k-50k">$30,000 - $50,000</option>
+                                <option value="50k-75k">$50,000 - $75,000</option>
+                                <option value="75k-100k">$75,000 - $100,000</option>
+                                <option value="100k+">$100,000+</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lifestyle Preferences Section -->
+                <div class="filter-section">
+                    <h4><i class="fas fa-home"></i> Lifestyle Preferences</h4>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="lifestyle">Lifestyle</label>
+                            <select id="lifestyle" class="filter-input">
+                                <option value="">Any lifestyle</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="smoking">Smoking</label>
+                            <select id="smoking" class="filter-input">
+                                <option value="">Any</option>
+                                <option value="never">Non-smoker</option>
+                                <option value="occasionally">Occasionally</option>
+                                <option value="regularly">Regular smoker</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="drinking">Drinking</label>
+                            <select id="drinking" class="filter-input">
+                                <option value="">Any</option>
+                                <option value="never">Never</option>
+                                <option value="socially">Socially</option>
+                                <option value="regularly">Regularly</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="children">Children</label>
+                            <select id="children" class="filter-input">
+                                <option value="">Any</option>
+                                <option value="has_children">Has children</option>
+                                <option value="no_children">No children</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Physical Attributes Section -->
+                <div class="filter-section">
+                    <h4><i class="fas fa-ruler-vertical"></i> Physical Attributes</h4>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="height-min">Height Range</label>
+                            <div class="height-range-container">
+                                <select id="height-min" class="filter-input height-select">
+                                    <option value="">Min Height</option>
+                                    <!-- Height options will be populated from database -->
+                                </select>
+                                <span class="range-separator">to</span>
+                                <select id="height-max" class="filter-input height-select">
+                                    <option value="">Max Height</option>
+                                    <!-- Height options will be populated from database -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <label for="body-type">Body Type</label>
+                            <select id="body-type" class="filter-input">
+                                <option value="">Any body type</option>
+                                <option value="slim">Slim</option>
+                                <option value="athletic">Athletic</option>
+                                <option value="average">Average</option>
+                                <option value="curvy">Curvy</option>
+                                <option value="large">Large</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="ethnicity">Ethnicity</label>
+                            <select id="ethnicity" class="filter-input">
+                                <option value="">Any ethnicity</option>
+                                <option value="asian">Asian</option>
+                                <option value="black">Black/African</option>
+                                <option value="hispanic">Hispanic/Latino</option>
+                                <option value="white">White/Caucasian</option>
+                                <option value="mixed">Mixed</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interests Section -->
+                <div class="filter-section">
+                    <h4><i class="fas fa-heart"></i> Interests</h4>
+                    <div class="interests-grid" id="interests-grid">
+                        <!-- Interests will be populated from database -->
+                        <div style="text-align: center; padding: 2rem; color: var(--muted-color);">
+                            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                            <p>Loading interests...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hobbies Section -->
+                <div class="filter-section">
+                    <h4><i class="fas fa-palette"></i> Hobbies</h4>
+                    <div class="interests-grid" id="hobbies-grid">
+                        <!-- Hobbies will be populated from database -->
+                        <div style="text-align: center; padding: 2rem; color: var(--muted-color);">
+                            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                            <p>Loading hobbies...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Actions -->
+        <div class="search-actions">
+            <button class="search-btn primary" id="performSearchBtn">
+                <i class="fas fa-search"></i> Search Now
+            </button>
+            <button class="search-btn secondary" id="clearFiltersBtn">
+                <i class="fas fa-eraser"></i> Clear Filters
+            </button>
+            <button class="search-btn outline" id="saveSearchBtn">
+                <i class="fas fa-save"></i> Save Search
+            </button>
+        </div>
+    </div>
+
+    <!-- Search Results Section -->
+    <div class="search-results-section">
+        <div class="results-header" id="search-results-header" style="display: none;">
+            <div class="results-info">
+                <h3><i class="fas fa-users"></i> <span id="search-count">0</span> matches found</h3>
+                <div class="sort-options">
+                    <label for="sort-by">Sort by:</label>
+                    <select id="sort-by" class="filter-input" data-sort-select="true">
+                        <option value="relevance">Best Match</option>
+                        <option value="age">Age</option>
+                        <option value="last_active">Last Active</option>
+                        <option value="newest">Newest Members</option>
+                    </select>
+                </div>
+            </div>
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="grid" id="viewGridBtn">
+                    <i class="fas fa-th"></i>
+                </button>
+                <button class="view-btn" data-view="list" id="viewListBtn">
+                    <i class="fas fa-list"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="search-results-container">
+            <div class="search-results grid-view" id="search-results">
+                <div class="search-placeholder">
+                    <div class="placeholder-content">
+                        <i class="fas fa-search"></i>
+                        <h3>Ready to find your perfect match?</h3>
+                        <p>Use our advanced filters above to discover amazing people near you!</p>
+                        <div class="quick-search-suggestions">
+                            <h4>Quick searches:</h4>
+                            <button class="suggestion-btn" data-quick-search="nearby">
+                                <i class="fas fa-map-marker-alt"></i> People Nearby
+                            </button>
+                            <button class="suggestion-btn" data-quick-search="online">
+                                <i class="fas fa-circle"></i> Online Now
+                            </button>
+                            <button class="suggestion-btn" data-quick-search="new">
+                                <i class="fas fa-star"></i> New Members
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="search-pagination" style="display: none;">
+            <button class="page-btn" id="prev-page" data-page-direction="-1">
+                <i class="fas fa-chevron-left"></i> Previous
+            </button>
+            <div class="page-numbers" id="page-numbers">
+                <!-- Page numbers will be inserted here -->
+            </div>
+            <button class="page-btn" id="next-page" data-page-direction="1">
+                Next <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<!-- Include Global Error Handler -->
+{{include:global-error-handler}}
+
+<!-- User Profile Modal -->
+{{include:user-profile-modal}}
+
+<!-- Include User Report Modal -->
+{{include:modals/user-report-modal}}
+
+<!-- Session Manager --><!-- Instant status manager is now loaded in layout -->
+
+<script src="/assets/js/shared/age-validation.js"></script>
+<script type="module" src="/assets/js/new/pages/search.js"></script>

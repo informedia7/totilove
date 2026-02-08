@@ -1,0 +1,144 @@
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 24px;
+    background: #f7f7fb;
+    color: #1f2033;
+}
+
+header {
+    margin-bottom: 24px;
+}
+
+header h1 {
+    margin: 0 0 8px;
+}
+
+.controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.controls label {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.9rem;
+    color: #555671;
+}
+
+.controls input {
+    margin-top: 6px;
+    padding: 10px;
+    border: 1px solid #d9dcec;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.drop-zone {
+    border: 2px dashed #8c8cf9;
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    background: #fff;
+    margin-bottom: 24px;
+    position: relative;
+}
+
+.drop-zone.dragover {
+    background: #eef0ff;
+    border-color: #5e5ef1;
+}
+
+.drop-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+button.primary {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 12px;
+}
+
+button.primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.list, .log, .history {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #e3e6f5;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.list li, .log li, .history li {
+    padding: 12px 16px;
+    border-bottom: 1px solid #eceff8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.list li:last-child, .log li:last-child, .history li:last-child {
+    border-bottom: none;
+}
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge.success {
+    background: rgba(76, 175, 80, 0.15);
+    color: #256029;
+}
+
+.badge.error {
+    background: rgba(244, 67, 54, 0.15);
+    color: #9c1e16;
+}
+
+.badge.info {
+    background: rgba(33, 150, 243, 0.15);
+    color: #0a4c92;
+}
+
+.badge.working {
+    background: rgba(255, 193, 7, 0.2);
+    color: #7a4e00;
+}
+
+.file-path {
+    flex: 1;
+    word-break: break-all;
+}
+
+.history-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.history-details span {
+    font-size: 0.85rem;
+    color: #5b5f7a;
+}

@@ -10,6 +10,55 @@ let currentReceiverId = null;
 let currentReceiverName = null;
 let isReplyMode = false;
 
+let verificationScriptPromise = null;
+
+function ensureComposeVerificationScriptLoaded() {
+    if (typeof window.checkEmailVerificationStatus === 'function') {
+        return Promise.resolve();
+    }
+
+    if (verificationScriptPromise) {
+        return verificationScriptPromise;
+    }
+
+    verificationScriptPromise = new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = '/assets/js/new/shared/email-verification-check.js';
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => resolve();
+        document.head.appendChild(script);
+    }).finally(() => {
+        verificationScriptPromise = null;
+    });
+
+    return verificationScriptPromise;
+}
+
+async function ensureEmailVerifiedBeforeCompose() {
+    try {
+        await ensureComposeVerificationScriptLoaded();
+
+        if (typeof window.checkEmailVerificationStatus === 'function') {
+            const isVerified = await window.checkEmailVerificationStatus();
+            if (!isVerified) {
+                if (typeof window.showVerificationMessage === 'function') {
+                    window.showVerificationMessage();
+                } else if (typeof showToast === 'function') {
+                    showToast('Please verify your email address before sending messages.', 'warning');
+                } else {
+                    alert('Please verify your email address before sending messages.');
+                }
+                return false;
+            }
+        }
+    } catch (error) {
+        console.warn('Email verification pre-check failed:', error);
+    }
+
+    return true;
+}
+
 
 
 // Initialize the universal message modal
@@ -176,6 +225,11 @@ async function sendMessage() {
     const currentUser = window.sessionManager?.getCurrentUser();
     if (!currentUser || !currentUser.id) {
         showToast('Please log in to send messages', 'error');
+        return;
+    }
+
+    const emailVerified = await ensureEmailVerifiedBeforeCompose();
+    if (!emailVerified) {
         return;
     }
     

@@ -2,6 +2,7 @@ const { Pool } = require('pg');
 const ActivityRateLimiter = require('../utils/activityRateLimiter');
 const BlockCheck = require('../utils/blockCheck');
 const { hydratePresenceStatuses, normalizeLastSeen } = require('../utils/presenceStatusHelper');
+const { requireEmailVerification } = require('../utils/emailVerificationCheck');
 
 class ActivityController {
     constructor(db, presenceService = null) {
@@ -820,6 +821,11 @@ class ActivityController {
                 });
             }
 
+            const verificationError = await requireEmailVerification(this.db, userId);
+            if (verificationError) {
+                return res.status(403).json(verificationError);
+            }
+
             try {
                 // Check if like already exists
                 const existingCheck = await this.db.query(`
@@ -902,6 +908,11 @@ class ActivityController {
                     success: false,
                     error: 'User ID to favorite is required'
                 });
+            }
+
+            const verificationError = await requireEmailVerification(this.db, userId);
+            if (verificationError) {
+                return res.status(403).json(verificationError);
             }
 
             try {

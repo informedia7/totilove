@@ -13,6 +13,59 @@ let filters = {
     minCompatibilityScore: null
 };
 
+let legacyEmailVerificationScriptPromise = null;
+
+function ensureLegacyMatchesVerificationScriptLoaded() {
+    if (typeof window.checkEmailVerificationStatus === 'function') {
+        return Promise.resolve();
+    }
+
+    if (legacyEmailVerificationScriptPromise) {
+        return legacyEmailVerificationScriptPromise;
+    }
+
+    legacyEmailVerificationScriptPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = '/assets/js/new/shared/email-verification-check.js';
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = (error) => {
+            console.error('Failed to load email verification script', error);
+            legacyEmailVerificationScriptPromise = null;
+            reject(error);
+        };
+        document.head.appendChild(script);
+    });
+
+    return legacyEmailVerificationScriptPromise;
+}
+
+async function requireEmailVerificationForLegacyMatches(actionDescription) {
+    try {
+        await ensureLegacyMatchesVerificationScriptLoaded();
+    } catch (error) {
+        return true;
+    }
+
+    if (typeof window.checkEmailVerificationStatus !== 'function') {
+        return true;
+    }
+
+    const isVerified = await window.checkEmailVerificationStatus();
+    if (!isVerified) {
+        if (typeof window.showVerificationMessage === 'function') {
+            window.showVerificationMessage();
+        } else if (typeof showToast === 'function') {
+            showToast(`Please verify your email to ${actionDescription}.`, 'warning');
+        } else {
+            alert(`Please verify your email to ${actionDescription}.`);
+        }
+        return false;
+    }
+
+    return true;
+}
+
 // Load stats
 async function loadStats() {
     try {
@@ -703,6 +756,11 @@ async function likeUser(userId) {
             showToast('Authentication required', 'error');
             return;
         }
+
+        const isVerified = await requireEmailVerificationForLegacyMatches('like users');
+        if (!isVerified) {
+            return;
+        }
         
         const sessionToken = getSessionToken();
         
@@ -747,6 +805,11 @@ async function addFavorite(userId) {
         
         if (!currentUserId) {
             showToast('Authentication required', 'error');
+            return;
+        }
+
+        const isVerified = await requireEmailVerificationForLegacyMatches('add favourites');
+        if (!isVerified) {
             return;
         }
         
