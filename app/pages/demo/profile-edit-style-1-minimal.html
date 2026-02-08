@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Edit Style 1: Minimal Clean Design</title>
+    <link rel="stylesheet" href="/assets/css/vendor/font-awesome.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .edit-form-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .edit-title {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .edit-cards-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .edit-card {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: #f7fafc;
+            color: #2d3748;
+            padding: 1.5rem;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card-title {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        /* About Me section - 2 rows of cards */
+        .edit-card:first-child .card-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .card-wrapper {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1.5rem;
+        }
+
+        .edit-card:first-child .card-wrapper {
+            margin-bottom: 0;
+        }
+
+        .card-wrapper:last-child {
+            margin-bottom: 0;
+        }
+
+        .card-title-above {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0 0 0.75rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .card-title-above i {
+            color: #4a5568;
+            font-size: 1.1rem;
+        }
+
+        .inner-card.compact-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .inner-card.compact-card:hover {
+            border-color: #cbd5e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-content-inner {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .demo-field {
+            padding: 0.75rem;
+            background: #f7fafc;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .demo-field label {
+            font-weight: 500;
+            color: #2d3748;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .demo-field-value {
+            color: #718096;
+        }
+
+        @media (max-width: 1024px) {
+            .edit-cards-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            /* Stack cards vertically on smaller screens */
+            .edit-card:first-child .card-content {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="edit-form-container">
+        <h3 class="edit-title">
+            <i class="fas fa-edit"></i>
+            Edit Profile Information
+        </h3>
+        
+        <div class="edit-cards-container">
+            <!-- About Me Card -->
+            <div class="edit-card">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <i class="fas fa-user"></i>
+                        About Me
+                    </h4>
+                </div>
+                <div class="card-content">
+                    <!-- Personal Information Card -->
+                    <div class="card-wrapper">
+                        <h4 class="card-title-above">
+                            <i class="fas fa-user-circle"></i>
+                            Personal Information
+                        </h4>
+                        <div class="inner-card compact-card">
+                            <div class="card-content-inner">
+                                <div class="demo-field">
+                                    <label>About Me:</label>
+                                    <div class="demo-field-value">I am a friendly and outgoing person who loves traveling and meeting new people.</div>
+                                </div>
+                                <div class="demo-field">
+                                    <label>Gender:</label>
+                                    <div class="demo-field-value">Male</div>
+                                </div>
+                                <div class="demo-field">
+                                    <label>Location:</label>
+                                    <div class="demo-field-value">Mauritius, Grand Port, Riviere Des Creoles</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Physical Appearance Card -->
+                    <div class="card-wrapper">
+                        <h4 class="card-title-above">
+                            <i class="fas fa-user"></i>
+                            Physical Appearance
+                        </h4>
+                        <div class="inner-card compact-card">
+                            <div class="card-content-inner">
+                                <div class="demo-field">
+                                    <label>Height:</label>
+                                    <div class="demo-field-value">175 cm</div>
+                                </div>
+                                <div class="demo-field">
+                                    <label>Weight:</label>
+                                    <div class="demo-field-value">70 kg</div>
+                                </div>
+                                <div class="demo-field">
+                                    <label>Body Type:</label>
+                                    <div class="demo-field-value">Athletic</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Education & Career Card -->
+                    <div class="card-wrapper">
+                        <h4 class="card-title-above">
+                            <i class="fas fa-briefcase"></i>
+                            Education & Career
+                        </h4>
+                        <div class="inner-card compact-card">
+                            <div class="card-content-inner">
+                                <div class="demo-field">
+                                    <label>Education:</label>
+                                    <div class="demo-field-value">Bachelor's Degree</div>
+                                </div>
+                                <div class="demo-field">
+                                    <label>Occupation:</label>
+                                    <div class="demo-field-value">Software Engineer</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- What I'm Looking For Card -->
+            <div class="edit-card">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <i class="fas fa-search"></i>
+                        What I'm Looking For
+                    </h4>
+                </div>
+                <div class="card-content">
+                    <!-- Age Range Card -->
+                    <div class="card-wrapper">
+                        <h4 class="card-title-above">
+                            <i class="fas fa-calendar-alt"></i>
+                            Age Range
+                        </h4>
+                        <div class="inner-card compact-card">
+                            <div class="card-content-inner">
+                                <div class="demo-field">
+                                    <label>Preferred Age:</label>
+                                    <div class="demo-field-value">25 - 35 years</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location Preferences Card -->
+                    <div class="card-wrapper">
+                        <h4 class="card-title-above">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Location Preferences
+                        </h4>
+                        <div class="inner-card compact-card">
+                            <div class="card-content-inner">
+                                <div class="demo-field">
+                                    <label>Preferred Countries:</label>
+                                    <div class="demo-field-value">Mauritius, Philippines, Thailand</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Physical Preferences Card -->
+                    <div class="card-wrapper">
+                        <h4 class="card-title-above">
+                            <i class="fas fa-heart"></i>
+                            Physical Preferences
+                        </h4>
+                        <div class="inner-card compact-card">
+                            <div class="card-content-inner">
+                                <div class="demo-field">
+                                    <label>Preferred Height:</label>
+                                    <div class="demo-field-value">160 - 175 cm</div>
+                                </div>
+                                <div class="demo-field">
+                                    <label>Preferred Body Type:</label>
+                                    <div class="demo-field-value">Slim, Athletic</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

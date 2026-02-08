@@ -11,6 +11,43 @@
  *   renderConversations, updateCurrentChatStatus, checkIfBlocked
  */
 
+const MOBILE_LAST_CONVERSATION_KEY = '__talkMobileLastConversationId';
+
+function rememberMobileConversation(conversationId) {
+    if (!isStackedViewport()) {
+        window[MOBILE_LAST_CONVERSATION_KEY] = null;
+        return;
+    }
+    window[MOBILE_LAST_CONVERSATION_KEY] = conversationId ? String(conversationId) : null;
+}
+
+function getRememberedMobileConversation() {
+    const stored = window[MOBILE_LAST_CONVERSATION_KEY];
+    return stored ? String(stored) : null;
+}
+
+function highlightConversationById(conversationId, options = {}) {
+    const normalizedId = conversationId ? String(conversationId) : null;
+    let matchedElement = null;
+
+    document.querySelectorAll('.conversation-item').forEach(item => {
+        const matches = normalizedId && item.getAttribute('data-conversation-id') === normalizedId;
+        item.classList.toggle('active', Boolean(matches));
+        if (matches) {
+            matchedElement = item;
+        }
+    });
+
+    if (options.scroll && matchedElement && typeof matchedElement.scrollIntoView === 'function') {
+        requestAnimationFrame(() => {
+            matchedElement.scrollIntoView({
+                behavior: options.behavior || 'auto',
+                block: options.block || 'center'
+            });
+        });
+    }
+}
+
 function applyBodyNavState(state) {
     if (!document || !document.body) {
         return;
@@ -278,7 +315,10 @@ async function selectConversation(conversationId, event) {
         // Show chat header with deleted user info and Clear button
         const chatHeader = document.getElementById('chatHeader');
         const messageInputArea = document.getElementById('messageInputArea');
-        if (chatHeader) chatHeader.style.display = 'flex';
+        if (chatHeader) {
+            chatHeader.style.display = 'flex';
+            chatHeader.classList.add('is-active');
+        }
         if (messageInputArea) messageInputArea.style.display = 'none'; // Hide input for deleted users
         updateChatHeader(conversation);
         // Don't load messages for deleted users
@@ -303,12 +343,22 @@ async function selectConversation(conversationId, event) {
         }
     }
 
+      if (isStackedViewport()) {
+          rememberMobileConversation(conversationId);
+          highlightConversationById(conversationId);
+      } else {
+          rememberMobileConversation(null);
+      }
+
     // Show chat interface
     const chatHeader = document.getElementById('chatHeader');
     const messageInputArea = document.getElementById('messageInputArea');
     const emptyState = document.getElementById('emptyState');
 
-    if (chatHeader) chatHeader.style.display = 'flex';
+    if (chatHeader) {
+        chatHeader.style.display = 'flex';
+        chatHeader.classList.add('is-active');
+    }
     if (messageInputArea) messageInputArea.style.display = 'block';
     if (emptyState) emptyState.style.display = 'none';
 
@@ -757,6 +807,8 @@ function goBackToConversations() {
         return;
     }
 
+    const previousConversationId = TalkState.getCurrentConversation();
+
     showConversationListOnMobile();
     
     // Clear current conversation
@@ -767,14 +819,28 @@ function goBackToConversations() {
     const messageInputArea = document.getElementById('messageInputArea');
     const emptyState = document.getElementById('emptyState');
     
-    if (chatHeader) chatHeader.style.display = 'none';
+    if (chatHeader) {
+        chatHeader.style.display = 'none';
+        chatHeader.classList.remove('is-active');
+    }
     if (messageInputArea) messageInputArea.style.display = 'none';
     if (emptyState) emptyState.style.display = 'none';
     
-    // Clear active conversation highlight
-    document.querySelectorAll('.conversation-item').forEach(item => {
-        item.classList.remove('active');
-    });
+    // Restore highlight for the last selected conversation when returning to the list
+    if (previousConversationId) {
+        rememberMobileConversation(previousConversationId);
+    }
+    const storedConversationId = getRememberedMobileConversation();
+    if (storedConversationId) {
+        highlightConversationById(storedConversationId, {
+            scroll: true,
+            behavior: 'smooth'
+        });
+    } else {
+        document.querySelectorAll('.conversation-item').forEach(item => {
+            item.classList.remove('active');
+        });
+    }
     
     // Clear messages area
     const messagesArea = document.getElementById('messagesArea');
@@ -787,10 +853,12 @@ function goBackToConversations() {
         cancelReply();
     }
     
-    // Scroll to top of conversation list
-    const conversationsList = document.getElementById('conversationsList');
-    if (conversationsList) {
-        conversationsList.scrollTop = 0;
+    // Scroll to top only when no stored selection is available
+    if (!storedConversationId) {
+        const conversationsList = document.getElementById('conversationsList');
+        if (conversationsList) {
+            conversationsList.scrollTop = 0;
+        }
     }
 }
 

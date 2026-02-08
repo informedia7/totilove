@@ -76,7 +76,10 @@ async function loadMessages(conversation, options = {}) {
                 const chatHeader = document.getElementById('chatHeader');
                 const messageInputArea = document.getElementById('messageInputArea');
                 if (emptyState) emptyState.style.display = 'flex';
-                if (chatHeader) chatHeader.style.display = 'none';
+                if (chatHeader) {
+                    chatHeader.style.display = 'none';
+                    chatHeader.classList.remove('is-active');
+                }
                 if (messageInputArea) messageInputArea.style.display = 'none';
                 
                 ensureConversationListVisibleOnMobile();

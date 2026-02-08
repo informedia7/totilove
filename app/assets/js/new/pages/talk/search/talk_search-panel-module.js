@@ -298,7 +298,10 @@ class SearchPanel {
                     const filters = this.controller.modules.filters;
                     filters.dateValues.startDate = null;
                     filters.dateValues.endDate = null;
+                    filters.pendingDateRange = { start: null, end: null };
+                    filters.appliedDateRange = { start: null, end: null };
                     filters.updateTimeFilterButtonDisplay();
+                    filters.updateDateRangeActionState?.();
                 }
                 
                 if (this.state) {

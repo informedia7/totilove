@@ -229,6 +229,7 @@ async function performRemoveUser(partnerId, partnerName, currentConversation) {
             const chatHeader = document.getElementById('chatHeader');
             if (chatHeader) {
                 chatHeader.style.display = 'none';
+                chatHeader.classList.remove('is-active');
             }
             
             // Reload conversations list

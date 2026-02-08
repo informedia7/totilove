@@ -49,14 +49,24 @@ class SearchController {
 
     handleGlobalClick(e) {
         if (!this.modules.filters) return;
-        
-        // Delegate to appropriate module
-        if (e.target.closest('.filter-dropdown-btn')) {
-            const btn = e.target.closest('.filter-dropdown-btn');
-            const type = btn.id.includes('sender') ? 'sender' : 'time';
+
+        const dropdownBtn = e.target.closest('.filter-dropdown-btn');
+        if (dropdownBtn) {
+            const type = dropdownBtn.id.includes('sender') ? 'sender' : 'time';
             this.modules.filters.toggleDropdown(type);
-        } else if (!e.target.closest('.filter-dropdown') && 
-                   !e.target.closest('.date-suggestion-dropdown')) {
+            return;
+        }
+
+        const path = typeof e.composedPath === 'function' ? e.composedPath() : null;
+        const pathContains = (selector) => {
+            if (path) {
+                return path.some(node => node instanceof Element && node.matches(selector));
+            }
+            return Boolean(e.target.closest(selector));
+        };
+
+        const insideDropdown = pathContains('.filter-dropdown') || pathContains('.date-suggestion-dropdown');
+        if (!insideDropdown) {
             this.modules.filters.closeAllDropdowns();
         }
     }

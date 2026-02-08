@@ -322,7 +322,16 @@
                 if (!searchPanel || !button) {
                     return;
                 }
-                if (!searchPanel.contains(event.target) && !button.contains(event.target)) {
+                const path = typeof event.composedPath === 'function'
+                    ? event.composedPath()
+                    : null;
+                const clickedInsidePanel = path
+                    ? path.includes(searchPanel)
+                    : searchPanel.contains(event.target);
+                const clickedButton = path
+                    ? path.includes(button)
+                    : button.contains(event.target);
+                if (!clickedInsidePanel && !clickedButton) {
                     callSearchPanel('closeSearchPanel');
                 }
             });

@@ -16,6 +16,9 @@ class SearchFilters {
             startDate: null,
             endDate: null
         };
+        this.calendarRange = null;
+        this.pendingDateRange = { start: null, end: null };
+        this.appliedDateRange = { start: null, end: null };
     }
 
     init() {
@@ -24,7 +27,8 @@ class SearchFilters {
             this.initializeFilterThemes();
             this.setupEventListeners();
             this.populateSenderFilter();
-            this.setupDateInputs();
+            this.setupCustomCalendar();
+            this.initializeDateValues();
         } catch (error) {
             console.error('[SearchFilters] Initialization error:', error);
         }
@@ -38,10 +42,10 @@ class SearchFilters {
             senderSearchInput: document.getElementById('senderSearchInput'),
             timeFilterBtn: document.getElementById('timeFilterBtn'),
             timeFilterContent: document.getElementById('timeFilterContent'),
-            startDateInput: document.getElementById('startDate'),
-            endDateInput: document.getElementById('endDate'),
             clearDateRangeBtn: document.getElementById('clearDateRangeBtn'),
-            dateSuggestionDropdown: document.getElementById('dateSuggestionDropdown')
+            dateSuggestionDropdown: document.getElementById('dateSuggestionDropdown'),
+            calendarRangeHost: document.getElementById('talkCalendarRange'),
+            applyDateRangeBtn: document.getElementById('applyDateRangeBtn')
         };
     }
 
@@ -68,7 +72,8 @@ class SearchFilters {
             senderSearchInput,
             timeFilterBtn,
             timeFilterContent,
-            clearDateRangeBtn
+            clearDateRangeBtn,
+            applyDateRangeBtn
         } = this.elements;
 
         // Sender filter dropdown
@@ -116,6 +121,14 @@ class SearchFilters {
             });
         }
 
+        if (applyDateRangeBtn) {
+            applyDateRangeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.applyPendingDateRangeFilter();
+            });
+        }
+
         // Date suggestion trigger (Quick Select button) - use event delegation
         // This is inside the time filter dropdown, so we need to handle it via delegation
         if (timeFilterContent) {
@@ -136,125 +149,167 @@ class SearchFilters {
 
         // Close dropdowns on outside click
         document.addEventListener('mousedown', (e) => {
-            const isInsideDropdown = e.target.closest('.filter-dropdown') ||
-                                   e.target.closest('.filter-dropdown-btn') ||
-                                   e.target.closest('.filter-dropdown-content') ||
-                                   e.target.closest('.date-suggestion-dropdown');
-            
+            const path = typeof e.composedPath === 'function' ? e.composedPath() : null;
+            const pathMatches = (selector) => {
+                if (!path) return null;
+                return path.find(node => node instanceof Element && node.matches(selector));
+            };
+
+            const isInsideDropdown = pathMatches('.filter-dropdown') ||
+                pathMatches('.filter-dropdown-btn') ||
+                pathMatches('.filter-dropdown-content') ||
+                pathMatches('.date-suggestion-dropdown') ||
+                e.target.closest('.filter-dropdown') ||
+                e.target.closest('.filter-dropdown-btn') ||
+                e.target.closest('.filter-dropdown-content') ||
+                e.target.closest('.date-suggestion-dropdown');
+
             if (!isInsideDropdown) {
                 setTimeout(() => this.closeAllDropdowns(), 10);
             }
         });
     }
 
-    setupDateInputs() {
-        const today = new Date().toISOString().split('T')[0];
-        const { startDateInput, endDateInput } = this.elements;
+    getPendingRange() {
+        return {
+            start: this.pendingDateRange?.start || null,
+            end: this.pendingDateRange?.end || null
+        };
+    }
 
-        if (startDateInput) {
-            startDateInput.max = today;
-            this.setupDateInputMonitoring(startDateInput, 'startDate');
+    hasPendingDateRangeChanges() {
+        const pending = this.getPendingRange();
+        const applied = this.appliedDateRange || { start: null, end: null };
+        return (pending.start !== applied.start) || (pending.end !== applied.end);
+    }
+
+    updateDateRangeActionState() {
+        const btn = this.elements?.applyDateRangeBtn;
+        if (!btn) return;
+
+        const hasChanges = this.hasPendingDateRangeChanges();
+        const hasSelection = Boolean(this.pendingDateRange?.start || this.pendingDateRange?.end);
+
+        btn.classList.toggle('show', hasChanges);
+        btn.disabled = !hasChanges;
+        btn.setAttribute('aria-disabled', hasChanges ? 'false' : 'true');
+        btn.textContent = 'Search';
+    }
+
+    applyPendingDateRangeFilter() {
+        if (!this.state) return;
+        if (!this.hasPendingDateRangeChanges()) return;
+
+        const pending = this.getPendingRange();
+        this.state.setCurrentDateRange({ ...pending });
+        this.appliedDateRange = { ...pending };
+        this.pendingDateRange = { ...pending };
+        this.updateDateRangeActionState();
+        this.updateTimeFilterButtonDisplay();
+        this.closeAllDropdowns();
+        this.triggerDateRangeSearch();
+    }
+
+    formatDateToISO(date) {
+        if (!(date instanceof Date) || Number.isNaN(date.getTime())) return null;
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    normalizeDateString(value) {
+        if (!value) return null;
+        const date = value instanceof Date ? new Date(value) : new Date(value);
+        if (Number.isNaN(date.getTime())) return null;
+        return this.formatDateToISO(date);
+    }
+
+    getMaxSelectableDate() {
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        return this.formatDateToISO(now);
+    }
+
+    clampToMaxDate(value) {
+        const normalized = this.normalizeDateString(value);
+        if (!normalized) return null;
+        const maxDate = this.getMaxSelectableDate();
+        return maxDate && normalized > maxDate ? maxDate : normalized;
+    }
+
+    sanitizeRange(range = {}) {
+        return {
+            start: this.clampToMaxDate(range?.start),
+            end: this.clampToMaxDate(range?.end)
+        };
+    }
+
+    setupCustomCalendar() {
+        if (!this.elements.calendarRangeHost || !window.TalkCalendarRange) {
+            return;
         }
 
-        if (endDateInput) {
-            endDateInput.max = today;
-            this.setupDateInputMonitoring(endDateInput, 'endDate');
+        try {
+            const minDate = (window.CONFIG?.DATES?.MIN_DATE) || '2010-01-01';
+            const storedRange = this.state?.getCurrentDateRange ? this.state.getCurrentDateRange() : null;
+            const initialRange = this.sanitizeRange(storedRange || {});
+
+            this.calendarRange = new window.TalkCalendarRange({
+                container: this.elements.calendarRangeHost,
+                minDate,
+                maxDate: this.getMaxSelectableDate(),
+                initialRange,
+                onChange: (range) => this.handleCalendarRangeChange(range)
+            });
+        } catch (error) {
+            console.error('[SearchFilters] Failed to initialize calendar range:', error);
         }
     }
 
-    setupDateInputMonitoring(input, type) {
-        if (!input) return;
-        
-        let previousValue = input.value || null;
-        this.dateValues[type] = previousValue;
+    handleCalendarRangeChange(range = {}) {
+        this.applyDateRange({
+            start: range.start || null,
+            end: range.end || null
+        }, { skipCalendar: true, source: 'calendar' });
+    }
 
-        const handleChange = () => {
-            const newValue = input.value || null;
-            if (previousValue !== newValue) {
-                previousValue = newValue;
-                this.dateValues[type] = newValue;
-                this.updateDateRange();
-            }
-        };
+    initializeDateValues() {
+        const stateRange = this.state?.getCurrentDateRange ? this.state.getCurrentDateRange() : null;
+        const initialRange = this.sanitizeRange(stateRange || {});
 
-        input.addEventListener('change', handleChange);
-        input.addEventListener('input', handleChange);
+        this.dateValues.startDate = initialRange.start;
+        this.dateValues.endDate = initialRange.end;
+        this.pendingDateRange = { ...initialRange };
+        this.appliedDateRange = { ...initialRange };
 
-        // Property interception for programmatic changes
-        try {
-            const descriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value') || 
-                             Object.getOwnPropertyDescriptor(Object.getPrototypeOf(input), 'value');
-            
-            if (descriptor?.set) {
-                const originalSet = descriptor.set;
-                const self = this;
-                Object.defineProperty(input, 'value', {
-                    set: function(newValue) {
-                        originalSet.call(this, newValue);
-                        if (previousValue !== newValue) {
-                            previousValue = newValue || null;
-                            self.dateValues[type] = newValue || null;
-                            self.updateDateRange();
-                        }
-                    },
-                    get: descriptor.get,
-                    configurable: true
-                });
-            }
-        } catch (error) {
-            // Property interception may fail in some browsers, fallback to polling
-            console.warn('[SearchFilters] Could not intercept value property, using polling fallback');
-            const pollInterval = setInterval(() => {
-                const currentValue = input.value || null;
-                if (previousValue !== currentValue) {
-                    previousValue = currentValue;
-                    this.dateValues[type] = currentValue;
-                    this.updateDateRange();
-                }
-            }, 100);
-            
-            // Clean up polling on input removal
-            const observer = new MutationObserver(() => {
-                if (!document.contains(input)) {
-                    clearInterval(pollInterval);
-                    observer.disconnect();
-                }
-            });
-            observer.observe(document.body, { childList: true, subtree: true });
+        if (this.calendarRange) {
+            this.calendarRange.setRange({ ...initialRange }, { silent: true, preserveView: true });
         }
 
-        // Calendar picker support
-        if (input.showPicker) {
-            const showPicker = () => {
-                try {
-                    input.showPicker();
-                    // Poll for changes after picker opens
-                    const pollInterval = setInterval(() => {
-                        const currentValue = input.value || null;
-                        if (previousValue !== currentValue) {
-                            previousValue = currentValue;
-                            this.dateValues[type] = currentValue;
-                            this.updateDateRange();
-                        }
-                    }, 100);
-                    
-                    setTimeout(() => clearInterval(pollInterval), 5000);
-                } catch (err) {
-                    input.focus();
-                }
-            };
+        this.updateTimeFilterButtonDisplay();
+        this.updateDateRangeActionState();
+    }
 
-            input.addEventListener('click', showPicker);
-            
-            const icon = input.parentElement?.querySelector('.date-icon');
-            if (icon) {
-                icon.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    showPicker();
-                });
-            }
+    applyDateRange(range = {}, options = {}) {
+        const normalized = this.sanitizeRange(range);
+
+        if (normalized.start && normalized.end && normalized.start > normalized.end) {
+            const temp = normalized.start;
+            normalized.start = normalized.end;
+            normalized.end = temp;
         }
+
+        this.dateValues.startDate = normalized.start;
+        this.dateValues.endDate = normalized.end;
+        this.pendingDateRange = { ...normalized };
+
+        if (!options.skipCalendar && this.calendarRange) {
+            this.calendarRange.setRange({ ...normalized }, { silent: true, preserveView: true });
+        }
+
+        this.updateTimeFilterButtonDisplay();
+        this.updateDateRangeActionState();
     }
 
     toggleDropdown(type) {
@@ -606,42 +661,14 @@ class SearchFilters {
                     break;
             }
 
-            // Update date inputs
-            const startDateStr = startDate.toISOString().split('T')[0];
-            const endDateStr = today.toISOString().split('T')[0];
-            
-            if (this.elements.startDateInput) {
-                this.elements.startDateInput.value = startDateStr;
-                this.elements.startDateInput.setAttribute('value', startDateStr);
-            }
-            if (this.elements.endDateInput) {
-                this.elements.endDateInput.value = endDateStr;
-                this.elements.endDateInput.setAttribute('value', endDateStr);
-            }
-            
-            this.dateValues.startDate = startDateStr;
-            this.dateValues.endDate = endDateStr;
+            const startDateStr = this.formatDateToISO(startDate);
+            const endDateStr = this.getMaxSelectableDate();
 
-            // Update state and trigger search
-            if (this.state) {
-                this.state.setCurrentDateRange({ start: startDateStr, end: endDateStr });
+            if (this.calendarRange) {
+                this.calendarRange.setRange({ start: startDateStr, end: endDateStr }, { silent: true, preserveView: true });
             }
             
-            // Force reload
-            const currentConv = this.state?.getCurrentConversation();
-            if (currentConv) {
-                const conversations = this.state?.getConversations();
-                const conv = conversations?.[currentConv];
-                if (conv) {
-                    conv.searchMessages = null;
-                }
-                if (this.state) {
-                    this.state.setLastSearchKey('');
-                }
-            }
-            
-            this.triggerDateRangeSearch();
-            this.updateTimeFilterButtonDisplay();
+            this.applyDateRange({ start: startDateStr, end: endDateStr }, { skipCalendar: true });
 
             // Close dropdown
             if (dateSuggestionDropdown) {
@@ -652,38 +679,6 @@ class SearchFilters {
         }
     }
 
-    updateDateRange() {
-        const { startDateInput, endDateInput } = this.elements;
-        
-        if (!startDateInput && !endDateInput) return;
-        
-        try {
-            const startDate = startDateInput?.value || null;
-            const endDate = endDateInput?.value || null;
-            
-            // Validate dates
-            if (startDate && endDate && startDate > endDate) {
-                // Swap dates if start > end
-                if (startDateInput && endDateInput) {
-                    const temp = startDate;
-                    startDateInput.value = endDate;
-                    endDateInput.value = temp;
-                    this.dateValues.startDate = endDate;
-                    this.dateValues.endDate = temp;
-                }
-            }
-            
-            if (this.state) {
-                this.state.setCurrentDateRange({ start: startDate, end: endDate });
-            }
-            
-            this.updateTimeFilterButtonDisplay();
-            this.triggerDateRangeSearch();
-        } catch (error) {
-            console.error('[SearchFilters] Error updating date range:', error);
-        }
-    }
-
     triggerDateRangeSearch() {
         if (!this.state) return;
         
@@ -691,6 +686,15 @@ class SearchFilters {
             // Reset pagination
             this.state.setCurrentMessagesDisplayed(10);
             this.state.setLastSearchKey('');
+
+            const currentConv = this.state.getCurrentConversation ? this.state.getCurrentConversation() : null;
+            if (currentConv) {
+                const conversations = this.state.getConversations ? this.state.getConversations() : null;
+                const conv = conversations?.[currentConv];
+                if (conv) {
+                    conv.searchMessages = null;
+                }
+            }
             
             // Clear search text
             const searchPanelInput = document.getElementById('searchPanelInput');
@@ -706,21 +710,12 @@ class SearchFilters {
     }
 
     clearDateRange() {
-        const { startDateInput, endDateInput } = this.elements;
-        
         try {
-            if (startDateInput) startDateInput.value = '';
-            if (endDateInput) endDateInput.value = '';
-            
-            this.dateValues.startDate = null;
-            this.dateValues.endDate = null;
-            
-            if (this.state) {
-                this.state.setCurrentDateRange({ start: null, end: null });
+            if (this.calendarRange) {
+                this.calendarRange.clear({ silent: true });
             }
-            
-            this.updateTimeFilterButtonDisplay();
-            this.triggerDateRangeSearch();
+
+            this.applyDateRange({ start: null, end: null }, { skipCalendar: true });
         } catch (error) {
             console.error('[SearchFilters] Error clearing date range:', error);
         }
@@ -731,7 +726,10 @@ class SearchFilters {
         if (!timeFilterBtn) return;
 
         try {
-            const dateRange = this.state?.getCurrentDateRange();
+            const dateRange = {
+                start: this.dateValues?.startDate || null,
+                end: this.dateValues?.endDate || null
+            };
             const span = timeFilterBtn.querySelector('span:first-child');
             if (!span) return;
 

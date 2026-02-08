@@ -10,8 +10,14 @@
  */
 
 const CONVERSATION_VIRTUALIZATION_THRESHOLD = 40;
+const LAST_SELECTED_CONVERSATION_KEY = '__talkLastSelectedConversationId';
 let conversationVirtualizer = null;
 let conversationListClickBound = false;
+
+function getStoredLastConversationId() {
+    const stored = window[LAST_SELECTED_CONVERSATION_KEY];
+    return stored ? String(stored) : null;
+}
 
 /**
  * Render conversations list
@@ -84,7 +90,25 @@ function createConversationElement(conversation) {
 
     // Add active class if this is the currently selected conversation
     const currentConversation = TalkState.getCurrentConversation();
-    if (currentConversation && conversation.id == currentConversation) {
+    const conversationIdString = String(conversation.id);
+    const activeConversationId = currentConversation ? String(currentConversation) : null;
+    let shouldMarkActive = false;
+
+    if (activeConversationId && conversationIdString === activeConversationId) {
+        shouldMarkActive = true;
+    } else if (!activeConversationId) {
+        const stackedLayout = typeof isStackedViewport === 'function'
+            ? isStackedViewport()
+            : window.innerWidth <= 768;
+        if (stackedLayout) {
+            const storedConversationId = getStoredLastConversationId();
+            if (storedConversationId && conversationIdString === storedConversationId) {
+                shouldMarkActive = true;
+            }
+        }
+    }
+
+    if (shouldMarkActive) {
         div.classList.add('active');
     }
 

@@ -177,18 +177,13 @@ button:contains('âž¤'),
         box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
     }
 
-.top-separator {
-    width: 1px;
-    height: 24px;
-    background: #e0e0e0;
-    margin: 0 8px;
-}
 
 .logo {
     height: 32px;
     width: auto;
     object-fit: contain;
 }
+
 
 .user-avatar {
     display: flex;
@@ -233,6 +228,8 @@ button:contains('âž¤'),
     margin-left: auto;
 }
 
+
+
 .user-status {
     --talk-presence-dot-color: #6c757d;
     --talk-status-border-color: transparent;
@@ -268,10 +265,11 @@ button:contains('âž¤'),
 @media (min-width: 768px) {
     .search-panel {
         position: absolute;
-        top: 60px;
+        top: auto;
+        bottom: 0;
         right: 0;
-        /* Increased width by ~30% (350px → 455px) */
-        width: 455px;
+        /* Slightly wider desktop drawer (~15% increase from 300px) */
+        width: 345px;
         height: calc(100% - 60px);
         background: white;
         border-radius: 12px;
@@ -294,15 +292,18 @@ button:contains('âž¤'),
     border-bottom: 1px solid #e9ecef;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     background: #f8f9fa;
     border-radius: 12px 12px 0 0;
+    position: relative;
 }
 
 .search-panel-title {
     font-weight: 600;
     color: #212529;
     font-size: 16px;
+    text-align: center;
+    flex: 1;
 }
 
 .search-panel-close {
@@ -314,12 +315,16 @@ button:contains('âž¤'),
     border-radius: 8px;
     transition: all var(--transition-default) ease;
     font-size: 16px;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
     .search-panel-close:hover {
         background: rgba(0, 123, 255, 0.1);
         color: var(--primary-color);
-        transform: scale(1.1);
+        transform: translateY(-50%) scale(1.1);
     }
 
 .search-panel-content {
@@ -343,6 +348,140 @@ button:contains('âž¤'),
         border-color: var(--primary-color);
         box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
     }
+
+/* Dark mode support for the chat search drawer */
+body.dark-mode .search-panel {
+    background: #05070d;
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #f5f7ff;
+}
+
+body.dark-mode .search-panel-header {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+body.dark-mode .search-panel-title,
+body.dark-mode .search-filter-label {
+    color: rgba(255, 255, 255, 0.92);
+}
+
+body.dark-mode .search-panel-close {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+body.dark-mode .search-panel-close:hover {
+    background: rgba(90, 84, 84, 0.08);
+    color: #fff;
+}
+
+body.dark-mode .search-panel-content {
+    background: transparent;
+}
+
+body.dark-mode .search-panel-input {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.28);
+    color: #fff;
+}
+
+body.dark-mode .search-panel-input::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+body.dark-mode .filter-dropdown-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.22);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+body.dark-mode .clear-messages-btn {
+    background: transparent;
+    border-color: rgba(220, 53, 69, 0.55);
+    color: #ff6b6b;
+}
+
+body.dark-mode .clear-messages-btn:hover {
+    background: rgba(220, 53, 69, 0.2);
+    color: #fff;
+}
+
+body.dark-mode .view-more-btn {
+    background: rgba(10, 12, 18, 0.9);
+    border-color: rgba(255, 255, 255, 0.08);
+    color: rgba(180, 185, 195, 0.9);
+}
+
+body.dark-mode .view-more-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.32);
+}
+
+    body.dark-mode .filter-btn {
+        background: rgba(10, 12, 18, 0.9);
+        border-color: rgba(255, 255, 255, 0.08);
+        color: rgba(148, 153, 162, 0.95);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+body.dark-mode .filter-dropdown-btn.active {
+    --talk-filter-bg: rgba(var(--color-primary-rgb), 0.2);
+    --talk-filter-border: rgba(var(--color-primary-rgb), 0.7);
+    --talk-filter-text: #fff;
+    --talk-filter-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.25);
+    --talk-filter-hover-bg: rgba(var(--color-primary-rgb), 0.25);
+    --talk-filter-hover-border: rgba(var(--color-primary-rgb), 0.85);
+}
+
+body.dark-mode .filter-dropdown-content {
+    background: #05070d;
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
+}
+
+body.dark-mode .filter-dropdown-search-container {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+body.dark-mode .filter-dropdown-search {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.35);
+    color: #fff;
+}
+
+body.dark-mode .filter-dropdown-search::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+body.dark-mode .filter-dropdown-search-icon {
+    color: rgba(255, 255, 255, 0.65);
+}
+
+body.dark-mode .filter-dropdown-item {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+body.dark-mode .filter-dropdown-item:hover,
+body.dark-mode .filter-dropdown-item.selected {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+body.dark-mode .search-messages-input-container {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+body.dark-mode .search-messages-input {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.28);
+    color: #fff;
+}
+
+body.dark-mode .search-messages-input::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+}
 
 .search-filters {
     margin-bottom: 20px;
@@ -800,8 +939,359 @@ button:contains('âž¤'),
     width: 310px; /* Match the width of the search input in chat sidebar */
     min-width: 310px; /* Ensure minimum width */
     left: -150px; /* Move dropdown box 150px to the left */
-    max-height: 450px !important; /* Increased height to show clear button */
-    overflow-y: auto !important; /* Allow scrolling if needed */
+    max-height: none !important; /* Allow calendar to extend fully */
+    overflow: visible !important; /* Prevent inner scrollbars */
+}
+
+.talk-calendar-range {
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.talk-calendar-range__controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.calendar-pill-group {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+}
+
+.calendar-pill {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background: #f8f9fa;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+}
+
+.calendar-pill.active {
+    border-color: #007bff;
+    background: rgba(0,123,255,0.12);
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.15);
+}
+
+.calendar-pill .pill-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.calendar-pill .pill-value {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #212529;
+}
+
+.calendar-swap-btn {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    background: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.calendar-swap-btn:hover {
+    border-color: #007bff;
+    color: #007bff;
+}
+
+.talk-calendar-range__summary {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #495057;
+}
+
+.talk-calendar-range__calendar {
+    margin-top: 12px;
+}
+
+.calendar-container {
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 12px;
+    background: #fff;
+    box-shadow: inset 0 1px 0 #f8f9fa;
+}
+
+.calendar-header,
+.calendar-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.calendar-title {
+    text-align: center;
+    flex: 1;
+    font-weight: 600;
+    color: #212529;
+}
+
+.calendar-nav-btn,
+.calendar-today-btn,
+.calendar-view-btn {
+    border: 1px solid #dee2e6;
+    background: #fff;
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.calendar-nav-btn:hover,
+.calendar-today-btn:hover,
+.calendar-today-btn.active,
+.calendar-view-btn:hover,
+.calendar-view-btn.active {
+    border-color: #007bff;
+    color: #007bff;
+    background: rgba(0,123,255,0.08);
+}
+
+.calendar-weekdays,
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-top: 10px;
+}
+
+.calendar-weekday {
+    text-align: center;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.calendar-day {
+    height: 38px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 500;
+    position: relative;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.calendar-day:hover {
+    background: rgba(0,123,255,0.08);
+}
+
+.calendar-day.today {
+    border: 1px solid rgba(0,123,255,0.4);
+}
+
+.calendar-day.selected {
+    background: #007bff;
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(0,123,255,0.25);
+}
+
+.calendar-day.disabled {
+    color: #adb5bd;
+    opacity: 0.6;
+}
+
+.day-event-indicator {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #007bff;
+    position: absolute;
+    bottom: 6px;
+}
+
+.calendar-view-selector,
+.calendar-quick-actions,
+.calendar-events {
+    margin-top: 10px;
+}
+
+/* Compact calendar layout inside time filter */
+.talk-calendar-range {
+    padding: 8px;
+}
+
+.talk-calendar-range .calendar-container {
+    padding: 8px;
+}
+
+.talk-calendar-range .calendar-header,
+.talk-calendar-range .calendar-footer {
+    gap: 6px;
+}
+
+.talk-calendar-range .calendar-nav-btn,
+.talk-calendar-range .calendar-today-btn,
+.talk-calendar-range .calendar-view-btn {
+    padding: 5px 8px;
+    font-size: 12px;
+}
+
+.talk-calendar-range .calendar-weekdays,
+.talk-calendar-range .calendar-days {
+    gap: 2px;
+    margin-top: 6px;
+}
+
+.talk-calendar-range .calendar-weekday {
+    font-size: 11px;
+}
+
+.talk-calendar-range .calendar-day {
+    height: 32px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.talk-calendar-range .calendar-view-selector,
+.talk-calendar-range .calendar-quick-actions,
+.talk-calendar-range .calendar-events {
+    display: none;
+}
+
+body.dark-mode .talk-calendar-range {
+    background: rgba(6, 8, 15, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.65);
+}
+
+body.dark-mode .calendar-pill {
+    border-color: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.85);
+}
+
+body.dark-mode .calendar-pill.active {
+    border-color: rgba(138,180,255,0.9);
+    background: rgba(138,180,255,0.15);
+    box-shadow: 0 0 0 2px rgba(138,180,255,0.25);
+}
+
+body.dark-mode .calendar-pill .pill-label {
+    color: rgba(255,255,255,0.7);
+}
+
+body.dark-mode .calendar-pill .pill-value {
+    color: rgba(255,255,255,0.9);
+}
+
+body.dark-mode .calendar-swap-btn {
+    border-color: rgba(255,255,255,0.15);
+    background: transparent;
+    color: rgba(255,255,255,0.8);
+}
+
+body.dark-mode .talk-calendar-range__summary {
+    color: rgba(245,247,255,0.85);
+}
+
+body.dark-mode .calendar-container {
+    border-color: rgba(255,255,255,0.15);
+    background: rgba(3,5,11,0.95);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+body.dark-mode .calendar-weekday {
+    color: rgba(255,255,255,0.55);
+}
+
+body.dark-mode .calendar-day {
+    color: rgba(255,255,255,0.85);
+}
+
+body.dark-mode .calendar-day.disabled {
+    color: rgba(255,255,255,0.35);
+}
+
+body.dark-mode .calendar-day.selected {
+    background: #8ab4ff;
+    color: #041124;
+}
+
+body.dark-mode .calendar-nav-btn,
+body.dark-mode .calendar-nav-btn,
+body.dark-mode .calendar-today-btn,
+body.dark-mode .calendar-view-btn,
+body.dark-mode .date-range-action-btn {
+    border-color: rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.85);
+}
+
+body.dark-mode .calendar-nav-btn:hover,
+body.dark-mode .calendar-today-btn:hover,
+body.dark-mode .calendar-today-btn.active,
+body.dark-mode .calendar-view-btn.active,
+body.dark-mode .calendar-view-btn:hover,
+body.dark-mode .date-range-action-btn:hover,
+body.dark-mode .date-range-action-btn:focus-visible,
+body.dark-mode .date-range-action-btn.active {
+    border-color: #8ab4ff;
+    color: #8ab4ff;
+    background: rgba(138,180,255,0.12);
+}
+body.dark-mode .clear-date-range-btn {
+    background: rgba(255,255,255,0.05) !important;
+    border-color: rgba(255,255,255,0.18) !important;
+    color: rgba(255,255,255,0.85) !important;
+}
+body.dark-mode .clear-date-range-btn:hover,
+body.dark-mode .clear-date-range-btn:focus-visible,
+body.dark-mode .clear-date-range-btn.active {
+    background: rgba(255,255,255,0.1) !important;
+    border-color: #8ab4ff !important;
+    color: #8ab4ff !important;
+}
+body.dark-mode .date-range-action-btn:hover,
+body.dark-mode .date-range-action-btn:focus-visible,
+body.dark-mode .date-range-action-btn.active {
+    border-color: #8ab4ff;
+    color: #8ab4ff;
+}
+body.dark-mode #timeFilterContent {
+    background: #06080f;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(245, 247, 255, 0.9);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.65);
+}
+body.dark-mode #timeFilterContent .filter-dropdown-section-title, body.dark-mode #timeFilterContent .date-input-container label { color: rgba(245, 247, 255, 0.7); }
+body.dark-mode #timeFilterContent .date-input-group {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+body.dark-mode #timeFilterContent .date-input {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: rgba(245, 247, 255, 0.95);
+}
+body.dark-mode #timeFilterContent .date-icon {
+    color: #8ab4ff;
+    opacity: 0.9;
 }
 
 /* Center time dropdown on mobile */
@@ -969,6 +1459,15 @@ button:contains('âž¤'),
     .date-suggestion-trigger:hover {
         background-color: #f8f9fa;
     }
+body.dark-mode .date-suggestion-trigger {
+    color: rgba(255,255,255,0.85);
+}
+body.dark-mode .date-suggestion-trigger .arrow-right {
+    color: rgba(255,255,255,0.65);
+}
+body.dark-mode .date-suggestion-trigger:hover {
+    background-color: rgba(255,255,255,0.08);
+}
 
 /* DAYS DROPDOWN CONTROL */
 .date-suggestion-dropdown {
@@ -986,6 +1485,11 @@ button:contains('âž¤'),
     visibility: hidden;
     transition: opacity 0.2s ease, visibility 0.2s ease;
 }
+body.dark-mode .date-suggestion-dropdown {
+    background: #0b111d;
+    border-color: rgba(255,255,255,0.12);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+}
 
     .date-suggestion-dropdown.show {
         display: block !important;
@@ -1000,6 +1504,11 @@ button:contains('âž¤'),
     color: #495057;
     font-size: 13px;
     background: #f8f9fa;
+}
+body.dark-mode .date-suggestion-header {
+    border-color: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.85);
+    background: rgba(255,255,255,0.05);
 }
 
 .date-suggestion-item {
@@ -1016,6 +1525,16 @@ button:contains('âž¤'),
     .date-suggestion-item:last-child {
         border-bottom: none;
     }
+body.dark-mode .date-suggestion-item {
+    border-bottom-color: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.78);
+}
+body.dark-mode .date-suggestion-item .date-suggestion-icon {
+    color: #8ab4ff;
+}
+body.dark-mode .date-suggestion-item:hover {
+    background: rgba(255,255,255,0.08);
+}
 
 .search-instruction-text {
     font-size: 14px;
@@ -1023,29 +1542,45 @@ button:contains('âž¤'),
 }
 
 /* Clear Date Range Button */
+
+.date-range-action-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    width: 100%;
+    align-items: center;
+}
+
+.date-range-action-btn {
+    border: 1px solid #dee2e6;
+    background: #fff;
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    color: #495057;
+    transition: border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+    min-width: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-sizing: border-box;
+}
+
+.date-range-action-btn:hover:not([disabled]),
+.date-range-action-btn:focus-visible,
+.date-range-action-btn.active {
+    border-color: #007bff;
+    color: #007bff;
+}
+
 .clear-date-range-btn {
-    margin-top: 12px !important;
-    margin-bottom: 8px !important;
-    padding: 10px 16px !important;
-    border: 1.5px solid #dee2e6 !important;
-    border-radius: 8px !important;
-    background: #fff !important;
-    cursor: pointer !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    width: 100% !important;
-    color: #6c757d !important;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 6px !important;
-    position: relative !important;
-    overflow: hidden;
+    margin: 0 !important;
     visibility: visible !important;
     opacity: 1 !important;
-    z-index: 1 !important;
-    box-sizing: border-box !important;
+    flex: 0 0 auto;
 }
 
 .clear-date-range-btn::after {
@@ -1081,6 +1616,33 @@ button:contains('âž¤'),
     content: '';
 }
 
+.apply-date-range-btn {
+    display: flex;
+    width: auto;
+    margin: 0;
+    flex: 1 1 0;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.apply-date-range-btn.show {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.apply-date-range-btn[disabled] {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.apply-date-range-btn:not([disabled]):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 16px 30px rgba(76, 110, 245, 0.45);
+}
+
 
 .header-btn {
     padding: 10px;
@@ -1105,6 +1667,66 @@ button:contains('âž¤'),
         background: rgba(0, 123, 255, 0.15);
         box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
     }
+
+.header-btn.back-btn {
+    padding: 0;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    color: inherit;
+}
+
+.header-btn.svg-btn {
+    padding: 0;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-btn.svg-btn svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.header-btn.svg-btn.svg-btn--sm {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+}
+
+.header-btn.svg-btn.svg-btn--sm svg {
+    width: 100%;
+    height: 100%;
+}
+
+.header-btn.svg-btn.settings-btn {
+    width: 19px;
+    height: 19px;
+    min-width: 19px;
+    padding: 0;
+}
+
+.header-btn.svg-btn.settings-btn svg {
+    transform: scale(0.5);
+    transform-origin: center;
+}
+
+
+.header-btn.back-btn:hover {
+    transform: translateX(-2px);
+}
+
+.header-btn.back-btn .back-icon,
+.chat-back-btn-mobile .back-icon {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
 
 /* ============================================ */
 /* Sidebar */
@@ -1172,6 +1794,10 @@ button:contains('âž¤'),
     font-weight: 500;
     cursor: pointer;
     transition: all var(--transition-default) ease;
+}
+
+body.dark-mode .filters .filter-btn {
+    color: rgba(148, 153, 162, 0.95);
 }
 
     .filter-btn:hover {
@@ -1427,6 +2053,10 @@ button:contains('âž¤'),
     align-items: center;
     background: white;
     min-height: 96px;
+}
+
+.chat-header:not(.is-active) .chat-avatar {
+    display: none;
 }
 
 .chat-avatar {
@@ -1755,10 +2385,13 @@ button:contains('âž¤'),
 
 /* Message Input */
 .message-input-area {
-    padding: 20px;
+    padding: 4px 16px;
     border-top: 1px solid #e9ecef;
     background: white;
     overflow: hidden !important;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
     /* Hide all scrollbars in message input area */
@@ -1777,12 +2410,13 @@ button:contains('âž¤'),
 
 .input-container {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
-    background: #f8f9fa;
-    border-radius: 24px;
-    padding: 12px 20px;
-    border: 2px solid #e9ecef;
+    flex-direction: row;
+    gap: 12px;
+    align-items: flex-end;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 8px 12px;
+    border: 1px solid #e9ecef;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden !important;
@@ -1791,7 +2425,7 @@ button:contains('âž¤'),
 .input-actions-wrapper {
     display: flex;
     align-items: flex-end;
-    gap: 12px;
+    gap: 8px;
     width: 100%;
     overflow: hidden !important;
 }
@@ -1840,10 +2474,12 @@ button:contains('âž¤'),
     flex: 1;
     border: none;
     background: none;
-    padding: 8px 0;
-    font-size: 18.9px; /* Increased by 20% from 15.75px */
+    padding: 4px 0;
+    font-size: 16px;
+    line-height: 1.4;
     resize: none;
-    max-height: 100px;
+    min-height: 32px;
+    max-height: 120px;
     outline: none;
     font-family: inherit;
     overflow: hidden !important;
@@ -1853,7 +2489,7 @@ button:contains('âž¤'),
 }
 
 .message-input::placeholder {
-    font-size: 18.9px; /* Increased by 20% from 15.75px */
+    font-size: 16px;
     color: #adb5bd;
 }
 
@@ -1875,8 +2511,8 @@ button:contains('âž¤'),
     font-size: 12px;
     color: #6c757d;
     text-align: left;
-    margin-bottom: 8px;
-    padding-left: 4px;
+    margin: 0;
+    padding-left: 0;
     transition: color 0.3s ease;
     flex-shrink: 0;
 }
@@ -1885,14 +2521,18 @@ button:contains('âž¤'),
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 8px;
+    gap: 8px;
+    margin: 0;
 }
 
 .input-meta-row .character-counter {
-    margin-bottom: 0;
-    padding-left: 0;
     text-align: right;
+}
+
+.input-meta-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .input-meta-row .typing-status-inline {
@@ -1901,22 +2541,51 @@ button:contains('âž¤'),
 }
 
 .input-action-btn {
-    padding: 10px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    padding: 0;
     border: none;
-    background: none;
-    color: var(--text-muted);
+    background: #f1f3f5;
+    color: #6c757d;
     cursor: pointer;
-    border-radius: 50%;
+    border-radius: 10px;
     transition: all var(--transition-default) ease;
-    font-size: 25.92px; /* Increased by 20% from 21.6px */
+    font-size: 20px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', sans-serif;
     font-variant-emoji: emoji;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
     .input-action-btn:hover {
-        background: var(--neutral-200);
-        transform: scale(1.1);
+        background: #e9ecef;
+        transform: none;
+        color: #343a40;
     }
+
+.input-action-btn.toolbar-action-btn {
+    width: auto;
+    height: auto;
+    min-width: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent !important;
+    color: #667eea;
+    position: relative;
+    left: -12px;
+    box-shadow: none;
+}
+
+.input-action-btn.toolbar-action-btn:hover,
+.input-action-btn.toolbar-action-btn:focus {
+    background: transparent !important;
+    color: #4b5bcc;
+    outline: none;
+    box-shadow: none;
+}
 
 .send-btn {
     background: var(--primary-gradient) !important;

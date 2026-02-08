@@ -208,10 +208,8 @@ window.filterDisplayedMessages = function() {
     if (!messageItems.length) return;
 
     const dateRange = state?.getCurrentDateRange?.() || {};
-    const startDateInputEl = document.getElementById('startDate');
-    const endDateInputEl = document.getElementById('endDate');
-    const actualStartDate = (startDateInputEl && startDateInputEl.value) ? startDateInputEl.value : dateRange.start;
-    const actualEndDate = (endDateInputEl && endDateInputEl.value) ? endDateInputEl.value : dateRange.end;
+    const actualStartDate = dateRange.start;
+    const actualEndDate = dateRange.end;
 
     let visibleCount = 0;
 

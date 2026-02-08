@@ -24,7 +24,7 @@ const CONFIG = {
         CACHE_DURATION: 60000
     },
     DATES: {
-        MIN_DATE: '2020-01-01',
+        MIN_DATE: '2010-01-01',
         MAX_YEARS_BACK: 5
     },
     USERS: {

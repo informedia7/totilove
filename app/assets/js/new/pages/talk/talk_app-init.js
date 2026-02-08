@@ -173,7 +173,10 @@ async function initApp() {
                     const chatHeader = document.getElementById('chatHeader');
                     const messageInputArea = document.getElementById('messageInputArea');
                     if (emptyState) emptyState.style.display = 'flex';
-                    if (chatHeader) chatHeader.style.display = 'none';
+                    if (chatHeader) {
+                        chatHeader.style.display = 'none';
+                        chatHeader.classList.remove('is-active');
+                    }
                     if (messageInputArea) messageInputArea.style.display = 'none';
                     
                     // On mobile: show sidebar and reset chat area when user is blocked
