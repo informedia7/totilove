@@ -65,10 +65,10 @@ body {
 
 /* Global emoji support for all emoji elements */
 .emoji,
-button:contains('Ã°Å¸â€œÅ½'),
-button:contains('Ã°Å¸ËœÅ '),
-button:contains('Ã°Å¸â€Â'),
-button:contains('Ã¢Å¾Â¤'),
+button:contains('+¦++GÇ£++'),
+button:contains('+¦++-£+á'),
+button:contains('+¦++GÇ¥-ì'),
+button:contains('+ó++-ñ'),
 .empty-state-icon,
 .filter-dropdown-search-icon,
 .search-icon,
@@ -2011,7 +2011,7 @@ body.dark-mode .filters .filter-btn {
 }
 
 .conversation-saved-count {
-    /* Increased by ~15% for "Ã¢Â­Â 2 saved" text */
+    /* Increased by ~15% for "+ó-¡-É 2 saved" text */
     font-size: 13px;
     color: #ffc107;
     margin-top: 2px;
