@@ -1,5 +1,7 @@
 const express = require('express');
+const config = require('../config/config');
 const router = express.Router();
+const SESSION_DURATION_MS = config.session?.duration || (2 * 60 * 60 * 1000);
 
 class MatchesRoutes {
     constructor(matchesController, authMiddleware) {
@@ -47,7 +49,7 @@ class MatchesRoutes {
             }
 
             // Extend session
-            session.expiresAt = Date.now() + (60 * 60 * 1000); // 1 hour
+            session.expiresAt = Date.now() + SESSION_DURATION_MS;
             
             return session;
         };

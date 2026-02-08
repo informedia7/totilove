@@ -4,7 +4,7 @@ require('dotenv').config();
 module.exports = {
     // Server Configuration
     server: {
-        port: process.env.PORT || 3000,
+        port: process.env.PORT || 3001,
         host: process.env.HOST || 'localhost',
         environment: process.env.NODE_ENV || 'development',
         cluster: process.env.ENABLE_CLUSTER === 'true',
@@ -20,7 +20,7 @@ module.exports = {
         user: process.env.DB_USER || 'postgres',
         password: process.env.DB_PASSWORD || 'password',
         max: 20,
-        idleTimeoutMillis: 30000,
+        idleTimeoutMillis: 30010,
         connectionTimeoutMillis: 2000,
         ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false
     },
@@ -42,7 +42,7 @@ module.exports = {
             origin: "*",
             methods: ["GET", "POST"]
         },
-        pingTimeout: 30000,
+        pingTimeout: 30010,
         pingInterval: 12000,
         maxHttpBufferSize: 1e6,
         transports: ['websocket', 'polling'],
@@ -60,7 +60,7 @@ module.exports = {
     // Session Configuration
     session: {
         secret: process.env.SESSION_SECRET || 'lightning-secret-key',
-        duration: 60 * 60 * 1000, // 1 hour
+        duration: 2 * 60 * 60 * 1000, // 2 hours
         cleanupInterval: 5 * 60 * 1000 // 5 minutes
     },
 
@@ -135,7 +135,7 @@ module.exports = {
             password: process.env.SMTP_PASSWORD || '',
             fromName: process.env.SMTP_FROM_NAME || 'Totilove'
         },
-        baseUrl: process.env.BASE_URL || 'http://localhost:3000',
+        baseUrl: process.env.BASE_URL || 'http://localhost:3001',
         tokenExpiry: 24 * 60 * 60 * 1000 // 24 hours in milliseconds
     }
 }; 

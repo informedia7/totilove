@@ -31,7 +31,8 @@ class AuthMiddleware {
         }
 
         // Extend session
-        session.expiresAt = Date.now() + (60 * 60 * 1000); // 1 hour
+        const sessionDuration = config.session?.duration || (2 * 60 * 60 * 1000);
+        session.expiresAt = Date.now() + sessionDuration;
         
         req.session = session;
         req.user = session.user;
@@ -54,7 +55,7 @@ class AuthMiddleware {
         this.sessions.set(sessionToken, {
             user: { ...user },
             createdAt: Date.now(),
-            expiresAt: Date.now() + (60 * 60 * 1000) // 1 hour
+            expiresAt: Date.now() + (config.session?.duration || (2 * 60 * 60 * 1000))
         });
         return sessionToken;
     }
