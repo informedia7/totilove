@@ -1586,9 +1586,13 @@ body.dark-mode #timeFilterContent {
     }
 
     .message-input {
-        font-size: var(--font-size-sm);
+        font-size: calc(var(--font-size-sm) * 1.4);
         min-height: 42px;
         max-height: 120px;
+    }
+
+    .message-input::placeholder {
+        font-size: calc(var(--font-size-sm) * 1.4);
     }
 
     .input-actions {
