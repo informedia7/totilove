@@ -1654,6 +1654,12 @@ body.dark-mode #timeFilterContent {
     /* Reset mobile-only styles */
     body {
         padding: var(--spacing-xl);
+        background: var(--accent-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+        background-attachment: fixed;
+    }
+    
+    body.dark-mode {
+        background: var(--color-gray-100);
     }
     
     .app-container {
