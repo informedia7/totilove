@@ -1430,9 +1430,9 @@ body.dark-mode #timeFilterContent {
    =============================== */
 @media (max-width: 480px) {
     .header {
-        height: 48px;
-        padding: 0 var(--spacing-xs);
-        gap: var(--spacing-xs);
+        height: 72px;
+        padding: 0 var(--spacing-sm);
+        gap: var(--spacing-sm);
     }
     
     .user-avatar {
@@ -1458,10 +1458,10 @@ body.dark-mode #timeFilterContent {
     }
     
     .header-btn {
-        min-width: var(--btn-size-xs);
-        width: var(--btn-size-xs);
-        height: var(--btn-size-xs);
-        font-size: var(--font-size-md);
+        min-width: calc(var(--btn-size-xs) * 1.4);
+        width: calc(var(--btn-size-xs) * 1.4);
+        height: calc(var(--btn-size-xs) * 1.4);
+        font-size: calc(var(--font-size-md) * 1.4);
     }
     
     .sidebar-header {
