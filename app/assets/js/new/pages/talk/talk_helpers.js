@@ -716,10 +716,9 @@
         }
 
         const now = new Date();
-        const diff = now - date;
-
-        if (diff < -1000) {
-            return 'Future time';
+        let diff = now - date;
+        if (diff < 0) {
+            diff = 0; // clamp clock drift that would otherwise label messages as "Future time"
         }
         const timeString = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
         const relativeTime = describeElapsed(diff);
