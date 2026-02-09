@@ -1,21 +1,4 @@
-/**
- * TALK MESSAGE ACTIONS
- * Handles message actions (reactions, replies, forward, delete, image viewer)
- * Extracted from talk.html (lines 1786-2385)
- * 
- * Dependencies:
- * - TalkState (talk_state.js)
- * - CONFIG (talk_config.js)
- * - Global functions: isMessageSentByMe, getCurrentFilter, showNotification, 
- *   saveMessage, unsaveMessage, deleteMessage, performDeleteMessage
- * 
- * IMPORTANT: Confirmation modal has been REMOVED - recall button calls performDeleteMessage directly
- * Version: 2.1 - No modal (updated 2025-01-XX to completely remove confirmation modal)
- * 
- * CACHE BUST: If you see errors about modal.dataset, clear browser cache (Ctrl+Shift+R)
- */
 
-// Global variable for current reply (stored in window for access)
 if (!window.currentReply) {
     window.currentReply = null;
 }
@@ -84,9 +67,7 @@ function addMessageActions(messageDiv, message) {
     };
     actionsDiv.appendChild(replyBtn);
 
-    // Save/Unsave button (only for received messages)
-    // Note: Soft-recalled messages can still be saved by receiver since content is still visible
-    // Only hard-recalled messages (which are deleted) should not show save button
+    
     // Use multiple checks to ensure we catch all received messages
     const isReceivedByType = message.type === 'received';
     const isReceivedByDOM = messageDiv.classList.contains('received');
@@ -207,14 +188,48 @@ function addMessageActions(messageDiv, message) {
 
     messageDiv.appendChild(actionsDiv);
 
-    // Show/hide actions on hover
-    messageDiv.addEventListener('mouseenter', () => {
-        actionsDiv.style.display = 'flex';
-    });
+    const interactiveSelector = [
+        '.message-bubble',
+        '.thumbnail-message-container',
+        '.message-attachments',
+        '.message-images-container',
+        '.message-image-container',
+        '.message-image-wrapper',
+        '.message-image-clean',
+        '.message-image'
+    ].join(', ');
 
-    messageDiv.addEventListener('mouseleave', () => {
+    const isElement = (node) => node && typeof node.closest === 'function';
+    const isInteractiveArea = (node) => isElement(node) && Boolean(node.closest(interactiveSelector));
+    const isActionsArea = (node) => isElement(node) && (node === actionsDiv || actionsDiv.contains(node));
+
+    const showActions = () => {
+        actionsDiv.style.display = 'flex';
+        actionsDiv.classList.add('is-visible');
+    };
+
+    const hideActions = () => {
         actionsDiv.style.display = 'none';
-    });
+        actionsDiv.classList.remove('is-visible');
+    };
+
+    const handlePointerOver = (event) => {
+        const target = event.target;
+        if (isInteractiveArea(target) || isActionsArea(target)) {
+            showActions();
+        }
+    };
+
+    const handlePointerOut = (event) => {
+        const next = event.relatedTarget;
+        if (isInteractiveArea(next) || isActionsArea(next)) {
+            return;
+        }
+        hideActions();
+    };
+
+    messageDiv.addEventListener('mouseover', handlePointerOver);
+    messageDiv.addEventListener('mouseout', handlePointerOut);
 }
 
 /**
