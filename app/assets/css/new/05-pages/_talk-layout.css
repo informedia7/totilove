@@ -46,6 +46,7 @@
     box-sizing: border-box;
 }
 
+html,
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', sans-serif;
     background: var(--accent-gradient);
@@ -58,6 +59,7 @@ body {
     overflow-y: auto;
 }
 
+
 :focus-visible {
     outline: 2px solid var(--primary-color);
     outline-offset: 2px;
@@ -65,10 +67,10 @@ body {
 
 /* Global emoji support for all emoji elements */
 .emoji,
-button:contains('+¶++G«£++'),
-button:contains('+¶++-£+·'),
-button:contains('+¶++G«•-Ï'),
-button:contains('+Û++-Ò'),
+button:contains('√∞≈∏‚Äú≈Ω'),
+button:contains('√∞≈∏Àú≈†'),
+button:contains('√∞≈∏‚Äù¬ç'),
+button:contains('√¢≈æ¬§'),
 .empty-state-icon,
 .filter-dropdown-search-icon,
 .search-icon,
@@ -189,6 +191,10 @@ button:contains('+Û++-Ò'),
     display: flex;
     align-items: center;
     margin-right: 16px;
+}
+
+.user-avatar[data-activity-link="true"] {
+    cursor: pointer;
 }
 
 .avatar-img {
@@ -1040,6 +1046,12 @@ body.dark-mode .search-messages-input::placeholder {
     gap: 8px;
 }
 
+.calendar-view-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
 .calendar-title {
     text-align: center;
     flex: 1;
@@ -1057,6 +1069,11 @@ body.dark-mode .search-messages-input::placeholder {
     cursor: pointer;
     font-weight: 600;
     transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.calendar-nav-btn {
+    font-size: 200%;
+    line-height: 1;
 }
 
 .calendar-nav-btn:hover,
@@ -1152,6 +1169,15 @@ body.dark-mode .search-messages-input::placeholder {
     font-size: 12px;
 }
 
+.talk-calendar-range .calendar-nav-btn {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.talk-calendar-range .calendar-view-toggle {
+    gap: 4px;
+}
+
 .talk-calendar-range .calendar-weekdays,
 .talk-calendar-range .calendar-days {
     gap: 2px;
@@ -1208,6 +1234,10 @@ body.dark-mode .calendar-swap-btn {
 
 body.dark-mode .talk-calendar-range__summary {
     color: rgba(245,247,255,0.85);
+}
+
+body.dark-mode .calendar-title {
+    color: rgba(255,255,255,0.95);
 }
 
 body.dark-mode .calendar-container {
@@ -1797,7 +1827,7 @@ body.dark-mode .date-suggestion-item:hover {
 }
 
 body.dark-mode .filters .filter-btn {
-    color: rgba(148, 153, 162, 0.95);
+    color: rgba(148, 153, 162, 0.65);
 }
 
     .filter-btn:hover {
@@ -2011,7 +2041,7 @@ body.dark-mode .filters .filter-btn {
 }
 
 .conversation-saved-count {
-    /* Increased by ~15% for "+Û-°-… 2 saved" text */
+    /* Increased by ~15% for "√¢¬≠¬ê 2 saved" text */
     font-size: 13px;
     color: #ffc107;
     margin-top: 2px;
