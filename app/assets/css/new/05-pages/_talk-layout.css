@@ -1038,18 +1038,28 @@ body.dark-mode .search-messages-input::placeholder {
     box-shadow: inset 0 1px 0 #f8f9fa;
 }
 
-.calendar-header,
-.calendar-footer {
+.calendar-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
 }
 
+.calendar-footer {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    width: 70%;
+    margin: 0 auto;
+}
+
 .calendar-view-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+    display: contents;
+}
+
+.calendar-footer .calendar-today-btn,
+.calendar-footer .calendar-view-btn {
+    width: 100%;
 }
 
 .calendar-title {
@@ -1574,10 +1584,13 @@ body.dark-mode .date-suggestion-item:hover {
 /* Clear Date Range Button */
 
 .date-range-action-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
-    margin-top: 12px;
-    width: 100%;
+    margin-top: 32px;
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
     align-items: center;
 }
 
@@ -1591,7 +1604,8 @@ body.dark-mode .date-suggestion-item:hover {
     font-size: 13px;
     color: #495057;
     transition: border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
-    min-width: 140px;
+    min-width: 0;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1610,7 +1624,6 @@ body.dark-mode .date-suggestion-item:hover {
     margin: 0 !important;
     visibility: visible !important;
     opacity: 1 !important;
-    flex: 0 0 auto;
 }
 
 .clear-date-range-btn::after {
@@ -1648,9 +1661,8 @@ body.dark-mode .date-suggestion-item:hover {
 
 .apply-date-range-btn {
     display: flex;
-    width: auto;
+    width: 100%;
     margin: 0;
-    flex: 1 1 0;
     visibility: hidden;
     opacity: 0;
     pointer-events: none;

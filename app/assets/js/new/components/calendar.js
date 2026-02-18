@@ -325,10 +325,14 @@ class Calendar {
         const today = this.clampDate(new Date());
         const isTodayActive = Boolean(today && this.selectedDate && this.isSameDay(this.selectedDate, today));
         const isYearActive = this.view === 'year';
+        const isMonthActive = this.view === 'month';
         return `
             <div class="calendar-footer">
                 <button class="calendar-today-btn ${isTodayActive ? 'active' : ''}">Today</button>
-                <button class="calendar-view-btn ${isYearActive ? 'active' : ''}" data-view="year">Year</button>
+                <div class="calendar-view-toggle" role="group" aria-label="Calendar view">
+                    <button class="calendar-view-btn ${isMonthActive ? 'active' : ''}" data-view="month" aria-pressed="${isMonthActive}">Month</button>
+                    <button class="calendar-view-btn ${isYearActive ? 'active' : ''}" data-view="year" aria-pressed="${isYearActive}">Year</button>
+                </div>
             </div>
         `;
     }
@@ -609,11 +613,6 @@ class Calendar {
     changeView(view) {
         const requestedView = view === 'year' ? 'year' : 'month';
         if (requestedView === this.view) {
-            if (requestedView === 'year') {
-                this.view = 'month';
-                this.options.onViewChange?.('month');
-                this.render();
-            }
             return;
         }
         this.view = requestedView;

@@ -93,6 +93,11 @@
     transition: all 0.3s ease;
 }
 
+.refresh-btn .refresh-label {
+    display: inline-flex;
+    align-items: center;
+}
+
 .refresh-btn:hover {
     background: rgba(255, 255, 255, 0.3);
     border-color: rgba(255, 255, 255, 0.5);
@@ -154,6 +159,34 @@
     order: 2;
     border-radius: 12px;
     overflow: hidden;
+}
+
+.mobile-eye-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 25;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.mobile-eye-btn i {
+    pointer-events: none;
+}
+
+.mobile-eye-btn:hover,
+.mobile-eye-btn:focus {
+    background: rgba(0, 0, 0, 0.8);
+    outline: none;
 }
 
 .gallery-item img {
@@ -347,6 +380,39 @@
 
 .btn-primary {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
+
+@media (max-width: 600px) and (orientation: portrait) {
+    #delete-confirmation-modal .modal-content {
+        max-width: 280px;
+        padding: 1.4rem;
+        border-radius: 12px;
+    }
+
+    #delete-confirmation-modal .modal-icon {
+        font-size: 2.1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    #delete-confirmation-modal .modal-title {
+        font-size: 1.05rem;
+    }
+
+    #delete-confirmation-modal .modal-message {
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+    }
+
+    #delete-confirmation-modal .modal-buttons {
+        gap: 0.5rem;
+    }
+
+    #delete-confirmation-modal .btn-cancel,
+    #delete-confirmation-modal .btn-confirm {
+        padding: 0.5rem 1.4rem;
+        font-size: 0.85rem;
+        border-radius: 6px;
+    }
+}
     color: var(--white);
     box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
 }
@@ -429,7 +495,202 @@
 
 @media (max-width: 480px) {
     .gallery-grid.enhanced {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.85rem;
+    }
+}
+
+@media (max-width: 600px) and (orientation: portrait) {
+    .profile-card {
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
+        padding: 0;
+    }
+
+    .gallery-section.enhanced-gallery {
+        background: transparent;
+        border: none;
+        margin: 0;
+    }
+
+    .card-header {
+        border-radius: 0;
+        margin: 0;
+    }
+
+    .card-header {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+    }
+
+    .card-header .header-content {
+        flex-wrap: nowrap;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .card-header .card-title,
+    .card-header .gallery-stats {
+        width: 100%;
+    }
+
+    .card-header .gallery-stats {
+        justify-content: space-between;
+    }
+
+    .card-header .card-title {
+        font-size: 1.2rem;
+    }
+
+    .gallery-stats {
+        flex-wrap: nowrap;
+        gap: 0.5rem;
+    }
+
+    .gallery-stats .gallery-quality {
+        padding: 0.3rem 0.4rem;
+        font-size: 0.75rem;
+        flex: 0 0 35%;
+        justify-content: center;
+        min-width: 0;
+    }
+
+    .gallery-stats .photo-count {
+        padding: 0.36rem 0.48rem;
+        font-size: 0.9rem;
+        flex: 0 0 42%;
+        justify-content: center;
+        min-width: 0;
+    }
+
+
+    .refresh-btn .refresh-label {
+        display: none;
+    }
+
+    .gallery-stats .refresh-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        padding: 0.41rem 0.83rem;
+        flex: 0 0 auto;
+        min-width: 60px;
+        box-shadow: none;
+        justify-content: center;
+        align-items: center;
+        margin-right: 15px;
+    }
+
+    .gallery-stats .refresh-btn i {
+        font-size: 1.63rem;
+    }
+}
+
+@media (max-width: 600px) and (orientation: portrait) {
+    .mobile-eye-btn {
+        display: none;
+    }
+
+    .gallery-content {
+        padding: 0.5rem 0 !important;
+        margin-top: 15px;
+    }
+
+    .gallery-grid.enhanced {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 2px;
+        width: 100%;
+    }
+
+    .gallery-grid.enhanced .gallery-item,
+    .gallery-grid.enhanced .image-wrapper,
+    .gallery-grid.enhanced img {
+        width: 100%;
+    }
+
+    .gallery-item .overlay {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .gallery-item.show-mobile-actions .overlay {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .gallery-item.show-mobile-actions .overlay .photo-actions {
+        pointer-events: auto;
+    }
+
+    .gallery-item.show-mobile-actions .mobile-eye-btn {
+        display: inline-flex;
+        bottom: 0.5rem;
+        top: auto;
+        right: 0.5rem;
+    }
+
+    .gallery-item.profile-photo .mobile-eye-btn,
+    .gallery-item .photo-badge.profile ~ .mobile-eye-btn {
+        top: 0.5rem !important;
+        bottom: auto !important;
+    }
+
+    .gallery-item.show-mobile-actions .overlay-content {
+        width: 100%;
+    }
+
+    .gallery-item.show-mobile-actions .photo-actions {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .gallery-item.show-mobile-actions .photo-action-btn {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        flex: 0 0 auto;
+    }
+
+    .gallery-item.show-mobile-actions .photo-action-btn i {
+        font-size: 1.25rem;
+    }
+
+    #delete-confirmation-modal .modal-content {
+        max-width: 240px;
+        padding: 1.2rem;
+        border-radius: 12px;
+    }
+
+    #delete-confirmation-modal .modal-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    #delete-confirmation-modal .modal-title {
+        font-size: 1rem;
+    }
+
+    #delete-confirmation-modal .modal-message {
+        font-size: 0.85rem;
+        margin-bottom: 0.75rem;
+    }
+
+    #delete-confirmation-modal .modal-buttons {
+        gap: 0.5rem;
+    }
+
+    #delete-confirmation-modal .btn-cancel,
+    #delete-confirmation-modal .btn-confirm {
+        padding: 0.45rem 1.2rem;
+        font-size: 0.85rem;
     }
 }
 

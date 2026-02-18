@@ -159,8 +159,8 @@
                                             <div id="talkCalendarRange"></div>
                                         </div>
                                         <div class="date-range-action-row">
-                                            <button type="button" id="clearDateRangeBtn" class="clear-date-range-btn date-range-action-btn" aria-label="Clear date range filter">
-                                                Clear date range
+                                            <button type="button" id="clearDateRangeBtn" class="clear-date-range-btn date-range-action-btn" aria-label="Clear date filter">
+                                                Clear date
                                             </button>
                                             <button type="button" id="applyDateRangeBtn" class="apply-date-range-btn date-range-action-btn" aria-label="Apply date filter" disabled>
                                                 Search
@@ -220,7 +220,7 @@
 
         <!-- Top Application Bar -->
         <div class="header">
-            <div class="user-avatar">
+            <div class="user-avatar" data-activity-link="true" role="link" tabindex="0" aria-label="View your activity feed">
                 <img src="{{userAvatar}}" alt="User Avatar" class="avatar-img" id="userAvatarImg">
             </div>
             <div class="user-info">
@@ -228,7 +228,7 @@
             </div>
 
             <div class="header-actions">
-                <a href="/profile-basic" class="header-btn" title="Profile">👤</a>
+                <a href="/profile-full" class="header-btn" title="Profile">👤</a>
                 
                 <button class="header-btn" title="Settings">⚙️</button>
               

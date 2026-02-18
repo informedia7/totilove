@@ -338,6 +338,102 @@
     }
 }
 
+/* Compact layout for very small portrait devices */
+@media (max-width: 480px) and (orientation: portrait) {
+    .global-navbar {
+        padding: 0.35rem 0;
+        height: auto;
+        min-height: 56px;
+    }
+
+    .global-navbar-container {
+        width: 100%;
+        padding: 0 0.5rem;
+        gap: 0.35rem;
+        flex-wrap: nowrap;
+        align-items: center;
+    }
+
+    .global-navbar-brand {
+        font-size: 1.1rem;
+        gap: 0.35rem;
+        white-space: nowrap;
+    }
+
+    .global-navbar-brand i {
+        font-size: 1.25rem;
+    }
+
+    .global-navbar-brand span {
+        display: none;
+    }
+
+    .global-mobile-toggle {
+        display: none;
+    }
+
+    .global-navbar-user,
+    .global-user-info {
+        min-width: 0;
+    }
+
+    .global-navbar-user {
+        flex: 1;
+        justify-content: flex-end;
+        gap: 0.35rem;
+    }
+
+    .global-auth-buttons {
+        flex-direction: row;
+        width: auto;
+        flex-wrap: nowrap;
+        gap: 0.35rem;
+        align-items: center;
+    }
+
+    .global-auth-buttons i {
+        display: none;
+    }
+
+    .global-auth-buttons > * {
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+
+    .global-btn-outline,
+    .global-btn-solid {
+        padding: 0.32rem 0.55rem;
+        font-size: 0.8rem;
+        border-radius: 8px;
+        width: auto;
+        line-height: 1.2;
+    }
+
+    .language-switcher {
+        margin: 0;
+    }
+
+    .language-switcher .custom-select {
+        min-width: 78px;
+        max-width: 92px;
+    }
+
+    .language-switcher .select-selected {
+        padding: 0.3rem 0.85rem 0.3rem 0.45rem;
+        font-size: 0.75rem;
+        box-shadow: none;
+    }
+
+    .language-switcher .select-selected:after {
+        right: 6px;
+    }
+
+    .language-switcher .flag-icon {
+        display: none;
+    }
+}
+
+
 /* Animation for nav items - DISABLED TO PREVENT JUMPING */
 .global-nav-item {
     /* Removed animations to prevent page jumping */
@@ -528,4 +624,7 @@
             padding: 6px 10px;
             font-size: 13px;
         }
+}
+
+@media (max-width: 480px) and (orientation: portrait) {
 }

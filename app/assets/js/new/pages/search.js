@@ -89,7 +89,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
     
     initializeFilters();
-    loadSearchStats();
     
     // Attach event listeners to search action buttons
     const performSearchBtn = document.getElementById('performSearchBtn');
@@ -312,15 +311,7 @@ function initializeFilters() {
     
     // When countries are selected via dropdown, uncheck "My preferred countries"
     // This is handled in addSearchCountry function
-}
 
-function loadSearchStats() {
-    // Simulate loading real-time statistics
-    setTimeout(() => {
-        document.getElementById('total-users').textContent = '1,247'; // This is just a display number, not a hardcoded user ID
-        document.getElementById('matches-today').textContent = '43';
-        document.getElementById('online-now').textContent = '156';
-    }, 500);
 }
 
 // Store countries and selected countries globally
@@ -353,7 +344,7 @@ async function loadCountries() {
                 // Add "All Countries" option
                 const allCountriesOption = document.createElement('option');
                 allCountriesOption.value = 'all';
-                allCountriesOption.textContent = '≡ƒîì All Countries';
+                allCountriesOption.textContent = '🌍 All Countries';
                 countrySelect.appendChild(allCountriesOption);
                 
                 // Add countries from database
@@ -1144,7 +1135,7 @@ function updateSelectedCountriesDisplay() {
         // Show "All Countries" when no specific countries are selected
         const allCountriesSpan = document.createElement('span');
         allCountriesSpan.style.cssText = 'background: #e8f5e8; color: #2e7d32; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem; font-style: italic;';
-        allCountriesSpan.innerHTML = '≡ƒîì All Countries (default)';
+        allCountriesSpan.innerHTML = '🌍 All Countries (default)';
         container.appendChild(allCountriesSpan);
         countSpan.textContent = 'All';
         
@@ -1171,7 +1162,7 @@ function updateSelectedCountriesDisplay() {
             if (/^[a-z]{2} /.test(displayName)) {
                 displayName = displayName.substring(3);
             }
-            span.innerHTML = `${displayName} <span style="cursor: pointer; font-weight: bold; margin-left: 0.25rem;" data-remove-country="${country.id}" class="remove-country-btn">├ù</span>`;
+            span.innerHTML = `${displayName} <button type="button" class="remove-country-btn" data-remove-country="${country.id}" onclick="removeSearchCountry('${country.id}')">x</button>`;
             container.appendChild(span);
         });
         
@@ -1216,6 +1207,9 @@ function removeSearchCountry(countryId) {
     selectedCountries = selectedCountries.filter(c => c.id != countryId);
     updateSelectedCountriesDisplay();
 }
+
+// Expose for inline button handlers
+window.removeSearchCountry = removeSearchCountry;
 
 
 
@@ -1613,7 +1607,7 @@ function viewProfile(userId) {
 // Load email verification check utility
 if (!window.checkEmailVerificationStatus) {
     const script = document.createElement('script');
-    script.src = '/assets/js/email-verification-check.js';
+    script.src = '/assets/js/new/shared/email-verification-check.js';
     document.head.appendChild(script);
 }
 

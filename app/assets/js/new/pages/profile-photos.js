@@ -27,6 +27,8 @@
     }
 
     let currentUserGender = null;
+    const MOBILE_PORTRAIT_QUERY = '(max-width: 600px) and (orientation: portrait)';
+    let mobileDocClickHandler = null;
 
     async function init() {
         // Get user ID - same way as stats-count.js (from window.currentUser)
@@ -235,19 +237,23 @@
             const isFeatured = image.featured === true || image.featured === 1 || image.featured === '1' || image.featured === 'true';
             
             const imageSrc = `/uploads/profile_images/${image.file_name}`;
-            const itemClass = 'gallery-item';
+            const itemClass = `gallery-item${isProfile ? ' profile-photo' : ''}${isFeatured ? ' featured-photo' : ''}`;
+            const safeFileName = (image.file_name || '').replace(/'/g, "\\'");
             
             const defaultImg = getDefaultProfileImage(currentUserGender);
             return `
-                <div class="${itemClass}" data-image-id="${image.id}">
+                <div class="${itemClass}" data-image-id="${image.id}" data-image-index="${index}">
                     <div class="image-wrapper">
+                        <button type="button" class="mobile-eye-btn" aria-label="Open photo" data-image-index="${index}">
+                            <i class="fas fa-eye"></i>
+                        </button>
                         <img src="${imageSrc}" alt="Profile photo" onerror="if(!this.src.includes('default_profile_')){this.src='${defaultImg}';}">
                         ${isProfile ? '<div class="photo-badge profile" title="Profile Photo"><i class="fas fa-user"></i></div>' : ''}
                         ${isFeatured ? '<div class="photo-badge featured" title="Featured Photo"><i class="fas fa-heart"></i></div>' : ''}
                         <div class="overlay enhanced">
                             <div class="overlay-content">
                                 <div class="photo-actions">
-                                    ${!isProfile ? `<button class="photo-action-btn set-profile" onclick="setProfileImage(${image.id})" title="Set as Profile">
+                                    ${!isProfile ? `<button class="photo-action-btn set-profile" onclick="setProfileImage(${image.id}, '${safeFileName}')" title="Set as Profile">
                                         <i class="fas fa-user"></i>
                                     </button>` : ''}
                                     ${!isFeatured ? `<button class="photo-action-btn set-featured" onclick="setFeaturedImage(${image.id})" title="Feature">
@@ -256,7 +262,7 @@
                                     ${isFeatured ? `<button class="photo-action-btn set-featured" onclick="unsetFeaturedImage(${image.id})" title="Unfeature">
                                         <i class="fas fa-heart-broken"></i>
                                     </button>` : ''}
-                                    <button class="photo-action-btn delete" onclick="deleteImage(${image.id}, '${image.file_name.replace(/'/g, "\\'")}')" title="Delete">
+                                    <button class="photo-action-btn delete" onclick="deleteImage(${image.id}, '${safeFileName}')" title="Delete">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
@@ -270,22 +276,67 @@
         // All photos maintain consistent size - no special sizing for single photos
 
         // Add lightbox functionality
-        galleryGrid.querySelectorAll('.gallery-item').forEach((item, index) => {
-            item.addEventListener('click', function(e) {
-                // Don't trigger lightbox if clicking on buttons
-                if (e.target.closest('.photo-action-btn')) {
-                    return;
+        const galleryItems = galleryGrid.querySelectorAll('.gallery-item');
+        const isPortraitMobile = window.matchMedia(MOBILE_PORTRAIT_QUERY).matches;
+
+        if (isPortraitMobile) {
+            if (mobileDocClickHandler) {
+                document.removeEventListener('click', mobileDocClickHandler);
+            }
+            mobileDocClickHandler = function(event) {
+                if (!event.target.closest('.gallery-item')) {
+                    galleryGrid.querySelectorAll('.gallery-item.show-mobile-actions')
+                        .forEach(item => item.classList.remove('show-mobile-actions'));
                 }
-                const img = this.querySelector('img');
-                if (img) {
+            };
+            document.addEventListener('click', mobileDocClickHandler);
+        } else if (mobileDocClickHandler) {
+            document.removeEventListener('click', mobileDocClickHandler);
+            mobileDocClickHandler = null;
+        }
+
+        galleryItems.forEach((item, index) => {
+            const eyeBtn = item.querySelector('.mobile-eye-btn');
+            if (eyeBtn) {
+                eyeBtn.addEventListener('click', (event) => {
+                    event.stopPropagation();
                     showImageLightbox(index, images);
+                });
+            }
+
+            if (isPortraitMobile) {
+                const imageWrapper = item.querySelector('.image-wrapper');
+                if (imageWrapper) {
+                    imageWrapper.addEventListener('click', (event) => {
+                        if (event.target.closest('.photo-action-btn') || event.target.closest('.mobile-eye-btn')) {
+                            return;
+                        }
+                        event.stopPropagation();
+                        const alreadyActive = item.classList.contains('show-mobile-actions');
+                        galleryGrid.querySelectorAll('.gallery-item.show-mobile-actions')
+                            .forEach(activeItem => activeItem.classList.remove('show-mobile-actions'));
+                        if (!alreadyActive) {
+                            item.classList.add('show-mobile-actions');
+                        }
+                    });
                 }
-            });
+            } else {
+                item.addEventListener('click', function(e) {
+                    // Don't trigger lightbox if clicking on buttons
+                    if (e.target.closest('.photo-action-btn')) {
+                        return;
+                    }
+                    const img = this.querySelector('img');
+                    if (img) {
+                        showImageLightbox(index, images);
+                    }
+                });
+            }
         });
     }
 
     // Set profile image
-    window.setProfileImage = async function(imageId) {
+    window.setProfileImage = async function(imageId, fileName) {
         try {
             const url = `/api/profile/set-profile-image`;
             
@@ -306,6 +357,7 @@
 
             if (response.success) {
                 showNotification('Profile photo updated!', 'success');
+                updateLayoutAvatarImage(fileName);
                 loadUserImages();
             } else {
                 throw new Error(response.error || response.message || 'Failed to set profile image');
@@ -484,6 +536,30 @@
             notification.style.animation = 'slideOutDown 0.4s ease-in';
             setTimeout(() => notification.remove(), 400);
         }, 3001);
+    }
+
+    function updateLayoutAvatarImage(fileName) {
+        if (!fileName) {
+            return;
+        }
+
+        const avatar = document.getElementById('layoutUserAvatar');
+        const fallback = document.getElementById('layoutUserAvatarFallback');
+        const timestamp = Date.now();
+        const newSrcBase = `/uploads/profile_images/${fileName}`;
+
+        if (avatar) {
+            avatar.src = `${newSrcBase}?v=${timestamp}`;
+            avatar.style.display = 'block';
+        }
+
+        if (fallback) {
+            fallback.style.display = 'none';
+        }
+
+        if (window.currentUser) {
+            window.currentUser.avatar = `${newSrcBase}?v=${timestamp}`;
+        }
     }
 
     // Lightbox functionality

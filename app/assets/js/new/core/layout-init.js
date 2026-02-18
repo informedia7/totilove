@@ -26,7 +26,55 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    attachActivityLinkNavigation();
+
 });
+
+function attachActivityLinkNavigation() {
+    const activityTargets = document.querySelectorAll('[data-activity-link="true"]');
+    if (!activityTargets.length) {
+        return;
+    }
+
+    const activityUrl = window.ACTIVITY_PAGE_URL || '/activity';
+
+    const navigateToActivity = () => {
+        window.location.assign(activityUrl);
+    };
+
+    const handleClick = (event) => {
+        event.preventDefault();
+        navigateToActivity();
+    };
+
+    const handleKeydown = (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') {
+            return;
+        }
+        event.preventDefault();
+        navigateToActivity();
+    };
+
+    activityTargets.forEach((target) => {
+        if (target.dataset.activityNavAttached === 'true') {
+            return;
+        }
+
+        target.dataset.activityNavAttached = 'true';
+        if (!target.hasAttribute('role')) {
+            target.setAttribute('role', 'link');
+        }
+        if (!target.hasAttribute('tabindex')) {
+            target.setAttribute('tabindex', '0');
+        }
+        if (!target.hasAttribute('aria-label')) {
+            target.setAttribute('aria-label', 'View your activity feed');
+        }
+        target.style.cursor = 'pointer';
+        target.addEventListener('click', handleClick);
+        target.addEventListener('keydown', handleKeydown);
+    });
+}
 
 
 

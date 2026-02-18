@@ -89,8 +89,7 @@ class GlobalNavbar {
             '/': 'home',
             '/index.html': 'home',
             '/public/index.html': 'home',
-                    '/profile-basic': 'profile',
-        '/profile-full': 'profile',
+                '/profile-full': 'profile',
         '/profile-photos': 'profile',
         '/profile-edit': 'profile',
         '/online': 'online',
@@ -1219,7 +1218,7 @@ GlobalNavbar.prototype.setupKeyboardShortcuts = function () {
             switch (event.key) {
                 case '1':
                     event.preventDefault();
-                    this.navigateToPage('/profile-basic', 'Profile');
+                    this.navigateToPage('/profile-full', 'Profile');
                     break;
                 case '2':
                     event.preventDefault();

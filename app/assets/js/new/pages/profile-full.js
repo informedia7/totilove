@@ -338,6 +338,78 @@
         
         currentLanguagesDisplay.innerHTML = `<div class="languages-badges-container" style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: flex-start;">${languagesHtml}</div>`;
     }
+
+    // Mobile-only buttons should slide cards into view
+    function initMobileTabNavigation() {
+        const tabGroup = document.querySelector('.mobile-card-tab-group');
+        const cardContainer = document.querySelector('.profile-cards-container');
+        if (!tabGroup || !cardContainer) return;
+
+        const tabs = Array.from(tabGroup.querySelectorAll('.mobile-card-tab'));
+        const portraitMatcher = window.matchMedia('(max-width: 480px) and (orientation: portrait)');
+
+        function setActiveTab(activeTab) {
+            tabs.forEach(tab => tab.classList.toggle('active', tab === activeTab));
+        }
+
+        function scrollToCard(cardEl) {
+            if (!cardEl) return;
+            if (portraitMatcher.matches) {
+                const scrollOptions = {
+                    left: cardEl.offsetLeft,
+                    behavior: 'smooth'
+                };
+                if (typeof cardContainer.scrollTo === 'function') {
+                    cardContainer.scrollTo(scrollOptions);
+                } else {
+                    cardContainer.scrollLeft = cardEl.offsetLeft;
+                }
+            } else {
+                cardEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', event => {
+                event.preventDefault();
+                const targetId = (tab.getAttribute('href') || '').replace('#', '');
+                const targetCard = targetId ? document.getElementById(targetId) : null;
+                scrollToCard(targetCard);
+                setActiveTab(tab);
+            });
+        });
+
+        let scrollTimeoutId = null;
+        cardContainer.addEventListener('scroll', () => {
+            if (!portraitMatcher.matches) return;
+            if (scrollTimeoutId) {
+                clearTimeout(scrollTimeoutId);
+            }
+
+            scrollTimeoutId = setTimeout(() => {
+                const containerCenter = cardContainer.scrollLeft + (cardContainer.clientWidth / 2);
+                let closestTab = null;
+                let smallestDistance = Number.POSITIVE_INFINITY;
+
+                tabs.forEach(tab => {
+                    const targetId = (tab.getAttribute('href') || '').replace('#', '');
+                    const targetCard = targetId ? document.getElementById(targetId) : null;
+                    if (!targetCard) return;
+
+                    const cardCenter = targetCard.offsetLeft + (targetCard.offsetWidth / 2);
+                    const distance = Math.abs(containerCenter - cardCenter);
+                    if (distance < smallestDistance) {
+                        smallestDistance = distance;
+                        closestTab = tab;
+                    }
+                });
+
+                if (closestTab) {
+                    setActiveTab(closestTab);
+                }
+            }, 100);
+        });
+    }
     
     // Initialize on page load
     function initialize() {
@@ -346,6 +418,7 @@
         setTimeout(highlightFilledFields, 100);
         // Load languages with a slight delay to ensure DOM is ready
         setTimeout(loadUserLanguages, 200);
+        initMobileTabNavigation();
     }
     
     if (document.readyState === 'loading') {

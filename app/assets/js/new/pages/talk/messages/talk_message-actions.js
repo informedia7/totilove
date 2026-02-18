@@ -1,4 +1,21 @@
+/**
+ * TALK MESSAGE ACTIONS
+ * Handles message actions (reactions, replies, forward, delete, image viewer)
+ * Extracted from talk.html (lines 1786-2385)
+ * 
+ * Dependencies:
+ * - TalkState (talk_state.js)
+ * - CONFIG (talk_config.js)
+ * - Global functions: isMessageSentByMe, getCurrentFilter, showNotification, 
+ *   saveMessage, unsaveMessage, deleteMessage, performDeleteMessage
+ * 
+ * IMPORTANT: Confirmation modal has been REMOVED - recall button calls performDeleteMessage directly
+ * Version: 2.1 - No modal (updated 2025-01-XX to completely remove confirmation modal)
+ * 
+ * CACHE BUST: If you see errors about modal.dataset, clear browser cache (Ctrl+Shift+R)
+ */
 
+// Global variable for current reply (stored in window for access)
 if (!window.currentReply) {
     window.currentReply = null;
 }
@@ -39,6 +56,13 @@ function addMessageActions(messageDiv, message) {
         return;
     }
 
+    // Determine the best anchor element (bubble or media container)
+    const anchor = messageDiv.querySelector(
+        '.message-bubble, .thumbnail-message-container, .message-images-container, .message-attachments, .message-content'
+    ) || messageDiv;
+
+    anchor.classList.add('message-action-anchor');
+
     // Add message quick actions on hover
     const actionsDiv = document.createElement('div');
     actionsDiv.className = 'message-actions';
@@ -67,7 +91,9 @@ function addMessageActions(messageDiv, message) {
     };
     actionsDiv.appendChild(replyBtn);
 
-    
+    // Save/Unsave button (only for received messages)
+    // Note: Soft-recalled messages can still be saved by receiver since content is still visible
+    // Only hard-recalled messages (which are deleted) should not show save button
     // Use multiple checks to ensure we catch all received messages
     const isReceivedByType = message.type === 'received';
     const isReceivedByDOM = messageDiv.classList.contains('received');
@@ -186,7 +212,7 @@ function addMessageActions(messageDiv, message) {
         actionsDiv.appendChild(recallBtn);
     }
 
-    messageDiv.appendChild(actionsDiv);
+    anchor.appendChild(actionsDiv);
 
     const interactiveSelector = [
         '.message-bubble',
@@ -213,23 +239,49 @@ function addMessageActions(messageDiv, message) {
         actionsDiv.classList.remove('is-visible');
     };
 
-    const handlePointerOver = (event) => {
-        const target = event.target;
-        if (isInteractiveArea(target) || isActionsArea(target)) {
+    let hideTimeout = null;
+    const cancelHide = () => {
+        if (hideTimeout) {
+            clearTimeout(hideTimeout);
+            hideTimeout = null;
+        }
+    };
+
+    const scheduleHide = () => {
+        cancelHide();
+        hideTimeout = setTimeout(() => {
+            hideActions();
+        }, 100);
+    };
+
+    const interactiveElements = new Set([actionsDiv]);
+
+    const primaryInteractiveRoot = anchor || messageDiv;
+    if (primaryInteractiveRoot) {
+        interactiveElements.add(primaryInteractiveRoot);
+        primaryInteractiveRoot.querySelectorAll(interactiveSelector).forEach(element => {
+            interactiveElements.add(element);
+        });
+    } else {
+        interactiveElements.add(messageDiv);
+    }
+
+    interactiveElements.forEach(element => {
+        if (!element) return;
+        element.addEventListener('mouseenter', (event) => {
+            cancelHide();
             showActions();
-        }
-    };
+        });
 
-    const handlePointerOut = (event) => {
-        const next = event.relatedTarget;
-        if (isInteractiveArea(next) || isActionsArea(next)) {
-            return;
-        }
-        hideActions();
-    };
-
-    messageDiv.addEventListener('mouseover', handlePointerOver);
-    messageDiv.addEventListener('mouseout', handlePointerOut);
+        element.addEventListener('mouseleave', (event) => {
+            cancelHide();
+            const next = event.relatedTarget;
+            if (isInteractiveArea(next) || isActionsArea(next)) {
+                return;
+            }
+            scheduleHide();
+        });
+    });
 }
 
 /**

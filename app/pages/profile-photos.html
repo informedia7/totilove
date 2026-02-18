@@ -3,10 +3,10 @@
 
 <!-- Profile tabs with sub-navigation -->
 <div class="profile-tabs">
-    <a href="/profile-basic" class="tab-btn" id="tab-basic">Basic Info</a>
-    <a href="/profile-full" class="tab-btn" id="tab-full">Full Info</a>
+    <a href="/profile-full" class="tab-btn" id="tab-full">My Profile</a>
     <a href="/profile-photos" class="tab-btn active" id="tab-photos">My Photos</a>
     <a href="/profile-edit" class="tab-btn" id="tab-edit">Edit Profile</a>
+    <a href="/profile-stats" class="tab-btn" id="tab-stats">My Stats</a>
 </div>
 
 <!-- Hidden data for JavaScript -->
@@ -24,27 +24,31 @@
             <div class="header-content">
                 <h2 class="card-title"><i class="fas fa-images"></i> Photo Gallery</h2>
                 <div class="gallery-stats">
-                    <span class="photo-count"><i class="fas fa-camera"></i> <span id="photo-count-text">0 Photos</span></span>
-                    <button class="btn btn-outline refresh-btn" id="refresh-btn" onclick="window.refreshPhotos()" title="Refresh photos">
-                        <i class="fas fa-sync-alt"></i> Refresh
+                    <span class="photo-count"><i class="fas fa-camera"></i> <span id="photo-count-text">0
+                            Photos</span></span>
+                    <button class="btn btn-outline refresh-btn" id="refresh-btn" onclick="window.refreshPhotos()"
+                        title="Refresh photos" aria-label="Refresh photos">
+                        <i class="fas fa-sync-alt"></i>
+                        <span class="refresh-label">Refresh</span>
                     </button>
                 </div>
             </div>
         </div>
         <div class="gallery-content">
 
-        <!-- Gallery Grid -->
-        <div class="gallery-grid enhanced" id="gallery-grid">
-            <div class="empty-state" id="empty-state">
-                <i class="fas fa-images"></i>
-                <p>No photos yet. Upload your first photo to get started!</p>
+            <!-- Gallery Grid -->
+            <div class="gallery-grid enhanced" id="gallery-grid">
+                <div class="empty-state" id="empty-state">
+                    <i class="fas fa-images"></i>
+                    <p>No photos yet. Upload your first photo to get started!</p>
+                </div>
             </div>
-        </div>
 
             <div class="gallery-actions">
                 <input type="file" id="file-input" multiple accept="image/*" style="display: none;">
                 <button class="btn btn-outline" id="add-photos-btn"><i class="fas fa-plus"></i> Add Photos</button>
-                <button class="btn btn-outline" id="edit-gallery-btn" style="display: none;"><i class="fas fa-edit"></i> Edit Gallery</button>
+                <button class="btn btn-outline" id="edit-gallery-btn" style="display: none;"><i class="fas fa-edit"></i>
+                    Edit Gallery</button>
             </div>
         </div>
     </div>

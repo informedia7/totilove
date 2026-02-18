@@ -84,31 +84,34 @@
     </div>
 
     <div class="activity-tabs">
-        <button class="activity-tab active" data-tab="all">
+        <button class="activity-tab active" data-tab="all" title="All Activity">
             <i class="fas fa-bell"></i>
             <span>All Activity</span>
         </button>
-        <button class="activity-tab" data-tab="messages">
+        <button class="activity-tab" data-tab="messages" title="Messages">
             <i class="fas fa-envelope"></i>
         </button>
-        <button class="activity-tab" data-tab="views" style="position: relative;">
+        <button class="activity-tab" data-tab="views" style="position: relative;" title="Who Viewed Me">
             <i class="fas fa-eye"></i>
             <span class="views-badge notification-badge"
                 style="position: absolute; top: -15px; right: -5px; background: #00b894; border-radius: 50%; width: 19px; height: 19px; border: 3px solid #fff; box-shadow: 0 0 0 2px #fff; animation: online-blink 3s infinite; z-index: 2; display: none; align-items: center; justify-content: center; box-sizing: border-box;"></span>
         </button>
-        <button class="activity-tab" data-tab="favorites">
+        <button class="activity-tab" data-tab="favorites" title="My Favorites">
             <i class="fas fa-heart" style="color: var(--danger-color);"></i>
         </button>
-        <button class="activity-tab" data-tab="liked">
+        <button class="activity-tab" data-tab="likes" title="Who Liked Me">
             <i class="fas fa-thumbs-up" style="color: #f39c12;"></i>
         </button>
-        <button class="activity-tab" data-tab="blocked">
+        <button class="activity-tab" data-tab="my-likes" title="Who I Like">
+            <i class="fas fa-user-plus" style="color: #f39c12;"></i>
+        </button>
+        <button class="activity-tab" data-tab="blocked" title="Blocked Users">
             <i class="fas fa-ban"></i>
         </button>
     </div>
 
     <!-- Who Viewed Me Section -->
-    <div class="activity-section viewers-section" style="margin-bottom: 2.5rem;">
+    <div class="activity-section viewers-section" data-section="viewers" style="margin-bottom: 2.5rem;">
         <div class="section-header"
             style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
             <h3 style="color: var(--dark-color); display: flex; align-items: center; gap: 0.5rem;">
@@ -131,7 +134,7 @@
     </div>
 
     <!-- My Favorites Section -->
-    <div class="activity-section favorites-section" style="margin-bottom: 2.5rem;">
+    <div class="activity-section favorites-section" data-section="favorites" style="margin-bottom: 2.5rem;">
         <div class="section-header"
             style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
             <h3 style="color: var(--dark-color); display: flex; align-items: center; gap: 0.5rem;">
@@ -156,7 +159,7 @@
     </div>
 
     <!-- New Messages Section -->
-    <div class="activity-section messages-section" style="margin-bottom: 2.5rem;">
+    <div class="activity-section messages-section" data-section="messages" data-mobile-collapsed="true" data-collapsible="true" style="margin-bottom: 2.5rem;">
         <div class="section-header"
             style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; cursor: pointer;"
             onclick="ActivityManager.toggleSection('messages')">
@@ -177,7 +180,7 @@
     </div>
 
     <!-- Who Liked Me Section -->
-    <div class="activity-section who-liked-me-section" style="margin-bottom: 2.5rem;">
+    <div class="activity-section who-liked-me-section" data-section="who-liked-me" data-mobile-collapsed="true" data-collapsible="true" style="margin-bottom: 2.5rem;">
         <div class="section-header"
             style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
             <h3 style="color: var(--dark-color); display: flex; align-items: center; gap: 0.5rem;">
@@ -200,7 +203,7 @@
     </div>
 
     <!-- Who I Like Section -->
-    <div class="activity-section who-i-like-section" style="margin-bottom: 2.5rem;">
+    <div class="activity-section who-i-like-section" data-section="who-i-like" data-mobile-collapsed="true" data-collapsible="true" style="margin-bottom: 2.5rem;">
         <div class="section-header"
             style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
             <h3 style="color: var(--dark-color); display: flex; align-items: center; gap: 0.5rem;">
@@ -225,7 +228,7 @@
     </div>
 
     <!-- Blocked Users Section -->
-    <div class="activity-section blocked-users-section" style="margin-bottom: 2.5rem;">
+    <div class="activity-section blocked-users-section" data-section="blocked" data-mobile-collapsed="true" data-collapsible="true" style="margin-bottom: 2.5rem;">
         <div class="section-header"
             style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
             <h3 style="color: var(--dark-color); display: flex; align-items: center; gap: 0.5rem;">

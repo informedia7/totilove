@@ -1,62 +1,4 @@
-﻿/* Smart Matching System Header Styles */
-.search-header {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-    color: white;
-    padding: 1rem;
-    border-radius: 10px;
-    margin-bottom: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-}
-
-.search-title h2 {
-    margin: 0 0 0.5rem 0;
-    font-size: 2rem;
-    font-weight: 700;
-}
-
-.search-subtitle {
-    margin: 0;
-    opacity: 0.9;
-    font-size: 1.1rem;
-}
-
-.search-stats {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.stat-card {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 7.5px;
-    padding: 0.5rem;
-    text-align: center;
-    min-width: 60px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.stat-card i {
-    font-size: 0.75rem;
-    margin-bottom: 0.25rem;
-    display: block;
-}
-
-.stat-number {
-    display: block;
-    font-size: 0.9rem;
-    font-weight: 700;
-    margin-bottom: 0.1rem;
-}
-
-.stat-label {
-    font-size: 0.45rem;
-    opacity: 0.9;
-}
-
-
+﻿
 /* Matches Section Styles */
 .matches-section {
     max-width: 1200px;
@@ -1216,50 +1158,6 @@
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
-    /* Search Header */
-    .search-header {
-        flex-direction: column;
-        text-align: center;
-        padding: 1rem 0.75rem;
-        gap: 1rem;
-    }
-
-    .search-title h2 {
-        font-size: 1.5rem;
-        margin-bottom: 0.25rem;
-    }
-
-    .search-subtitle {
-        font-size: 0.9rem;
-    }
-
-    /* Search Stats */
-    .search-stats {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.5rem;
-        width: 100%;
-    }
-
-    .stat-card {
-        flex: 1 1 calc(50% - 0.5rem);
-        min-width: calc(50% - 0.5rem);
-        max-width: calc(50% - 0.5rem);
-        padding: 0.75rem 0.5rem;
-    }
-
-    .stat-card i {
-        font-size: 0.85rem;
-    }
-
-    .stat-number {
-        font-size: 0.85rem;
-    }
-
-    .stat-label {
-        font-size: 0.5rem;
-    }
-
     /* Matches Header */
     .matches-header {
         flex-direction: column;
@@ -1493,20 +1391,6 @@
 
 /* Extra Small Mobile */
 @media (max-width: 480px) {
-    .search-title h2 {
-        font-size: 1.25rem;
-    }
-
-    .search-subtitle {
-        font-size: 0.85rem;
-    }
-
-    .stat-card {
-        flex: 1 1 100%;
-        min-width: 100%;
-        max-width: 100%;
-    }
-
     .matches-header {
         padding: 1rem;
     }

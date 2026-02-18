@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title data-i18n="app.name">Totilove</title>
     
     <!-- PWA Manifest -->
@@ -13,21 +13,21 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Totilove">
     
+    <!-- Styles -->
     <link rel="stylesheet" href="/assets/css/vendor/font-awesome.min.css">
-    <!-- Global Navbar CSS - Direct link to ensure it loads -->
     <link rel="stylesheet" href="/assets/css/new/02-components/_navigation.css">
+    <link rel="stylesheet" href="/assets/css/new/05-pages/_index.css">
+    
+    <!-- Icons -->
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" type="image/svg+xml" href="/assets/images/default_profile_male.svg">
     <link rel="apple-touch-icon" href="/assets/images/icon-192x192.png">
-    <!-- Index/Homepage CSS - Extracted from inline styles - Phase 1 CSS Extraction -->
-    <link rel="stylesheet" href="/assets/css/new/05-pages/_index.css">
     
     <!-- PWA Initialization -->
     <script src="/assets/js/new/pwa-init.js"></script>
 </head>
 <body class="homepage">
-
-
+    <!-- Navbar will be injected here by global-navbar.js -->
 
     <!-- Hero Section -->
     <section class="hero-section main-content">
@@ -37,7 +37,6 @@
                 <h1 class="hero-title" data-i18n="hero.title">Find Love Across Borders</h1>
                 <p class="hero-subtitle" data-i18n="hero.subtitle">
                     Connect with people worldwide through our intelligent matching system.
-                    Support for 25+ languages, cultural preferences, and your preferred measurement system.
                 </p>
 
                 <div class="hero-features">
@@ -61,7 +60,7 @@
 
                 <div class="hero-actions">
                     <a href="/pages/register.html" class="btn btn-primary">
-                        <i class="fas fa-user-plus"></i> <span data-i18n="hero.cta.primary">Join Free Today</span>
+                        <i class="fas fa-user-plus"></i> <span data-i18n="hero.cta.primary">Join Free</span>
                     </a>
                     <a href="#features" class="btn btn-outline">
                         <i class="fas fa-play"></i> <span data-i18n="hero.cta.secondary">Learn More</span>
@@ -71,124 +70,124 @@
         </div>
     </section>
 
-    <!-- Language & Interest Showcase -->
+    <!-- Language & Interest Showcase - Mobile Optimized -->
     <section class="showcase-section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title" data-i18n="showcase.title">Express Yourself Completely</h2>
+                <h2 class="section-title" data-i18n="showcase.title">Connect Your Way</h2>
                 <p class="section-subtitle" data-i18n="showcase.subtitle">
-                    Share your languages, interests, and preferences in the way that feels most natural to you.
+                    Share what matters most to you
                 </p>
             </div>
 
             <div class="showcase-tabs">
                 <button class="tab-btn active" onclick="showTab('languages')">
-                    <i class="fas fa-comments"></i> <span data-i18n="showcase.tabs.languages">Languages</span>
+                    <i class="fas fa-comments"></i> <span>Languages</span>
                 </button>
                 <button class="tab-btn" onclick="showTab('interests')">
-                    <i class="fas fa-heart"></i> <span data-i18n="showcase.tabs.interests">Interests</span>
+                    <i class="fas fa-heart"></i> <span>Interests</span>
                 </button>
                 <button class="tab-btn" onclick="showTab('measurements')">
-                    <i class="fas fa-ruler"></i> <span data-i18n="showcase.tabs.measurements">Measurements</span>
+                    <i class="fas fa-ruler"></i> <span>Units</span>
                 </button>
             </div>
 
             <div id="languages" class="tab-content active">
                 <div class="showcase-grid">
-                    <div class="showcase-item language-item">
+                    <div class="showcase-item">
                         <div class="showcase-icon">🇺🇸</div>
                         <h4>English</h4>
-                        <p data-i18n="showcase.languages.english">Native, Fluent, Advanced</p>
+                        <p>Fluent</p>
                     </div>
-                    <div class="showcase-item language-item">
+                    <div class="showcase-item">
                         <div class="showcase-icon">🇻🇳</div>
                         <h4>Tiếng Việt</h4>
-                        <p data-i18n="showcase.languages.vietnamese">Southeast Asian Language</p>
+                        <p>Native</p>
                     </div>
-                    <div class="showcase-item language-item">
+                    <div class="showcase-item">
                         <div class="showcase-icon">🇹🇭</div>
                         <h4>ไทย</h4>
-                        <p data-i18n="showcase.languages.thai">Tonal Language Family</p>
+                        <p>Conversational</p>
                     </div>
-                    <div class="showcase-item language-item">
+                    <div class="showcase-item">
                         <div class="showcase-icon">🇨🇳</div>
                         <h4>中文</h4>
-                        <p data-i18n="showcase.languages.chinese">Mandarin Chinese</p>
+                        <p>Advanced</p>
                     </div>
-                    <div class="showcase-item language-item">
+                    <div class="showcase-item">
                         <div class="showcase-icon">🌍</div>
                         <h4>21+ More</h4>
-                        <p data-i18n="showcase.languages.more">Worldwide Coverage</p>
+                        <p>All languages</p>
                     </div>
                 </div>
             </div>
 
             <div id="interests" class="tab-content">
                 <div class="showcase-grid">
-                    <div class="showcase-item interest-item">
+                    <div class="showcase-item">
                         <div class="showcase-icon">⚽</div>
-                        <h4>Sports & Fitness</h4>
-                        <p>Soccer, Basketball, Yoga</p>
+                        <h4>Sports</h4>
+                        <p>Soccer, Basketball</p>
                     </div>
-                    <div class="showcase-item interest-item">
+                    <div class="showcase-item">
                         <div class="showcase-icon">🎨</div>
-                        <h4>Arts & Creativity</h4>
-                        <p>Photography, Painting, Music</p>
+                        <h4>Arts</h4>
+                        <p>Music, Painting</p>
                     </div>
-                    <div class="showcase-item interest-item">
+                    <div class="showcase-item">
                         <div class="showcase-icon">💻</div>
-                        <h4>Technology</h4>
-                        <p>Programming, AI, Gaming</p>
+                        <h4>Tech</h4>
+                        <p>Programming, AI</p>
                     </div>
-                    <div class="showcase-item interest-item">
+                    <div class="showcase-item">
                         <div class="showcase-icon">✈️</div>
-                        <h4>Travel & Adventure</h4>
-                        <p>Exploring, Hiking, Culture</p>
+                        <h4>Travel</h4>
+                        <p>Adventure</p>
                     </div>
-                    <div class="showcase-item interest-item">
+                    <div class="showcase-item">
                         <div class="showcase-icon">🍳</div>
-                        <h4>Food & Cooking</h4>
-                        <p>Culinary Arts, Dining</p>
+                        <h4>Cooking</h4>
+                        <p>Food & Dining</p>
                     </div>
-                    <div class="showcase-item interest-item">
+                    <div class="showcase-item">
                         <div class="showcase-icon">📚</div>
-                        <h4>15+ Categories</h4>
-                        <p>Express Your Passions</p>
+                        <h4>15+ More</h4>
+                        <p>Express yourself</p>
                     </div>
                 </div>
             </div>
 
             <div id="measurements" class="tab-content">
                 <div class="showcase-grid">
-                    <div class="showcase-item measurement-item">
+                    <div class="showcase-item">
                         <div class="showcase-icon">📏</div>
-                        <h4>Height Display</h4>
-                        <p>180cm ↔ 5'11"</p>
+                        <h4>Height</h4>
+                        <p>cm ↔ ft/in</p>
                     </div>
-                    <div class="showcase-item measurement-item">
+                    <div class="showcase-item">
                         <div class="showcase-icon">⚖️</div>
-                        <h4>Weight System</h4>
-                        <p>70kg ↔ 154lbs</p>
+                        <h4>Weight</h4>
+                        <p>kg ↔ lbs</p>
                     </div>
-                    <div class="showcase-item measurement-item">
+                    <div class="showcase-item">
                         <div class="showcase-icon">🌡️</div>
-                        <h4>Temperature</h4>
+                        <h4>Temp</h4>
                         <p>°C ↔ °F</p>
                     </div>
-                    <div class="showcase-item measurement-item">
+                    <div class="showcase-item">
                         <div class="showcase-icon">🇺🇸</div>
-                        <h4>US Imperial</h4>
-                        <p>Feet, Inches, Pounds</p>
+                        <h4>Imperial</h4>
+                        <p>US System</p>
                     </div>
-                    <div class="showcase-item measurement-item">
+                    <div class="showcase-item">
                         <div class="showcase-icon">🇬🇧</div>
                         <h4>UK System</h4>
-                        <p>Stone, Pounds, Feet</p>
+                        <p>Stone, Pounds</p>
                     </div>
-                    <div class="showcase-item measurement-item">
+                    <div class="showcase-item">
                         <div class="showcase-icon">🌍</div>
-                        <h4>Metric Global</h4>
-                        <p>Centimeters, Kilograms</p>
+                        <h4>Metric</h4>
+                        <p>Global standard</p>
                     </div>
                 </div>
             </div>
@@ -201,8 +200,7 @@
             <div class="section-header">
                 <h2 class="section-title" data-i18n="features.title">Why Choose Totilove?</h2>
                 <p class="section-subtitle" data-i18n="features.subtitle">
-                    Our platform combines cutting-edge technology with cultural sensitivity
-                    to help you find meaningful connections worldwide.
+                    Technology meets cultural sensitivity for meaningful connections
                 </p>
             </div>
 
@@ -211,10 +209,9 @@
                     <div class="feature-icon">
                         <i class="fas fa-language"></i>
                     </div>
-                    <h3 class="feature-title" data-i18n="features.items.languages.title">Multi-Language Support</h3>
+                    <h3 class="feature-title" data-i18n="features.items.languages.title">Multi-Language</h3>
                     <p class="feature-description" data-i18n="features.items.languages.description">
-                        Connect in your native language. We support 25+ world languages with
-                        fluency tracking and cultural matching preferences.
+                        25+ languages with fluency tracking and cultural matching.
                     </p>
                 </div>
 
@@ -222,10 +219,9 @@
                     <div class="feature-icon">
                         <i class="fas fa-brain"></i>
                     </div>
-                    <h3 class="feature-title" data-i18n="features.items.matching.title">Smart Matching Algorithm</h3>
+                    <h3 class="feature-title" data-i18n="features.items.matching.title">Smart Matching</h3>
                     <p class="feature-description" data-i18n="features.items.matching.description">
-                        Our AI-powered system considers shared languages, interests, cultural background,
-                        and personal preferences for optimal compatibility.
+                        AI-powered compatibility based on your preferences.
                     </p>
                 </div>
 
@@ -233,10 +229,9 @@
                     <div class="feature-icon">
                         <i class="fas fa-users"></i>
                     </div>
-                    <h3 class="feature-title" data-i18n="features.items.interests.title">Interest-Based Connections</h3>
+                    <h3 class="feature-title" data-i18n="features.items.interests.title">Interest-Based</h3>
                     <p class="feature-description" data-i18n="features.items.interests.description">
-                        Find people who share your passions. From sports to arts, technology to travel -
-                        connect over what you love most.
+                        Connect over shared passions and activities.
                     </p>
                 </div>
 
@@ -246,8 +241,7 @@
                     </div>
                     <h3 class="feature-title" data-i18n="features.items.culture.title">Cultural Intelligence</h3>
                     <p class="feature-description" data-i18n="features.items.culture.description">
-                        Respect cultural differences with automatic regional preferences, measurement systems,
-                        and culturally-aware matching.
+                        Automatic regional preferences and measurement systems.
                     </p>
                 </div>
 
@@ -255,10 +249,9 @@
                     <div class="feature-icon">
                         <i class="fas fa-shield-alt"></i>
                     </div>
-                    <h3 class="feature-title" data-i18n="features.items.privacy.title">Privacy & Security</h3>
+                    <h3 class="feature-title" data-i18n="features.items.privacy.title">Privacy First</h3>
                     <p class="feature-description" data-i18n="features.items.privacy.description">
-                        Your safety is our priority. Advanced verification, privacy controls, and secure messaging
-                        keep your personal information protected.
+                        Advanced verification and secure messaging.
                     </p>
                 </div>
 
@@ -266,10 +259,9 @@
                     <div class="feature-icon">
                         <i class="fas fa-mobile-alt"></i>
                     </div>
-                    <h3 class="feature-title" data-i18n="features.items.mobile.title">Mobile Optimized</h3>
+                    <h3 class="feature-title" data-i18n="features.items.mobile.title">Mobile Ready</h3>
                     <p class="feature-description" data-i18n="features.items.mobile.description">
-                        Stay connected anywhere. Our responsive design works perfectly on desktop,
-                        tablet, and mobile devices.
+                        Optimized for all your devices.
                     </p>
                 </div>
             </div>
@@ -280,14 +272,13 @@
     <section class="cta-section">
         <div class="container">
             <div class="cta-content">
-                <h2 class="cta-title" data-i18n="cta.title">Ready to Find Your Perfect Match?</h2>
+                <h2 class="cta-title" data-i18n="cta.title">Ready to Find Your Match?</h2>
                 <p class="cta-description" data-i18n="cta.description">
-                    Join thousands of people worldwide who have found love through our
-                    intelligent, culturally-aware matching system.
+                    Join thousands who found love through our culturally-aware matching.
                 </p>
                 <div class="hero-actions">
                     <a href="/pages/register.html" class="btn btn-primary">
-                        <i class="fas fa-heart"></i> <span data-i18n="cta.primary">Start Your Journey</span>
+                        <i class="fas fa-heart"></i> <span data-i18n="cta.primary">Start Free</span>
                     </a>
                     <a href="/pages/login.html" class="btn btn-outline">
                         <i class="fas fa-sign-in-alt"></i> <span data-i18n="cta.secondary">Sign In</span>
@@ -303,15 +294,15 @@
             <div class="footer-grid">
                 <div class="footer-section">
                     <h3>💕 <span data-i18n="app.name">Totilove</span></h3>
-                    <p data-i18n="footer.description">Connecting hearts across cultures and continents. Find love that transcends borders.</p>
+                    <p data-i18n="footer.description">Connecting hearts across cultures and continents.</p>
                 </div>
                 <div class="footer-section">
                     <h3 data-i18n="footer.features">Features</h3>
                     <ul>
-                        <li><a href="#features" data-i18n="features.items.languages.title">Multi-Language Support</a></li>
-                        <li><a href="#features" data-i18n="features.items.matching.title">Smart Matching</a></li>
-                        <li><a href="#features" data-i18n="features.items.culture.title">Cultural Intelligence</a></li>
-                        <li><a href="#features" data-i18n="features.items.interests.title">Interest Matching</a></li>
+                        <li><a href="#features">Multi-Language</a></li>
+                        <li><a href="#features">Smart Matching</a></li>
+                        <li><a href="#features">Cultural Intelligence</a></li>
+                        <li><a href="#features">Interest Matching</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
@@ -320,7 +311,6 @@
                         <li><a href="/help">Help Center</a></li>
                         <li><a href="/safety">Safety Tips</a></li>
                         <li><a href="/contact">Contact Us</a></li>
-                        <li><a href="/feedback">Feedback</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
@@ -329,12 +319,11 @@
                         <li><a href="/privacy">Privacy Policy</a></li>
                         <li><a href="/terms">Terms of Service</a></li>
                         <li><a href="/cookies">Cookie Policy</a></li>
-                        <li><a href="/community">Community Guidelines</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 <span data-i18n="app.name">Totilove</span>. <span data-i18n="footer.copyright">All rights reserved. Made with ❤️ for love without borders.</span></p>
+                <p>&copy; 2025 <span data-i18n="app.name">Totilove</span>. <span data-i18n="footer.copyright">Made with ❤️ for love without borders.</span></p>
             </div>
         </div>
     </footer>
@@ -342,7 +331,27 @@
     <!-- Scripts -->
     <script src="/assets/i18n/simple-i18n.js"></script>
     <script src="/components/navbar/global-navbar.js"></script>
-    <!-- Index/Homepage JavaScript - Extracted from inline scripts - Phase 1 CSS/JS Extraction -->
     <script src="/assets/js/new/pages/index.js"></script>
+    
+    <script>
+        // Simple tab switching function
+        function showTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.closest('.tab-btn').classList.add('active');
+        }
+    </script>
 </body>
 </html>

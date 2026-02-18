@@ -614,178 +614,223 @@ body {
 }
 
 /* ===== HOMEPAGE NAVBAR OVERRIDES ===== */
-body.homepage .global-navbar {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    justify-content: center;
+body.homepage .global-navbar,
+body:has(.hero-section) .global-navbar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    display: flex !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-body.homepage .global-navbar-brand {
-    color: white;
-    font-weight: 700;
-    font-size: 1.5rem;
-    flex-shrink: 0;
+body.homepage .global-navbar-brand,
+body:has(.hero-section) .global-navbar-brand {
+    color: white !important;
+    font-weight: 700 !important;
+    font-size: 1.5rem !important;
+    flex-shrink: 0 !important;
+    margin-right: auto !important;
 }
 
-body.homepage .global-navbar-brand i {
-    background: linear-gradient(135deg, #fff 0%, #f8f9fa 25%, #fff 50%, #e3f2fd 75%, #fff 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-size: 1.8rem;
+body.homepage .global-navbar-brand i,
+body:has(.hero-section) .global-navbar-brand i {
+    background: linear-gradient(135deg, #fff 0%, #f8f9fa 25%, #fff 50%, #e3f2fd 75%, #fff 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    font-size: 1.8rem !important;
 }
 
-@media (max-width: 768px) {
-    body.homepage .global-navbar-brand {
-        font-size: 1.25rem;
-    }
-    
-    body.homepage .global-navbar-brand i {
-        font-size: 1.5rem;
-    }
+body.homepage .global-navbar-container,
+body:has(.hero-section) .global-navbar-container {
+    width: 100% !important;
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 0 2rem !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 2rem !important;
 }
 
-/* Navbar buttons (match reference) */
+body.homepage .global-navbar-nav,
+body:has(.hero-section) .global-navbar-nav {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 1.5rem !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body.homepage .global-navbar-user,
+body:has(.hero-section) .global-navbar-user {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1.25rem !important;
+    flex-shrink: 0 !important;
+}
+
+body.homepage .global-nav-item,
+body:has(.hero-section) .global-nav-item {
+    position: relative !important;
+}
+
 body.homepage .global-nav-link,
 body:has(.hero-section) .global-nav-link {
-    color: white;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 0.7rem 1.5rem;
-    border-radius: 10px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    color: white !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    padding: 0.7rem 1.5rem !important;
+    border-radius: 10px !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
 }
 
 body.homepage .global-nav-link:hover,
 body:has(.hero-section) .global-nav-link:hover {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    transform: translateY(-2px) !important;
 }
 
 body.homepage .global-nav-link.active,
 body:has(.hero-section) .global-nav-link.active {
-    background: rgba(255, 255, 255, 0.3);
-    color: white;
+    background: rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
 }
 
 body.homepage .global-nav-link i,
 body:has(.hero-section) .global-nav-link i {
-    font-size: 1rem;
+    font-size: 1rem !important;
 }
 
 body.homepage .global-auth-buttons,
 body:has(.hero-section) .global-auth-buttons {
-    display: flex;
-    gap: 1rem;
-    align-items: center; justify-content: center; margin: 0 auto;
+    display: flex !important;
+    gap: 1rem !important;
+    align-items: center !important;
 }
 
 body.homepage .global-btn-outline,
 body:has(.hero-section) .global-btn-outline {
-    padding: 0.7rem 1.5rem;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    background: transparent;
-    color: white;
-    border-radius: 10px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    font-weight: 600;
+    padding: 0.7rem 1.5rem !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    background: transparent !important;
+    color: white !important;
+    border-radius: 10px !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+    font-weight: 600 !important;
 }
 
 body.homepage .global-btn-outline:hover,
 body:has(.hero-section) .global-btn-outline:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.5);
-    color: white;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+    color: white !important;
 }
 
 body.homepage .global-btn-solid,
 body:has(.hero-section) .global-btn-solid {
-    padding: 0.7rem 1.5rem;
-    background: rgba(255, 255, 255, 0.2);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    color: white;
-    border-radius: 10px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    font-weight: 600;
+    padding: 0.7rem 1.5rem !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
+    border-radius: 10px !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+    font-weight: 600 !important;
 }
 
 body.homepage .global-btn-solid:hover,
 body:has(.hero-section) .global-btn-solid:hover {
-    background: rgba(255, 255, 255, 0.3);
-    color: white;
+    background: rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
 }
 
 @media (min-width: 769px) {
+    body.homepage .global-navbar-nav,
+    body:has(.hero-section) .global-navbar-nav {
+        gap: 2.25rem !important;
+    }
+
+    body.homepage .global-auth-buttons,
+    body:has(.hero-section) .global-auth-buttons {
+        gap: 2rem !important;
+    }
+
+    body.homepage .global-navbar-user,
+    body:has(.hero-section) .global-navbar-user {
+        gap: 2rem !important;
+    }
+}
+
+@media (max-width: 768px) {
     body.homepage .global-navbar-brand,
     body:has(.hero-section) .global-navbar-brand {
-        margin-right: auto;
+        font-size: 1.25rem !important;
+    }
+    
+    body.homepage .global-navbar-brand i,
+    body:has(.hero-section) .global-navbar-brand i {
+        font-size: 1.5rem !important;
     }
 
     body.homepage .global-navbar-container,
     body:has(.hero-section) .global-navbar-container {
-        width: 100%;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 2rem;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        padding: 0 1rem !important;
     }
 
     body.homepage .global-navbar-nav,
     body:has(.hero-section) .global-navbar-nav {
-        flex: 1 1 auto;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        gap: 2.25rem;
+        order: initial !important;
+        width: auto !important;
+        flex-wrap: nowrap !important;
+        justify-content: center !important;
+        gap: 0.5rem !important;
     }
 
-    body.homepage .global-auth-buttons,
-    body:has(.hero-section) .global-auth-buttons,
     body.homepage .global-navbar-user,
     body:has(.hero-section) .global-navbar-user {
-        display: flex;
-        align-items: center;
-        gap: 2rem;
-        flex-shrink: 0;
-    }
-
-    body.homepage .global-nav-item,
-    body:has(.hero-section) .global-nav-item {
-        position: relative;
-        display: flex;
-        align-items: center;
+        order: initial !important;
+        width: auto !important;
+        justify-content: flex-end !important;
+        flex-wrap: nowrap !important;
+        gap: 0.5rem !important;
     }
 }
 
 @media (max-width: 480px) {
     body.homepage .global-nav-link,
-    body:has(.hero-section) .global-nav-link,
+    body:has(.hero-section) .global-nav-link {
+        padding: 0.55rem 1rem !important;
+    }
+
     body.homepage .global-btn-outline,
     body:has(.hero-section) .global-btn-outline,
     body.homepage .global-btn-solid,
     body:has(.hero-section) .global-btn-solid {
-        padding: 0.55rem 1rem;
+        padding: 0.55rem 1rem !important;
     }
 
-    body.homepage .global-auth-buttons,
-    body:has(.hero-section) .global-auth-buttons {
-        gap: 0.5rem;
+    body.homepage .global-navbar-container,
+    body:has(.hero-section) .global-navbar-container {
+        gap: 0.35rem !important;
     }
 }

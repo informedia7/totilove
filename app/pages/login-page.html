@@ -193,7 +193,7 @@
                     }
                     
                     // Show success message briefly
-                    showMessage('Login successful! Redirecting to your profile...', 'success');
+                    showMessage('Login successful! Redirecting to your activity feed...', 'success');
                     
                     // Check if there's a return URL from query parameters
                     const urlParams = new URLSearchParams(window.location.search);
@@ -201,7 +201,7 @@
                     
                     // Redirect after a short delay (NO TOKEN - cookie handles auth)
                     setTimeout(() => {
-                        const redirectUrl = returnUrl ? decodeURIComponent(returnUrl) : '/profile-full';
+                        const redirectUrl = returnUrl ? decodeURIComponent(returnUrl) : '/activity';
                         window.location.href = redirectUrl;
                     }, 1500);
                 } else {
@@ -310,7 +310,7 @@
                             console.log('✅ Existing session is valid');
                             const urlParams = new URLSearchParams(window.location.search);
                             const returnUrl = urlParams.get('return');
-                            const redirectUrl = returnUrl ? decodeURIComponent(returnUrl) : '/profile-full';
+                            const redirectUrl = returnUrl ? decodeURIComponent(returnUrl) : '/activity';
                             window.location.href = redirectUrl;
                             return;
                         }

@@ -35,25 +35,32 @@ window.handleLogout = async function(event) {
 };
 
 // Mobile menu toggle function
-function toggleMobileMenu() {
+function toggleMobileMenu(forceState) {
     const menuContainer = document.getElementById('mobile-menu-container');
     const menuToggle = document.getElementById('mobile-menu-toggle');
-    
-    if (menuContainer && menuToggle) {
-        menuContainer.classList.toggle('mobile-open');
+
+    if (!menuContainer || !menuToggle) {
+        return;
     }
+
+    const shouldOpen = typeof forceState === 'boolean'
+        ? forceState
+        : !menuContainer.classList.contains('mobile-open');
+
+    menuContainer.classList.toggle('mobile-open', shouldOpen);
+    menuToggle.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
 }
 
 // Close mobile menu when clicking outside
 document.addEventListener('click', function(event) {
     const menuContainer = document.getElementById('mobile-menu-container');
     const menuToggle = document.getElementById('mobile-menu-toggle');
-    
+
     if (menuContainer && menuToggle && window.innerWidth <= 768) {
         const isClickInside = menuContainer.contains(event.target) || menuToggle.contains(event.target);
-        
+
         if (!isClickInside && menuContainer.classList.contains('mobile-open')) {
-            menuContainer.classList.remove('mobile-open');
+            toggleMobileMenu(false);
         }
     }
 });
@@ -64,10 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
     menuItems.forEach(item => {
         item.addEventListener('click', function() {
             if (window.innerWidth <= 768) {
-                const menuContainer = document.getElementById('mobile-menu-container');
-                if (menuContainer) {
-                    menuContainer.classList.remove('mobile-open');
-                }
+                toggleMobileMenu(false);
             }
         });
     });
@@ -111,7 +115,7 @@ function initializePresenceEngine() {
         clearInterval(pollInterval);
 
         const registerDots = (root = document) => {
-            const selectors = '.online-dot[data-user-id], .online-dot-results[data-user-id]';
+            const selectors = '.online-dot-results[data-user-id]';
             root.querySelectorAll(selectors).forEach(element => {
                 const userId = element.dataset.userId;
                 if (userId) {
@@ -177,7 +181,6 @@ function initializeLayoutNotifications() {
     }
 
     if (window.PresenceConfig && window.PresenceConfig.socketEnabled === false) {
-        console.info('[Layout] Skipping notification socket; disabled via PresenceConfig');
         return;
     }
     
@@ -190,12 +193,7 @@ function initializeLayoutNotifications() {
             .then(() => {
                 initializeLayoutNotifications();
             })
-            .catch((error) => {
-                if (!window._layoutSocketWarned) {
-                    console.warn('[Layout] Socket.IO client unavailable, skipping notification channel', error);
-                    window._layoutSocketWarned = true;
-                }
-            });
+            .catch(() => {});
         return;
     }
 
@@ -479,6 +477,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function toggleAccountDropdown(event) {
     event.stopPropagation();
     const dropdown = document.getElementById('account-dropdown');
+    const icon = document.getElementById('account-icon');
     const isVisible = dropdown && dropdown.style.display === 'block';
     
     // Close all dropdowns first
@@ -489,6 +488,9 @@ function toggleAccountDropdown(event) {
     // Toggle this dropdown
     if (dropdown && !isVisible) {
         dropdown.style.display = 'block';
+        icon?.setAttribute('aria-expanded', 'true');
+    } else {
+        icon?.setAttribute('aria-expanded', 'false');
     }
 }
 
@@ -503,6 +505,7 @@ document.addEventListener('click', function(event) {
         !icon.contains(event.target) && 
         !wrapper.contains(event.target)) {
         dropdown.style.display = 'none';
+        icon.setAttribute('aria-expanded', 'false');
     }
 });
 

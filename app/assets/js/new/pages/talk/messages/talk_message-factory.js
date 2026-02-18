@@ -625,13 +625,11 @@ const MessageFactory = {
             bubble.appendChild(attachmentsDiv);
         }
 
-        if (!message.isUploading) {
-            if (typeof addMessageActions === 'function') {
-                addMessageActions(messageDiv, message);
-            }
-        }
-
         messageDiv.appendChild(bubble);
+
+        if (!message.isUploading && typeof addMessageActions === 'function') {
+            addMessageActions(messageDiv, message);
+        }
 
         // CRITICAL: Remove any existing timestamps before adding new one (prevent duplicates)
         const existingTimeElements = messageDiv.querySelectorAll('.message-time');

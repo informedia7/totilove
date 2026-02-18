@@ -266,6 +266,50 @@
         });
     }
 
+    function attachActivityLinkNavigation() {
+        const activityTargets = document.querySelectorAll('[data-activity-link="true"]');
+        if (!activityTargets.length) {
+            return;
+        }
+
+        const activityUrl = window.ACTIVITY_PAGE_URL || '/activity';
+        const navigateToActivity = () => {
+            window.location.assign(activityUrl);
+        };
+
+        activityTargets.forEach((target) => {
+            if (target.dataset.activityNavAttached === 'true') {
+                return;
+            }
+
+            target.dataset.activityNavAttached = 'true';
+            if (!target.hasAttribute('role')) {
+                target.setAttribute('role', 'link');
+            }
+            if (!target.hasAttribute('tabindex')) {
+                target.setAttribute('tabindex', '0');
+            }
+            if (!target.hasAttribute('aria-label')) {
+                target.setAttribute('aria-label', 'View your activity feed');
+            }
+            target.style.cursor = 'pointer';
+
+            target.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                navigateToActivity();
+            });
+
+            target.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter' && event.key !== ' ') {
+                    return;
+                }
+                event.preventDefault();
+                navigateToActivity();
+            });
+        });
+    }
+
     function callSearchPanel(methodName) {
         if (typeof window[methodName] === 'function') {
             window[methodName]();
@@ -450,6 +494,7 @@
         attachKeyboardShortcuts();
         attachBackButtons();
         attachAvatarFallback();
+        attachActivityLinkNavigation();
         attachSearchPanelHandlers();
         attachChatMenuListeners();
         attachComposerControls();

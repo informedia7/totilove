@@ -67,8 +67,10 @@
 
     /* Sizing */
     --header-height-mobile: 60px;
+    --header-height-mobile-landscape: 50px;
     --header-height-desktop: 80px;
     --sidebar-width-mobile: 100%;
+    --sidebar-width-mobile-landscape: 280px;
     --sidebar-width-tablet: 360px;
     --sidebar-width-desktop: 320px;
 
@@ -146,7 +148,7 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     line-height: var(--line-height-normal);
     color: var(--color-text-primary);
-    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    background: var(--color-gray-100);
     overflow-x: hidden;
     min-height: 100dvh;
   }
@@ -220,12 +222,7 @@
   .app-container {
     background: var(--color-white);
     width: 100%;
-    height: 100vh;
-    height: 100svh;
     height: 100dvh;
-    min-height: 100vh;
-    min-height: 100svh;
-    min-height: 100dvh;
     max-width: 100%;
     margin: 0;
     overflow: hidden;
@@ -239,8 +236,8 @@
     overflow: hidden;
   }
 
-  /* MOBILE LAYOUT */
-  @media (max-width: 767px) {
+  /* MOBILE PORTRAIT LAYOUT */
+  @media (max-width: 767px) and (orientation: portrait) {
     body[data-nav-state="NAV_CONVERSATIONS_LIST"] .sidebar {
       visibility: visible;
       opacity: 1;
@@ -279,8 +276,6 @@
 
     .app-container > .main-content {
       flex-direction: column;
-      height: calc(100vh - var(--header-height-mobile));
-      height: calc(100svh - var(--header-height-mobile));
       height: calc(100dvh - var(--header-height-mobile));
     }
 
@@ -292,13 +287,39 @@
     body[data-nav-state="NAV_CHAT"] .chat-back-btn-mobile {
       display: inline-flex;
     }
+
+  }
+
+  /* MOBILE LANDSCAPE LAYOUT */
+  @media (max-width: 767px) and (orientation: landscape) {
+    .app-container > .main-content {
+      flex-direction: row;
+      height: calc(100dvh - var(--header-height-mobile-landscape));
+    }
+
+    /* Always show both panels in landscape */
+    body[data-nav-state="NAV_CONVERSATIONS_LIST"] .sidebar,
+    body[data-nav-state="NAV_CHAT"] .sidebar,
+    body[data-nav-state="NAV_CONVERSATIONS_LIST"] .chat-area,
+    body[data-nav-state="NAV_CHAT"] .chat-area {
+      visibility: visible !important;
+      opacity: 1 !important;
+      transform: none !important;
+      pointer-events: auto !important;
+      position: relative !important;
+    }
+
+    /* Hide mobile back button in landscape */
+    .chat-back-btn-mobile {
+      display: none !important;
+    }
   }
 
   /* TABLET & DESKTOP LAYOUT */
   @media (min-width: 768px) {
     body {
       padding: var(--spacing-md);
-      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+      background: var(--color-gray-100);
     }
 
     .app-container {
@@ -428,7 +449,7 @@
     background: transparent;
   }
 
-  /* CHAT BACK BUTTON (Mobile Only) */
+  /* CHAT BACK BUTTON (Mobile Portrait Only) */
   .chat-back-btn-mobile {
     display: none;
     width: 38px;
@@ -1031,7 +1052,7 @@
     transition: transform 0.3s ease, opacity 0.2s ease;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 768px) and (orientation: portrait) {
     .search-panel { top: 86px; }
   }
 
@@ -1152,8 +1173,6 @@
     line-height: var(--line-height-normal);
     max-width: 400px;
   }
-
-  /* CALENDAR NAVIGATION */
 }
 
 /* -------------------------------
@@ -1392,12 +1411,6 @@
     border-color: var(--color-gray-300) !important;
   }
 
-  body.dark-mode .message.sent .message-bubble {
-    background: #3d3e5c !important;
-    border-color: rgba(255, 255, 255, 0.07) !important;
-    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.4) !important;
-  }
-
   body.dark-mode .message-bubble .message-attachments {
     background: rgba(255, 255, 255, 0.03) !important;
     border-color: rgba(255, 255, 255, 0.08) !important;
@@ -1455,7 +1468,7 @@
     min-width: var(--btn-size-md);
     padding: 0;
     border-radius: var(--border-radius-sm);
-    background: transparent !important;
+    background: rgba(255, 255, 255, 0.08) !important;
     color: rgba(255, 255, 255, 0.85) !important;
     display: inline-flex;
     align-items: center;
@@ -1466,7 +1479,7 @@
 
   body.dark-mode .header-btn.back-btn:hover,
   body.dark-mode .header-btn.chat-back-btn-mobile:hover {
-    background: transparent !important;
+    background: rgba(255, 255, 255, 0.15) !important;
     color: #fff !important;
   }
 
@@ -1583,10 +1596,6 @@
     color: rgba(255, 255, 255, 0.55) !important;
   }
 
-  body.dark-mode .conversation-name {
-    color: rgba(var(--color-white-rgb), 0.67) !important;
-  }
-
   body.dark-mode .conversation-preview,
   body.dark-mode .conversation-time {
     color: var(--color-text-secondary);
@@ -1608,7 +1617,7 @@
   body.dark-mode .filters .filter-btn,
   body.dark-mode .conversation-filters .filter-btn {
     background: rgba(0, 0, 0, 0.85) !important;
-    color: rgba(255, 255, 255, 0.67) !important;
+    color: rgba(255, 255, 255, 0.95) !important;
     border-color: rgba(255, 255, 255, 0.22) !important;
     box-shadow: none !important;
   }
@@ -1617,13 +1626,13 @@
   body.dark-mode .filters .filter-btn:focus-visible {
     background: rgba(0, 0, 0, 0.92) !important;
     border-color: rgba(255, 255, 255, 0.35) !important;
-    color: rgba(255, 255, 255, 0.68) !important;
+    color: rgba(255, 255, 255, 0.97) !important;
   }
 
   body.dark-mode .filters .filter-btn.active,
   body.dark-mode .conversation-filters .filter-btn.active {
     background: rgba(0, 0, 0, 0.98) !important;
-    color: rgba(255, 255, 255, 0.7) !important;
+    color: rgba(255, 255, 255, 1) !important;
     border-color: rgba(255, 255, 255, 0.45) !important;
     box-shadow:
       inset 0 -8px 24px rgba(var(--color-primary-rgb), 0.6),
@@ -1698,12 +1707,12 @@
    7. RESPONSIVE STYLES
 ------------------------------- */
 @layer responsive {
-  /* MOBILE (Default for all phones) */
-  @media (max-width: 767px) {
+  /* MOBILE PORTRAIT (Default for all phones) */
+  @media (max-width: 767px) and (orientation: portrait) {
     body {
       padding: 0 !important;
       margin: 0 !important;
-      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)) !important;
+      background: var(--color-gray-100) !important;
     }
 
     .app-container {
@@ -1711,43 +1720,19 @@
       box-shadow: none !important;
       height: 100dvh;
       min-height: -webkit-fill-available;
-      background: var(--color-white) !important;
-    }
-
-    body.dark-mode .app-container {
-      background: #0a0a0a !important;
-    }
-
-    body.dark-mode {
-      background: #0a0a0a !important;
-    }
-
-    body.dark-mode body {
-      background: #0a0a0a !important;
     }
 
     /* iPhone 12 & small mobile (390px and below) */
-    @media (max-width: 390px) {
+    @media (max-width: 390px) and (orientation: portrait) {
       .app-container {
-        height: 100vh !important;
-        height: 100svh !important;
         height: 100dvh !important;
-        min-height: 100vh !important;
-        min-height: 100svh !important;
         min-height: 100dvh !important;
-        max-height: 100vh !important;
-        max-height: 100svh !important;
         max-height: 100dvh !important;
         margin: 0 !important;
         border-radius: 0 !important;
         width: 100% !important;
         max-width: 100% !important;
         box-shadow: none !important;
-        background: var(--color-white) !important;
-      }
-
-      body.dark-mode .app-container {
-        background: #0a0a0a !important;
       }
 
       .header {
@@ -1762,8 +1747,8 @@
       }
 
       body.dark-mode .header {
-        background: #0a0a0a !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+        background: var(--color-white) !important;
+        border-bottom: 0 !important;
       }
 
       .avatar-img {
@@ -1823,34 +1808,21 @@
       }
 
       .app-container > .main-content {
-        height: calc(100vh - 86px) !important;
-        height: calc(100svh - 86px) !important;
         height: calc(100dvh - 86px) !important;
       }
 
       .sidebar {
         width: 100% !important;
         max-width: 100% !important;
-        height: calc(100vh - 86px) !important;
-        height: calc(100svh - 86px) !important;
         height: calc(100dvh - 86px) !important;
         background: var(--color-white) !important;
         border-radius: 0 !important;
-      }
-
-      body.dark-mode .sidebar {
-        background: #0a0a0a !important;
       }
 
       .sidebar-header {
         padding: var(--spacing-sm) !important;
         background: var(--color-white) !important;
         border-radius: 0 !important;
-      }
-
-      body.dark-mode .sidebar-header {
-        background: #0a0a0a !important;
-        border-bottom-color: rgba(255, 255, 255, 0.12) !important;
       }
 
       .search-input {
@@ -1865,19 +1837,11 @@
         background: var(--color-white) !important;
       }
 
-      body.dark-mode .conversations {
-        background: #0a0a0a !important;
-      }
-
       .conversation-item {
         padding: var(--spacing-sm) var(--spacing-xs) !important;
         margin-bottom: var(--spacing-xs) !important;
         background: var(--color-white) !important;
         border-radius: 9px !important;
-      }
-
-      body.dark-mode .conversation-item {
-        background: #0a0a0a !important;
       }
 
       .conversation-avatar {
@@ -1915,11 +1879,6 @@
         padding: 0 var(--spacing-sm) !important;
         background: var(--color-white) !important;
         border-radius: 0 !important;
-      }
-
-      body.dark-mode .chat-header {
-        background: #0a0a0a !important;
-        border-bottom-color: rgba(255, 255, 255, 0.12) !important;
       }
 
       .chat-avatar {
@@ -1966,10 +1925,6 @@
         -webkit-overflow-scrolling: touch !important;
       }
 
-      body.dark-mode .messages-area {
-        background: #0a0a0a !important;
-      }
-
       .message-bubble {
         max-width: 70% !important;
         padding: var(--spacing-sm) var(--spacing-md) !important;
@@ -2004,10 +1959,6 @@
         background: var(--color-white) !important;
       }
 
-      body.dark-mode .search-panel {
-        background: #0a0a0a !important;
-      }
-
       .search-panel-header {
         padding: var(--spacing-sm) !important;
         background: var(--color-white) !important;
@@ -2015,18 +1966,9 @@
         border-radius: 0 !important;
       }
 
-      body.dark-mode .search-panel-header {
-        background: #0a0a0a !important;
-        border-bottom-color: rgba(255, 255, 255, 0.12) !important;
-      }
-
       .search-panel-content {
         padding: var(--spacing-sm) !important;
         background: var(--color-white) !important;
-      }
-
-      body.dark-mode .search-panel-content {
-        background: #0a0a0a !important;
       }
 
       #timeFilterContent {
@@ -2056,10 +1998,6 @@
         border-radius: 12px !important;
       }
 
-      body.dark-mode .block-confirm-modal .block-confirm-content {
-        background: #0a0a0a !important;
-      }
-
       @supports (padding: max(0px)) {
         .header,
         .chat-header {
@@ -2082,26 +2020,15 @@
     }
 
     /* Extra small mobile (391px to 480px) */
-    @media (max-width: 480px) and (min-width: 391px) {
+    @media (max-width: 480px) and (min-width: 391px) and (orientation: portrait) {
       .app-container {
-        height: 100vh !important;
-        height: 100svh !important;
         height: 100dvh !important;
-        min-height: 100vh !important;
-        min-height: 100svh !important;
         min-height: 100dvh !important;
-        max-height: 100vh !important;
-        max-height: 100svh !important;
         max-height: 100dvh !important;
         margin: 0 !important;
         border-radius: 0 !important;
         width: 100% !important;
         box-shadow: none !important;
-        background: var(--color-white) !important;
-      }
-
-      body.dark-mode .app-container {
-        background: #0a0a0a !important;
       }
 
       body {
@@ -2110,28 +2037,18 @@
         overflow: hidden !important;
       }
 
-      body.dark-mode {
-        background: #0a0a0a !important;
-      }
-
       .header {
-        height: 70px !important;
+        height: 48px !important;
         padding: 0 var(--spacing-sm) !important;
         gap: var(--spacing-xs) !important;
         border-radius: 0 !important;
         flex-wrap: nowrap !important;
         overflow: visible !important;
-        background: var(--color-white) !important;
-      }
-
-      body.dark-mode .header {
-        background: #0a0a0a !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
       }
 
       .avatar-img {
-        width: calc(var(--avatar-size-conversation) * 1.15) !important;
-        height: calc(var(--avatar-size-conversation) * 1.15) !important;
+        width: var(--avatar-size-conversation) !important;
+        height: var(--avatar-size-conversation) !important;
       }
 
       .username {
@@ -2144,57 +2061,32 @@
       }
 
       .header-btn {
-        min-width: 56px !important;
-        width: 56px !important;
-        height: 56px !important;
-        font-size: 26px !important;
+        min-width: 32px !important;
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 17px !important;
       }
 
-      .chat-back-btn-mobile,
-      body.dark-mode .chat-back-btn-mobile {
-        min-width: 70px !important;
-        width: 70px !important;
-        height: 70px !important;
+      .chat-back-btn-mobile {
+        min-width: 38px !important;
+        width: 38px !important;
+        height: 38px !important;
       }
 
       .header-actions {
         flex: 0 0 auto !important;
-        justify-content: flex-start !important;
-        gap: var(--spacing-xs) !important;
-        min-width: auto !important;
-        margin-left: 0 !important;
-      }
-
-      .header-actions .header-btn {
-        min-width: 56px !important;
-      }
-
-      .connection-status {
-        margin-left: auto !important;
-      }
-
-      .user-info {
-        display: none !important;
-        width: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
+        justify-content: flex-end !important;
+        gap: calc(var(--spacing-xs) * 0.6) !important;
+        min-width: 0 !important;
       }
 
       .app-container > .main-content {
-        height: calc(100vh - 70px) !important;
-        height: calc(100svh - 70px) !important;
-        height: calc(100dvh - 70px) !important;
+        height: calc(100dvh - 48px) !important;
       }
 
       .chat-header {
         height: 52px !important;
         border-radius: 0 !important;
-        background: var(--color-white) !important;
-      }
-
-      body.dark-mode .chat-header {
-        background: #0a0a0a !important;
-        border-bottom-color: rgba(255, 255, 255, 0.12) !important;
       }
 
       .chat-avatar {
@@ -2214,13 +2106,6 @@
 
       .conversation-item {
         padding: var(--spacing-sm) var(--spacing-xs) !important;
-        margin-bottom: var(--spacing-xs) !important;
-        background: var(--color-white) !important;
-        border-radius: 9px !important;
-      }
-
-      body.dark-mode .conversation-item {
-        background: #0a0a0a !important;
       }
 
       .conversation-avatar {
@@ -2232,29 +2117,15 @@
       .sidebar {
         width: 100% !important;
         max-width: 100% !important;
-        height: calc(100vh - 48px) !important;
-        height: calc(100svh - 48px) !important;
         height: calc(100dvh - 48px) !important;
         border-radius: 0 !important;
-        background: var(--color-white) !important;
-      }
-
-      body.dark-mode .sidebar {
-        background: #0a0a0a !important;
       }
 
       .conversations {
         padding: var(--spacing-xs) !important;
         margin: 0 !important;
-        height: calc(100vh - 48px - 64px) !important;
-        height: calc(100svh - 48px - 64px) !important;
         height: calc(100dvh - 48px - 64px) !important;
         overflow-y: auto !important;
-        background: var(--color-white) !important;
-      }
-
-      body.dark-mode .conversations {
-        background: #0a0a0a !important;
       }
 
       .conversation-info {
@@ -2263,7 +2134,6 @@
 
       .conversation-name {
         font-size: var(--font-size-sm) !important;
-        color: var(--color-text-primary) !important;
       }
 
       .conversation-preview {
@@ -2272,30 +2142,6 @@
 
       .conversation-time {
         font-size: 9px !important;
-      }
-
-      body.dark-mode .conversation-name {
-        color: rgba(var(--color-white-rgb), 0.67) !important;
-      }
-
-      body.dark-mode .conversation-preview {
-        color: rgba(var(--color-white-rgb), 0.7) !important;
-      }
-
-      body.dark-mode .filters .filter-btn,
-      body.dark-mode .sidebar-header .filter-btn,
-      body.dark-mode .sidebar .filter-btn,
-      body.dark-mode .conversation-filters .filter-btn {
-        background: rgba(0, 0, 0, 0.85) !important;
-        border-color: rgba(var(--color-white-rgb), 0.22) !important;
-        color: rgba(var(--color-white-rgb), 0.67) !important;
-      }
-
-      body.dark-mode .filters .filter-btn.active,
-      body.dark-mode .conversation-filters .filter-btn.active {
-        background: rgba(0, 0, 0, 0.98) !important;
-        border-color: rgba(var(--color-white-rgb), 0.45) !important;
-        color: rgba(var(--color-white-rgb), 0.7) !important;
       }
 
       #timeFilterContent {
@@ -2315,6 +2161,172 @@
         color: var(--color-text-primary) !important;
         border-color: rgba(var(--color-white-rgb), 0.15) !important;
         box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55) !important;
+      }
+    }
+  }
+
+  /* MOBILE LANDSCAPE (Automatic switch for all phones) */
+  @media (max-width: 767px) and (orientation: landscape) {
+    body {
+      padding: 0 !important;
+      margin: 0 !important;
+      background: var(--color-gray-100) !important;
+    }
+
+    .app-container {
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      height: 100dvh;
+      min-height: -webkit-fill-available;
+    }
+
+    /* Responsive adjustments for landscape */
+    .header {
+      height: var(--header-height-mobile-landscape);
+      padding: 0 var(--spacing-sm);
+    }
+
+    .avatar-img {
+      width: var(--avatar-size-sm);
+      height: var(--avatar-size-sm);
+    }
+
+    .username {
+      font-size: var(--font-size-sm);
+      max-width: 120px;
+    }
+
+    .header-btn {
+      width: var(--btn-size-sm);
+      height: var(--btn-size-sm);
+      min-width: var(--btn-size-sm);
+      font-size: var(--font-size-md);
+    }
+
+    .sidebar {
+      width: var(--sidebar-width-mobile-landscape);
+      flex: 0 0 var(--sidebar-width-mobile-landscape);
+      border-right: var(--border-width) solid var(--color-gray-200);
+    }
+
+    .conversation-avatar {
+      width: 36px;
+      height: 36px;
+      font-size: var(--font-size-md);
+    }
+
+    .conversation-name {
+      font-size: var(--font-size-sm);
+    }
+
+    .conversation-preview {
+      font-size: var(--font-size-xs);
+    }
+
+    .chat-header {
+      height: 60px;
+      min-height: 60px;
+      padding: 0 var(--spacing-sm);
+    }
+
+    .chat-avatar {
+      width: 40px;
+      height: 40px;
+      font-size: var(--font-size-md);
+    }
+
+    .chat-name {
+      font-size: var(--font-size-sm);
+    }
+
+    .chat-status {
+      font-size: var(--font-size-xs);
+    }
+
+    .chat-action-btn {
+      width: var(--btn-size-sm);
+      height: var(--btn-size-sm);
+      min-width: var(--btn-size-sm);
+      font-size: var(--font-size-md);
+    }
+
+    .messages-area {
+      padding: var(--spacing-md);
+    }
+
+    .message-bubble {
+      max-width: 75%;
+      padding: var(--spacing-xs) var(--spacing-sm);
+    }
+
+    .message-content {
+      font-size: var(--font-size-sm);
+    }
+
+    .message-input-area {
+      padding: var(--spacing-xxs, 4px) var(--spacing-sm);
+    }
+
+    .message-input {
+      font-size: var(--font-size-sm);
+      min-height: 32px;
+      max-height: 80px;
+    }
+
+    .input-action-btn {
+      width: var(--btn-size-sm);
+      height: var(--btn-size-sm);
+      min-width: var(--btn-size-sm);
+      font-size: var(--font-size-md);
+    }
+
+    /* Extra small landscape (phones with small height) */
+    @media (max-height: 400px) {
+      .header {
+        height: 44px;
+      }
+
+      .sidebar {
+        width: 200px;
+        flex: 0 0 200px;
+      }
+
+      .messages-area {
+        padding: 8px;
+      }
+
+      .message-input-area {
+        padding: var(--spacing-xxs, 4px);
+        min-height: 32px;
+      }
+    }
+
+    /* Larger landscape (taller phones) */
+    @media (min-height: 600px) {
+      .sidebar {
+        width: 280px;
+        flex: 0 0 280px;
+      }
+
+      .messages-area {
+        padding: 16px;
+      }
+    }
+
+    /* Safe area adjustments for landscape */
+    @supports (padding: max(0px)) {
+      .header,
+      .chat-header {
+        padding-left: max(8px, env(safe-area-inset-left)) !important;
+        padding-right: max(8px, env(safe-area-inset-right)) !important;
+      }
+
+      .messages-area {
+        padding-right: env(safe-area-inset-right) !important;
+      }
+
+      .message-input-area {
+        padding-bottom: max(var(--spacing-xxs, 4px), env(safe-area-inset-bottom)) !important;
       }
     }
   }
@@ -2455,6 +2467,22 @@
       height: var(--btn-size-md);
       min-width: var(--btn-size-md);
       font-size: var(--font-size-lg);
+    }
+
+    /* Tablet landscape specific */
+    @media (orientation: landscape) {
+      .app-container {
+        height: 85vh;
+      }
+
+      .sidebar {
+        width: var(--sidebar-width-desktop);
+        flex: 0 0 var(--sidebar-width-desktop);
+      }
+
+      .messages-area {
+        padding: var(--spacing-md);
+      }
     }
   }
 

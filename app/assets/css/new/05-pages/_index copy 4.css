@@ -686,7 +686,7 @@ body.homepage .global-auth-buttons,
 body:has(.hero-section) .global-auth-buttons {
     display: flex;
     gap: 1rem;
-    align-items: center; justify-content: center; margin: 0 auto;
+    align-items: center;
 }
 
 body.homepage .global-btn-outline,
@@ -724,54 +724,6 @@ body.homepage .global-btn-solid:hover,
 body:has(.hero-section) .global-btn-solid:hover {
     background: rgba(255, 255, 255, 0.3);
     color: white;
-}
-
-@media (min-width: 769px) {
-    body.homepage .global-navbar-brand,
-    body:has(.hero-section) .global-navbar-brand {
-        margin-right: auto;
-    }
-
-    body.homepage .global-navbar-container,
-    body:has(.hero-section) .global-navbar-container {
-        width: 100%;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 2rem;
-    }
-
-    body.homepage .global-navbar-nav,
-    body:has(.hero-section) .global-navbar-nav {
-        flex: 1 1 auto;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        gap: 2.25rem;
-    }
-
-    body.homepage .global-auth-buttons,
-    body:has(.hero-section) .global-auth-buttons,
-    body.homepage .global-navbar-user,
-    body:has(.hero-section) .global-navbar-user {
-        display: flex;
-        align-items: center;
-        gap: 2rem;
-        flex-shrink: 0;
-    }
-
-    body.homepage .global-nav-item,
-    body:has(.hero-section) .global-nav-item {
-        position: relative;
-        display: flex;
-        align-items: center;
-    }
 }
 
 @media (max-width: 480px) {

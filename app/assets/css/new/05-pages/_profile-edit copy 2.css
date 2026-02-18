@@ -1,5 +1,3 @@
-@import url('../02-components/_profile-completion.css');
-
 /* Profile Edit Page Styles - Extracted from profile-edit.html */
 
 /* Settings-style header (matching Account Settings) */
@@ -46,11 +44,6 @@
     justify-content: space-between;
     gap: 1.5rem;
     flex-wrap: wrap;
-}
-
-.profile-edit-header .card-title {
-    flex: 1 1 auto;
-    min-width: 0;
 }
 
 .profile-edit-header .profile-completion-summary {
@@ -228,70 +221,6 @@
     overflow-wrap: break-word;
 }
 
-/* About Me style sections (parity with profile full) */
-.about-me-section {
-    margin: 1rem 0;
-    padding: 1rem;
-    background: #f8f9fa;
-    border-radius: 12px;
-    border-left: 4px solid #667eea;
-}
-
-.about-me-section .section-title {
-    margin: 0 0 0.75rem 0;
-    color: #667eea;
-    font-size: 1.1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.about-me-section .section-title i {
-    color: #667eea;
-}
-
-.about-me-editor textarea,
-.looking-for-editor textarea {
-    width: 100%;
-    border: none;
-    background: transparent;
-    font-size: 1rem;
-    line-height: 1.5;
-    color: #555;
-    font-style: italic;
-    padding: 0;
-    min-height: 120px;
-    resize: vertical;
-}
-
-.about-me-editor .form-group,
-.looking-for-editor .form-group {
-    margin: 0;
-}
-
-.about-me-editor textarea:focus,
-.looking-for-editor textarea:focus {
-    outline: none;
-    box-shadow: none;
-}
-
-.about-me-editor .char-counter,
-.looking-for-editor .char-counter {
-    font-size: 0.85rem;
-    margin-top: 0.5rem;
-}
-
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    border: 0;
-}
-
 .edit-card.compact-card .card-header {
     display: none;
 }
@@ -355,21 +284,12 @@
 }
 
 /* 2 Column Layout - Like Copy file */
-.profile-cards-container {
+.edit-cards-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
     margin-bottom: 2rem;
     align-items: start;
-}
-
-.mobile-card-tab-group {
-    display: none;
-}
-
-.mobile-card-tab {
-    text-decoration: none;
-    cursor: pointer;
 }
 
 /* Profile Column (Left: About Me, Right: What I'm Looking For) */
@@ -424,13 +344,11 @@
     background: #fff;
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    padding: 0 !important;
+    overflow: visible;
     width: 100%;
     max-width: 100%;
     min-width: 0;
     box-sizing: border-box;
-    border: 1px solid #e9ecef;
 }
 
 .edit-card .card-header {
@@ -518,6 +436,7 @@
     from { opacity: 0; transform: translateY(-5px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
 
 /* Dropdown Widths */
 #height-select, #preferred-height, #weight-kg, #preferred-weight,
@@ -629,7 +548,7 @@
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-    .profile-cards-container {
+    .edit-cards-container {
         grid-template-columns: 1fr;
         gap: 1.5rem;
     }
@@ -658,140 +577,11 @@
     }
 }
 
-@media (max-width: 768px) {
-    .card-content {
-        padding: 0.9rem;
-    }
-
-    .about-me-section {
-        margin: 0.4rem 0;
-        padding: 0.65rem;
-    }
-
-    .about-me-section .section-title {
-        font-size: 0.95rem;
-        margin-bottom: 0.35rem;
-    }
-
-    #about-edit {
-        font-size: 0.9rem;
-        line-height: 1.35;
-    }
-
-    .info-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.5rem 0.75rem;
-    }
-
-    .info-item {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 0.4rem 0.25rem;
-        border: none;
-        background: #f8f9fb;
-        border-radius: 10px;
-    }
-
-    .info-value {
-        text-align: left;
-        max-width: 100%;
-    }
-
-    .card-wrapper {
-        margin-bottom: 0.7rem;
-    }
-
-    .card-title-above {
-        font-size: 1rem;
-        margin-bottom: 0.35rem;
-        padding-bottom: 0.4rem;
-    }
-
-    .inner-card.compact-card {
-        padding: 0.9rem;
-    }
-
-    .inner-card.compact-card .form-row,
-    .edit-card .form-row {
-        gap: 0.6rem 0.75rem;
-    }
-
-    .inner-card.compact-card .form-group,
-    .edit-card .form-group {
-        margin-bottom: 0.75rem;
-    }
-}
-
 @media (max-width: 480px) {
-    .profile-edit-header {
-        flex-wrap: nowrap;
-        align-items: center;
-        gap: 0.75rem;
-    }
-    .profile-edit-header .card-title {
-        flex: 1 1 auto;
-        min-width: 0;
-        transform: scale(0.62);
-        transform-origin: left center;
-    }
-    .profile-edit-header .profile-completion-summary {
-        display: inline-flex;
-        align-items: center;
-        justify-content: flex-end;
-        flex: 0 0 auto;
-        white-space: nowrap;
-        max-width: 48%;
-        transform: scale(0.72) translateX(-32px);
-        transform-origin: right center;
-    }
-    .profile-edit-header .completion-line-header {
-        display: flex;
-        align-items: center;
-        gap: 0.35rem;
-        white-space: nowrap;
-    }
-    .profile-edit-header .completion-line-label {
-        font-size: 0.78rem;
-    }
-    .profile-edit-header .completion-line-percentage {
-        font-size: 0.9rem;
-    }
     .edit-title {
         font-size: 1.5rem;
         flex-direction: column;
         gap: 0.5rem;
-    }
-    .profile-cards-container {
-        display: flex;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        gap: 0;
-        padding-bottom: 0;
-        scroll-padding: 0;
-        -webkit-overflow-scrolling: touch;
-    }
-    .profile-cards-container::-webkit-scrollbar {
-        display: none;
-    }
-    .profile-column {
-        flex: 0 0 100%;
-        width: 100%;
-        scroll-snap-align: center;
-        scroll-snap-stop: always;
-    }
-
-    .profile-card {
-        flex: 0 0 100%;
-        width: 100%;
-        scroll-snap-align: center;
-        scroll-snap-stop: always;
-        border-radius: 0;
-    }
-
-    .profile-card .card-header {
-        display: none !important;
-        border-radius: 0;
     }
     
     .card-header {
@@ -799,52 +589,11 @@
     }
     
     .card-title {
-        font-size: 1rem;
-        gap: 0.5rem;
-    }
-
-    .card-title i {
-        font-size: 0.9rem;
+        font-size: 1.1rem;
     }
     
     .card-content {
         padding: 1rem;
-    }
-
-    .card-wrapper {
-        margin: 0.5rem 0;
-    }
-
-    .card-title-above {
-        font-size: 0.98rem;
-        gap: 0.4rem;
-        padding-bottom: 0.35rem;
-        margin-bottom: 0.4rem;
-    }
-
-    .inner-card.compact-card {
-        padding: 0.75rem;
-        border-radius: 12px;
-    }
-
-    .about-me-section {
-        padding: 0.6rem;
-        margin: 0.5rem 0;
-    }
-
-    .about-me-text,
-    #about-edit {
-        font-size: 0.9rem;
-        line-height: 1.5;
-    }
-
-    .about-me-section .section-title {
-        font-size: 0.85rem;
-    }
-
-    .info-grid {
-        gap: 0.3rem 0.5rem;
-        margin-bottom: 0.4rem;
     }
     
     .form-group input,
@@ -852,61 +601,6 @@
     .form-group textarea {
         padding: 0.5rem;
         font-size: 0.9rem;
-    }
-
-    .inner-card.compact-card .form-row,
-    .edit-card .form-row {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.5rem 0.65rem;
-    }
-
-    .inner-card.compact-card .form-group,
-    .edit-card .form-group {
-        margin-bottom: 0.6rem;
-    }
-
-    .form-group label {
-        font-size: 0.85rem;
-    }
-
-    .char-counter {
-        font-size: 0.8rem;
-    }
-}
-
-@media (max-width: 480px) and (orientation: portrait) {
-    .mobile-card-tab-group {
-        display: flex;
-        justify-content: center;
-        gap: 0.5rem;
-        padding: 0 0.75rem;
-        margin: 0.25rem 0 0.75rem;
-    }
-
-    .mobile-card-tab {
-        flex: 1;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.4rem;
-        padding: 0.45rem 0.75rem;
-        border-radius: 999px;
-        border: 1px solid rgba(76, 91, 214, 0.35);
-        color: #4c5bd6;
-        font-size: 0.8rem;
-        font-weight: 600;
-        background: rgba(102, 126, 234, 0.08);
-    }
-
-    .mobile-card-tab i {
-        font-size: 0.75rem;
-    }
-
-    .mobile-card-tab.active {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: #fff;
-        border-color: transparent;
-        box-shadow: 0 4px 10px rgba(102, 126, 234, 0.25);
     }
 }
 
@@ -961,17 +655,6 @@
 
 .notification-info i {
     color: #17a2b8;
-}
-
-@media (max-width: 600px) and (orientation: portrait) {
-    .notification {
-        top: calc(var(--mobile-layout-header-height, 80px) + 12px);
-        left: 12px;
-        right: 12px;
-        width: auto;
-        max-width: none;
-        z-index: 1400;
-    }
 }
 
 .save-btn:disabled {
@@ -1542,5 +1225,4 @@
     font-size: 1rem;
     background: white;
 }
-
 

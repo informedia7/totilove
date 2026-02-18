@@ -43,8 +43,8 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
                 }
             }
             
-            // Redirect to profile (NO TOKEN - cookie handles auth)
-            window.location.href = '/profile-full';
+            // Redirect to activity page (NO TOKEN - cookie handles auth)
+            window.location.href = '/activity';
         } else {
             // Show error message
             if (data.error) {

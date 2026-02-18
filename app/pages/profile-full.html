@@ -1,16 +1,49 @@
 <!-- Profile tabs with sub-navigation -->
 <div class="profile-tabs">
-    <a href="/profile-basic" class="tab-btn" id="tab-basic">Basic Info</a>
-    <a href="/profile-full" class="tab-btn active" id="tab-full">Full Info</a>
+    <a href="/profile-full" class="tab-btn active" id="tab-full">My Profile</a>
     <a href="/profile-photos" class="tab-btn" id="tab-photos">My Photos</a>
     <a href="/profile-edit" class="tab-btn" id="tab-edit">Edit Profile</a>
+    <a href="/profile-stats" class="tab-btn" id="tab-stats">My Stats</a>
 </div>
 
 <!-- Full Profile Information -->
-<div id="tab-panel-full">
+<div id="tab-panel-full" class="settings-section">
+    <div class="card-header profile-full-header">
+        <div class="card-title">
+            <div class="card-icon">
+                <i class="fas fa-id-card"></i>
+            </div>
+            <span>My Profile</span>
+        </div>
+        <div class="profile-completion-summary">
+            <div class="profile-completion-line" data-profile-completion-badge>
+                <div class="completion-line-header">
+                    <span class="completion-line-label">Profile completion</span>
+                    <span class="completion-line-percentage" data-profile-completion-percentage>{{profileCompletionPercentage}}%</span>
+                </div>
+                <div class="completion-line-track" aria-hidden="true">
+                    <div class="completion-line-fill" data-profile-completion-fill style="width: {{profileCompletionPercentage}}%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mobile-card-tab-group">
+        <a href="#about-me-card" class="mobile-card-tab active">
+            <i class="fas fa-user"></i>
+            <span>About Me</span>
+        </a>
+        <a href="#person-looking-card" class="mobile-card-tab">
+            <i class="fas fa-search"></i>
+            <span>Person I'm Looking For</span>
+        </a>
+    </div>
     <div class="profile-cards-container">
         <!-- About Me Card -->
-        <div class="profile-card">
+        <div class="profile-card" id="about-me-card">
+            <div class="mobile-card-label" aria-hidden="true">
+                <i class="fas fa-user"></i>
+                <span>About Me</span>
+            </div>
             <div class="card-header">
                 <h3 class="card-title">
                     <i class="fas fa-user"></i>
@@ -215,9 +248,19 @@
                 </div>
             </div>
         </div>
-
         <!-- Person I'm Looking For Card -->
-        <div class="profile-card">
+        <div class="mobile-swipe-hint" aria-hidden="true">
+            <span>
+                <i class="fas fa-arrow-left"></i>
+                Swipe to view who you're looking for
+                <i class="fas fa-arrow-right"></i>
+            </span>
+        </div>
+        <div class="profile-card" id="person-looking-card">
+            <div class="mobile-card-label" aria-hidden="true">
+                <i class="fas fa-search"></i>
+                <span>Person I'm Looking For</span>
+            </div>
             <div class="card-header">
                 <h3 class="card-title">
                     <i class="fas fa-search"></i>

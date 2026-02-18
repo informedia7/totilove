@@ -3,6 +3,25 @@
  * Extracted from index.html - Phase 1 CSS/JS Extraction
  */
 
+function adjustMainContentPadding(event) {
+    const navbar = document.querySelector('.global-navbar');
+    const mainContent = document.querySelector('.main-content');
+    if (!mainContent) {
+        return;
+    }
+
+    const computedHeight = event?.detail?.height;
+    const navbarHeight = typeof computedHeight === 'number' ? computedHeight : (navbar?.offsetHeight || 0);
+
+    if (navbarHeight > 0) {
+        mainContent.style.paddingTop = `${navbarHeight}px`;
+    }
+}
+
+window.addEventListener('load', adjustMainContentPadding);
+window.addEventListener('resize', adjustMainContentPadding);
+document.addEventListener('navbarLoaded', adjustMainContentPadding);
+
 // Initialize everything on page load
 document.addEventListener('DOMContentLoaded', async function() {
     try {
@@ -24,6 +43,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         // Initialize scroll animations
         initScrollAnimations();
+
+        adjustMainContentPadding();
     } catch (error) {
         // Silent fallback
     }
