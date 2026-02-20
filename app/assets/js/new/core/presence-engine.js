@@ -34,11 +34,6 @@
         // Rate Limiting & Retries
         requestStatusRateLimitMs: 1000,
         requestStatusMaxRetries: 3,
-        httpRateLimitBackoffMs: 12000,
-        httpRateLimitBackoffMaxMs: 60000,
-        httpRateLimitMaxStrikes: 5,
-        leadershipRateLimitBackoffMs: 15000,
-        leadershipRateLimitBackoffMaxMs: 60000,
         followerHeartbeatFallbackMs: 90000,
         promiseMaxAgeMs: 300000,
         
@@ -80,24 +75,6 @@
         meta: null
     };
 
-    function parseRetryAfterMs(value) {
-        if (!value && value !== 0) {
-            return null;
-        }
-
-        const numeric = Number(value);
-        if (Number.isFinite(numeric)) {
-            return numeric > 0 ? numeric * 1000 : 0;
-        }
-
-        const timestamp = Date.parse(value);
-        if (!Number.isNaN(timestamp)) {
-            return Math.max(0, timestamp - Date.now());
-        }
-
-        return null;
-    }
-
     function resolveSessionToken() {
         try {
             if (window.sessionManager?.getToken) {
@@ -133,9 +110,6 @@
             this.consecutiveFailures = 0;
             this.cache = null;
             this.cacheExpiresAt = 0;
-            this.rateLimitBackoffMs = options.rateLimitBackoffMs || DEFAULT_CONFIG.leadershipRateLimitBackoffMs;
-            this.rateLimitBackoffMaxMs = options.rateLimitBackoffMaxMs || DEFAULT_CONFIG.leadershipRateLimitBackoffMaxMs;
-            this.rateLimitPenaltyCount = 0;
             this.sessionTokenProvider = typeof options.sessionTokenProvider === 'function'
                 ? options.sessionTokenProvider
                 : resolveSessionToken;
@@ -157,18 +131,6 @@
         markSuccess() {
             this.consecutiveFailures = 0;
             this.disabledUntil = 0;
-            this.rateLimitPenaltyCount = 0;
-        }
-
-        applyRateLimitPenalty(retryAfterMs) {
-            const fallback = this.rateLimitBackoffMs || 0;
-            const baseDelay = Number.isFinite(retryAfterMs) && retryAfterMs >= 0 ? retryAfterMs : fallback;
-            const normalizedBase = Math.max(baseDelay, fallback, 1000);
-            const multiplier = Math.pow(2, this.rateLimitPenaltyCount || 0);
-            const maxDelay = Math.max(this.rateLimitBackoffMaxMs || normalizedBase, normalizedBase);
-            const penalty = Math.min(normalizedBase * Math.max(1, multiplier), maxDelay);
-            this.rateLimitPenaltyCount = Math.min((this.rateLimitPenaltyCount || 0) + 1, 6);
-            this.disabledUntil = Date.now() + penalty;
         }
 
         buildHeaders() {
@@ -218,13 +180,6 @@
                 payload = await response.json();
             } catch (_error) {
                 payload = null;
-            }
-
-            if (response.status === 429) {
-                const retryAfterMs = parseRetryAfterMs(response.headers?.get?.('Retry-After'));
-                this.applyRateLimitPenalty(retryAfterMs);
-                const error = new Error(payload?.error || 'rate_limited');
-                throw error;
             }
 
             if (response.status >= 500) {
@@ -302,8 +257,6 @@
             this.lastRequestTime = new Map();
             this.retryCounts = new Map();
             this.failedUserIds = new Set();
-            this.httpRateLimitedUntil = 0;
-            this.httpRateLimitPenaltyCount = 0;
             
             // Timers
             this.batchTimer = null;
@@ -345,9 +298,7 @@
             this.lastLeaderHeartbeat = 0;
             this.lastFollowerHeartbeat = 0;
             this.leadershipApi = new LeadershipApiClient({
-                channel: this.config.leadershipChannelName,
-                rateLimitBackoffMs: this.config.leadershipRateLimitBackoffMs,
-                rateLimitBackoffMaxMs: this.config.leadershipRateLimitBackoffMaxMs
+                channel: this.config.leadershipChannelName
             });
             
             // Metrics
@@ -1361,38 +1312,6 @@
             }, {});
         }
 
-        getNextBatchDelay() {
-            if (this.httpRateLimitedUntil) {
-                const wait = this.httpRateLimitedUntil - Date.now();
-                if (wait > 0) {
-                    return wait;
-                }
-                this.httpRateLimitedUntil = 0;
-            }
-            return this.config.batchDelay;
-        }
-
-        applyHttpRateLimitPenalty(retryAfterMs) {
-            const fallback = this.config.httpRateLimitBackoffMs || 0;
-            const baseDelay = Number.isFinite(retryAfterMs) && retryAfterMs >= 0 ? retryAfterMs : fallback;
-            const normalizedBase = Math.max(baseDelay, fallback, 1000);
-            const multiplier = Math.pow(2, this.httpRateLimitPenaltyCount || 0);
-            const maxDelay = Math.max(this.config.httpRateLimitBackoffMaxMs || normalizedBase, normalizedBase);
-            const penalty = Math.min(normalizedBase * Math.max(1, multiplier), maxDelay);
-            const cap = this.config.httpRateLimitMaxStrikes || 5;
-            this.httpRateLimitPenaltyCount = Math.min((this.httpRateLimitPenaltyCount || 0) + 1, cap);
-            this.httpRateLimitedUntil = Date.now() + penalty;
-            if (this.batchTimer) {
-                clearTimeout(this.batchTimer);
-                this.batchTimer = null;
-            }
-        }
-
-        resetHttpRateLimitPenalty() {
-            this.httpRateLimitedUntil = 0;
-            this.httpRateLimitPenaltyCount = 0;
-        }
-
         // === Batch Processing ===
         queueUserId(userId) {
             if (this.pageHidden) {
@@ -1405,21 +1324,11 @@
             if (this.batchTimer) {
                 clearTimeout(this.batchTimer);
             }
-            const delay = this.getNextBatchDelay();
-            this.batchTimer = setTimeout(() => this.processBatch(), delay);
+            this.batchTimer = setTimeout(() => this.processBatch(), this.config.batchDelay);
         }
 
         async processBatch() {
             if (this.pendingUserIds.size === 0) return;
-
-            if (this.httpRateLimitedUntil && Date.now() < this.httpRateLimitedUntil) {
-                const delay = this.getNextBatchDelay();
-                if (this.batchTimer) {
-                    clearTimeout(this.batchTimer);
-                }
-                this.batchTimer = setTimeout(() => this.processBatch(), delay);
-                return;
-            }
 
             const batch = Array.from(this.pendingUserIds).slice(0, this.config.maxBatchSize);
             batch.forEach(id => this.pendingUserIds.delete(id));
@@ -1431,7 +1340,6 @@
             const batchStart = Date.now();
             let httpStatus = null;
             let errorCode = null;
-            let retryAfterMs = null;
 
             try {
                 const response = await fetch('/api/users-online-status', {
@@ -1441,7 +1349,6 @@
                 });
 
                 httpStatus = response.status;
-                retryAfterMs = parseRetryAfterMs(response.headers?.get?.('Retry-After'));
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
                 }
@@ -1477,7 +1384,7 @@
                         source: payload.source || 'http'
                     });
                 });
-                this.resetHttpRateLimitPenalty();
+                
                 this.captureBatchMetric({
                     durationMs: Date.now() - batchStart,
                     batchSize: validBatch.length,
@@ -1505,14 +1412,9 @@
                     httpStatus,
                     source: 'http'
                 });
-
-                if (httpStatus === 429) {
-                    this.applyHttpRateLimitPenalty(retryAfterMs);
-                }
             } finally {
                 if (this.pendingUserIds.size > 0) {
-                    const delay = this.getNextBatchDelay();
-                    this.batchTimer = setTimeout(() => this.processBatch(), delay);
+                    this.batchTimer = setTimeout(() => this.processBatch(), this.config.batchDelay);
                 }
             }
         }

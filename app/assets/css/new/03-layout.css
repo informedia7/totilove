@@ -1305,7 +1305,7 @@ html[data-theme="light"] .mobile-menu-item.active,
 }
 
 .card-title span {
-    color: black !important;
+    color: var(--dark-color) !important;
     font-size: 1.5rem !important;
     font-weight: bold !important;
 }

@@ -338,10 +338,21 @@
     font-size: 1.1rem;
 }
 
-.section-title-icon-primary { color: var(--primary); }
-.section-title-icon-danger { color: var(--danger-color); }
-.section-title-icon-warning { color: #f39c12; }
-.section-title-icon-blocked { color: #d63031; }
+.section-title-icon-primary {
+    color: var(--primary);
+}
+
+.section-title-icon-danger {
+    color: var(--danger-color);
+}
+
+.section-title-icon-warning {
+    color: #f39c12;
+}
+
+.section-title-icon-blocked {
+    color: #d63031;
+}
 
 .count-badge {
     background: var(--primary);
@@ -353,8 +364,13 @@
     margin-left: 0.5rem;
 }
 
-.count-badge-warning { background: #f39c12; }
-.count-badge-danger { background: #d63031; }
+.count-badge-warning {
+    background: #f39c12;
+}
+
+.count-badge-danger {
+    background: #d63031;
+}
 
 .section-actions {
     display: flex;
@@ -378,12 +394,29 @@
     justify-content: center;
 }
 
-.view-all-btn { color: var(--primary); }
-.view-all-btn-danger { color: var(--danger-color); border-color: var(--danger-color); }
-.view-all-btn-warning { color: #f39c12; border-color: #f39c12; }
+.view-all-btn {
+    color: var(--primary);
+}
 
-.default-view-btn { color: var(--danger-color); border-color: var(--danger-color); }
-.default-view-btn-warning { color: #f39c12; border-color: #f39c12; }
+.view-all-btn-danger {
+    color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+.view-all-btn-warning {
+    color: #f39c12;
+    border-color: #f39c12;
+}
+
+.default-view-btn {
+    color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+.default-view-btn-warning {
+    color: #f39c12;
+    border-color: #f39c12;
+}
 
 /* Messages */
 .messages-list {
@@ -434,7 +467,9 @@
     word-break: break-word;
 }
 
-.message-card-name-deleted { color: #ff9800; }
+.message-card-name-deleted {
+    color: #ff9800;
+}
 
 .message-card-details-row,
 .message-card-info {
@@ -451,7 +486,9 @@
     margin-bottom: 0.2rem;
 }
 
-.message-card-time i { margin-right: 0.2rem; }
+.message-card-time i {
+    margin-right: 0.2rem;
+}
 
 .message-card-text {
     font-size: 0.9rem;
@@ -493,7 +530,9 @@
     word-break: break-word;
 }
 
-.message-unread-count { color: #00b894; }
+.message-unread-count {
+    color: #00b894;
+}
 
 /* Modals */
 .unblock-confirm-message {
@@ -629,11 +668,14 @@
 
 /* ---------- ANIMATIONS ---------- */
 @keyframes online-blink {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: scale(1);
         box-shadow: 0 0 0 2px #fff, 0 0 4px 1px #00b894;
         opacity: 1;
     }
+
     50% {
         transform: scale(1.07);
         box-shadow: 0 0 0 2.7px #fff, 0 0 7px 1.7px #00b894;
@@ -642,7 +684,9 @@
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes slideInRight {
@@ -650,6 +694,7 @@
         transform: translateX(100%);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -660,15 +705,24 @@
 
 /* Tablet (min-width: 600px) */
 @media (min-width: 600px) {
-    .activity-container { padding: 1.5rem; }
-    .activity-header h2 { font-size: 1.75rem; }
-    .activity-tabs { gap: 0.75rem; }
-    .activity-tab { 
-        min-width: 50px; 
-        min-height: 50px; 
-        padding: 0.5rem 1rem; 
+    .activity-container {
+        padding: 1.5rem;
     }
-    
+
+    .activity-header h2 {
+        font-size: 1.75rem;
+    }
+
+    .activity-tabs {
+        gap: 0.75rem;
+    }
+
+    .activity-tab {
+        min-width: 50px;
+        min-height: 50px;
+        padding: 0.5rem 1rem;
+    }
+
     .activity-card-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -677,85 +731,95 @@
         padding-bottom: 0;
         scroll-snap-type: none;
     }
-    
+
     .activity-card-wrapper {
         flex: initial;
         scroll-snap-align: unset;
     }
-    
-    .activity-card-action-btn { flex: initial; min-width: auto; }
-    
-    .unblock-confirm-actions { 
-        flex-direction: row; 
-        gap: 1rem; 
+
+    .activity-card-action-btn {
+        flex: initial;
+        min-width: auto;
     }
-    
+
+    .unblock-confirm-actions {
+        flex-direction: row;
+        gap: 1rem;
+    }
+
     .unblock-confirm-cancel,
-    .unblock-confirm-yes { 
-        width: auto; 
-        flex: 1; 
+    .unblock-confirm-yes {
+        width: auto;
+        flex: 1;
     }
-    
-    .messages-list.grid { grid-template-columns: repeat(2, 1fr); }
+
+    .messages-list.grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 /* Desktop (min-width: 768px) */
 @media (min-width: 768px) {
-    .activity-container { padding: 2rem; }
-    .activity-header h2 { 
-        font-size: 2rem; 
-        margin-bottom: 1rem; 
+    .activity-container {
+        padding: 2rem;
     }
-    
-    .activity-tabs { 
-        gap: 1rem; 
-        justify-content: flex-start; 
+
+    .activity-header h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
     }
-    
-    .activity-tab { 
-        min-width: 50px; 
-        height: 50px; 
-        padding: 0.5rem 1rem; 
+
+    .activity-tabs {
+        gap: 1rem;
+        justify-content: flex-start;
     }
-    
-    .activity-tab span { display: inline; }
-    
-    .activity-card-grid { 
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+
+    .activity-tab {
+        min-width: 50px;
+        height: 50px;
+        padding: 0.5rem 1rem;
     }
-    
-    .activity-card-overlay { 
-        top: 0.75rem; 
-        left: 0.75rem; 
-        gap: 0.5rem; 
+
+    .activity-tab span {
+        display: inline;
     }
-    
+
+    .activity-card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+
+    .activity-card-overlay {
+        top: 0.75rem;
+        left: 0.75rem;
+        gap: 0.5rem;
+    }
+
     .activity-card-overlay .remove-favorite-btn,
-    .activity-card-overlay .unlike-btn { 
-        width: 36px; 
-        height: 36px; 
+    .activity-card-overlay .unlike-btn {
+        width: 36px;
+        height: 36px;
     }
-    
-    .activity-card-meta { 
-        margin-top: 0.85rem; 
-        font-size: 0.9rem; 
+
+    .activity-card-meta {
+        margin-top: 0.85rem;
+        font-size: 0.9rem;
     }
-    
-    .activity-card-meta-note { 
-        padding: 0.45rem 0.65rem; 
-        font-size: 0.85rem; 
+
+    .activity-card-meta-note {
+        padding: 0.45rem 0.65rem;
+        font-size: 0.85rem;
     }
-    
-    .activity-card-actions { 
-        margin-top: 0.75rem; 
-        gap: 0.5rem; 
+
+    .activity-card-actions {
+        margin-top: 0.75rem;
+        gap: 0.5rem;
     }
-    
-    .activity-card-action-btn { 
-        padding: 0.4rem 0.95rem; 
-        font-size: 0.85rem; 
+
+    .activity-card-action-btn {
+        padding: 0.4rem 0.95rem;
+        font-size: 0.85rem;
     }
-    
+
     .activity-online-dot,
     .activity-container .uc-badge-online.online-dot-results {
         top: 0.5rem;
@@ -764,55 +828,67 @@
         height: 0.85rem;
         border: 3px solid #fff;
     }
-    
-    .messages-list.grid { 
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+
+    .messages-list.grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     }
-    
-    .message-card { padding: 1rem; }
-    .message-card-avatar { width: 50px; height: 50px; }
+
+    .message-card {
+        padding: 1rem;
+    }
+
+    .message-card-avatar {
+        width: 50px;
+        height: 50px;
+    }
 }
 
 /* Large Desktop (min-width: 1024px) */
 @media (min-width: 1024px) {
-    .activity-card-grid { 
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+    .activity-card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     }
-    
-    .messages-list.grid { 
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
+
+    .messages-list.grid {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     }
 }
 
 /* Very Small Phones (max-width: 360px) */
 @media (max-width: 360px) {
-    .activity-container { padding: 0.75rem; }
-    
-    .activity-tab { 
-        min-width: 40px; 
-        min-height: 40px; 
-        padding: 0.3rem 0.6rem; 
-        font-size: 0.8rem; 
+    .activity-container {
+        padding: 0.75rem;
     }
-    
-    .activity-tab i { font-size: 1rem; }
-    
-    .activity-card-action-btn { 
-        font-size: 0.75rem; 
-        padding: 0.3rem 0.6rem; 
+
+    .activity-tab {
+        min-width: 40px;
+        min-height: 40px;
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
     }
-    
-    .section-title { font-size: 1rem; }
-    
-    .count-badge { 
-        font-size: 0.7rem; 
-        padding: 0.15rem 0.5rem; 
+
+    .activity-tab i {
+        font-size: 1rem;
     }
-    
+
+    .activity-card-action-btn {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.6rem;
+    }
+
+    .section-title {
+        font-size: 1rem;
+    }
+
+    .count-badge {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.5rem;
+    }
+
     .view-all-btn,
-    .default-view-btn { 
-        padding: 0.3rem 0.6rem; 
-        font-size: 0.75rem; 
+    .default-view-btn {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.75rem;
     }
 }
 
@@ -823,12 +899,15 @@
         max-height: 300px;
         overflow-y: auto;
     }
-    
-    .activity-tabs { margin-bottom: 1rem; }
+
+    .activity-tabs {
+        margin-bottom: 1rem;
+    }
 }
 
 /* Touch Device Optimizations */
 @media (hover: none) and (pointer: coarse) {
+
     .activity-tab,
     .activity-card-action-btn,
     .unblock-confirm-cancel,
@@ -839,7 +918,7 @@
         min-height: 44px;
         min-width: 44px;
     }
-    
+
     .activity-card-overlay .remove-favorite-btn,
     .activity-card-overlay .unlike-btn {
         width: 36px;
@@ -849,13 +928,22 @@
 
 /* Reduced Motion Support */
 @media (prefers-reduced-motion: reduce) {
+
     .activity-card-action-btn,
     .unblock-confirm-yes,
     .activity-tab {
         transition: none;
     }
-    
-    @keyframes online-blink { 0%, 100% { opacity: 1; } }
-    
-    .loading-spinner { animation-duration: 2s; }
+
+    @keyframes online-blink {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+    }
+
+    .loading-spinner {
+        animation-duration: 2s;
+    }
 }
