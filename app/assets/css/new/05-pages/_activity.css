@@ -100,6 +100,25 @@
     scroll-snap-align: start;
 }
 
+/* Ensure user-card quick actions remain available just like in results grid */
+.activity-container .uc-quick-actions {
+    display: flex !important;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10 !important; /* Above activity-card-overlay (z-index: 5) */
+}
+
+.activity-container .uc-image-container:hover .uc-quick-actions,
+.activity-container .uc-image-container.uc-show-actions .uc-quick-actions {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Ensure the individual quick action buttons are clickable */
+.activity-container .uc-quick-action {
+    pointer-events: auto !important;
+}
+
 .activity-card-overlay {
     position: absolute;
     top: 0.5rem;
@@ -269,10 +288,6 @@
 .activity-online-dot.presence-indicator {
     display: flex;
     align-items: center;
-}
-
-.activity-container .uc-quick-actions {
-    display: none !important;
 }
 
 .activity-container .uc-badge-online.online-dot-results {
@@ -702,6 +717,15 @@
 }
 
 /* ---------- RESPONSIVE BREAKPOINTS ---------- */
+
+/* Mobile Portrait - More space between quick action buttons */
+@media (max-width: 767px) and (orientation: portrait) {
+    .activity-container .uc-quick-actions {
+        gap: 30px !important;
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+    }
+}
 
 /* Tablet (min-width: 600px) */
 @media (min-width: 600px) {
