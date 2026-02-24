@@ -329,6 +329,12 @@
     contain: none !important;
 }
 
+.message-actions.is-visible {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+}
+
 /* Position actions above for sent messages */
 .message.sent .message-actions {
     right: 10px;
