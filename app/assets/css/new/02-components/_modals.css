@@ -1,0 +1,1034 @@
+/* ========================================
+   MODALS COMPONENT
+   Extracted from: 
+   - app/assets/css/02-components.css
+   - app/assets/css/talk_modals.css
+   - app/components/modals/languages-modal.css
+   - Inline styles in HTML files
+   Migration Phase 1: Week 4
+   
+   This file contains all modal styles.
+   Old files still exist and work - this is parallel extraction.
+   ======================================== */
+
+/* ===== MODAL BASE STYLES ===== */
+:root {
+    /* Modal Design Tokens */
+    --modal-z-index: 10000;
+    --modal-z-index-overlay: 10001;
+    --modal-backdrop: rgba(0, 0, 0, 0.5);
+    --modal-backdrop-dark: rgba(0, 0, 0, 0.7);
+    --modal-backdrop-blur: blur(4px);
+    --modal-radius: 16px;
+    --modal-radius-sm: 12px;
+    --modal-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    --modal-transition: 0.3s ease;
+}
+
+/* ===== BASE MODAL STRUCTURE ===== */
+.modal,
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: var(--modal-z-index);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay {
+    position: absolute;
+    background: var(--modal-backdrop-dark);
+    backdrop-filter: var(--modal-backdrop-blur);
+    -webkit-backdrop-filter: var(--modal-backdrop-blur);
+}
+
+.modal-content,
+.modal-window {
+    position: relative;
+    background: white;
+    border-radius: var(--modal-radius);
+    padding: var(--lg);
+    max-width: 600px;
+    width: 90%;
+    box-shadow: var(--modal-shadow);
+    animation: modalSlideUp var(--modal-transition);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+@keyframes modalSlideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ===== MESSAGE MODAL ===== */
+.message-modal.show,
+.message-modal[style*="display: block"] {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: var(--modal-z-index);
+}
+
+.message-modal .modal-content {
+    width: 92%;
+    max-width: 100%;
+    background: var(--card, white);
+    border-radius: var(--r-lg, 16px) var(--r-lg, 16px) 0 0;
+    padding: var(--md, 1rem);
+    max-height: 92vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg, 0 10px 40px rgba(0, 0, 0, 0.15));
+}
+
+/* Universal Message Modal */
+.universal-message-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--modal-backdrop);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--modal-z-index);
+}
+
+.message-modal-window {
+    background: white;
+    border-radius: var(--modal-radius-sm);
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--modal-shadow);
+}
+
+.message-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.message-modal-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.message-modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #666;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.message-modal-close-btn:hover {
+    background: #f0f0f0;
+}
+
+.message-modal-form {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.message-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    width: 100%;
+    margin-top: auto;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+}
+
+.message-modal-footer--inline {
+    margin-top: 1rem;
+    padding-top: 1rem;
+}
+
+.universal-message-modal .message-modal-footer--inline {
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+}
+
+.universal-message-modal .message-modal-footer--inline .send-btn {
+    margin-right: 20px;
+}
+
+.universal-message-modal .cancel-btn,
+.universal-message-modal .send-btn {
+    padding: 0.45rem 1.15rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    line-height: 1.2;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.universal-message-modal .cancel-btn {
+    background: #f4f6fb;
+    border-color: #d6d9e4;
+    color: #4b5873;
+}
+
+.universal-message-modal .cancel-btn:hover {
+    background: #e8ecf6;
+    color: #2f3c5a;
+}
+
+.universal-message-modal .send-btn {
+    background: linear-gradient(135deg, #667eea, #7f8ff4);
+    box-shadow: 0 6px 14px rgba(102, 126, 234, 0.25);
+}
+
+.universal-message-modal .send-btn:hover {
+    background: linear-gradient(135deg, #5a6fd8, #7282ec);
+    box-shadow: 0 8px 18px rgba(102, 126, 234, 0.35);
+}
+
+/* ===== BLOCK/UNBLOCK CONFIRMATION MODAL ===== */
+.block-confirm-modal,
+.unblock-confirm-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: var(--modal-z-index);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.block-confirm-overlay,
+.unblock-confirm-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--modal-backdrop-dark);
+    backdrop-filter: var(--modal-backdrop-blur);
+    -webkit-backdrop-filter: var(--modal-backdrop-blur);
+}
+
+.block-confirm-content,
+.unblock-confirm-content {
+    position: relative;
+    background: white;
+    border-radius: var(--modal-radius);
+    padding: var(--lg, 2rem);
+    max-width: 450px;
+    width: 90%;
+    box-shadow: var(--modal-shadow);
+    animation: modalSlideUp var(--modal-transition);
+    text-align: center;
+}
+
+.block-confirm-icon,
+.unblock-confirm-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto var(--md, 1.5rem);
+    background: linear-gradient(135deg, #d63031, #e74c3c);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+}
+
+.unblock-confirm-icon {
+    background: linear-gradient(135deg, #00b894, #00d2a0);
+}
+
+.block-confirm-title,
+.unblock-confirm-title {
+    font-size: var(--f-xl, 1.5rem);
+    color: var(--dark, #2d3436);
+    margin-bottom: var(--md, 1rem);
+    font-weight: 700;
+}
+
+.block-confirm-message,
+.unblock-confirm-message {
+    color: var(--text-muted, #636e72);
+    line-height: 1.6;
+    margin-bottom: var(--lg, 2rem);
+    font-size: var(--f-md, 1rem);
+}
+
+.block-confirm-message strong,
+.unblock-confirm-message strong {
+    color: var(--dark, #2d3436);
+    font-weight: 600;
+}
+
+.block-confirm-actions,
+.unblock-confirm-actions {
+    display: flex;
+    gap: var(--md, 1rem);
+    justify-content: center;
+}
+
+.block-confirm-cancel,
+.block-confirm-yes,
+.unblock-confirm-cancel,
+.unblock-confirm-yes {
+    padding: var(--md, 0.8rem) var(--lg, 1.5rem);
+    border-radius: var(--r-md, 8px);
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-size: var(--f-md, 1rem);
+    transition: var(--transition, all 0.3s ease);
+    display: flex;
+    align-items: center;
+    gap: var(--sm, 0.5rem);
+    min-height: var(--touch, 44px);
+}
+
+.block-confirm-cancel,
+.unblock-confirm-cancel {
+    background: #dfe6e9;
+    color: var(--dark, #2d3436);
+}
+
+.block-confirm-cancel:hover,
+.unblock-confirm-cancel:hover {
+    background: #b2bec3;
+}
+
+.block-confirm-yes {
+    background: linear-gradient(135deg, #d63031, #e74c3c);
+    color: white;
+}
+
+.block-confirm-yes:hover {
+    background: linear-gradient(135deg, #c0392b, #d63031);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(214, 48, 49, 0.3);
+}
+
+.unblock-confirm-yes {
+    background: linear-gradient(135deg, #00b894, #00d2a0);
+    color: white;
+}
+
+.unblock-confirm-yes:hover {
+    background: linear-gradient(135deg, #00a885, #00b894);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 184, 148, 0.3);
+}
+
+/* ===== REPORT MODAL ===== */
+.report-modal.show,
+.report-modal[style*="display: block"] {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: var(--modal-z-index);
+}
+
+.report-modal-content {
+    width: 92%;
+    max-width: 600px;
+    background: var(--card, white);
+    border-radius: var(--r-lg, 16px) var(--r-lg, 16px) 0 0;
+    padding: var(--md, 1rem);
+    max-height: 92vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg, 0 10px 40px rgba(0, 0, 0, 0.15));
+}
+
+/* ===== MODAL CLOSE BUTTON ===== */
+.modal-close {
+    position: absolute;
+    top: var(--md, 1rem);
+    right: var(--md, 1rem);
+    background: transparent;
+    border: none;
+    font-size: var(--f-xl, 1.5rem);
+    color: var(--text, #333);
+    cursor: pointer;
+    width: var(--touch, 44px);
+    height: var(--touch, 44px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--r-full, 50%);
+    transition: var(--transition, all 0.3s ease);
+}
+
+.modal-close:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* ===== MODAL ACTION BUTTONS ===== */
+.modal-like-btn,
+.modal-message-btn,
+.modal-report-btn {
+    min-height: var(--touch, 44px);
+    padding: var(--sm, 0.5rem) var(--md, 1rem);
+    border-radius: var(--r-md, 8px);
+    font-size: var(--f-md, 1rem);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sm, 0.5rem);
+    cursor: pointer;
+    transition: var(--transition, all 0.3s ease);
+}
+
+/* ===== LANGUAGES MODAL ===== */
+.languages-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--modal-backdrop);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--modal-z-index);
+}
+
+.languages-modal-window {
+    background: white;
+    border-radius: var(--modal-radius);
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--modal-shadow);
+    overflow: hidden;
+}
+
+.languages-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 2px solid #e1e5e9;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    flex-shrink: 0;
+}
+
+.languages-modal-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.languages-modal-close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+    min-width: 36px;
+    min-height: 36px;
+}
+
+.languages-modal-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.languages-modal-content {
+    padding: 1rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.languages-checkbox-section {
+    margin-bottom: 1rem;
+}
+
+.languages-checkbox-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.languages-checkbox-header .section-label {
+    margin: 0;
+}
+
+.unselect-all-languages-btn {
+    background: #f8f9fa;
+    color: #6c757d;
+    border: 2px solid #e9ecef;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+}
+
+.unselect-all-languages-btn:hover {
+    background: #e9ecef;
+    color: #495057;
+    border-color: #dee2e6;
+}
+
+.section-label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #333;
+    margin-bottom: 0.75rem;
+}
+
+.languages-checkbox-container {
+    max-height: none;
+    overflow-y: visible;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.5rem;
+}
+
+.language-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: white;
+    border: 2px solid #e1e5e9;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.language-checkbox-item:hover {
+    border-color: #667eea;
+    background: #f0f4ff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.1);
+}
+
+.language-checkbox-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #667eea;
+    flex-shrink: 0;
+}
+
+.checkbox-label {
+    font-size: 0.9rem;
+    color: #555;
+    cursor: pointer;
+    flex: 1;
+}
+
+.languages-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-top: 2px solid #e1e5e9;
+    background: #f8f9fa;
+    flex-shrink: 0;
+}
+
+.cancel-languages-btn,
+.save-languages-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+}
+
+.cancel-languages-btn {
+    background: #f8f9fa;
+    color: #6c757d;
+    border: 2px solid #e9ecef;
+}
+
+.cancel-languages-btn:hover {
+    background: #e9ecef;
+    color: #495057;
+}
+
+.save-languages-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.save-languages-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.save-languages-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ===== RICH TEXT EDITOR (Message Modal) ===== */
+.rich-text-toolbar {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+}
+
+.toolbar-btn {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #666;
+    transition: all 0.2s;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toolbar-btn:hover {
+    background: #e9ecef;
+    color: #333;
+}
+
+.toolbar-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+.rich-text-editor {
+    min-height: 150px;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0 0 8px 8px;
+    outline: none;
+    font-family: inherit;
+    line-height: 1.5;
+    overflow-y: auto;
+}
+
+.rich-text-editor:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    .modal-content,
+    .modal-window,
+    .block-confirm-content,
+    .unblock-confirm-content {
+        width: 95%;
+        padding: var(--md, 1rem);
+    }
+    
+    .block-confirm-content {
+        max-width: 225px;
+        width: 203px;
+        padding: 1rem;
+        margin: 1rem;
+    }
+    
+    .block-confirm-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+        margin: 0 auto 0.75rem;
+    }
+    
+    .block-confirm-title {
+        font-size: 0.75rem;
+        margin: 0.5rem 0 0.5rem;
+    }
+    
+    .block-confirm-message {
+        font-size: 0.5rem;
+        line-height: 1.4;
+        margin-bottom: 1rem;
+    }
+    
+    .block-confirm-actions {
+        flex-direction: row;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+    
+    .block-confirm-cancel,
+    .block-confirm-yes {
+        flex: 1;
+        padding: 0.4rem 0.75rem;
+        font-size: 0.5rem;
+    }
+    
+    .languages-modal-window {
+        width: 95%;
+        max-height: 90vh;
+    }
+    
+    .languages-checkbox-container {
+        grid-template-columns: 1fr;
+        max-height: 300px;
+    }
+    
+    .languages-modal-footer {
+        flex-direction: column-reverse;
+    }
+    
+    .cancel-languages-btn,
+    .save-languages-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .block-confirm-content {
+        width: 95% !important;
+        padding: 1.25rem !important;
+        margin: 0.5rem !important;
+    }
+    
+    .block-confirm-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .block-confirm-title {
+        font-size: 1.1rem;
+        margin: 0.75rem 0 0.5rem;
+    }
+    
+    .block-confirm-message {
+        font-size: 0.85rem;
+        margin-bottom: 1.25rem;
+    }
+    
+    .block-confirm-cancel,
+    .block-confirm-yes {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.85rem;
+    }
+}
+
+@media (min-width: 500px) {
+    .block-confirm-content {
+        width: 450px !important;
+    }
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content,
+    .modal-window,
+    .block-confirm-content,
+    .unblock-confirm-content {
+        animation: none;
+    }
+    
+    .block-confirm-yes:hover,
+    .unblock-confirm-yes:hover {
+        transform: none;
+    }
+}
+
+/* Focus visible for keyboard navigation */
+.modal-close:focus-visible,
+.message-modal-close-btn:focus-visible,
+.languages-modal-close-btn:focus-visible {
+    outline: 2px solid var(--primary-color, #667eea);
+    outline-offset: 2px;
+}
+
+/* ========================================
+   LANGUAGE FLAG ICONS
+   Migrated from: app/components/modals/languages-modal.css
+   Date: 2025-01-XX
+   ======================================== */
+
+/* CSS flag icons as fallback */
+.flag-icon {
+    display: inline-block;
+    width: 24px;
+    height: 18px;
+    border-radius: 3px;
+    vertical-align: middle;
+}
+
+.language-flag-icon {
+    flex-shrink: 0;
+    border-radius: 3px;
+    width: 24px;
+    height: 18px;
+    display: inline-block;
+    background-color: #e1e5e9;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Specific flag classes override the default background */
+.language-flag-icon.flag-icon[class*="flag-"] {
+    background-color: transparent;
+}
+
+/* Flag styles for various countries */
+.flag-us {
+    background: linear-gradient(to bottom, #B22234 0%, #B22234 7.7%, #FFFFFF 7.7%, #FFFFFF 15.4%, #B22234 15.4%);
+}
+
+.flag-es {
+    background: linear-gradient(to bottom, #C60B1E 25%, #FFC400 25%, #FFC400 75%, #C60B1E 75%);
+}
+
+.flag-fr {
+    background: linear-gradient(to right, #002395 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #ED2939 66.66%);
+}
+
+.flag-de {
+    background: linear-gradient(to bottom, #000000 33.33%, #DD0000 33.33%, #DD0000 66.66%, #FFCE00 66.66%);
+}
+
+.flag-it {
+    background: linear-gradient(to right, #009246 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #CE2B37 66.66%);
+}
+
+.flag-pt {
+    background: linear-gradient(to bottom, #006600 0%, #006600 50%, #FF0000 50%, #FF0000 100%);
+}
+
+.flag-ru {
+    background: linear-gradient(to bottom, #FFFFFF 33.33%, #0039A6 33.33%, #0039A6 66.66%, #D52B1E 66.66%);
+}
+
+.flag-cn, .flag-zh {
+    background: #DE2910;
+    position: relative;
+}
+
+.flag-cn:before, .flag-zh:before {
+    content: '★';
+    color: #FFDE00;
+    position: absolute;
+    left: 2px;
+    top: -1px;
+    font-size: 12px;
+}
+
+.flag-ja, .flag-jp {
+    background: #FFFFFF;
+    background-image: radial-gradient(circle, #BC002D 30%, transparent 30%);
+    background-size: 50% 50%;
+    background-position: center;
+}
+
+.flag-ko, .flag-kr {
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 50%, #000000 50%, #000000 100%);
+    background-image: 
+        radial-gradient(circle at 50% 50%, #CE1126 20%, transparent 20%),
+        linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 50%, #000000 50%, #000000 100%);
+}
+
+.flag-ar, .flag-sa {
+    background: linear-gradient(to bottom, #000000 0%, #000000 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #006C35 66.66%);
+}
+
+.flag-hi, .flag-in {
+    background: linear-gradient(to bottom, #FF9933 0%, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%);
+    background-image: 
+        radial-gradient(circle at 50% 50%, #000080 15%, transparent 15%),
+        linear-gradient(to bottom, #FF9933 0%, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%);
+}
+
+.flag-vn {
+    background: linear-gradient(to bottom, #DA020E 50%, #FFFF00 50%);
+    position: relative;
+}
+
+.flag-vn:before {
+    content: '★';
+    color: #FFFF00;
+    position: absolute;
+    left: 8px;
+    top: 1px;
+    font-size: 10px;
+}
+
+.flag-th {
+    background: linear-gradient(to bottom, #ED1C24 16.66%, #FFFFFF 16.66%, #FFFFFF 33.33%, #241D4F 33.33%, #241D4F 66.66%, #FFFFFF 66.66%, #FFFFFF 83.33%, #ED1C24 83.33%);
+}
+
+.flag-tr {
+    background: linear-gradient(to bottom, #E30A17 0%, #E30A17 50%, #FFFFFF 50%);
+    background-image: 
+        radial-gradient(circle at 25% 50%, #FFFFFF 12%, transparent 12%),
+        linear-gradient(to bottom, #E30A17 0%, #E30A17 50%, #FFFFFF 50%);
+}
+
+.flag-pl {
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 50%, #DC143C 50%);
+}
+
+.flag-nl {
+    background: linear-gradient(to bottom, #AE1C28 0%, #AE1C28 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #21468B 66.66%);
+}
+
+.flag-sv {
+    background: linear-gradient(to bottom, #006AA7 0%, #006AA7 50%, #FECC00 50%);
+    background-image: 
+        linear-gradient(to right, #006AA7 0%, #006AA7 50%, #FECC00 50%),
+        linear-gradient(to bottom, #006AA7 0%, #006AA7 50%, #FECC00 50%);
+    background-size: 30% 30%;
+    background-position: left top;
+}
+
+.flag-no {
+    background: linear-gradient(to bottom, #BA0C2F 0%, #BA0C2F 50%, #FFFFFF 50%);
+    background-image: 
+        linear-gradient(to right, #BA0C2F 0%, #BA0C2F 50%, #FFFFFF 50%),
+        linear-gradient(to bottom, #BA0C2F 0%, #BA0C2F 50%, #FFFFFF 50%);
+    background-size: 30% 30%;
+    background-position: left top;
+}
+
+.flag-da, .flag-dk {
+    background: linear-gradient(to bottom, #C8102E 0%, #C8102E 50%, #FFFFFF 50%);
+    background-image: 
+        linear-gradient(to right, #C8102E 0%, #C8102E 50%, #FFFFFF 50%),
+        linear-gradient(to bottom, #C8102E 0%, #C8102E 50%, #FFFFFF 50%);
+    background-size: 30% 30%;
+    background-position: left top;
+}
+
+.flag-fi {
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 50%, #003580 50%);
+    background-image: 
+        linear-gradient(to right, #FFFFFF 0%, #FFFFFF 50%, #003580 50%),
+        linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 50%, #003580 50%);
+    background-size: 30% 30%;
+    background-position: left top;
+}
+
+.flag-el, .flag-gr {
+    background: linear-gradient(to bottom, #0D5EAF 0%, #0D5EAF 25%, #FFFFFF 25%, #FFFFFF 50%, #0D5EAF 50%, #0D5EAF 75%, #FFFFFF 75%);
+}
+
+.flag-he, .flag-il {
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 50%, #0038B8 50%);
+}
+
+.flag-cs {
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 50%, #D7141A 50%);
+}
+
+.flag-hu {
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 33.33%, #CE2939 33.33%, #CE2939 66.66%, #477050 66.66%);
+}
+
+.flag-ro {
+    background: linear-gradient(to right, #002B7F 0%, #002B7F 33.33%, #FCD116 33.33%, #FCD116 66.66%, #CE1126 66.66%);
+}
+
+.flag-bg {
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 33.33%, #00966E 33.33%, #00966E 66.66%, #D62612 66.66%);
+}
+
+.flag-hr {
+    background: linear-gradient(to bottom, #171796 0%, #171796 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #FF0000 66.66%);
+}
+
+.flag-sk {
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 33.33%, #0B4EA2 33.33%, #0B4EA2 66.66%, #EE1C25 66.66%);
+}
+
+.flag-sl {
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 33.33%, #0C47B7 33.33%, #0C47B7 66.66%, #FF0000 66.66%);
+}
+
+.flag-uk, .flag-ua {
+    background: linear-gradient(to bottom, #0057B7 0%, #0057B7 50%, #FFD700 50%);
+}
+
+/* Fallback for languages without specific flag styles */
+.flag-icon:not([class*="flag-"]) {
+    background: #e1e5e9;
+}
+
+
+
+

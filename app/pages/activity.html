@@ -1,0 +1,251 @@
+<!-- Extracted CSS from activity.html - Phase 1 CSS Extraction -->
+<link rel="stylesheet" href="/assets/css/new/02-components/components.css">
+<link rel="stylesheet" href="/assets/css/new/05-pages/_activity.css">
+
+<!-- Include Universal Message Modal (must be loaded before activity script) -->
+{{include:modals/universal-message-modal}}
+
+<!-- Include User Profile Modal -->
+{{include:modals/user-profile-modal}}
+
+<!-- Include User Report Modal -->
+{{include:modals/user-report-modal}}
+
+<!-- Block Confirmation Modal -->
+<div id="blockConfirmModal" class="block-confirm-modal" style="display: none;">
+    <div class="block-confirm-overlay"></div>
+    <div class="block-confirm-content">
+        <div class="block-confirm-icon">
+            <i class="fas fa-ban"></i>
+        </div>
+        <h3 class="block-confirm-title">Block User?</h3>
+        <p class="block-confirm-message">Are you sure you want to block <strong id="blockUsername">this user</strong>?
+            They will no longer be able to contact you or see your profile in search results.</p>
+        <div class="block-confirm-actions">
+            <button class="block-confirm-cancel" onclick="closeBlockConfirm()">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+            <button class="block-confirm-yes" onclick="confirmBlock()">
+                <i class="fas fa-ban"></i> Block User
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Unblock Confirmation Modal -->
+<div id="unblockConfirmModal" class="unblock-confirm-modal" style="display: none;">
+    <div class="unblock-confirm-overlay"></div>
+    <div class="unblock-confirm-content">
+        <div class="unblock-confirm-icon">
+            <i class="fas fa-unlock"></i>
+        </div>
+        <h3 class="unblock-confirm-title">Unblock User?</h3>
+        <p class="unblock-confirm-message">Are you sure you want to unblock <strong id="unblockUsername">this
+                user</strong>? They will be able to contact you and see your profile in search results again.</p>
+        <div class="unblock-confirm-actions">
+            <button class="unblock-confirm-cancel" onclick="closeUnblockConfirm()">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+            <button class="unblock-confirm-yes" onclick="confirmUnblock()">
+                <i class="fas fa-unlock"></i> Unblock User
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Activity Page -->
+<script>
+    // Inject user data from server template variables
+    window.currentUser = {
+        id: parseInt('{{userId}}') || null,
+        real_name: '{{realName}}' || '',
+        email: '{{userEmail}}' || ''
+    };
+
+    // Set authentication status
+    window.isAuthenticated = window.currentUser.id && window.currentUser.id !== 'null' && window.currentUser.id !== '';
+
+    // Load email verification check utility
+    if (!window.checkEmailVerificationStatus) {
+        const script = document.createElement('script');
+        script.src = '/assets/js/new/shared/email-verification-check.js';
+        document.head.appendChild(script);
+    }
+</script>
+<div class="activity-container">
+    <!-- Activity Header -->
+    <div class="card-header">
+        <div class="card-title">
+            <div class="card-icon">
+                <i class="fas fa-bell"></i>
+            </div>
+            <span>Activity:</span>
+        </div>
+    </div>
+
+    <div class="activity-tabs">
+        <button class="activity-tab active" data-tab="all" title="All Activity">
+            <i class="fas fa-bell"></i>
+            <span>All Activity</span>
+        </button>
+        <button class="activity-tab" data-tab="messages" title="Messages">
+            <i class="fas fa-envelope"></i>
+        </button>
+        <button class="activity-tab" data-tab="views" style="position: relative;" title="Who Viewed Me">
+            <i class="fas fa-eye"></i>
+            <span class="views-badge notification-badge"
+                style="position: absolute; top: -15px; right: -5px; background: #00b894; border-radius: 50%; width: 19px; height: 19px; border: 3px solid #fff; box-shadow: 0 0 0 2px #fff; animation: online-blink 3s infinite; z-index: 2; display: none; align-items: center; justify-content: center; box-sizing: border-box;"></span>
+        </button>
+        <button class="activity-tab" data-tab="favorites" title="My Favorites">
+            <i class="fas fa-heart" style="color: var(--danger-color);"></i>
+        </button>
+        <button class="activity-tab" data-tab="likes" title="Who Liked Me">
+            <i class="fas fa-thumbs-up" style="color: #f39c12;"></i>
+        </button>
+        <button class="activity-tab" data-tab="my-likes" title="Who I Like">
+            <i class="fas fa-user-plus" style="color: #f39c12;"></i>
+        </button>
+        <button class="activity-tab" data-tab="blocked" title="Blocked Users">
+            <i class="fas fa-ban"></i>
+        </button>
+    </div>
+
+    <!-- Who Viewed Me Section -->
+    <div class="activity-section viewers-section" data-section="viewers" style="margin-bottom: 2.5rem;">
+        <div class="section-header"
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="color: var(--dark-color); display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-eye" style="color: var(--primary);"></i>
+                Who Viewed Me
+                <span class="viewers-count-badge"
+                    style="background: var(--primary); color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">0
+                    today</span>
+                <div class="viewers-view-all" style="display: none; margin-left: 0.5rem;">
+                    <button class="view-all-viewers-btn"
+                        style="background: transparent; color: var(--primary); border: 2px solid var(--primary); padding: 0.4rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">View
+                        All (<span class="total-viewers-count">0</span>)</button>
+                </div>
+            </h3>
+        </div>
+
+        <div class="viewers-list activity-card-grid">
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <!-- My Favorites Section -->
+    <div class="activity-section favorites-section" data-section="favorites" style="margin-bottom: 2.5rem;">
+        <div class="section-header"
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="color: var(--dark-color); display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-heart" style="color: var(--danger-color);"></i>
+                My Favorites
+                <div class="favorites-view-all" style="display: inline-block; margin-left: 0.5rem;">
+                    <button class="view-all-favorites-btn"
+                        style="background: transparent; color: var(--danger-color); border: 2px solid var(--danger-color); padding: 0.4rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">View
+                        All (<span class="total-favorites-count">0</span>)</button>
+                </div>
+                <div class="favorites-default-view" style="display: none; margin-left: 0.5rem;">
+                    <button class="default-view-favorites-btn"
+                        style="background: transparent; color: var(--danger-color); border: 2px solid var(--danger-color); padding: 0.4rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">Default
+                        View</button>
+                </div>
+            </h3>
+        </div>
+
+        <div class="favorites-grid activity-card-grid">
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <!-- New Messages Section -->
+    <div class="activity-section messages-section" data-section="messages" data-mobile-collapsed="true" data-collapsible="true" style="margin-bottom: 2.5rem;">
+        <div class="section-header"
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; cursor: pointer;"
+            onclick="ActivityManager.toggleSection('messages')">
+            <h3 style="color: var(--dark-color); display: flex; align-items: center; gap: 0.5rem;">
+                <span class="messages-toggle-icon"
+                    style="font-size: 1.5rem; color: var(--dark-color); user-select: none;">+</span>
+                <i class="fas fa-envelope" style="color: var(--primary);"></i>
+                New Messages
+                <span class="messages-count-badge"
+                    style="background: var(--primary); color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">0
+                    new</span>
+            </h3>
+        </div>
+
+        <div class="messages-list" style="display: none; gap: 1rem;">
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <!-- Who Liked Me Section -->
+    <div class="activity-section who-liked-me-section" data-section="who-liked-me" data-mobile-collapsed="true" data-collapsible="true" style="margin-bottom: 2.5rem;">
+        <div class="section-header"
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="color: var(--dark-color); display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-thumbs-up" style="color: #f39c12;"></i>
+                Who Liked Me
+                <span class="who-liked-me-count-badge"
+                    style="background: #f39c12; color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">0
+                    today</span>
+                <div class="who-liked-me-view-all" style="display: none; margin-left: 0.5rem;">
+                    <button class="view-all-who-liked-me-btn"
+                        style="background: transparent; color: #f39c12; border: 2px solid #f39c12; padding: 0.4rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">View
+                        All (<span class="total-who-liked-me-count">0</span>)</button>
+                </div>
+            </h3>
+        </div>
+
+        <div class="who-liked-me-grid activity-card-grid">
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <!-- Who I Like Section -->
+    <div class="activity-section who-i-like-section" data-section="who-i-like" data-mobile-collapsed="true" data-collapsible="true" style="margin-bottom: 2.5rem;">
+        <div class="section-header"
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="color: var(--dark-color); display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-thumbs-up" style="color: #f39c12;"></i>
+                Who I Like
+                <div class="who-i-like-view-all" style="display: inline-block; margin-left: 0.5rem;">
+                    <button class="view-all-who-i-like-btn"
+                        style="background: transparent; color: #f39c12; border: 2px solid #f39c12; padding: 0.4rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">View
+                        All (<span class="total-who-i-like-count">0</span>)</button>
+                </div>
+                <div class="who-i-like-default-view" style="display: none; margin-left: 0.5rem;">
+                    <button class="default-view-who-i-like-btn"
+                        style="background: transparent; color: #f39c12; border: 2px solid #f39c12; padding: 0.4rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">Default
+                        View</button>
+                </div>
+            </h3>
+        </div>
+
+        <div class="who-i-like-grid activity-card-grid">
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <!-- Blocked Users Section -->
+    <div class="activity-section blocked-users-section" data-section="blocked" data-mobile-collapsed="true" data-collapsible="true" style="margin-bottom: 2.5rem;">
+        <div class="section-header"
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="color: var(--dark-color); display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-ban" style="color: #d63031;"></i>
+                Blocked Users
+                <span class="blocked-users-count-badge"
+                    style="background: #d63031; color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">0
+                    blocked</span>
+            </h3>
+        </div>
+
+        <div class="blocked-users-grid activity-card-grid">
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Activity Page JavaScript - Moved to new structure (Phase 1 CSS/JS Extraction) -->
+<script src="/components/user-card/user-card.js"></script>
+<script src="/assets/js/new/pages/activity.js"></script>

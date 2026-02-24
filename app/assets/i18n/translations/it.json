@@ -1,0 +1,195 @@
+{
+  "app": {
+    "name": "Totilove",
+    "tagline": "Trova l'Amore Senza Confini",
+    "description": "Connettiti con persone in tutto il mondo attraverso il nostro sistema di compatibilità intelligente"
+  },
+  "navigation": {
+    "home": "Home",
+    "about": "Chi Siamo",
+    "features": "Funzionalità",
+    "pricing": "Prezzi",
+    "contact": "Contatti",
+    "login": "Accedi",
+    "register": "Registrati Gratis",
+    "profile": "Profilo",
+    "messages": "Messaggi",
+    "matches": "Match",
+    "settings": "Impostazioni",
+    "logout": "Esci"
+  },
+  "hero": {
+    "title": "Trova l'Amore Senza Confini",
+    "subtitle": "Connettiti con persone in tutto il mondo attraverso il nostro sistema di compatibilità intelligente. Supporto per 25+ lingue, preferenze culturali e il tuo sistema di misurazione preferito.",
+    "features": {
+      "languages": "25+ Lingue",
+      "matching": "Compatibilità Intelligente",
+      "security": "Sicuro e Protetto",
+      "mobile": "Ottimizzato Mobile"
+    },
+    "cta": {
+      "primary": "Registrati Gratis Oggi",
+      "secondary": "Scopri di Più"
+    }
+  },
+  "features": {
+    "title": "Perché Scegliere Totilove?",
+    "subtitle": "La nostra piattaforma combina tecnologia all'avanguardia con sensibilità culturale per aiutarti a trovare connessioni significative in tutto il mondo.",
+    "items": {
+      "languages": {
+        "title": "Supporto Multi-lingua",
+        "description": "Connettiti nella tua lingua madre. Supportiamo 25+ lingue mondiali con monitoraggio della fluidità e preferenze di compatibilità culturale."
+      },
+      "matching": {
+        "title": "Algoritmo di Compatibilità Intelligente",
+        "description": "Il nostro sistema alimentato dall'IA considera lingue condivise, interessi, background culturale e preferenze personali per una compatibilità ottimale."
+      },
+      "interests": {
+        "title": "Connessioni Basate sugli Interessi",
+        "description": "Trova persone che condividono le tue passioni. Dallo sport alle arti, dalla tecnologia ai viaggi - connettiti su quello che ami di più."
+      },
+      "culture": {
+        "title": "Intelligenza Culturale",
+        "description": "Rispetta le differenze culturali con preferenze regionali automatiche, sistemi di misurazione e compatibilità culturalmente consapevole."
+      },
+      "privacy": {
+        "title": "Privacy e Sicurezza",
+        "description": "La tua sicurezza è la nostra priorità. Verifica avanzata, controlli della privacy e messaggistica sicura proteggono le tue informazioni personali."
+      },
+      "mobile": {
+        "title": "Ottimizzato Mobile",
+        "description": "Rimani connesso ovunque. Il nostro design responsive funziona perfettamente su desktop, tablet e dispositivi mobili."
+      }
+    }
+  },
+  "showcase": {
+    "title": "Esprimiti Completamente",
+    "subtitle": "Condividi le tue lingue, interessi e preferenze nel modo che ti sembra più naturale.",
+    "tabs": {
+      "languages": "Lingue",
+      "interests": "Interessi",
+      "measurements": "Misure"
+    },
+    "languages": {
+      "english": "Madrelingua, Fluente, Avanzato",
+      "italian": "Lingua Romanza",
+      "french": "Lingua Romanza",
+      "german": "Famiglia Germanica",
+      "spanish": "Lingua Romanza",
+      "russian": "Lingua Slava",
+      "chinese": "Cinese Mandarino",
+      "vietnamese": "Lingua Vietnamita",
+      "thai": "Famiglia Tonale",
+      "more": "Copertura Mondiale"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Bentornato",
+      "email": "Indirizzo Email",
+      "password": "Password",
+      "remember": "Ricordami",
+      "forgot": "Password Dimenticata?",
+      "submit": "Accedi",
+      "register_link": "Non hai un account? Registrati Gratis"
+    },
+    "register": {
+      "title": "Unisciti a Totilove",
+      "subtitle": "Inizia il tuo viaggio d'amore internazionale",
+      "first_name": "Nome",
+      "last_name": "Cognome",
+      "email": "Indirizzo Email",
+      "password": "Password",
+      "confirm_password": "Conferma Password",
+      "birth_date": "Data di Nascita",
+      "gender": "Genere",
+      "male": "Uomo",
+      "female": "Donna",
+      "other": "Altro",
+      "terms": "Accetto i termini di servizio e la politica sulla privacy",
+      "submit": "Crea Account",
+      "login_link": "Hai già un account? Accedi"
+    }
+  },
+  "profile": {
+    "title": "Il Mio Profilo",
+    "edit": "Modifica Profilo",
+    "basic_info": "Informazioni di Base",
+    "languages": "Lingue",
+    "interests": "Interessi",
+    "preferences": "Preferenze",
+    "photos": "Foto",
+    "save": "Salva",
+    "cancel": "Annulla"
+  },
+  "chat": {
+    "title": "Messaggi",
+    "new_message": "Nuovo Messaggio",
+    "search": "Cerca conversazioni...",
+    "online": "Online",
+    "offline": "Offline",
+    "typing": "sta scrivendo...",
+    "send": "Invia",
+    "attach": "Allega",
+    "emoji": "Emoji"
+  },
+  "matches": {
+    "title": "Match",
+    "new_matches": "Nuovi Match",
+    "mutual_likes": "Mi Piace Reciproci",
+    "view_profile": "Visualizza Profilo",
+    "send_message": "Invia Messaggio",
+    "like": "Mi Piace",
+    "pass": "Passa"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "account": "Account",
+    "privacy": "Privacy",
+    "notifications": "Notifiche",
+    "language": "Lingua",
+    "measurements": "Sistema di Misurazione",
+    "metric": "Metrico",
+    "imperial": "Imperiale",
+    "save": "Salva Modifiche"
+  },
+  "footer": {
+    "company": "Azienda",
+    "about": "Chi Siamo",
+    "careers": "Lavora con Noi",
+    "press": "Stampa",
+    "support": "Supporto",
+    "help": "Centro Assistenza",
+    "safety": "Consigli di Sicurezza",
+    "contact": "Contattaci",
+    "feedback": "Feedback",
+    "legal": "Legale",
+    "privacy": "Politica sulla Privacy",
+    "terms": "Termini di Servizio",
+    "cookies": "Politica sui Cookie",
+    "community": "Linee Guida della Community",
+    "copyright": "Tutti i diritti riservati. Fatto con ❤️ per l'amore senza confini."
+  },
+  "common": {
+    "loading": "Caricamento...",
+    "error": "Errore",
+    "success": "Successo",
+    "cancel": "Annulla",
+    "confirm": "Conferma",
+    "delete": "Elimina",
+    "edit": "Modifica",
+    "save": "Salva",
+    "close": "Chiudi",
+    "next": "Avanti",
+    "previous": "Precedente",
+    "search": "Cerca",
+    "filter": "Filtra",
+    "sort": "Ordina",
+    "view": "Visualizza",
+    "add": "Aggiungi",
+    "remove": "Rimuovi",
+    "update": "Aggiorna",
+    "refresh": "Aggiorna",
+    "back": "Indietro"
+  }
+} 

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{pageTitle}} - Totilove</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#764ba2">
+    <!-- Modern PWA meta tag (replaces deprecated apple-mobile-web-app-capable) -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <!-- Keep Apple-specific tags for iOS compatibility -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Totilove">
+
+    <link rel="stylesheet" href="/assets/css/vendor/font-awesome.min.css">
+
+    <!-- Layout CSS - Extracted from inline styles - Phase 1 CSS Extraction -->
+    <link rel="stylesheet" href="/assets/css/new/03-layout.css">
+
+    <script>
+        (function initializeTheme() {
+            try {
+                const root = document.documentElement;
+                const prefersDark = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : true;
+                const stored = localStorage.getItem('totilove-theme');
+                const theme = stored || (prefersDark ? 'dark' : 'light');
+                root.dataset.theme = theme;
+                root.classList.toggle('theme-dark', theme === 'dark');
+                root.classList.toggle('theme-light', theme === 'light');
+            } catch (error) {
+                document.documentElement.dataset.theme = 'dark';
+                document.documentElement.classList.add('theme-dark');
+            }
+        })();
+    </script>
+
+    <!-- CSRF Token Management (auto-injects tokens into all requests) -->
+    <!-- Industry standard: Cookie-based sessions + per-session CSRF tokens -->
+    <script src="/assets/js/csrf-token.js"></script>
+
+    <!-- New CSS Architecture (Compatibility Wrapper Strategy) -->
+    <!-- Load order: Old CSS first (inline styles above), then new scoped CSS -->
+    <!-- All new CSS is scoped to #app-root - old CSS remains untouched -->
+    <!-- Conditionally loaded via asset-loader.js based on feature flags -->
+    <script>
+        // Inject feature flags for asset loader
+        window.FEATURE_FLAGS = {{FEATURE_FLAGS_JSON}} || {
+            useNewCSS: false,
+            useNewJS: false,
+            useNewComponents: false,
+            enableAll: false
+        };
+    </script>
+    <script>
+        (function configurePresenceClient() {
+            const presenceFlags = (window.FEATURE_FLAGS && window.FEATURE_FLAGS.presence) || {};
+            const normalizedConfig = {
+                socketEnabled: presenceFlags.socketEnabled !== false,
+                streamingEnabled: presenceFlags.streamingEnabled !== false,
+                sseFallbackEnabled: presenceFlags.sseFallbackEnabled !== false,
+                metricsEnabled: presenceFlags.monitoringEnabled === true,
+                redisEnabled: presenceFlags.redisEnabled !== false
+            };
+            window.PresenceConfig = Object.assign({}, normalizedConfig, window.PresenceConfig || {});
+        })();
+    </script>
+    <script src="/assets/js/new/asset-loader.js"></script>
+
+    <!-- PWA Initialization -->
+    <script src="/assets/js/new/pwa-init.js"></script>
+</head>
+
+<body class="layout-shell" data-user-id="{{userId}}" data-user-real-name="{{real_name}}" data-user-email="{{userEmail}}"
+    data-user-age="{{userAge}}" data-user-gender="{{userGenderRaw}}" data-user-location="{{userLocation}}"
+    data-user-member-since="{{memberSince}}" data-user-last-active="{{lastActive}}">
+
+    <!-- Compatibility Wrapper: All new CSS scoped to #app-root -->
+    <!-- Old CSS continues to work - this wrapper only affects new scoped CSS -->
+    <div id="app-root">
+
+        <div class="profile-container" id="profile-container">
+            <div id="loading" style="display: none;">Loading...</div>
+            <div id="error" class="error-message" style="display:none;"></div>
+
+            <!-- Profile Header (always visible) -->
+            <header class="profile-header layout-header" role="banner">
+                <div class="profile-header-left">
+                    <div class="profile-avatar" id="avatar" data-activity-link="true" role="link" tabindex="0"
+                        aria-label="View your activity feed">
+                        {{if:userAvatar}}
+                        <img src="{{userAvatar}}" alt="Profile Photo" id="layoutUserAvatar" class="avatar-img">
+                        {{/if}}
+                        <i class="fas fa-user profile-avatar-fallback" id="layoutUserAvatarFallback"></i>
+                    </div>
+                    <div class="profile-main user-info">
+                        <span class="profile-real_name username" id="real_name">Hi, {{real_name}}!</span>
+                    </div>
+                </div>
+                <div class="profile-header-right header-actions" role="group" aria-label="Primary user actions">
+                    <button class="header-btn theme-toggle" id="theme-toggle" type="button" aria-pressed="true"
+                        aria-label="Toggle color theme">
+                        <i class="fas fa-moon" aria-hidden="true"></i>
+                    </button>
+                    <div class="account-icon-wrapper">
+                        <button class="header-btn account-btn" id="account-icon" type="button" aria-haspopup="true"
+                            aria-expanded="false" aria-controls="account-dropdown" aria-label="Open account menu">
+                            <i class="fas fa-user-circle user-account-icon"
+                                style="color: {{accountIconColor}}; font-size: 2.8rem !important;"></i>
+                        </button>
+                        <div class="account-dropdown" id="account-dropdown" style="display: none;">
+                            <a href="/account" class="dropdown-item">
+                                <i class="fas fa-user"></i>
+                                <span>My Account</span>
+                            </a>
+                            <a href="/logout" class="dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Mobile Hamburger Menu (right under header) -->
+            <div class="mobile-menu-wrapper">
+                <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-expanded="false"
+                    aria-controls="mobile-menu-container">
+                    <i class="fas fa-bars" aria-hidden="true"></i>
+                    <span class="toggle-text">Menu</span>
+                    <i class="fas fa-chevron-down toggle-arrow" aria-hidden="true"></i>
+                </button>
+                <div class="mobile-menu-container" id="mobile-menu-container">
+                    <ul class="mobile-menu-list">
+                        <a href="/profile-full" class="mobile-menu-item {{profileActive}}">
+                            <i class="fas fa-user"></i>
+                            <span>Profile</span>
+                        </a>
+                        <a href="/matches" class="mobile-menu-item {{matchesActive}}">
+                            <i class="fas fa-heart"></i>
+                            <span>Matches</span>
+                        </a>
+                        <a href="/search" class="mobile-menu-item {{searchActive}}">
+                            <i class="fas fa-search"></i>
+                            <span>Search</span>
+                        </a>
+                        <a href="/talk" class="mobile-menu-item {{talkActive}}">
+                            <i class="fas fa-comments"></i>
+                            <span>Talk</span>
+                            <span class="talk-notification-badge" id="talk-notification-badge-mobile"
+                                style="display: none; margin-left: auto; background: #e74c3c; color: white; padding: 0.2rem 0.5rem; border-radius: 10px; font-size: 0.8rem;">0</span>
+                        </a>
+                        <a href="/activity" class="mobile-menu-item {{activityActive}}">
+                            <i class="fas fa-bell"></i>
+                            <span>Activity</span>
+                        </a>
+                        <a href="/settings" class="mobile-menu-item {{settingsActive}}">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                        <a href="/account" class="mobile-menu-item {{accountActive}}">
+                            <i class="fas fa-user-circle"></i>
+                            <span>Account</span>
+                        </a>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Tab Navigation (desktop) -->
+            <nav class="tab-navigation" id="tab-navigation" aria-label="Desktop navigation">
+                <div class="tab-buttons">
+                    <a href="/profile-full" class="tab-btn {{profileActive}}">
+                        <i class="fas fa-user"></i>Profile
+                    </a>
+                    <a href="/matches" class="tab-btn {{matchesActive}}">
+                        <i class="fas fa-heart"></i>Matches
+                    </a>
+                    <a href="/search" class="tab-btn {{searchActive}}">
+                        <i class="fas fa-search"></i>Search
+                    </a>
+                    <a href="/talk" class="tab-btn {{talkActive}}">
+                        <i class="fas fa-comments"></i>Talk
+                        <span class="talk-notification-badge" id="talk-notification-badge"
+                            style="display: none;">0</span>
+                    </a>
+                    <a href="/activity" class="tab-btn {{activityActive}}">
+                        <i class="fas fa-bell"></i>Activity
+                    </a>
+                    <a href="/settings" class="tab-btn {{settingsActive}}">
+                        <i class="fas fa-cog"></i>Settings
+                    </a>
+                    <a href="/account" class="tab-btn {{accountActive}}">
+                        <i class="fas fa-user-circle"></i>Account
+                    </a>
+                </div>
+            </nav>
+
+            <!-- Tab Content -->
+            <main class="tab-content" id="app-content" role="main" tabindex="-1">
+                {{content}}
+            </main>
+        </div>
+
+    </div> <!-- End #app-root wrapper -->
+
+    <!-- Scripts -->
+    {{if:presence.socketEnabled}}
+    <script src="/socket.io/socket.io.js?v=1.0.1"></script>
+    {{/if}}
+    <script src="/assets/js/new/core/session-manager.js"></script>
+    <script>
+        (function bootstrapPresenceStack() {
+            if (window.__disablePresenceEngine) {
+                return;
+            }
+            if (window.__presenceScriptsLoaded) {
+                return;
+            }
+            window.__presenceScriptsLoaded = true;
+            const sources = [
+                '/assets/js/new/core/presence-engine.js?v=20260120'
+            ];
+            const loadNext = (index) => {
+                if (index >= sources.length) {
+                    return;
+                }
+                const script = document.createElement('script');
+                script.src = sources[index];
+                script.dataset.source = 'layout-presence-loader';
+                script.defer = false;
+                script.onload = () => loadNext(index + 1);
+                script.onerror = () => {
+                    loadNext(index + 1);
+                };
+                document.body.appendChild(script);
+            };
+            loadNext(0);
+        })();
+    </script>
+    <!-- User authentication data (CSP-safe: data attributes) - must load after body exists -->
+    <script src="/assets/js/new/core/layout-user-data.js"></script>
+    <script src="/assets/js/new/core/layout-main.js"></script>
+    <script src="/assets/js/new/core/layout-init.js"></script>
+    <script>
+        (function setupThemeToggle() {
+            const root = document.documentElement;
+            const toggle = document.getElementById('theme-toggle');
+            if (!toggle) {
+                return;
+            }
+
+            const updateVisualState = (theme) => {
+                toggle.setAttribute('aria-pressed', theme === 'dark');
+                const icon = toggle.querySelector('i');
+                if (icon) {
+                    icon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+                }
+            };
+
+            const setTheme = (theme, persist = true) => {
+                root.dataset.theme = theme;
+                root.classList.toggle('theme-dark', theme === 'dark');
+                root.classList.toggle('theme-light', theme === 'light');
+                if (persist) {
+                    try {
+                        localStorage.setItem('totilove-theme', theme);
+                    } catch (error) {
+                        /* noop */
+                    }
+                }
+                updateVisualState(theme);
+            };
+
+            const getStoredTheme = () => {
+                try {
+                    return localStorage.getItem('totilove-theme');
+                } catch (error) {
+                    return null;
+                }
+            };
+
+            const initialTheme = getStoredTheme() || root.dataset.theme || 'dark';
+            setTheme(initialTheme, false);
+
+            toggle.addEventListener('click', () => {
+                const nextTheme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+                setTheme(nextTheme, true);
+            });
+
+            const mediaQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+            const handleMediaChange = (event) => {
+                if (getStoredTheme()) {
+                    return;
+                }
+                setTheme(event.matches ? 'dark' : 'light', false);
+            };
+
+            if (mediaQuery) {
+                if (mediaQuery.addEventListener) {
+                    mediaQuery.addEventListener('change', handleMediaChange);
+                } else if (mediaQuery.addListener) {
+                    mediaQuery.addListener(handleMediaChange);
+                }
+            }
+        })();
+    </script>
+</body>
+
+</html>

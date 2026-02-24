@@ -1,0 +1,456 @@
+<!-- Extracted CSS from account.html - Phase 1 CSS Extraction -->
+<link rel="stylesheet" href="/assets/css/new/05-pages/_account.css">
+<div class="account-section">
+    <div class="card-header">
+        <div class="card-title">
+            <div class="card-icon">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <span>My Account:</span>
+        </div>
+        <div class="flex-align-center-gap-0-5">
+            <i class="fas fa-calendar-alt muted-color-icon"></i>
+            <span class="font-weight-600-dark-0-9">Account Created</span>
+            <span class="muted-0-9" id="account-created-date">Loading...</span>
+        </div>
+        <div class="flex-align-center-gap-0-5">
+            <i class="fas fa-clock muted-color-icon"></i>
+            <span class="font-weight-600-dark-0-9">Last Login</span>
+            <span class="muted-0-9" id="last-login-date">Loading...</span>
+        </div>
+    </div>
+
+    <div class="profile-content">
+        <!-- Email Verification -->
+        <div class="profile-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="card-title">Email Verification</div>
+            </div>
+            <div class="padding-0">
+                <!-- Verified State -->
+                <div id="email-verified-section" style="display: none;">
+                    <div class="email-verified-section">
+                        <div class="flex-align-center-gap-0-5-mb-0-25">
+                            <i class="fas fa-check-circle font-size-1-1"></i>
+                            <h3 class="margin-0-font-0-95-weight-700">Email Verified</h3>
+                        </div>
+                        <p class="margin-0-opacity-0-9-font-0-8">Your email address has been successfully verified!</p>
+                        <div class="mt-0-25-pt-0-25-border-top-white-0-2">
+                            <div class="font-size-0-7-opacity-0-9" id="verified-email-display"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Not Verified State -->
+                <div id="email-not-verified-section" style="display: none;">
+                    <div class="email-not-verified-card" id="email-verification-card" onclick="toggleEmailVerificationDetails()">
+                        <div class="flex-align-center-gap-0-75">
+                            <div class="font-size-1-5-color-orange-flex-shrink-0">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="flex-1-min-width-0">
+                                <div class="flex-align-center-justify-between-mb-0-25">
+                                    <h3 class="margin-0-color-856404-font-1-weight-700">Email Not Verified</h3>
+                                    <i class="fas fa-chevron-down color-856404-font-0-9-transition-transform" id="email-verification-chevron"></i>
+                                </div>
+                                <p class="margin-0-color-856404-font-0-85-line-height-1-4">
+                                    Please verify your email address to unlock all features including messaging, profile viewing, likes, and favourites.
+                                </p>
+                                
+                                <!-- Expandable Content -->
+                                <div id="email-verification-details" style="display: none;" class="mt-0-75">
+                                    <div class="bg-white-padding-0-75-border-radius-8-mb-0-75">
+                                        <div class="font-weight-600-color-856404-mb-0-4-font-0-85">How to verify:</div>
+                                        <ol class="margin-0-padding-left-1-2-color-856404-font-0-85-line-height-1-6">
+                                            <li class="margin-bottom-0-25">Check your inbox at <strong id="user-email-display">{{userEmail}}</strong></li>
+                                            <li class="margin-bottom-0-25"><strong>Method 1:</strong> Click the verification link in the email (easiest)</li>
+                                            <li><strong>Method 2:</strong> Enter the 6-digit code from the email below</li>
+                                        </ol>
+                                    </div>
+
+                                    <!-- Code Verification Section -->
+                                    <div class="bg-blue-light-padding-0-75-border-radius-8-mb-0-75-border-2-solid-blue">
+                                        <h4 class="margin-0-0-0-5-0-color-blue-font-0-9-weight-700-flex-align-center-gap-0-4">
+                                            <i class="fas fa-key"></i> Verify with Code
+                                        </h4>
+                                        <p class="margin-0-0-0-5-0-color-blue-font-0-8">
+                                            Enter the 6-digit verification code from your email:
+                                        </p>
+                                        <div class="display-flex-gap-0-5-align-center-flex-wrap">
+                                            <input type="text" 
+                                                   id="verification-code-input" 
+                                                   class="verification-code-input"
+                                                   placeholder="000000" 
+                                                   maxlength="6" 
+                                                   pattern="[0-9]{6}"
+                                                   onclick="event.stopPropagation();">
+                                            <button id="verify-code-btn" 
+                                                    class="verify-code-btn"
+                                                    disabled
+                                                    onclick="event.stopPropagation();">
+                                                <i class="fas fa-check"></i> Verify
+                                            </button>
+                                        </div>
+                                        <div id="code-verification-message" class="mt-0-5-padding-0-5-border-radius-6-font-0-8" style="display: none;"></div>
+                                    </div>
+
+                                    <div class="display-flex-gap-0-5-flex-wrap">
+                                        <button id="resend-verification-btn" class="resend-verification-btn" onclick="event.stopPropagation();">
+                                            <i class="fas fa-paper-plane"></i> <span class="white-space-nowrap-overflow-hidden-text-overflow-ellipsis">Resend Verification Email</span>
+                                        </button>
+                                        <button id="checkEmailVerificationBtn" class="check-email-verification-btn" onclick="event.stopPropagation();">
+                                            <i class="fas fa-sync-alt"></i> <span class="white-space-nowrap">Refresh Status</span>
+                                        </button>
+                                    </div>
+                                    <div id="verification-message" class="mt-0-5-padding-0-5-border-radius-6-font-0-8" style="display: none;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="email-verification-loading" class="email-verification-loading">
+                    <div class="font-size-1-2-color-muted-mb-0-5">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    <p class="color-muted-margin-0-font-size-0-85">Checking verification status...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Password Security -->
+        <div class="profile-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="card-title">Password Security</div>
+            </div>
+            <div class="padding-1-5-0">
+                <div class="padding-1-5-bg-yellow-light-border-2-solid-yellow-border-radius-12-mb-1-5">
+                    <div class="display-flex-align-start-gap-1">
+                        <div class="font-size-2-color-orange">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="flex-1-min-width-0">
+                            <h3 class="margin-0-0-0-5-0-color-dark-yellow-font-1-2-weight-700">Password Security</h3>
+                            <p class="margin-0-0-1-0-color-dark-yellow-font-0-95-line-height-1-6">
+                                Keep your account secure by regularly updating your password.
+                            </p>
+                            <div class="bg-white-padding-1-border-radius-8-mb-1">
+                                <div class="display-flex-justify-between-align-center-flex-wrap-gap-0-5">
+                                    <div class="flex-1-min-width-0-overflow-hidden">
+                                        <div class="font-weight-600-color-856404-mb-0-25-font-0-9">Password</div>
+                                        <div class="font-size-0-9-color-856404-word-break">Last changed: <span id="password-last-changed">Unknown</span></div>
+                                    </div>
+                                    <button id="changePasswordBtn" class="change-password-btn">
+                                        <i class="fas fa-key"></i> Change Password
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="profile-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="card-title">Quick Actions</div>
+            </div>
+            <div class="padding-1-5-0">
+                <div class="padding-1-5-bg-gradient-purple-border-radius-12-mb-1-5">
+                    <div class="display-flex-align-start-gap-1">
+                        <div class="font-size-2-color-white">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="flex-1-min-width-0">
+                            <h3 class="margin-0-0-0-5-0-color-white-font-1-2-weight-700">Quick Actions</h3>
+                            <p class="margin-0-0-1-0-color-white-font-0-95-line-height-1-6-opacity-0-9">
+                                Manage your profile and account settings quickly.
+                            </p>
+                            <div class="display-flex-gap-0-75-flex-wrap">
+                                <a href="/profile-edit" class="edit-profile-link">
+                                    <i class="fas fa-edit"></i> Edit Profile
+                                </a>
+                                <button id="pauseAccountBtn" class="pause-account-btn">
+                                    <i class="fas fa-pause"></i> Pause Account
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Management -->
+        <div class="profile-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-user-edit"></i>
+                </div>
+                <div class="card-title">Profile Management</div>
+            </div>
+            <div class="padding-1-5-0">
+                <div class="padding-1-5-bg-gradient-pink-border-radius-12-mb-1-5">
+                    <div class="display-flex-align-start-gap-1">
+                        <div class="font-size-2-color-white">
+                            <i class="fas fa-user-edit"></i>
+                        </div>
+                        <div class="flex-1-min-width-0">
+                            <h3 class="margin-0-0-0-5-0-color-white-font-1-2-weight-700">Profile Management</h3>
+                            <p class="margin-0-0-1-0-color-white-font-0-95-line-height-1-6-opacity-0-9">
+                                Manage your photos and view your complete profile.
+                            </p>
+                            <div class="bg-rgba-white-0-2-padding-1-border-radius-8-mb-1">
+                                <div class="display-flex-gap-0-75-flex-wrap">
+                                    <a href="/profile-photos" class="manage-photos-link">
+                                        <i class="fas fa-images"></i> Manage Photos
+                                    </a>
+                                    <a href="/profile-full" class="view-full-profile-link">
+                                        <i class="fas fa-eye"></i> View Full Profile
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="bg-rgba-white-0-2-padding-1-border-radius-8-color-white">
+                                <div class="display-flex-justify-between-align-center-mb-0-75">
+                                    <div>
+                                        <div class="font-weight-600-mb-0-25-font-size-1">Profile Completion</div>
+                                        <div class="font-size-0-85-opacity-0-9">Complete your profile to get more matches</div>
+                                    </div>
+                                    <div class="text-align-center">
+                                        <div class="font-size-2-font-weight-700" id="profile-completion-percentage">0%</div>
+                                        <div class="font-size-0-75-opacity-0-9" id="profile-completion-label">Loading...</div>
+                                    </div>
+                                </div>
+                                <div class="bg-rgba-white-0-2-border-radius-4-height-8-overflow-hidden">
+                                    <div id="profile-completion-bar" class="profile-completion-bar"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Billing & Subscription -->
+        <div class="profile-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div class="card-title">Billing & Subscription</div>
+            </div>
+            <div class="padding-1-5-0">
+                <div class="padding-1-5-bg-gradient-primary-secondary-border-radius-12-mb-1-5">
+                    <div class="display-flex-align-start-gap-1">
+                        <div class="font-size-2-color-white">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <div class="flex-1-min-width-0">
+                            <h3 class="margin-0-0-0-5-0-color-white-font-1-2-weight-700">Subscription Plan</h3>
+                            <div class="bg-rgba-white-0-2-padding-1-border-radius-8-mb-1">
+                                <div class="display-flex-justify-between-align-center-mb-0-75">
+                                    <div>
+                                        <div class="font-size-0-9-opacity-0-9-mb-0-5-color-white">Current Plan</div>
+                                        <div class="font-size-1-5-font-weight-700-color-white" id="current-plan-name-display">Loading...</div>
+                                    </div>
+                                    <div class="bg-rgba-white-0-3-padding-0-5-1-border-radius-20-font-weight-600-font-0-9-color-white" id="current-plan-badge-display">
+                                        FREE
+                                    </div>
+                                </div>
+                                <div class="font-size-0-9-opacity-0-9-color-white-mb-0-75" id="current-plan-description-display">
+                                    Loading plan details...
+                                </div>
+                                <div class="font-size-0-85-opacity-0-8-color-white" id="current-plan-expiry-display" style="display: none;">
+                                    <i class="fas fa-calendar"></i> Expires: <span id="current-plan-expiry-date">--</span>
+                                </div>
+                            </div>
+                            <a href="/billing.html" class="manage-billing-link">
+                                <i class="fas fa-arrow-right"></i> Manage Billing & Subscription
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Management -->
+        <div class="profile-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="card-title">Data Management</div>
+            </div>
+            <div class="padding-1-5-0">
+                <div class="padding-1-5-bg-yellow-light-border-2-solid-yellow-border-radius-12-mb-1-5">
+                    <div class="display-flex-align-start-gap-1">
+                        <div class="font-size-2-color-orange">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="flex-1-min-width-0">
+                            <h3 class="margin-0-0-0-5-0-color-dark-yellow-font-1-2-weight-700">Data Management</h3>
+                            <p class="margin-0-0-1-0-color-dark-yellow-font-0-95-line-height-1-6">
+                                Manage your account data and privacy settings.
+                            </p>
+                            <div class="bg-white-padding-1-border-radius-8-mb-1">
+                                <div class="display-flex-justify-between-align-center-padding-0-75-0-border-bottom-1-solid-light-gray-flex-wrap-gap-0-5">
+                                    <div class="flex-1-min-width-0-overflow-hidden">
+                                        <div class="font-weight-600-color-856404-mb-0-25-font-0-9">Download Account Data</div>
+                                        <div class="font-size-0-9-color-856404-word-break">Export all your account data (GDPR compliant)</div>
+                                    </div>
+                                    <button id="downloadAccountDataBtn" class="download-account-data-btn">
+                                        <i class="fas fa-download"></i> Download
+                                    </button>
+                                </div>
+                                <div class="display-flex-justify-between-align-center-padding-0-75-0-flex-wrap-gap-0-5">
+                                    <div class="flex-1-min-width-0-overflow-hidden">
+                                        <div class="font-weight-600-color-856404-mb-0-25-font-0-9">Delete Account</div>
+                                        <div class="font-size-0-9-color-856404-word-break">⚠️ Permanently delete your account - This cannot be undone</div>
+                                    </div>
+                                    <button id="deleteAccountBtn" class="delete-account-btn">
+                                        <i class="fas fa-trash"></i> Delete Account
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div id="change-password-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="text-align-center-mb-1-5">
+            <div class="width-64-height-64-bg-blue-light-border-radius-50-display-flex-align-center-justify-center-margin-0-auto-1">
+                <i class="fas fa-key font-size-2-color-primary"></i>
+            </div>
+            <h3 class="margin-0-0-0-5-0-color-dark-color-font-size-1-5">Change Password</h3>
+            <p class="margin-0-color-muted-font-size-0-95">Enter your current password and choose a new one</p>
+        </div>
+        
+        <form id="change-password-form" onsubmit="handleChangePassword(event)">
+            <div class="margin-bottom-1">
+                <label for="current-password-input" class="display-block-mb-0-5-font-weight-600-color-dark-color">Current Password</label>
+                <input type="password" id="current-password-input" class="width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-box-sizing-border-box" required>
+            </div>
+            
+            <div class="margin-bottom-1">
+                <label for="new-password-input" class="display-block-mb-0-5-font-weight-600-color-dark-color-position-relative">
+                    New Password
+                    <button type="button" onclick="togglePasswordRequirements(event)" class="bg-none-border-none-color-purple-cursor-pointer-ml-8-font-16-padding-0-position-relative" title="Show password requirements">
+                        <i class="fas fa-info-circle" id="password-info-icon"></i>
+                    </button>
+                    <div id="passwordRequirements" class="password-requirements-tooltip" style="display: none;">
+                        <div class="display-flex-align-items-flex-start-gap-0-5-mb-0-5">
+                            <i class="fas fa-info-circle font-size-0-9-flex-shrink-0-mt-0-05"></i>
+                            <div>
+                                <div class="font-weight-600-mb-0-5">Password must contain:</div>
+                                <ul class="margin-0-padding-left-1-2-list-style-none">
+                                    <li id="length" class="display-flex-align-center-gap-0-5-mb-0-25">
+                                        <span class="width-8-height-8-border-radius-50-bg-red"></span>
+                                        <span>5-12 characters</span>
+                                    </li>
+                                    <li id="uppercase" class="display-flex-align-center-gap-0-5-mb-0-25">
+                                        <span class="width-8-height-8-border-radius-50-bg-red"></span>
+                                        <span>At least one uppercase letter</span>
+                                    </li>
+                                    <li id="number" class="display-flex-align-center-gap-0-5">
+                                        <span class="width-8-height-8-border-radius-50-bg-red"></span>
+                                        <span>At least one number</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="position-absolute-top-100-left-20-border-6-solid-transparent-border-top-color-purple"></div>
+                    </div>
+                </label>
+                <input type="password" id="new-password-input" class="width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-box-sizing-border-box" required minlength="5" maxlength="12">
+            </div>
+            
+            <div class="margin-bottom-1-5">
+                <label for="confirm-password-input" class="display-block-mb-0-5-font-weight-600-color-dark-color">Confirm New Password</label>
+                <input type="password" id="confirm-password-input" class="width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-box-sizing-border-box" required minlength="5" maxlength="12">
+            </div>
+            
+            <div id="password-change-message" class="margin-bottom-1-bg-padding-0-75-border-radius-8-font-size-0-9" style="display: none;"></div>
+            
+            <div class="display-flex-gap-1-justify-content-flex-end">
+                <button type="button" id="closeChangePasswordModalBtn" class="bg-light-gray-color-dark-color-border-1-solid-light-gray-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-pointer-font-size-0-95">Cancel</button>
+                <button type="submit" id="change-password-submit-btn" class="bg-primary-color-white-border-none-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-pointer-font-size-0-95">Change Password</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Account Confirmation Modal -->
+<div id="delete-account-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <!-- Step 1: Initial Confirmation -->
+        <div id="delete-confirm-step1">
+            <div class="text-align-center-mb-1-5">
+                <div class="width-64-height-64-bg-red-light-border-radius-50-display-flex-align-items-center-justify-content-center-margin-0-auto-1">
+                    <i class="fas fa-exclamation-triangle font-size-2-color-red"></i>
+                </div>
+                <h3 class="margin-0-0-0-5-0-color-dark-color-font-size-1-5">Delete Account</h3>
+                <p class="margin-0-color-muted-font-size-0-95">⚠️ This action is permanent and cannot be undone</p>
+            </div>
+            
+            <div class="bg-yellow-light-border-1-solid-yellow-border-radius-8-padding-1-mb-1-5">
+                <div class="font-weight-600-color-dark-yellow-text-align-center">⚠️ This action is PERMANENT and cannot be undone</div>
+            </div>
+            
+            <div class="display-flex-gap-1-justify-content-flex-end">
+                <button id="closeDeleteAccountModalBtn" class="bg-light-gray-color-dark-color-border-1-solid-light-gray-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-pointer-font-size-0-95">Cancel</button>
+                <button id="showDeleteConfirmStep2Btn" class="bg-primary-color-white-border-none-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-pointer-font-size-0-95" style="background: var(--danger-color);">Continue</button>
+            </div>
+        </div>
+        
+        <!-- Step 2: Type DELETE Confirmation -->
+        <div id="delete-confirm-step2" style="display: none;">
+            <div class="text-align-center-mb-1-5">
+                <div class="width-64-height-64-bg-red-light-border-radius-50-display-flex-align-items-center-justify-content-center-margin-0-auto-1">
+                    <i class="fas fa-trash-alt font-size-2-color-red"></i>
+                </div>
+                <h3 class="margin-0-0-0-5-0-color-dark-color-font-size-1-5">Final Confirmation</h3>
+                <p class="margin-0-color-muted-font-size-0-95">⚠️ Type "DELETE" to permanently delete your account</p>
+            </div>
+            
+            <div class="margin-bottom-1-5">
+                <input type="text" id="delete-confirm-input" placeholder="Type DELETE here" class="width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-text-align-center-text-transform-uppercase-box-sizing-border-box">
+                <div id="delete-confirm-error" class="color-red-font-size-0-85-mt-0-5-text-align-center" style="display: none;">Please type "DELETE" exactly to confirm</div>
+            </div>
+            
+            <div class="display-flex-gap-1-justify-content-flex-end">
+                <button id="showDeleteConfirmStep1Btn" class="bg-light-gray-color-dark-color-border-1-solid-light-gray-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-pointer-font-size-0-95">Back</button>
+                <button id="delete-confirm-btn" class="bg-gray-color-white-border-none-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-not-allowed-font-size-0-95" disabled>Delete Account</button>
+            </div>
+        </div>
+        
+        <!-- Step 3: Processing -->
+        <div id="delete-confirm-step3" class="text-align-center" style="display: none;">
+            <div class="margin-bottom-1-5">
+                <i class="fas fa-spinner fa-spin font-size-3-color-primary"></i>
+            </div>
+            <h3 class="margin-0-0-0-5-0-color-dark-color">Deleting Account...</h3>
+            <p class="margin-0-color-muted">Please wait while we process your request</p>
+        </div>
+    </div>
+</div>
+
+<!-- Account Page JavaScript - Moved to new structure (Phase 1 CSS/JS Extraction) -->
+<script src="/assets/js/shared/password-validator.js"></script>
+<script src="/assets/js/new/pages/account-delete.js"></script>
+<script src="/assets/js/new/pages/account.js"></script>

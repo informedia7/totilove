@@ -1,0 +1,973 @@
+/* ============================================
+   ACTIVITY PAGE STYLES - Consolidated Mobile First
+   ============================================ */
+
+/* ---------- BASE MOBILE STYLES ---------- */
+.activity-container {
+    padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow-x: hidden;
+}
+
+.activity-header {
+    margin-bottom: 1.5rem;
+}
+
+.activity-header h2 {
+    color: var(--primary);
+    margin-bottom: 0.75rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+/* Tabs - Mobile */
+.activity-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.activity-tab {
+    padding: 0.4rem 0.8rem;
+    border: 2px solid var(--primary);
+    background: transparent;
+    color: var(--primary);
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 0.9rem;
+}
+
+.activity-tab.active {
+    background: var(--primary);
+    color: white;
+}
+
+.activity-tab:hover:not(.active) {
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.activity-tab i {
+    font-size: 1.1rem;
+}
+
+.activity-tab span {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .activity-tabs .activity-tab[data-tab="all"] {
+        display: none !important;
+    }
+}
+
+.activity-tab.position-relative {
+    position: relative;
+}
+
+/* Card Grid - Mobile Horizontal Scroll */
+.activity-card-grid {
+    display: flex;
+    gap: 0.85rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.activity-card-grid::-webkit-scrollbar {
+    display: none;
+}
+
+.activity-card-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex: 0 0 min(280px, 78vw);
+    scroll-snap-align: start;
+}
+
+/* Ensure user-card quick actions remain available just like in results grid */
+.activity-container .uc-quick-actions {
+    display: flex !important;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10 !important; /* Above activity-card-overlay (z-index: 5) */
+}
+
+.activity-container .uc-image-container:hover .uc-quick-actions,
+.activity-container .uc-image-container.uc-show-actions .uc-quick-actions {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Ensure the individual quick action buttons are clickable */
+.activity-container .uc-quick-action {
+    pointer-events: auto !important;
+}
+
+.activity-card-overlay {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.activity-card-overlay button {
+    pointer-events: auto;
+}
+
+.activity-card-wrapper .uc-card,
+.activity-card-wrapper .activity-legacy-card {
+    flex-grow: 1;
+}
+
+.activity-card-meta {
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+    color: var(--muted-color);
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.activity-card-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.activity-card-meta-note {
+    padding: 0.35rem 0.5rem;
+    border-radius: 6px;
+    background: rgba(99, 110, 114, 0.12);
+    color: var(--dark-color);
+    font-size: 0.8rem;
+    line-height: 1.3;
+    word-break: break-word;
+}
+
+.activity-card-actions {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.activity-card-action-btn {
+    border: none;
+    border-radius: 999px;
+    padding: 0.35rem 0.8rem;
+    font-weight: 600;
+    font-size: 0.8rem;
+    background: rgba(99, 110, 114, 0.12);
+    color: var(--dark-color);
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+    min-height: 36px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.activity-card-action-btn:hover {
+    background: rgba(99, 110, 114, 0.2);
+}
+
+.activity-card-action-btn.remove-favorite-btn {
+    background: rgba(214, 48, 49, 0.15);
+    color: #d63031;
+}
+
+.activity-card-action-btn.remove-favorite-btn:hover {
+    background: rgba(214, 48, 49, 0.25);
+}
+
+.activity-card-action-btn.unlike-btn {
+    background: rgba(243, 156, 18, 0.2);
+    color: #d17a00;
+}
+
+.activity-card-action-btn.unlike-btn:hover {
+    background: rgba(243, 156, 18, 0.3);
+}
+
+.activity-card-action-btn.unblock-user-btn {
+    background: rgba(46, 204, 113, 0.2);
+    color: #00a885;
+}
+
+.activity-card-action-btn.unblock-user-btn:hover {
+    background: rgba(46, 204, 113, 0.35);
+}
+
+.activity-card-overlay .remove-favorite-btn,
+.activity-card-overlay .unlike-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.25s ease, background 0.25s ease;
+    background: rgba(214, 48, 49, 0.92);
+}
+
+.activity-card-overlay .remove-favorite-btn:hover,
+.activity-card-overlay .unlike-btn:hover {
+    transform: scale(1.08);
+}
+
+.activity-card-overlay .unlike-btn {
+    background: rgba(243, 156, 18, 0.92);
+}
+
+.activity-card-overlay .remove-favorite-btn .favorite-icon-hover,
+.activity-card-overlay .unlike-btn .thumb-icon-hover {
+    display: none;
+}
+
+.activity-card-overlay .remove-favorite-btn:hover .favorite-icon-default {
+    display: none;
+}
+
+.activity-card-overlay .remove-favorite-btn:hover .favorite-icon-hover {
+    display: inline-flex;
+}
+
+.activity-card-overlay .unlike-btn:hover .thumb-icon-default {
+    display: none;
+}
+
+.activity-card-overlay .unlike-btn:hover .thumb-icon-hover {
+    display: inline-flex;
+}
+
+/* Online Status Indicators */
+.activity-online-dot {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.4rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    display: none;
+    pointer-events: none;
+    background: #12b886;
+    z-index: 2;
+    overflow: hidden;
+    font-size: 0;
+}
+
+.activity-online-dot.presence-indicator {
+    display: flex;
+    align-items: center;
+}
+
+.activity-container .uc-badge-online.online-dot-results {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #12b886;
+    pointer-events: none;
+    padding: 0 !important;
+    z-index: 2;
+}
+
+.activity-container .uc-badge-online.online-dot-results .presence-text,
+.activity-container .uc-badge-online.online-dot-results .presence-last-seen,
+.activity-container .presence-text,
+.activity-container .presence-last-seen {
+    display: none !important;
+}
+
+.activity-container .uc-badge-online.online-dot-results .presence-dot {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: currentColor;
+    display: block;
+}
+
+/* Sections */
+.activity-section {
+    margin-bottom: 2rem;
+}
+
+.activity-section.is-hidden {
+    display: none;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.section-header.cursor-pointer {
+    cursor: pointer;
+}
+
+.section-title {
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.section-title-icon-primary {
+    color: var(--primary);
+}
+
+.section-title-icon-danger {
+    color: var(--danger-color);
+}
+
+.section-title-icon-warning {
+    color: #f39c12;
+}
+
+.section-title-icon-blocked {
+    color: #d63031;
+}
+
+.count-badge {
+    background: var(--primary);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+}
+
+.count-badge-warning {
+    background: #f39c12;
+}
+
+.count-badge-danger {
+    background: #d63031;
+}
+
+.section-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.view-all-btn,
+.default-view-btn {
+    background: transparent;
+    border: 2px solid var(--primary);
+    padding: 0.35rem 0.8rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.8rem;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.view-all-btn {
+    color: var(--primary);
+}
+
+.view-all-btn-danger {
+    color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+.view-all-btn-warning {
+    color: #f39c12;
+    border-color: #f39c12;
+}
+
+.default-view-btn {
+    color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+.default-view-btn-warning {
+    color: #f39c12;
+    border-color: #f39c12;
+}
+
+/* Messages */
+.messages-list {
+    display: none;
+    gap: 0.75rem;
+}
+
+.messages-list.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+.message-card {
+    display: flex;
+    align-items: flex-start;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(31, 38, 135, 0.08);
+    transition: transform 0.2s;
+}
+
+.message-card-deleted {
+    opacity: 0.7;
+    border-left: 3px solid #ff9800;
+    cursor: pointer;
+}
+
+.message-card-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 0.75rem;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.message-card-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.message-card-name {
+    font-weight: 600;
+    color: #00b894;
+    margin-bottom: 0.2rem;
+    font-size: 0.85rem;
+    word-break: break-word;
+}
+
+.message-card-name-deleted {
+    color: #ff9800;
+}
+
+.message-card-details-row,
+.message-card-info {
+    font-size: 0.8rem;
+    color: var(--muted-color);
+    margin-bottom: 0.2rem;
+    word-break: break-word;
+}
+
+.message-card-time-row,
+.message-card-time {
+    font-size: 0.75rem;
+    color: var(--muted-color);
+    margin-bottom: 0.2rem;
+}
+
+.message-card-time i {
+    margin-right: 0.2rem;
+}
+
+.message-card-text {
+    font-size: 0.9rem;
+    color: var(--dark-color);
+    line-height: 1.4;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.reply-message-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.35rem 0.7rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.deactivated-badge,
+.message-deactivated-badge {
+    padding: 0.35rem 0.7rem;
+    color: #ff9800;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    background: rgba(255, 152, 0, 0.1);
+}
+
+.message-deleted-text {
+    filter: blur(3px);
+    opacity: 0.6;
+    word-break: break-word;
+}
+
+.message-unread-count {
+    color: #00b894;
+}
+
+/* Modals */
+.unblock-confirm-message {
+    color: #636e72;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.unblock-confirm-message strong {
+    color: #2d3436;
+    font-weight: 600;
+}
+
+.unblock-confirm-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.unblock-confirm-cancel,
+.unblock-confirm-yes {
+    padding: 0.7rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    min-height: 44px;
+}
+
+.unblock-confirm-cancel {
+    background: #dfe6e9;
+    color: #2d3436;
+}
+
+.unblock-confirm-cancel:hover {
+    background: #b2bec3;
+}
+
+.unblock-confirm-yes {
+    background: linear-gradient(135deg, #00b894, #00d2a0);
+    color: white;
+}
+
+.unblock-confirm-yes:hover {
+    background: linear-gradient(135deg, #00a885, #00b894);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 184, 148, 0.3);
+}
+
+/* Badges */
+.views-badge {
+    position: absolute;
+    top: -12px;
+    right: -5px;
+    background: #00b894;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px #fff;
+    animation: online-blink 3s infinite;
+    z-index: 2;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    font-size: 0.6rem;
+}
+
+/* Section Toggle */
+.section-toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--dark-color);
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0.25rem;
+    min-width: 32px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.messages-toggle-icon {
+    font-size: 1.2rem;
+    color: var(--dark-color);
+    user-select: none;
+}
+
+/* Empty & Error States */
+.empty-state,
+.empty-state-message {
+    text-align: center;
+    color: var(--muted-color);
+    padding: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.empty-state-grid-span,
+.empty-state-grid-span-likes,
+.empty-state-message.grid-full-width {
+    grid-column: 1 / -1;
+}
+
+.error-state,
+.error-message-text {
+    text-align: center;
+    color: var(--danger-color);
+    padding: 1.5rem;
+    font-size: 0.95rem;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--primary);
+    animation: spin 1s ease-in-out infinite;
+}
+
+/* ---------- ANIMATIONS ---------- */
+@keyframes online-blink {
+
+    0%,
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 2px #fff, 0 0 4px 1px #00b894;
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.07);
+        box-shadow: 0 0 0 2.7px #fff, 0 0 7px 1.7px #00b894;
+        opacity: 0.9;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* ---------- RESPONSIVE BREAKPOINTS ---------- */
+
+/* Mobile Portrait - More space between quick action buttons */
+@media (max-width: 767px) and (orientation: portrait) {
+    .activity-container .uc-quick-actions {
+        gap: 30px !important;
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+    }
+}
+
+/* Tablet (min-width: 600px) */
+@media (min-width: 600px) {
+    .activity-container {
+        padding: 1.5rem;
+    }
+
+    .activity-header h2 {
+        font-size: 1.75rem;
+    }
+
+    .activity-tabs {
+        gap: 0.75rem;
+    }
+
+    .activity-tab {
+        min-width: 50px;
+        min-height: 50px;
+        padding: 0.5rem 1rem;
+    }
+
+    .activity-card-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+        overflow: visible;
+        padding-bottom: 0;
+        scroll-snap-type: none;
+    }
+
+    .activity-card-wrapper {
+        flex: initial;
+        scroll-snap-align: unset;
+    }
+
+    .activity-card-action-btn {
+        flex: initial;
+        min-width: auto;
+    }
+
+    .unblock-confirm-actions {
+        flex-direction: row;
+        gap: 1rem;
+    }
+
+    .unblock-confirm-cancel,
+    .unblock-confirm-yes {
+        width: auto;
+        flex: 1;
+    }
+
+    .messages-list.grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Desktop (min-width: 768px) */
+@media (min-width: 768px) {
+    .activity-container {
+        padding: 2rem;
+    }
+
+    .activity-header h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .activity-tabs {
+        gap: 1rem;
+        justify-content: flex-start;
+    }
+
+    .activity-tab {
+        min-width: 50px;
+        height: 50px;
+        padding: 0.5rem 1rem;
+    }
+
+    .activity-tab span {
+        display: inline;
+    }
+
+    .activity-card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+
+    .activity-card-overlay {
+        top: 0.75rem;
+        left: 0.75rem;
+        gap: 0.5rem;
+    }
+
+    .activity-card-overlay .remove-favorite-btn,
+    .activity-card-overlay .unlike-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .activity-card-meta {
+        margin-top: 0.85rem;
+        font-size: 0.9rem;
+    }
+
+    .activity-card-meta-note {
+        padding: 0.45rem 0.65rem;
+        font-size: 0.85rem;
+    }
+
+    .activity-card-actions {
+        margin-top: 0.75rem;
+        gap: 0.5rem;
+    }
+
+    .activity-card-action-btn {
+        padding: 0.4rem 0.95rem;
+        font-size: 0.85rem;
+    }
+
+    .activity-online-dot,
+    .activity-container .uc-badge-online.online-dot-results {
+        top: 0.5rem;
+        right: 0.5rem;
+        width: 0.85rem;
+        height: 0.85rem;
+        border: 3px solid #fff;
+    }
+
+    .messages-list.grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+
+    .message-card {
+        padding: 1rem;
+    }
+
+    .message-card-avatar {
+        width: 50px;
+        height: 50px;
+    }
+}
+
+/* Large Desktop (min-width: 1024px) */
+@media (min-width: 1024px) {
+    .activity-card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+
+    .messages-list.grid {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    }
+}
+
+/* Very Small Phones (max-width: 360px) */
+@media (max-width: 360px) {
+    .activity-container {
+        padding: 0.75rem;
+    }
+
+    .activity-tab {
+        min-width: 40px;
+        min-height: 40px;
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    .activity-tab i {
+        font-size: 1rem;
+    }
+
+    .activity-card-action-btn {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.6rem;
+    }
+
+    .section-title {
+        font-size: 1rem;
+    }
+
+    .count-badge {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.5rem;
+    }
+
+    .view-all-btn,
+    .default-view-btn {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* Landscape Orientation */
+@media (max-height: 500px) and (orientation: landscape) {
+    .activity-card-grid {
+        grid-template-columns: repeat(2, 1fr);
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .activity-tabs {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+
+    .activity-tab,
+    .activity-card-action-btn,
+    .unblock-confirm-cancel,
+    .unblock-confirm-yes,
+    .view-all-btn,
+    .default-view-btn,
+    .reply-message-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    .activity-card-overlay .remove-favorite-btn,
+    .activity-card-overlay .unlike-btn {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+
+    .activity-card-action-btn,
+    .unblock-confirm-yes,
+    .activity-tab {
+        transition: none;
+    }
+
+    @keyframes online-blink {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+    }
+
+    .loading-spinner {
+        animation-duration: 2s;
+    }
+}

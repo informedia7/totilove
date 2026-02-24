@@ -1,0 +1,213 @@
+<!-- Extracted CSS from settings.html - Phase 1 CSS Extraction -->
+<link rel="stylesheet" href="/assets/css/new/05-pages/_settings.css">
+<!-- Settings Page -->
+<div class="settings-section">
+    <div class="card-header">
+        <div class="card-title">
+            <div class="card-icon">
+                <i class="fas fa-cog"></i>
+            </div>
+            <span>Account Settings</span>
+        </div>
+    </div>
+
+    <div class="profile-content">
+        <div class="profile-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="card-title">Who Can Contact Me</div>
+            </div>
+            <div class="settings-grid-gap">
+                <div>
+                    <label for="country-select" class="label-block">From Countries (<span id="selected-countries-count">0</span>/10)</label>
+                    <div class="margin-bottom-1">
+                        <div id="selected-countries" class="selected-countries-container">
+                            <!-- Selected countries will be populated here -->
+                        </div>
+                        <select id="country-select" class="country-select-input">
+                            <option value="">Select a country...</option>
+                            <!-- Countries will be populated here -->
+                        </select>
+                        <p class="help-text-muted">Select countries from the dropdown above</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="label-block">Age Range</div>
+                    <div class="age-range-container">
+                        <div class="age-range-field">
+                            <label for="age-min" class="age-range-label">From</label>
+                            <select id="age-min" class="age-select-input">
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
+                        <div class="age-range-field">
+                            <label for="age-max" class="age-range-label">To</label>
+                            <select id="age-max" class="age-select-input">
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="require-photos" class="checkbox-input">
+                        <span class="checkbox-label-text">Only users with profile photos can contact me</span>
+                    </label>
+                </div>
+                
+                <div>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="no-same-gender" class="checkbox-input" checked>
+                        <span class="checkbox-label-text">No contact from same gender</span>
+                    </label>
+                </div>
+                
+                <div>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="verified-profiles-only" class="checkbox-input">
+                        <span class="checkbox-label-text">Verified profiles only</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="card-title">Privacy Settings</div>
+            </div>
+            <div class="settings-section-padding">
+                <div class="settings-row">
+                    <div>
+                        <div class="settings-title">Profile Visibility</div>
+                        <div class="settings-description">Control who can discover your profile</div>
+                    </div>
+                    <select id="profile-visibility" name="profileVisibility" class="profile-visibility-select" onchange="updateVisibilityDescription(this.value)">
+                        <option value="public" selected>🌍 Public</option>
+                        <option value="friends">👥 Friends</option>
+                        <option value="private">🔒 Private</option>
+                    </select>
+                </div>
+                <div id="visibility-description" class="visibility-description">
+                    Your profile will appear in search results and can be discovered by anyone on the platform.
+                </div>
+                <div class="settings-row">
+                    <div>
+                        <div class="settings-title">Show Online Status</div>
+                        <div class="settings-description">Let others see when you're online</div>
+                    </div>
+                    <label class="toggle-switch-label">
+                        <input type="checkbox" id="show-online-status" class="toggle-switch-input" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="settings-row-no-border">
+                    <div>
+                        <div class="settings-title">Show Last Active</div>
+                        <div class="settings-description">Display when you were last active</div>
+                    </div>
+                    <label class="toggle-switch-label">
+                        <input type="checkbox" id="show-last-active" class="toggle-switch-input" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-sliders-h"></i>
+                </div>
+                <div class="card-title">My Preferences</div>
+            </div>
+            <div class="settings-section-padding">
+                <div class="settings-row-no-border">
+                    <div>
+                        <div class="settings-title">User Measurement</div>
+                        <div class="settings-description">Choose units for height and weight</div>
+                    </div>
+                    <select id="measurement-system" name="measurementSystem" class="measurement-select">
+                        <option value="metric">Metric (cm, kg)</option>
+                        <option value="imperial">Imperial (ft/in, lbs)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="profile-content margin-top-2">
+        <div class="profile-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="card-title">Notification Preferences</div>
+            </div>
+            <div class="settings-section-padding">
+                <div class="settings-row">
+                    <div>
+                        <div class="settings-title">New Messages</div>
+                        <div class="settings-description">Get notified of new messages</div>
+                    </div>
+                    <label class="toggle-switch-label">
+                        <input type="checkbox" id="notify-new-messages" class="toggle-switch-input" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="settings-row-no-border">
+                    <div>
+                        <div class="settings-title">Profile Views</div>
+                        <div class="settings-description">Get notified when someone views your profile</div>
+                    </div>
+                    <label class="toggle-switch-label">
+                        <input type="checkbox" id="notify-profile-views" class="toggle-switch-input">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="settings-row settings-row-border-top">
+                    <div>
+                        <div class="settings-title">Messages Per Day</div>
+                        <div class="settings-description">Set your daily messaging limit</div>
+                    </div>
+                    <div class="messages-per-day-container">
+                        <input type="number" 
+                               id="messagesPerDay" 
+                               min="1" 
+                               max="1000" 
+                               value="50" 
+                               placeholder="50"
+                               class="messages-per-day-input">
+                        <span class="messages-per-day-label">messages</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="settings-actions">
+        <button id="save-settings-btn" class="save-settings-btn">
+            <i class="fas fa-save"></i> Save Settings
+        </button>
+        <button class="cancel-settings-btn">
+            <i class="fas fa-times"></i> Cancel
+        </button>
+    </div>
+
+    <!-- Settings Page JavaScript - Moved to new structure (Phase 1 CSS/JS Extraction) -->
+    <script src="/assets/js/new/pages/settings.js"></script>
+    
+    <!-- Session Manager -->
+
+</div>
+
+</div>
+
+</div>
