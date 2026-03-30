@@ -1,0 +1,195 @@
+{
+  "app": {
+    "name": "Totilove",
+    "tagline": "Trouvez l'Amour Sans Frontières",
+    "description": "Connectez-vous avec des personnes du monde entier grâce à notre système de compatibilité intelligent"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "about": "À propos",
+    "features": "Fonctionnalités",
+    "pricing": "Tarifs",
+    "contact": "Contact",
+    "login": "Se connecter",
+    "register": "Rejoindre gratuitement",
+    "profile": "Profil",
+    "messages": "Messages",
+    "matches": "Correspondances",
+    "settings": "Paramètres",
+    "logout": "Se déconnecter"
+  },
+  "hero": {
+    "title": "Trouvez l'Amour Sans Frontières",
+    "subtitle": "Connectez-vous avec des personnes du monde entier grâce à notre système de compatibilité intelligent. Support pour plus de 25 langues, préférences culturelles et votre système de mesure préféré.",
+    "features": {
+      "languages": "25+ Langues",
+      "matching": "Compatibilité Intelligente",
+      "security": "Sûr et Sécurisé",
+      "mobile": "Optimisé Mobile"
+    },
+    "cta": {
+      "primary": "Rejoindre Gratuitement Aujourd'hui",
+      "secondary": "En Savoir Plus"
+    }
+  },
+  "features": {
+    "title": "Pourquoi Choisir Totilove ?",
+    "subtitle": "Notre plateforme combine technologie de pointe et sensibilité culturelle pour vous aider à trouver des connexions significatives dans le monde entier.",
+    "items": {
+      "languages": {
+        "title": "Support Multi-langues",
+        "description": "Connectez-vous dans votre langue maternelle. Nous supportons plus de 25 langues mondiales avec suivi de fluidité et préférences de compatibilité culturelle."
+      },
+      "matching": {
+        "title": "Algorithme de Compatibilité Intelligent",
+        "description": "Notre système alimenté par l'IA considère les langues partagées, les intérêts, l'arrière-plan culturel et les préférences personnelles pour une compatibilité optimale."
+      },
+      "interests": {
+        "title": "Connexions Basées sur les Intérêts",
+        "description": "Trouvez des personnes qui partagent vos passions. Du sport aux arts, de la technologie aux voyages - connectez-vous sur ce que vous aimez le plus."
+      },
+      "culture": {
+        "title": "Intelligence Culturelle",
+        "description": "Respectez les différences culturelles avec des préférences régionales automatiques, des systèmes de mesure et une compatibilité culturellement consciente."
+      },
+      "privacy": {
+        "title": "Confidentialité et Sécurité",
+        "description": "Votre sécurité est notre priorité. Vérification avancée, contrôles de confidentialité et messagerie sécurisée protègent vos informations personnelles."
+      },
+      "mobile": {
+        "title": "Optimisé Mobile",
+        "description": "Restez connecté partout. Notre design responsive fonctionne parfaitement sur ordinateur, tablette et appareils mobiles."
+      }
+    }
+  },
+  "showcase": {
+    "title": "Exprimez-vous Complètement",
+    "subtitle": "Partagez vos langues, intérêts et préférences de la manière qui vous semble la plus naturelle.",
+    "tabs": {
+      "languages": "Langues",
+      "interests": "Intérêts",
+      "measurements": "Mesures"
+    },
+    "languages": {
+      "english": "Natif, Courant, Avancé",
+      "french": "Langue Romane",
+      "german": "Famille Germanique",
+      "italian": "Langue Romane",
+      "spanish": "Langue Romane",
+      "russian": "Langue Slave",
+      "chinese": "Chinois Mandarin",
+      "vietnamese": "Langue Vietnamienne",
+      "thai": "Langue Tonale",
+      "more": "Couverture Mondiale"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Bon Retour",
+      "email": "Adresse Email",
+      "password": "Mot de Passe",
+      "remember": "Se Souvenir de Moi",
+      "forgot": "Mot de Passe Oublié ?",
+      "submit": "Se Connecter",
+      "register_link": "Pas de compte ? Rejoindre Gratuitement"
+    },
+    "register": {
+      "title": "Rejoindre Totilove",
+      "subtitle": "Commencez votre voyage d'amour international",
+      "first_name": "Prénom",
+      "last_name": "Nom de Famille",
+      "email": "Adresse Email",
+      "password": "Mot de Passe",
+      "confirm_password": "Confirmer le Mot de Passe",
+      "birth_date": "Date de Naissance",
+      "gender": "Genre",
+      "male": "Homme",
+      "female": "Femme",
+      "other": "Autre",
+      "terms": "J'accepte les conditions d'utilisation et la politique de confidentialité",
+      "submit": "Créer un Compte",
+      "login_link": "Déjà un compte ? Se Connecter"
+    }
+  },
+  "profile": {
+    "title": "Mon Profil",
+    "edit": "Modifier le Profil",
+    "basic_info": "Informations de Base",
+    "languages": "Langues",
+    "interests": "Intérêts",
+    "preferences": "Préférences",
+    "photos": "Photos",
+    "save": "Enregistrer",
+    "cancel": "Annuler"
+  },
+  "chat": {
+    "title": "Messages",
+    "new_message": "Nouveau Message",
+    "search": "Rechercher des conversations...",
+    "online": "En ligne",
+    "offline": "Hors ligne",
+    "typing": "tape...",
+    "send": "Envoyer",
+    "attach": "Joindre",
+    "emoji": "Émoji"
+  },
+  "matches": {
+    "title": "Correspondances",
+    "new_matches": "Nouvelles Correspondances",
+    "mutual_likes": "J'aime Mutuels",
+    "view_profile": "Voir le Profil",
+    "send_message": "Envoyer un Message",
+    "like": "J'aime",
+    "pass": "Passer"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "account": "Compte",
+    "privacy": "Confidentialité",
+    "notifications": "Notifications",
+    "language": "Langue",
+    "measurements": "Système de Mesure",
+    "metric": "Métrique",
+    "imperial": "Impérial",
+    "save": "Enregistrer les Modifications"
+  },
+  "footer": {
+    "company": "Entreprise",
+    "about": "À Propos",
+    "careers": "Carrières",
+    "press": "Presse",
+    "support": "Support",
+    "help": "Centre d'Aide",
+    "safety": "Conseils de Sécurité",
+    "contact": "Nous Contacter",
+    "feedback": "Retour",
+    "legal": "Légal",
+    "privacy": "Politique de Confidentialité",
+    "terms": "Conditions d'Utilisation",
+    "cookies": "Politique des Cookies",
+    "community": "Directives Communautaires",
+    "copyright": "Tous droits réservés. Fait avec ❤️ pour l'amour sans frontières."
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "save": "Enregistrer",
+    "close": "Fermer",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "view": "Voir",
+    "add": "Ajouter",
+    "remove": "Supprimer",
+    "update": "Mettre à Jour",
+    "refresh": "Actualiser",
+    "back": "Retour"
+  }
+} 
