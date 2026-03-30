@@ -1,0 +1,178 @@
+{
+  "app": {
+    "name": "Totilove",
+    "tagline": "Find Love Across Borders",
+    "description": "Connect with people worldwide through our intelligent matching system"
+  },
+  "navigation": {
+    "home": "Home",
+    "about": "About",
+    "features": "Features", 
+    "pricing": "Pricing",
+    "contact": "Contact",
+    "login": "Sign In",
+    "register": "Join Free",
+    "profile": "Profile",
+    "messages": "Messages",
+    "matches": "Matches",
+    "settings": "Settings",
+    "logout": "Sign Out"
+  },
+  "hero": {
+    "title": "Find Love Across Borders",
+    "subtitle": "Connect with people worldwide through our intelligent matching system. Support for 25+ languages, cultural preferences, and your preferred measurement system.",
+    "features": {
+      "languages": "25+ Languages",
+      "matching": "Smart Matching", 
+      "security": "Safe & Secure",
+      "mobile": "Mobile Ready"
+    },
+    "cta": {
+      "primary": "Join Free Today",
+      "secondary": "Learn More"
+    }
+  },
+  "features": {
+    "title": "Why Choose Totilove?",
+    "subtitle": "Our platform combines cutting-edge technology with cultural sensitivity to help you find meaningful connections worldwide.",
+    "items": {
+      "languages": {
+        "title": "Multi-Language Support",
+        "description": "Connect in your native language. We support 25+ world languages with fluency tracking and cultural matching preferences."
+      },
+      "matching": {
+        "title": "Smart Matching Algorithm", 
+        "description": "Our AI-powered system considers shared languages, interests, cultural background, and personal preferences for optimal compatibility."
+      },
+      "interests": {
+        "title": "Interest-Based Connections",
+        "description": "Find people who share your passions. From sports to arts, technology to travel - connect over what you love most."
+      },
+      "culture": {
+        "title": "Cultural Intelligence",
+        "description": "Respect cultural differences with automatic regional preferences, measurement systems, and culturally-aware matching."
+      },
+      "privacy": {
+        "title": "Privacy & Security",
+        "description": "Your safety is our priority. Advanced verification, privacy controls, and secure messaging keep your personal information protected."
+      },
+      "mobile": {
+        "title": "Mobile Optimized",
+        "description": "Stay connected anywhere. Our responsive design works perfectly on desktop, tablet, and mobile devices."
+      }
+    }
+  },
+  "showcase": {
+    "title": "Express Yourself Completely",
+    "subtitle": "Share your languages, interests, and preferences in the way that feels most natural to you.",
+    "tabs": {
+      "languages": "Languages",
+      "interests": "Interests", 
+      "measurements": "Measurements"
+    },
+    "languages": {
+      "english": "Native, Fluent, Advanced",
+      "vietnamese": "Southeast Asian Language",
+      "thai": "Tonal Language Family",
+      "chinese": "Mandarin Chinese",
+      "more": "Worldwide Coverage"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "email": "Email Address",
+      "password": "Password",
+      "remember": "Remember Me",
+      "forgot": "Forgot Password?",
+      "submit": "Sign In",
+      "register_link": "Don't have an account? Join Free"
+    },
+    "register": {
+      "title": "Join Totilove",
+      "subtitle": "Start your international love journey",
+      "first_name": "First Name",
+      "last_name": "Last Name", 
+      "email": "Email Address",
+      "password": "Password",
+      "confirm_password": "Confirm Password",
+      "birth_date": "Date of Birth",
+      "gender": "Gender",
+      "looking_for": "Looking For",
+      "location": "Location",
+      "languages": "Languages I Speak",
+      "interests": "My Interests",
+      "submit": "Create Account",
+      "login_link": "Already have an account? Sign In",
+      "terms": "By creating an account, you agree to our Terms of Service and Privacy Policy"
+    }
+  },
+  "profile": {
+    "sections": {
+      "basic": "Basic Information",
+      "languages": "Languages I Speak", 
+      "interests": "My Interests",
+      "preferences": "Preferences",
+      "photos": "Photos"
+    },
+    "languages": {
+      "add": "Add Language",
+      "fluency": "Fluency Level",
+      "skills": "Skills",
+      "reading": "Reading",
+      "writing": "Writing", 
+      "speaking": "Speaking",
+      "understanding": "Understanding",
+      "years": "Years Speaking",
+      "native": "This is my native language",
+      "remove": "Remove Language"
+    }
+  },
+  "matching": {
+    "compatibility": "Compatibility",
+    "shared_languages": "Shared Languages",
+    "common_interests": "Common Interests",
+    "cultural_match": "Cultural Match",
+    "distance": "Distance"
+  },
+  "messaging": {
+    "type_message": "Type a message...",
+    "send": "Send",
+    "online": "Online",
+    "last_seen": "Last seen {{time}}",
+    "translation_hint": "Message may be translated"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel", 
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "remove": "Remove",
+    "close": "Close",
+    "next": "Next",
+    "previous": "Previous",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success!",
+    "search": "Search...",
+    "filter": "Filter",
+    "sort": "Sort",
+    "clear": "Clear"
+  },
+  "errors": {
+    "required": "This field is required",
+    "email_invalid": "Please enter a valid email address", 
+    "password_weak": "Password must be at least 8 characters",
+    "passwords_mismatch": "Passwords do not match",
+    "age_restriction": "You must be 18 or older",
+    "network_error": "Network error. Please try again.",
+    "server_error": "Server error. Please try again later."
+  },
+  "success": {
+    "account_created": "Account created successfully!",
+    "profile_updated": "Profile updated successfully!",
+    "language_added": "Language added to your profile!",
+    "message_sent": "Message sent successfully!"
+  }
+}
