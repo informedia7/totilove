@@ -1,0 +1,309 @@
+/* ============================================
+   SETTINGS PAGE STYLES
+   Extracted from settings.html - Phase 1 CSS Extraction
+   ============================================ */
+
+/* Toggle switch styles */
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background-color: var(--primary);
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(26px);
+}
+
+/* Inline styles converted to classes */
+.settings-grid-gap {
+    display: grid;
+    gap: 1.5rem;
+    padding: 1rem 0;
+}
+
+.label-block {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--dark-color);
+}
+
+.margin-bottom-1 {
+    margin-bottom: 1rem;
+}
+
+.selected-countries-container {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.country-select-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: white;
+}
+
+.help-text-muted {
+    font-size: 0.9rem;
+    color: var(--muted-color);
+    margin-top: 0.5rem;
+}
+
+.age-range-container {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.age-range-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.age-range-label {
+    font-size: 0.9rem;
+    color: var(--muted-color);
+}
+
+.age-select-input {
+    width: 80px;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    text-align: center;
+    background: white;
+    font-size: 0.9rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+}
+
+.checkbox-label-text {
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.checkbox-input {
+    width: 18px;
+    height: 18px;
+}
+
+.settings-section-padding {
+    padding: 1rem 0;
+}
+
+.settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.settings-row:last-child {
+    border-bottom: none;
+}
+
+.settings-row-no-border {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+}
+
+.settings-title {
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.settings-description {
+    font-size: 0.9rem;
+    color: var(--muted-color);
+}
+
+.profile-visibility-select {
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    font-size: 0.95rem;
+    min-width: 180px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.visibility-description {
+    font-size: 0.85rem;
+    color: var(--muted-color);
+    padding-left: 0.25rem;
+    line-height: 1.4;
+}
+
+.toggle-switch-label {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.toggle-switch-input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.measurement-select {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    font-size: 0.9rem;
+}
+
+.messages-per-day-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.messages-per-day-input {
+    width: 80px;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    text-align: center;
+    background: var(--background-color);
+    color: var(--text-color);
+    transition: border-color 0.3s ease;
+}
+
+.messages-per-day-input:focus {
+    border-color: var(--primary);
+}
+
+.messages-per-day-label {
+    color: var(--muted-color);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.settings-actions {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.save-settings-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 1rem;
+}
+
+.save-settings-btn:hover {
+    background: var(--secondary);
+}
+
+.cancel-settings-btn {
+    background: transparent;
+    color: var(--muted-color);
+    border: 1px solid #ddd;
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cancel-settings-btn:hover {
+    background: var(--light-color);
+}
+
+.margin-top-2 {
+    margin-top: 2rem;
+}
+
+.settings-row-border-top {
+    border-top: 1px solid #f0f0f0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
