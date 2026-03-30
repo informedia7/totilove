@@ -1,0 +1,248 @@
+<!-- Universal Block Confirmation Modal Component -->
+<div id="blockConfirmModal" class="block-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="blockConfirmTitle" aria-describedby="blockConfirmMessage" tabindex="-1" style="display: none;">
+    <div class="block-confirm-overlay" aria-hidden="true"></div>
+    <div class="block-confirm-content">
+        <div class="block-confirm-icon">
+            <i class="fas fa-ban" aria-hidden="true"></i>
+        </div>
+        <h3 class="block-confirm-title" id="blockConfirmTitle">Block User?</h3>
+        <p class="block-confirm-message" id="blockConfirmMessage">
+            Are you sure you want to block <strong id="blockUsername">this user</strong>? They will no longer be able to contact you or see your profile in search results.
+        </p>
+        <div class="block-confirm-actions">
+            <button class="block-confirm-btn block-confirm-cancel" id="blockConfirmCancel">
+                <i class="fas fa-times"></i>
+                <span>Cancel</span>
+            </button>
+            <button class="block-confirm-btn block-confirm-yes" id="blockConfirmYes">
+                <i class="fas fa-ban"></i>
+                <span>Block User</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.block-confirm-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.block-confirm-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(5, 12, 24, 0.75);
+    backdrop-filter: blur(4px);
+}
+
+.block-confirm-content {
+    position: relative;
+    width: min(420px, 100%);
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.3);
+    animation: blockConfirmSlideUp 0.3s ease;
+}
+
+@keyframes blockConfirmSlideUp {
+    from {
+        transform: translateY(45px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.block-confirm-icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 1.25rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.7rem;
+    color: #fff;
+    background: linear-gradient(135deg, #d63031, #f05252);
+    box-shadow: 0 14px 30px rgba(214, 48, 49, 0.35);
+}
+
+.block-confirm-title {
+    font-size: 1.45rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem;
+    color: #1f2933;
+}
+
+.block-confirm-message {
+    margin: 0 0 1.75rem;
+    color: #4b5563;
+    line-height: 1.55;
+    font-size: 0.98rem;
+}
+
+.block-confirm-message strong {
+    color: #111827;
+}
+
+.block-confirm-actions {
+    display: flex;
+    gap: 0.85rem;
+}
+
+.block-confirm-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.85rem 1rem;
+    border-radius: 14px;
+    border: 2px solid transparent;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.block-confirm-cancel {
+    background: transparent;
+    border-color: #e5e7eb;
+    color: #4b5563;
+}
+
+.block-confirm-cancel:hover {
+    border-color: #cbd5f5;
+    color: #111827;
+}
+
+.block-confirm-yes {
+    background: linear-gradient(135deg, #d63031, #f05252);
+    color: #ffffff;
+    box-shadow: 0 8px 20px rgba(214, 48, 49, 0.35);
+}
+
+.block-confirm-yes:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(214, 48, 49, 0.45);
+}
+
+@media (max-width: 540px) {
+    .block-confirm-modal {
+        padding: 1rem;
+    }
+
+    .block-confirm-content {
+        padding: 1.4rem;
+    }
+
+    .block-confirm-actions {
+        flex-direction: column;
+    }
+}
+
+/* Dark mode overrides */
+.block-confirm-modal.dark .block-confirm-overlay,
+html[data-theme="dark"] .block-confirm-modal .block-confirm-overlay,
+body.dark-mode .block-confirm-modal .block-confirm-overlay {
+    background: rgba(2, 6, 23, 0.85);
+}
+
+.block-confirm-modal.dark .block-confirm-content,
+html[data-theme="dark"] .block-confirm-modal .block-confirm-content,
+body.dark-mode .block-confirm-modal .block-confirm-content {
+    background: #0f172a;
+    color: #e2e8f0;
+    box-shadow: 0 30px 80px rgba(2, 6, 23, 0.9);
+}
+
+.block-confirm-modal.dark .block-confirm-title,
+html[data-theme="dark"] .block-confirm-modal .block-confirm-title,
+body.dark-mode .block-confirm-modal .block-confirm-title {
+    color: #f8fafc;
+}
+
+.block-confirm-modal.dark .block-confirm-message,
+html[data-theme="dark"] .block-confirm-modal .block-confirm-message,
+body.dark-mode .block-confirm-modal .block-confirm-message {
+    color: #cbd5f5;
+}
+
+.block-confirm-modal.dark .block-confirm-message strong,
+html[data-theme="dark"] .block-confirm-modal .block-confirm-message strong,
+body.dark-mode .block-confirm-modal .block-confirm-message strong {
+    color: #fde68a;
+}
+
+.block-confirm-modal.dark .block-confirm-cancel,
+html[data-theme="dark"] .block-confirm-modal .block-confirm-cancel,
+body.dark-mode .block-confirm-modal .block-confirm-cancel {
+    border-color: rgba(148, 163, 184, 0.4);
+    color: #e2e8f0;
+}
+
+.block-confirm-modal.dark .block-confirm-cancel:hover,
+html[data-theme="dark"] .block-confirm-modal .block-confirm-cancel:hover,
+body.dark-mode .block-confirm-modal .block-confirm-cancel:hover {
+    border-color: rgba(129, 140, 248, 0.7);
+}
+
+.block-confirm-modal.dark .block-confirm-yes,
+html[data-theme="dark"] .block-confirm-modal .block-confirm-yes,
+body.dark-mode .block-confirm-modal .block-confirm-yes {
+    box-shadow: 0 10px 32px rgba(248, 113, 113, 0.4);
+}
+
+.block-confirm-modal.dark .block-confirm-content::after,
+html[data-theme="dark"] .block-confirm-modal .block-confirm-content::after,
+body.dark-mode .block-confirm-modal .block-confirm-content::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    pointer-events: none;
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.15);
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.__blockConfirmListenersAttached) {
+        return;
+    }
+    window.__blockConfirmListenersAttached = true;
+
+    const modal = document.getElementById('blockConfirmModal');
+    const cancelBtn = document.getElementById('blockConfirmCancel');
+    const confirmBtn = document.getElementById('blockConfirmYes');
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            if (typeof window.closeBlockConfirm === 'function') {
+                window.closeBlockConfirm();
+            } else if (modal) {
+                modal.style.display = 'none';
+            }
+        });
+    }
+
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            if (typeof window.confirmBlock === 'function') {
+                window.confirmBlock();
+            }
+        });
+    }
+});
+</script>
+
