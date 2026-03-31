@@ -189,7 +189,10 @@ class Server {
         const PORT = process.env.PORT || 3001;
         
         this.server.listen(PORT, () => {
-            // Server started successfully
+            console.log(`✅ Server started successfully on port ${PORT}`);
+            console.log(`📍 Health check: http://localhost:${PORT}/health`);
+            console.log(`📊 Status endpoint: http://localhost:${PORT}/status`);
+            console.log(`🚀 Ready to accept requests`);
         });
 
         // Graceful shutdown handling
