@@ -20,7 +20,7 @@ function createDatabaseConfig() {
     const baseConfig = {
         // High performance settings for concurrent users
         max: 20,
-        min: 5,
+        min: Number(process.env.DB_POOL_MIN || 2),
         idleTimeoutMillis: 30010,
         connectionTimeoutMillis: 5000,
         statement_timeout: 10000,

@@ -7,6 +7,7 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const compression = require('compression');
 
 /**
  * Configure Express app with middleware and security headers
@@ -25,6 +26,9 @@ function configureExpress(app) {
     } else {
         app.set('trust proxy', 1);
     }
+
+    // Gzip/deflate all compressible responses (HTML, JSON, CSS, JS, etc.)
+    app.use(compression({ threshold: 1024 }));
 
     // High performance Express configuration
     app.use(cors({
@@ -47,18 +51,23 @@ function configureExpress(app) {
         parameterLimit: 1000
     }));
     
+    // 1 year cache for hashed/versioned assets, 1 day for pages and components.
+    const assetCacheOptions  = { maxAge: '365d', immutable: true, etag: true, lastModified: true };
+    const pageCacheOptions   = { maxAge: '1d',   etag: true, lastModified: true };
+    const uploadCacheOptions = { maxAge: '7d',   etag: true, lastModified: true };
+
     // Static file serving - specific paths first
-    app.use('/assets', express.static(path.join(__dirname, '../../app', 'assets')));
-    app.use('/pages', express.static(path.join(__dirname, '../../app', 'pages')));
-    app.use('/uploads', express.static(path.join(__dirname, '../../app', 'uploads')));
-    app.use('/js', express.static(path.join(__dirname, '../../app', 'js')));
-    app.use('/components', express.static(path.join(__dirname, '../../app', 'components')));
-    
+    app.use('/assets', express.static(path.join(__dirname, '../../app', 'assets'), assetCacheOptions));
+    app.use('/pages', express.static(path.join(__dirname, '../../app', 'pages'), pageCacheOptions));
+    app.use('/uploads', express.static(path.join(__dirname, '../../app', 'uploads'), uploadCacheOptions));
+    app.use('/js', express.static(path.join(__dirname, '../../app', 'js'), assetCacheOptions));
+    app.use('/components', express.static(path.join(__dirname, '../../app', 'components'), pageCacheOptions));
+
     // Ensure chat images are served from the correct path
-    app.use('/uploads/chat_images', express.static(path.join(__dirname, '../../app', 'uploads', 'chat_images')));
-    
+    app.use('/uploads/chat_images', express.static(path.join(__dirname, '../../app', 'uploads', 'chat_images'), uploadCacheOptions));
+
     // Catch-all static file serving - MUST be before routes
-    app.use('/', express.static(path.join(__dirname, '../../app')));
+    app.use('/', express.static(path.join(__dirname, '../../app'), pageCacheOptions));
     
     // Security headers (including CSP for XSS protection)
     app.use((req, res, next) => {

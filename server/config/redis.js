@@ -66,10 +66,8 @@ async function setupRedis() {
             redisClient.connect(),
             new Promise((_, reject) => setTimeout(() => reject(new Error('redis_connect_timeout')), connectTimeoutMs))
         ]);
-        
-        // Configure Redis for high-load operations
-        await redisClient.configSet('maxmemory-policy', 'allkeys-lru');
-        await redisClient.configSet('tcp-keepalive', '60');
+
+        // Skip CONFIG commands — managed Redis (Railway/Heroku) blocks them
         connectedRedis = redisClient;
     } catch (error) {
         // Redis not available, using memory cache
