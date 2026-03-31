@@ -1,0 +1,28 @@
+/**
+ * Main CSS Entry Point
+ * 
+ * Imports all CSS files in the correct order:
+ * 1. Tokens (design variables)
+ * 2. Base (reset, normalize, typography)
+ * 3. Components (all UI components)
+ * 4. Layout (grids, containers, utilities)
+ * 5. Responsive (desktop enhancements - when ready)
+ * 
+ * Migration Phase 1: Week 6
+ */
+
+/* Step 1: Design Tokens (must be first) */
+@import url('./00-tokens.css');
+
+/* Step 2: Base Styles (reset, normalize, typography) */
+@import url('./01-base.css');
+
+/* Step 3: Components (all UI components) */
+@import url('./02-components/components.css');
+
+/* Step 4: Layout (grids, containers, utilities) */
+@import url('./03-layout.css');
+
+/* Step 5: Responsive (desktop enhancements) */
+@import url('./04-responsive.css');
+
