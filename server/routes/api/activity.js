@@ -3,7 +3,12 @@
  * Handles activity-related endpoints (favorites, likes, viewers, etc.)
  */
 
-const { activityLimiter } = require('../../../routers/middleware/rateLimiter');
+let activityLimiter = (req, res, next) => next();
+try {
+    ({ activityLimiter } = require('../../../routers/middleware/rateLimiter'));
+} catch (error) {
+    console.warn('⚠️ Optional activityLimiter unavailable, using pass-through fallback limiter');
+}
 
 /**
  * Setup activity-related routes
