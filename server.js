@@ -47,6 +47,9 @@ class Server {
     constructor() {
         this.app = express();
         this.server = http.createServer(this.app);
+        this.bootState = 'starting';
+        this.bootError = null;
+        this.initCompletedAt = null;
         const presenceFlags = typeof featureFlags.getPresenceFlags === 'function'
             ? featureFlags.getPresenceFlags()
             : { monitoringEnabled: false, socketEnabled: true };
@@ -97,8 +100,37 @@ class Server {
         this.socketAdapterClients = null;
         this.socketAdapterEnabled = false;
         this.isShuttingDown = false;
+
+        this.registerBootstrapRoutes();
         
-        this.init();
+        this.init().catch((error) => {
+            this.bootState = 'error';
+            this.bootError = error;
+            console.error('❌ Server initialization failed:', error.message);
+        });
+    }
+
+    registerBootstrapRoutes() {
+        this.app.get('/health', (_req, res) => {
+            res.status(200).json({
+                ok: true,
+                state: this.bootState,
+                timestamp: new Date().toISOString()
+            });
+        });
+
+        this.app.get('/status', (_req, res) => {
+            res.status(200).json({
+                ok: true,
+                state: this.bootState,
+                startedAt: this.initCompletedAt,
+                socketsEnabled: this.socketsEnabled,
+                databaseReady: !!this.db,
+                redisReady: !!this.redis,
+                error: this.bootError ? this.bootError.message : null,
+                timestamp: new Date().toISOString()
+            });
+        });
     }
 
     async init() {
@@ -165,6 +197,8 @@ class Server {
         
         // 8. Start monitoring
         this.monitoringUtils.startMonitoring();
+        this.bootState = 'ready';
+        this.initCompletedAt = new Date().toISOString();
     }
 
     async configureSocketAdapter() {
