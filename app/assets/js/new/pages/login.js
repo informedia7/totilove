@@ -28,8 +28,26 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             },
             body: JSON.stringify({ email, password })
         });
-        
-        const data = await response.json();
+
+        const contentType = response.headers.get('content-type') || '';
+        let data = {};
+
+        if (contentType.includes('application/json')) {
+            data = await response.json();
+        } else {
+            const text = await response.text();
+            data = {
+                success: false,
+                error: text && text.trim().startsWith('<')
+                    ? 'Unexpected non-JSON response from server.'
+                    : (text || 'Unexpected server response')
+            };
+        }
+
+        if (response.status === 503) {
+            showNotification('Server is still starting. Please try again in a few seconds.', 'error');
+            return;
+        }
         
         if (data.success) {
             // Store user info only (cookie handles auth automatically)

@@ -114,6 +114,14 @@ class Server {
     }
 
     registerBootstrapRoutes() {
+        const buildBootErrorPayload = () => ({
+            success: false,
+            error: this.bootState === 'error'
+                ? (this.bootError?.message || 'Service failed to initialize')
+                : 'Service is starting, please try again in a moment.',
+            state: this.bootState
+        });
+
         this.app.get('/', (req, res, next) => {
             if (this.bootState === 'ready') {
                 return next();
@@ -157,10 +165,7 @@ class Server {
                 }
             }
 
-            return res.status(503).json({
-                success: false,
-                error: 'Service is starting, please try again in a moment.'
-            });
+            return res.status(this.bootState === 'error' ? 500 : 503).json(buildBootErrorPayload());
         });
 
         this.app.post('/register', async (req, res, next) => {
@@ -177,10 +182,7 @@ class Server {
                 }
             }
 
-            return res.status(503).json({
-                success: false,
-                error: 'Service is starting, please try again in a moment.'
-            });
+            return res.status(this.bootState === 'error' ? 500 : 503).json(buildBootErrorPayload());
         });
 
         this.app.get('/health', (_req, res) => {
