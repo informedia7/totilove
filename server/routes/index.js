@@ -153,6 +153,16 @@ function setupRoutes(app, dependencies) {
             res.status(404).send('<h1>CSS Test Dashboard not found</h1>');
         }
     });
+
+    // Health fallback endpoints for deployment platforms probing '/'.
+    // If legacy page routers are unavailable, this still keeps the service healthy.
+    app.get('/healthz', (req, res) => {
+        res.status(200).json({ success: true, status: 'ok' });
+    });
+
+    app.get('/', (req, res) => {
+        res.status(200).json({ success: true, status: 'ok' });
+    });
 }
 
 function createSessionExpiryRedirect(authMiddleware) {
