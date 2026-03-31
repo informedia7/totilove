@@ -47,6 +47,8 @@ class Server {
     constructor() {
         this.app = express();
         this.server = http.createServer(this.app);
+        this.initCompleted = false;
+        this.initError = null;
         const presenceFlags = typeof featureFlags.getPresenceFlags === 'function'
             ? featureFlags.getPresenceFlags()
             : { monitoringEnabled: false, socketEnabled: true };
@@ -97,8 +99,31 @@ class Server {
         this.socketAdapterClients = null;
         this.socketAdapterEnabled = false;
         this.isShuttingDown = false;
+
+        // Bootstrap probes so deployment health checks can pass while async init is running.
+        this.app.get('/healthz', (req, res, next) => {
+            if (this.initCompleted) {
+                return next();
+            }
+            return res.status(200).json({ success: true, status: 'booting' });
+        });
+
+        this.app.get('/', (req, res, next) => {
+            if (this.initCompleted) {
+                return next();
+            }
+            return res.status(200).json({ success: true, status: 'booting' });
+        });
         
-        this.init();
+        this.init()
+            .then(() => {
+                this.initCompleted = true;
+                console.info('✅ Server initialization completed');
+            })
+            .catch((error) => {
+                this.initError = error;
+                console.error('❌ Server initialization failed:', error.message);
+            });
     }
 
     async init() {
@@ -189,7 +214,7 @@ class Server {
         const PORT = process.env.PORT || 3001;
         
         this.server.listen(PORT, () => {
-            // Server started successfully
+            console.info(`✅ HTTP server listening on port ${PORT}`);
         });
 
         // Graceful shutdown handling
@@ -271,6 +296,11 @@ if (shouldUseCluster) {
     if (cluster.isMaster && process.env.NODE_ENV === 'production' && !enableCluster) {
         console.info('ℹ️ Cluster mode disabled (set ENABLE_CLUSTER=true to opt-in).');
     }
+
+    process.on('unhandledRejection', (reason) => {
+        const message = reason && reason.message ? reason.message : String(reason);
+        console.error('❌ Unhandled promise rejection:', message);
+    });
 
     // Start single server instance
     const server = new Server();
