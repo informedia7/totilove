@@ -29,15 +29,29 @@ module.exports = {
     },
 
     // Redis Configuration
-    redis: {
-        host: process.env.REDIS_HOST || 'localhost',
-        port: process.env.REDIS_PORT || 6379,
-        password: process.env.REDIS_PASSWORD || null,
-        db: process.env.REDIS_DB || 0,
-        retryDelayOnFailover: 100,
-        enableReadyCheck: false,
-        maxRetriesPerRequest: null
-    },
+    redis: (() => {
+        const redisUrl = process.env.REDIS_URL || process.env.REDIS_PRIVATE_URL || null;
+        const host = process.env.REDIS_HOST || 'localhost';
+        const port = Number(process.env.REDIS_PORT || 6379);
+        const db = Number(process.env.REDIS_DB || 0);
+
+        return {
+            // Keep both URL and host/port for compatibility across modules.
+            url: redisUrl || undefined,
+            host,
+            port,
+            password: process.env.REDIS_PASSWORD || null,
+            db,
+            socket: {
+                host,
+                port,
+                connectTimeout: Number(process.env.REDIS_CONNECT_TIMEOUT_MS || 5000)
+            },
+            retryDelayOnFailover: 100,
+            enableReadyCheck: false,
+            maxRetriesPerRequest: null
+        };
+    })(),
 
     // WebSocket Configuration
     websocket: {

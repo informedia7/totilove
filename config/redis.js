@@ -12,8 +12,19 @@ class RedisManager {
     async connect() {
         try {
             console.log('🔄 Setting up Redis cluster for 10K+ users...');
-            
-            this.client = redis.createClient(config.redis);
+
+            const redisUrl = process.env.REDIS_URL || process.env.REDIS_PRIVATE_URL || config.redis.url;
+            const redisOptions = {
+                ...(redisUrl ? { url: redisUrl } : {}),
+                ...(config.redis.password ? { password: config.redis.password } : {}),
+                database: Number(config.redis.db || 0),
+                socket: {
+                    host: config.redis.host,
+                    port: Number(config.redis.port),
+                    connectTimeout: Number(process.env.REDIS_CONNECT_TIMEOUT_MS || 5000)
+                }
+            };
+            this.client = redis.createClient(redisOptions);
             
             // Set up event handlers
             this.client.on('connect', () => {

@@ -308,12 +308,23 @@ class Server {
         }
 
         try {
-            const pubClient = createRedisClient(appConfig.redis);
+            const redisUrl = process.env.REDIS_URL || process.env.REDIS_PRIVATE_URL || appConfig.redis.url;
+            const redisOptions = {
+                ...(redisUrl ? { url: redisUrl } : {}),
+                ...(process.env.REDIS_PASSWORD ? { password: process.env.REDIS_PASSWORD } : {}),
+                database: Number(process.env.REDIS_DB || appConfig.redis.db || 0),
+                socket: {
+                    host: process.env.REDIS_HOST || appConfig.redis.host || 'localhost',
+                    port: Number(process.env.REDIS_PORT || appConfig.redis.port || 6379),
+                    connectTimeout: Number(process.env.SOCKET_ADAPTER_CONNECT_TIMEOUT_MS || 5000)
+                }
+            };
+
+            const pubClient = createRedisClient(redisOptions);
             const subClient = pubClient.duplicate();
-            const connectTimeoutMs = Number(process.env.SOCKET_ADAPTER_CONNECT_TIMEOUT_MS || 2000);
             await Promise.race([
                 Promise.all([pubClient.connect(), subClient.connect()]),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('adapter_connect_timeout')), connectTimeoutMs))
+                new Promise((_, reject) => setTimeout(() => reject(new Error('adapter_connect_timeout')), redisOptions.socket.connectTimeout))
             ]);
             this.io.adapter(createAdapter(pubClient, subClient));
             this.socketAdapterClients = { pubClient, subClient };
