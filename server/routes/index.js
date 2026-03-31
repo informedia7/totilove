@@ -13,11 +13,21 @@ const { setupPresenceRoutes } = require('./api/presence');
 const { setupStateRoutes } = require('./api/state');
 const { setupImageRoutes } = require('./images');
 
+function loadOptionalModule(modulePath, label) {
+    try {
+        return require(modulePath);
+    } catch (error) {
+        console.warn(`⚠️ Optional ${label} unavailable, skipping legacy route mount`);
+        return null;
+    }
+}
+
 // Route modules
-const AuthRoutes = require('../../routers/authRoutes');
-const MessageRoutes = require('../../routers/messageRoutes');
-const TemplateRoutes = require('../../routers/templateRoutes');
-const MatchesRoutes = require('../../routers/matchesRoutes');
+const AuthRoutes = loadOptionalModule('../../routers/authRoutes', 'AuthRoutes');
+const MessageRoutes = loadOptionalModule('../../routers/messageRoutes', 'MessageRoutes');
+const TemplateRoutes = loadOptionalModule('../../routers/templateRoutes', 'TemplateRoutes');
+const MatchesRoutes = loadOptionalModule('../../routers/matchesRoutes', 'MatchesRoutes');
+const adminRoutes = loadOptionalModule('../../admin/routes/adminRoutes', 'adminRoutes');
 
 /**
  * Setup all routes
@@ -75,25 +85,40 @@ function setupRoutes(app, dependencies) {
     console.log('[ROUTE DEBUG] setupUserRoutes completed');
     
     // Setup route modules
-    const authRoutes = new AuthRoutes(controllers.authController, controllers.templateController, authMiddleware, io, redis);
-    const messageRoutes = new MessageRoutes(controllers.messageController, authMiddleware);
-    const templateRoutes = new TemplateRoutes(controllers.templateController, authMiddleware);
-    const matchesRoutes = new MatchesRoutes(controllers.matchesController, authMiddleware);
-
-    // Admin routes (no authentication required for demo purposes)
-    const adminRoutes = require('../../admin/routes/adminRoutes');
+    const authRoutes = AuthRoutes
+        ? new AuthRoutes(controllers.authController, controllers.templateController, authMiddleware, io, redis)
+        : null;
+    const messageRoutes = MessageRoutes
+        ? new MessageRoutes(controllers.messageController, authMiddleware)
+        : null;
+    const templateRoutes = TemplateRoutes
+        ? new TemplateRoutes(controllers.templateController, authMiddleware)
+        : null;
+    const matchesRoutes = MatchesRoutes
+        ? new MatchesRoutes(controllers.matchesController, authMiddleware)
+        : null;
 
     // Mount routes - ORDER MATTERS!
     // Mount message routes BEFORE authRoutes to ensure messageCountLimiter is applied first
-    app.use('/api/messages', messageRoutes.getRouter());
+    if (messageRoutes?.getRouter) {
+        app.use('/api/messages', messageRoutes.getRouter());
+    }
     
     // Mount authRoutes (which includes accountRoutes with apiLimiter)
-    app.use('/', authRoutes.getRouter());
+    if (authRoutes?.getRouter) {
+        app.use('/', authRoutes.getRouter());
+    }
     
     // Mount other routes
-    app.use('/api/matches', matchesRoutes.getRouter());
-    app.use('/api/stats', matchesRoutes.setupStatsRoutes());
-    app.use('/admin', adminRoutes);
+    if (matchesRoutes?.getRouter) {
+        app.use('/api/matches', matchesRoutes.getRouter());
+    }
+    if (matchesRoutes?.setupStatsRoutes) {
+        app.use('/api/stats', matchesRoutes.setupStatsRoutes());
+    }
+    if (adminRoutes) {
+        app.use('/admin', adminRoutes);
+    }
     setupSearchRoutes(app, controllers.searchController);
     setupMonitoringRoutes(app, monitoringUtils);
     setupStateRoutes(app, { stateService, authMiddleware });
@@ -101,7 +126,9 @@ function setupRoutes(app, dependencies) {
     setupImageRoutes(app);
     
     // Template routes
-    app.use('/', templateRoutes.getRouter());
+    if (templateRoutes?.getRouter) {
+        app.use('/', templateRoutes.getRouter());
+    }
     
     // CSS Comparison Tool - serve from root directory
     app.get('/css-comparison-tool.html', (req, res) => {
