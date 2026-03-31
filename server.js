@@ -102,6 +102,9 @@ class Server {
 
         // Bootstrap probes so deployment health checks can pass while async init is running.
         this.app.get('/healthz', (req, res, next) => {
+            if (this.initError) {
+                return res.status(503).json({ success: false, status: 'failed', error: this.initError.message });
+            }
             if (this.initCompleted) {
                 return next();
             }
@@ -109,6 +112,9 @@ class Server {
         });
 
         this.app.get('/', (req, res, next) => {
+            if (this.initError) {
+                return res.status(503).json({ success: false, status: 'failed', error: this.initError.message });
+            }
             if (this.initCompleted) {
                 return next();
             }
@@ -193,6 +199,11 @@ class Server {
     }
 
     async configureSocketAdapter() {
+        const enableSocketAdapter = process.env.ENABLE_SOCKET_ADAPTER === 'true';
+        if (!enableSocketAdapter) {
+            return;
+        }
+
         if (!this.io || !this.socketsEnabled || this.socketAdapterClients || process.env.DISABLE_SOCKET_ADAPTER === 'true') {
             return;
         }
