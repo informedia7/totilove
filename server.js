@@ -143,6 +143,46 @@ class Server {
             return this.serveBootstrapPage(pageName, res, next);
         });
 
+        this.app.post('/login', async (req, res, next) => {
+            if (this.bootState === 'ready') {
+                return next();
+            }
+
+            const authController = this.controllers?.authController;
+            if (authController && typeof authController.login === 'function') {
+                try {
+                    return await authController.login(req, res);
+                } catch (error) {
+                    return res.status(500).json({ success: false, error: 'Login failed' });
+                }
+            }
+
+            return res.status(503).json({
+                success: false,
+                error: 'Service is starting, please try again in a moment.'
+            });
+        });
+
+        this.app.post('/register', async (req, res, next) => {
+            if (this.bootState === 'ready') {
+                return next();
+            }
+
+            const authController = this.controllers?.authController;
+            if (authController && typeof authController.register === 'function') {
+                try {
+                    return await authController.register(req, res);
+                } catch (error) {
+                    return res.status(500).json({ success: false, error: 'Registration failed' });
+                }
+            }
+
+            return res.status(503).json({
+                success: false,
+                error: 'Service is starting, please try again in a moment.'
+            });
+        });
+
         this.app.get('/health', (_req, res) => {
             res.status(200).json({
                 ok: true,
