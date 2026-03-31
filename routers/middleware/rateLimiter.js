@@ -8,23 +8,27 @@ let RedisStore = null;
 let rateLimiterRedisClient = null;
 let rateLimiterStoreFactory = null;
 let createRedisClient = null;
+const rateLimitingEnabled = process.env.ENABLE_RATE_LIMITING === 'true';
+const passthroughLimiter = (_req, _res, next) => next();
 
-try {
-    rateLimit = require('express-rate-limit');
-} catch (e) {
-    console.warn('[RateLimiter] express-rate-limit not installed. Install with: npm install express-rate-limit');
-}
+if (rateLimitingEnabled) {
+    try {
+        rateLimit = require('express-rate-limit');
+    } catch (e) {
+        console.warn('[RateLimiter] express-rate-limit not installed. Install with: npm install express-rate-limit');
+    }
 
-try {
-    ({ RedisStore } = require('rate-limit-redis'));
-} catch (e) {
-    console.warn('[RateLimiter] rate-limit-redis not installed. Install with: npm install rate-limit-redis');
-}
+    try {
+        ({ RedisStore } = require('rate-limit-redis'));
+    } catch (e) {
+        console.warn('[RateLimiter] rate-limit-redis not installed. Falling back to local in-memory limiting.');
+    }
 
-try {
-    ({ createClient: createRedisClient } = require('redis'));
-} catch (e) {
-    console.warn('[RateLimiter] redis client not available. Install redis >= 5 to enable shared stores.');
+    try {
+        ({ createClient: createRedisClient } = require('redis'));
+    } catch (e) {
+        console.warn('[RateLimiter] redis client not available. Install redis >= 5 to enable shared stores.');
+    }
 }
 
 const healthPathList = (process.env.RATE_LIMIT_HEALTH_PATHS || '/health,/status,/healthz')
@@ -171,9 +175,13 @@ rateLimiterStoreFactory = initializeRateLimitStore();
 let limiterInstanceCounter = 0;
 
 function createLimiter(options = {}) {
+    if (!rateLimitingEnabled) {
+        return passthroughLimiter;
+    }
+
     if (!rateLimit) {
         // Fallback: no rate limiting if library not installed
-        return (req, res, next) => next();
+        return passthroughLimiter;
     }
 
     const baseOptions = {
@@ -382,6 +390,6 @@ module.exports = {
     statusReadLimiter,
     statusWriteLimiter,
     presenceHeartbeatLimiter,
-    hasRateLimit: !!rateLimit
+    hasRateLimit: rateLimitingEnabled && !!rateLimit
 };
 
