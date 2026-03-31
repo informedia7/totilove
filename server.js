@@ -253,8 +253,8 @@ class Server {
     }
 }
 
-// Cluster support for production
-if (cluster.isMaster && process.env.NODE_ENV === 'production') {
+// Cluster support is opt-in. Railway should run a single worker unless explicitly enabled.
+if (cluster.isPrimary && process.env.NODE_ENV === 'production' && appConfig.server.cluster) {
     const numCPUs = os.cpus().length;
     const numWorkers = Math.min(numCPUs, 4);
     
