@@ -1,0 +1,803 @@
+<!-- User Report Modal -->
+<div id="userReportModal" class="report-modal" role="dialog" aria-modal="true" aria-labelledby="report-real_name" aria-describedby="report-form" tabindex="-1" style="display: none;">
+    <div class="report-modal-content">
+        <button class="close-report-modal" id="closeReportModalBtn" aria-label="Close report modal">&times;</button>
+        
+        <div class="report-modal-header">
+            <div class="report-icon">
+                <i class="fas fa-flag"></i>
+            </div>
+            <h2>Report User</h2>
+            <p>You are reporting: <strong id="report-real_name">Loading...</strong></p>
+        </div>
+        
+        <form id="report-form" class="report-form">
+            <div class="form-group">
+                <label for="report-type">
+                    <i class="fas fa-list"></i> Reason for Reporting
+                </label>
+                <select id="report-type" name="report_type" class="report-select" required>
+                    <option value="">Select a reason...</option>
+                    <option value="fake_profile">Fake Profile</option>
+                    <option value="harassment">Harassment</option>
+                    <option value="inappropriate_content">Inappropriate Content</option>
+                    <option value="inappropriate_messages">Inappropriate Messages</option>
+                    <option value="other">Other</option>
+                    <option value="scam_fraud">Scam or Fraud</option>
+                    <option value="spam">Spam</option>
+                    <option value="underage">Underage User</option>
+                </select>
+                <small class="helper-text">Please select the reason that best describes the issue</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="report-description">
+                    <i class="fas fa-comment-alt"></i> Additional Details (Optional)
+                </label>
+                <textarea id="report-description" name="description" class="report-textarea" rows="3" maxlength="300" placeholder="Please provide any additional information that might help us understand the issue..." oninput="sanitizeTextarea(this); updateCharCount(this)"></textarea>
+                <div class="char-count-row">
+                    <small class="helper-text">Only letters, numbers, spaces, and basic punctuation are allowed</small>
+                    <small id="char-count" class="helper-text">0 / 300</small>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="block-toggle">
+                    <input type="checkbox" id="block-user-checkbox" name="block_user" class="block-checkbox" checked>
+                    <div class="block-copy">
+                        <span class="block-title">
+                            <i class="fas fa-ban"></i> Block user <strong id="block-real_name">Loading...</strong> from further contacts
+                        </span>
+                        <small class="helper-text">This will prevent this user from contacting you or seeing your profile</small>
+                    </div>
+                </label>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" id="reportModalCancelBtn" class="cancel-btn">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i> Submit Report
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.report-modal {
+    position: fixed;
+    inset: 0;
+    padding: 1.4rem;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 10001;
+    overflow-y: auto;
+}
+
+.report-modal-content {
+    max-width: 600px;
+    width: min(600px, calc(100% - 2.8rem));
+    margin: 1.4rem auto;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 1.4rem;
+    position: relative;
+    box-sizing: border-box;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    color: #2d3436;
+}
+
+.report-modal-header {
+    text-align: center;
+    margin-bottom: 1.4rem;
+}
+
+.report-icon {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 0.8rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: #ffffff;
+    background: linear-gradient(135deg, #e74c3c, #c44569);
+    box-shadow: 0 12px 25px rgba(231, 76, 60, 0.35);
+}
+
+.report-modal-header h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0 0 0.35rem;
+}
+
+.report-modal-header p {
+    margin: 0;
+    color: #636e72;
+    font-size: 0.9rem;
+}
+
+.report-modal-header strong {
+    color: #2d3436;
+}
+
+.report-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.05rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #2d3436;
+    margin-bottom: 0.35rem;
+    font-size: 0.9rem;
+}
+
+.report-select,
+.report-textarea {
+    width: 100%;
+    padding: 0.65rem 0.8rem;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    background: #ffffff;
+    color: #2d3436;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.report-select:focus,
+.report-textarea:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+    outline: none;
+}
+
+.helper-text {
+    display: block;
+    color: #636e72;
+    margin-top: 0.21rem;
+    font-size: 0.75rem;
+}
+
+.char-count-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.35rem;
+}
+
+.block-toggle {
+    display: flex;
+    gap: 0.65rem;
+    cursor: pointer;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.block-toggle:hover {
+    background: #eef1f5;
+    border-color: #dee3ea;
+}
+
+.block-checkbox {
+    width: 18px;
+    height: 18px;
+    margin-top: 0.2rem;
+    accent-color: #d63031;
+}
+
+.block-title {
+    font-weight: 600;
+    color: #2d3436;
+    display: block;
+    margin-bottom: 0.14rem;
+    font-size: 0.9rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.7rem;
+}
+
+.cancel-btn,
+.submit-btn {
+    flex: 1;
+    padding: 0.75rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.cancel-btn {
+    border: 2px solid #e9ecef;
+    background: transparent;
+    color: #636e72;
+}
+
+.cancel-btn:hover {
+    border-color: #d0d4da;
+    color: #2d3436;
+}
+
+.submit-btn {
+    border: none;
+    background: linear-gradient(135deg, #e74c3c, #c44569);
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.35);
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(231, 76, 60, 0.45);
+}
+
+.close-report-modal {
+    position: absolute;
+    top: 0.7rem;
+    right: 0.7rem;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    color: #666666;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.close-report-modal:hover {
+    transform: scale(1.05);
+    color: #e74c3c;
+    background: #ffffff;
+}
+
+@media (max-width: 520px) {
+    .report-modal {
+        padding: 0.8rem;
+    }
+
+    .report-modal-content {
+        width: calc(100% - 1.2rem);
+        padding: 1.1rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+}
+
+.report-modal.dark,
+html[data-theme="dark"] .report-modal,
+body.dark-mode .report-modal {
+    background: rgba(4, 9, 20, 0.85);
+}
+
+.report-modal.dark .report-modal-content,
+html[data-theme="dark"] .report-modal .report-modal-content,
+body.dark-mode .report-modal .report-modal-content {
+    background: #0f172a;
+    color: #e2e8f0;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+}
+
+.report-modal.dark .report-modal-header p,
+html[data-theme="dark"] .report-modal .report-modal-header p,
+body.dark-mode .report-modal .report-modal-header p {
+    color: #94a3b8;
+}
+
+.report-modal.dark .report-modal-header strong,
+html[data-theme="dark"] .report-modal .report-modal-header strong,
+body.dark-mode .report-modal .report-modal-header strong {
+    color: #fef3c7;
+}
+
+.report-modal.dark .form-group label,
+html[data-theme="dark"] .report-modal .form-group label,
+body.dark-mode .report-modal .form-group label {
+    color: #f8fafc;
+}
+
+.report-modal.dark .report-select,
+.report-modal.dark .report-textarea,
+html[data-theme="dark"] .report-modal .report-select,
+html[data-theme="dark"] .report-modal .report-textarea,
+body.dark-mode .report-modal .report-select,
+body.dark-mode .report-modal .report-textarea {
+    background: #111827;
+    border-color: #1f2937;
+    color: #e2e8f0;
+}
+
+.report-modal.dark .report-select:focus,
+.report-modal.dark .report-textarea:focus,
+html[data-theme="dark"] .report-modal .report-select:focus,
+html[data-theme="dark"] .report-modal .report-textarea:focus,
+body.dark-mode .report-modal .report-select:focus,
+body.dark-mode .report-modal .report-textarea:focus {
+    border-color: #8b95ff;
+    box-shadow: 0 0 0 3px rgba(139, 149, 255, 0.25);
+}
+
+.report-modal.dark .helper-text,
+html[data-theme="dark"] .report-modal .helper-text,
+body.dark-mode .report-modal .helper-text {
+    color: #94a3b8;
+}
+
+.report-modal.dark .block-toggle,
+html[data-theme="dark"] .report-modal .block-toggle,
+body.dark-mode .report-modal .block-toggle {
+    background: #111a2c;
+    border-color: rgba(148, 163, 184, 0.2);
+}
+
+.report-modal.dark .block-toggle:hover,
+html[data-theme="dark"] .report-modal .block-toggle:hover,
+body.dark-mode .report-modal .block-toggle:hover {
+    background: #151f33;
+    border-color: rgba(129, 140, 248, 0.45);
+}
+
+.report-modal.dark .block-title,
+html[data-theme="dark"] .report-modal .block-title,
+body.dark-mode .report-modal .block-title {
+    color: #f8fafc;
+}
+
+.report-modal.dark .cancel-btn,
+html[data-theme="dark"] .report-modal .cancel-btn,
+body.dark-mode .report-modal .cancel-btn {
+    border-color: rgba(148, 163, 184, 0.35);
+    color: #e2e8f0;
+    background: rgba(15, 23, 42, 0.4);
+}
+
+.report-modal.dark .cancel-btn:hover,
+html[data-theme="dark"] .report-modal .cancel-btn:hover,
+body.dark-mode .report-modal .cancel-btn:hover {
+    border-color: rgba(129, 140, 248, 0.75);
+    color: #f8fafc;
+}
+
+.report-modal.dark .close-report-modal,
+html[data-theme="dark"] .report-modal .close-report-modal,
+body.dark-mode .report-modal .close-report-modal {
+    background: rgba(23, 32, 45, 0.95);
+    color: #f1f5f9;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+.report-modal.dark .close-report-modal:hover,
+html[data-theme="dark"] .report-modal .close-report-modal:hover,
+body.dark-mode .report-modal .close-report-modal:hover {
+    color: #f87171;
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+document.getElementById('userReportModal')?.addEventListener('click',e=>{if(e.target.id==='userReportModal')closeReportModal();});
+document.getElementById('closeReportModalBtn')?.addEventListener('click',closeReportModal);
+document.getElementById('reportModalCancelBtn')?.addEventListener('click',closeReportModal);
+});
+</script>
+
+<script>
+function showReportNotification(message, type = 'info') {
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#00b894' : type === 'error' ? '#e74c3c' : type === 'warning' ? '#f39c12' : '#667eea'};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10002;
+        max-width: 300px;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    `;
+    
+    toast.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+        <span>${message}</span>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Animate in
+    setTimeout(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(0)';
+    }, 10);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
+            }
+        }, 300);
+    }, 5000);
+}
+
+// Global variables for report modal
+let reportModalData = {
+    userId: null,
+    real_name: null
+};
+
+// Open report modal
+function openReportModal(userId, real_name) {
+    const modal = document.getElementById('userReportModal');
+    if (!modal) {
+        return;
+    }
+    
+    // Store data
+    reportModalData.userId = userId;
+    // Use real_name if provided and not empty, otherwise try to fetch it or use fallback
+    if (real_name && real_name.trim() !== '' && real_name !== `User ${userId}`) {
+        reportModalData.real_name = real_name.trim();
+    } else {
+        // Try to get name from profile modal if available
+        const profileRealNameEl = document.getElementById('modal-profile-real_name');
+        if (profileRealNameEl && profileRealNameEl.textContent.trim() !== '' && profileRealNameEl.textContent.trim() !== 'Loading...') {
+            reportModalData.real_name = profileRealNameEl.textContent.trim();
+        } else {
+            // Last resort: use fallback
+            reportModalData.real_name = `User ${userId}`;
+        }
+    }
+    
+    // Update modal content
+    document.getElementById('report-real_name').textContent = reportModalData.real_name;
+    document.getElementById('block-real_name').textContent = reportModalData.real_name;
+    
+    // Reset form
+    document.getElementById('report-form').reset();
+    
+    // Set block user checkbox to checked by default
+    const blockCheckbox = document.getElementById('block-user-checkbox');
+    if (blockCheckbox) {
+        blockCheckbox.checked = true;
+    }
+    
+    // Reset character count
+    const charCount = document.getElementById('char-count');
+    if (charCount) charCount.textContent = '0 / 300';
+    
+    // Show modal
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+// Close report modal
+function closeReportModal() {
+    const modal = document.getElementById('userReportModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+    
+    // Reset data
+    reportModalData.userId = null;
+    reportModalData.real_name = null;
+}
+
+// Handle report form submission
+document.addEventListener('DOMContentLoaded', function() {
+    const reportForm = document.getElementById('report-form');
+    if (reportForm) {
+        reportForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!reportModalData.userId) {
+                showReportNotification('Error: No user selected for reporting', 'error');
+                return;
+            }
+            
+            const reportType = document.getElementById('report-type').value?.trim();
+            if (!reportType || reportType === '') {
+                showReportNotification('Please select a reason for reporting', 'warning');
+                document.getElementById('report-type').focus();
+                return;
+            }
+            
+            const description = document.getElementById('report-description').value.trim();
+            const blockUser = document.getElementById('block-user-checkbox').checked;
+            
+            // Get current user ID and session token
+            const currentUserId = window.currentUser?.id || 
+                                 window.getCurrentUserId?.() || 
+                                 (window.sessionManager && window.sessionManager.getCurrentUser()?.id) ||
+                                 null;
+            
+            if (!currentUserId) {
+                showReportNotification('Please log in to report users', 'error');
+                return;
+            }
+            
+            const sessionToken = window.getSessionToken?.() || 
+                                (window.sessionManager && window.sessionManager.getToken()) ||
+                                '';
+            
+            // Disable submit button
+            const submitBtn = reportForm.querySelector('.submit-btn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            
+            try {
+                    if (!reportModalData.userId) {
+                    throw new Error('No user ID provided for reporting');
+                }
+                if (!reportType || reportType.trim() === '') {
+                    throw new Error('Report type is required');
+                }
+                const requestPayload = {
+                    reported_user_id: reportModalData.userId,
+                    report_type: reportType,
+                    description: description || ''
+                };
+                
+                // Submit report
+                const reportResponse = await fetch('/api/reports', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-ID': currentUserId,
+                        'Authorization': `Bearer ${sessionToken}`
+                    },
+                    body: JSON.stringify(requestPayload)
+                });
+                
+                // Parse response JSON
+                let reportData;
+                try {
+                    reportData = await reportResponse.json();
+                } catch (parseError) {
+                    const statusText = reportResponse.statusText || 'Unknown error';
+                    throw new Error(`Server error: ${reportResponse.status} ${statusText}`);
+                }
+                
+                if ((reportData.alreadyExists || (reportData.error && reportData.error.toLowerCase().includes('already reported'))) && !blockUser) {
+                    showReportNotification(`You have already reported ${reportModalData.real_name}`, 'warning');
+                    setTimeout(() => {
+                        closeReportModal();
+                    }, 2000);
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                    return;
+                }
+                
+                if (!reportResponse.ok && !reportData.alreadyExists) {
+                    const errorMessage = reportData.error || reportData.message || `Failed to submit report (${reportResponse.status})`;
+                    throw new Error(errorMessage);
+                }
+                
+                if (!reportData.success && !reportData.alreadyExists) {
+                    const errorMessage = reportData.error || reportData.message || 'Failed to submit report';
+                    throw new Error(errorMessage);
+                }
+                if (blockUser && (reportData.success || reportData.alreadyExists)) {
+                    try {
+                        const blockResponse = await fetch(`/api/users/${reportModalData.userId}/block`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-User-ID': currentUserId,
+                                'Authorization': `Bearer ${sessionToken}`
+                            },
+                            body: JSON.stringify({
+                                reason: 'Blocked after reporting'
+                            })
+                        });
+                        
+                        const blockData = await blockResponse.json();
+                        
+                        if (blockData.success) {
+                            if (reportData.alreadyExists) {
+                                showReportNotification(`${reportModalData.real_name} was already reported and is now blocked`, 'success');
+                            } else {
+                                showReportNotification(`${reportModalData.real_name} was reported and blocked successfully`, 'success');
+                            }
+                            
+                            if (window.ActivityManager) {
+                                Promise.all([
+                                    window.ActivityManager.loadFavorites(),
+                                    window.ActivityManager.loadWhoLikedMe(),
+                                    window.ActivityManager.loadWhoILike(),
+                                    window.ActivityManager.loadLikes(),
+                                    window.ActivityManager.loadBlockedUsers()
+                                ]).catch(() => {});
+                            }
+                            
+                            setTimeout(() => {
+                                closeReportModal();
+                            }, 500);
+                        } else {
+                            const reportMsg = reportData.alreadyExists 
+                                ? `${reportModalData.real_name} was already reported, but failed to block user` 
+                                : `${reportModalData.real_name} was reported successfully, but failed to block user`;
+                            showReportNotification(`${reportMsg}: ${blockData.error || 'Unknown error'}`, 'warning');
+                        }
+                    } catch (blockError) {
+                        const reportMsg = reportData.alreadyExists 
+                            ? `${reportModalData.real_name} was already reported, but failed to block user` 
+                            : `${reportModalData.real_name} was reported successfully, but failed to block user`;
+                        showReportNotification(`${reportMsg}: ${blockError.message}`, 'warning');
+                    }
+                } else if (reportData.success) {
+                    showReportNotification(`${reportModalData.real_name} was reported successfully`, 'success');
+                    setTimeout(() => {
+                        closeReportModal();
+                    }, 500);
+                } else if (reportData.alreadyExists && !blockUser) {
+                    // This case is handled by the early return above
+                } else {
+                    throw new Error(reportData.error || 'Failed to submit report');
+                }
+                
+            } catch (error) {
+                const errorMessage = error.message || 'Failed to submit report. Please try again.';
+                showReportNotification(errorMessage, 'error');
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
+    }
+    
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('userReportModal');
+            if (modal && modal.style.display !== 'none') {
+                closeReportModal();
+            }
+        }
+    });
+});
+
+// Sanitize textarea input - only allow alphanumeric, spaces, and basic punctuation
+function sanitizeTextarea(textarea) {
+    const originalValue = textarea.value;
+    // Allow: letters (a-z, A-Z), numbers (0-9), spaces, and basic punctuation (. , ! ? : ; - ' " ( ) [ ])
+    // Remove: HTML tags, script tags, special characters that could be used for code injection
+    const sanitized = originalValue.replace(/[<>{}[\]\\|`~!@#$%^&*+=_]/g, '');
+    
+    // Only allow alphanumeric, spaces, and safe punctuation
+    const allowed = /^[a-zA-Z0-9\s.,!?:;'\-"()]*$/;
+    let cleaned = '';
+    for (let i = 0; i < sanitized.length; i++) {
+        const char = sanitized[i];
+        if (allowed.test(char)) {
+            cleaned += char;
+        }
+    }
+    
+    if (cleaned !== originalValue) {
+        textarea.value = cleaned;
+    }
+}
+
+// Update character count
+function updateCharCount(textarea) {
+    const charCount = document.getElementById('char-count');
+    if (charCount) {
+        const currentLength = textarea.value.length;
+        const maxLength = textarea.getAttribute('maxlength') || 300;
+        charCount.textContent = `${currentLength} / ${maxLength}`;
+        
+        // Change color when approaching limit
+        if (currentLength > maxLength * 0.9) {
+            charCount.style.color = '#e74c3c';
+        } else if (currentLength > maxLength * 0.75) {
+            charCount.style.color = '#f39c12';
+        } else {
+            charCount.style.color = '#636e72';
+        }
+    }
+}
+
+// Accessibility & focus management for report modal
+(function() {
+    const modal = document.getElementById('userReportModal');
+    if (!modal) return;
+
+    const focusableSelector = 'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    let previousFocus = null;
+    let previousOverflow = null;
+    let active = false;
+
+    function trapFocus(e) {
+        if (e.key !== 'Tab') return;
+        const focusable = Array.from(modal.querySelectorAll(focusableSelector)).filter(el => el.offsetParent !== null);
+        if (focusable.length === 0) {
+            e.preventDefault();
+            modal.focus();
+            return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+        }
+    }
+
+    function handleKeydown(e) {
+        if (e.key === 'Escape') {
+            e.stopPropagation();
+            closeReportModal();
+            return;
+        }
+        trapFocus(e);
+    }
+
+    function onOpen() {
+        if (active) return;
+        active = true;
+        previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        modal.addEventListener('keydown', handleKeydown, true);
+        setTimeout(() => {
+            const focusTarget = modal.querySelector(focusableSelector) || modal;
+            focusTarget?.focus();
+        }, 0);
+    }
+
+    function onClose() {
+        if (!active) return;
+        active = false;
+        modal.removeEventListener('keydown', handleKeydown, true);
+        document.body.style.overflow = previousOverflow;
+        previousFocus?.focus?.();
+    }
+
+    const observer = new MutationObserver(() => {
+        const isVisible = getComputedStyle(modal).display !== 'none';
+        if (isVisible) {
+            onOpen();
+        } else {
+            onClose();
+        }
+    });
+    observer.observe(modal, { attributes: true, attributeFilter: ['style'] });
+    window.addEventListener('pagehide', () => observer.disconnect());
+})();
+</script>
+
+
