@@ -1,0 +1,731 @@
+/* Languages Modal Styles */
+.languages-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.languages-modal-window {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.languages-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 2px solid #e1e5e9;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    flex-shrink: 0;
+}
+
+.languages-modal-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.languages-modal-close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+}
+
+.languages-modal-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.languages-modal-content {
+    padding: 1rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Languages Checkbox Section */
+.languages-checkbox-section {
+    margin-bottom: 1rem;
+}
+
+.languages-checkbox-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.languages-checkbox-header .section-label {
+    margin: 0;
+}
+
+.unselect-all-languages-btn {
+    background: #f8f9fa;
+    color: #6c757d;
+    border: 2px solid #e9ecef;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.unselect-all-languages-btn:hover {
+    background: #e9ecef;
+    color: #495057;
+    border-color: #dee2e6;
+}
+
+.unselect-all-languages-btn:active {
+    background: #dee2e6;
+    transform: scale(0.98);
+}
+
+.section-label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #333;
+    margin-bottom: 0.75rem;
+}
+
+.languages-checkbox-list {
+    margin-top: 0.5rem;
+}
+
+.languages-checkbox-container {
+    max-height: none;
+    overflow-y: visible;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.5rem;
+}
+
+.language-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: white;
+    border: 2px solid #e1e5e9;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.language-checkbox-item:hover {
+    border-color: #667eea;
+    background: #f0f4ff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.1);
+}
+
+.language-checkbox-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #667eea;
+    flex-shrink: 0;
+}
+
+.language-checkbox-item input[type="checkbox"]:checked + .checkbox-label {
+    font-weight: 600;
+    color: #667eea;
+}
+
+.checkbox-label {
+    font-size: 0.9rem;
+    color: #555;
+    cursor: pointer;
+    flex: 1;
+}
+
+.language-item-content .form-row,
+#language-detail-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.language-item-content .form-group,
+#language-detail-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.language-item-content label,
+#language-detail-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #555;
+    font-size: 0.95rem;
+}
+
+.language-item-content select,
+.language-item-content input[type="text"],
+.language-item-content input[type="number"],
+#language-detail-form select,
+#language-detail-form input[type="text"],
+#language-detail-form input[type="number"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.language-item-content select:focus,
+.language-item-content input:focus,
+#language-detail-form select:focus,
+#language-detail-form input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.skills-label {
+    display: block;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    color: #555;
+}
+
+.skills-checkboxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.75rem;
+}
+
+.skills-checkboxes label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: normal;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+}
+
+.skills-checkboxes label:hover {
+    background: #f0f0f0;
+}
+
+.skills-checkboxes input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+    accent-color: #667eea;
+}
+
+.required-hint {
+    font-size: 0.85rem;
+    font-weight: normal;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.no-languages-msg {
+    text-align: center;
+    color: #6c757d;
+    padding: 2rem;
+    font-style: italic;
+}
+
+.languages-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-top: 2px solid #e1e5e9;
+    background: #f8f9fa;
+    flex-shrink: 0;
+}
+
+.cancel-languages-btn,
+.save-languages-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cancel-languages-btn {
+    background: #f8f9fa;
+    color: #6c757d;
+    border: 2px solid #e9ecef;
+}
+
+.cancel-languages-btn:hover {
+    background: #e9ecef;
+    color: #495057;
+}
+
+.save-languages-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.save-languages-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.save-languages-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Language Badges Display (used on profile-edit page) */
+.current-languages-display {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 6px;
+    min-height: 1.5rem;
+}
+
+.languages-badges-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.language-badge {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #f5f5f5;
+    color: #333;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+    border: 1px solid #e1e5e9;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.language-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: #667eea;
+}
+
+.language-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.language-flag-icon {
+    flex-shrink: 0;
+    border-radius: 3px;
+    width: 24px;
+    height: 18px;
+    display: inline-block;
+}
+
+.language-badge:active {
+    transform: translateY(0);
+}
+
+.language-name {
+    display: inline-block;
+}
+
+.primary-badge {
+    background: #667eea;
+    color: white;
+    padding: 0.15rem 0.4rem;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+}
+
+.no-languages-text {
+    color: #999;
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+/* CSS flag icons as fallback */
+.flag-icon {
+    display: inline-block;
+    width: 24px;
+    height: 18px;
+    border-radius: 3px;
+    vertical-align: middle;
+}
+
+.flag-us {
+    background: linear-gradient(to bottom, #B22234 0%, #B22234 7.7%, #FFFFFF 7.7%, #FFFFFF 15.4%, #B22234 15.4%);
+}
+
+.flag-es {
+    background: linear-gradient(to bottom, #C60B1E 25%, #FFC400 25%, #FFC400 75%, #C60B1E 75%);
+}
+
+.flag-fr {
+    background: linear-gradient(to right, #002395 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #ED2939 66.66%);
+}
+
+.flag-de {
+    background: linear-gradient(to bottom, #000000 33.33%, #DD0000 33.33%, #DD0000 66.66%, #FFCE00 66.66%);
+}
+
+.flag-it {
+    background: linear-gradient(to right, #009246 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #CE2B37 66.66%);
+}
+
+.flag-pt {
+    background: linear-gradient(to bottom, #006600 0%, #006600 50%, #FF0000 50%, #FF0000 100%);
+}
+
+.flag-ru {
+    background: linear-gradient(to bottom, #FFFFFF 33.33%, #0039A6 33.33%, #0039A6 66.66%, #D52B1E 66.66%);
+}
+
+.flag-cn, .flag-zh {
+    background: #DE2910;
+    position: relative;
+}
+
+.flag-cn:before, .flag-zh:before {
+    content: '★';
+    color: #FFDE00;
+    position: absolute;
+    left: 2px;
+    top: -1px;
+    font-size: 12px;
+}
+
+.flag-ja {
+    background: #FFFFFF;
+    background-image: radial-gradient(circle, #BC002D 30%, transparent 30%);
+    background-size: 50% 50%;
+    background-position: center;
+}
+
+.flag-ko {
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 50%, #000000 50%, #000000 100%);
+    background-image: 
+        radial-gradient(circle at 50% 50%, #CE1126 20%, transparent 20%),
+        linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 50%, #000000 50%, #000000 100%);
+}
+
+.flag-ar {
+    background: linear-gradient(to bottom, #000000 0%, #000000 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #006C35 66.66%);
+}
+
+.flag-hi {
+    background: linear-gradient(to bottom, #FF9933 0%, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%);
+    background-image: 
+        radial-gradient(circle at 50% 50%, #000080 15%, transparent 15%),
+        linear-gradient(to bottom, #FF9933 0%, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%);
+}
+
+.flag-vn {
+    background: linear-gradient(to bottom, #DA020E 50%, #FFFF00 50%);
+    position: relative;
+}
+
+.flag-vn:before {
+    content: '★';
+    color: #FFFF00;
+    position: absolute;
+    left: 8px;
+    top: 1px;
+    font-size: 10px;
+}
+
+.flag-th {
+    background: linear-gradient(to bottom, #ED1C24 16.66%, #FFFFFF 16.66%, #FFFFFF 33.33%, #241D4F 33.33%, #241D4F 66.66%, #FFFFFF 66.66%, #FFFFFF 83.33%, #ED1C24 83.33%);
+}
+
+.flag-tr {
+    background: linear-gradient(to bottom, #E30A17 0%, #E30A17 50%, #FFFFFF 50%);
+    background-image: 
+        radial-gradient(circle at 25% 50%, #FFFFFF 12%, transparent 12%),
+        linear-gradient(to bottom, #E30A17 0%, #E30A17 50%, #FFFFFF 50%);
+}
+
+.flag-pl {
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 50%, #DC143C 50%);
+}
+
+.flag-nl {
+    background: linear-gradient(to bottom, #AE1C28 0%, #AE1C28 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #21468B 66.66%);
+}
+
+.flag-sv {
+    background: linear-gradient(to bottom, #006AA7 0%, #006AA7 50%, #FECC00 50%);
+    background-image: 
+        linear-gradient(to right, #006AA7 0%, #006AA7 50%, #FECC00 50%),
+        linear-gradient(to bottom, #006AA7 0%, #006AA7 50%, #FECC00 50%);
+    background-size: 30% 30%;
+    background-position: left top;
+}
+
+.flag-no {
+    background: linear-gradient(to bottom, #BA0C2F 0%, #BA0C2F 50%, #FFFFFF 50%);
+    background-image: 
+        linear-gradient(to right, #BA0C2F 0%, #BA0C2F 50%, #FFFFFF 50%),
+        linear-gradient(to bottom, #BA0C2F 0%, #BA0C2F 50%, #FFFFFF 50%);
+    background-size: 30% 30%;
+    background-position: left top;
+}
+
+.flag-da {
+    background: linear-gradient(to bottom, #C8102E 0%, #C8102E 50%, #FFFFFF 50%);
+    background-image: 
+        linear-gradient(to right, #C8102E 0%, #C8102E 50%, #FFFFFF 50%),
+        linear-gradient(to bottom, #C8102E 0%, #C8102E 50%, #FFFFFF 50%);
+    background-size: 30% 30%;
+    background-position: left top;
+}
+
+.flag-fi {
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 50%, #003580 50%);
+    background-image: 
+        linear-gradient(to right, #FFFFFF 0%, #FFFFFF 50%, #003580 50%),
+        linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 50%, #003580 50%);
+    background-size: 30% 30%;
+    background-position: left top;
+}
+
+.flag-el {
+    background: linear-gradient(to bottom, #0D5EAF 0%, #0D5EAF 25%, #FFFFFF 25%, #FFFFFF 50%, #0D5EAF 50%, #0D5EAF 75%, #FFFFFF 75%);
+}
+
+.flag-he {
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 50%, #0038B8 50%);
+}
+
+.flag-cs {
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 50%, #D7141A 50%);
+}
+
+.flag-hu {
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 33.33%, #CE2939 33.33%, #CE2939 66.66%, #477050 66.66%);
+}
+
+.flag-ro {
+    background: linear-gradient(to right, #002B7F 0%, #002B7F 33.33%, #FCD116 33.33%, #FCD116 66.66%, #CE1126 66.66%);
+}
+
+.flag-bg {
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 33.33%, #00966E 33.33%, #00966E 66.66%, #D62612 66.66%);
+}
+
+.flag-hr {
+    background: linear-gradient(to bottom, #171796 0%, #171796 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #FF0000 66.66%);
+}
+
+.flag-sk {
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 33.33%, #0B4EA2 33.33%, #0B4EA2 66.66%, #EE1C25 66.66%);
+}
+
+.flag-sl {
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 33.33%, #0C47B7 33.33%, #0C47B7 66.66%, #FF0000 66.66%);
+}
+
+.flag-uk {
+    background: linear-gradient(to bottom, #0057B7 0%, #0057B7 50%, #FFD700 50%);
+}
+
+/* Fallback for languages without specific flag styles */
+.flag-icon:not([class*="flag-"]) {
+    background: #e1e5e9;
+}
+
+/* Ensure flag icons always have a background, even if specific flag class doesn't exist */
+.language-flag-icon.flag-icon {
+    background-color: #e1e5e9;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Specific flag classes override the default background */
+.language-flag-icon.flag-icon[class*="flag-"] {
+    background-color: transparent;
+}
+
+/* Additional country code flag classes for languages that map to different country codes */
+/* These are used as fallbacks when flag images fail to load */
+.flag-sa { /* Saudi Arabia - for Arabic */
+    background: linear-gradient(to bottom, #000000 0%, #000000 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #006C35 66.66%);
+}
+
+.flag-il { /* Israel - for Hebrew */
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 50%, #0038B8 50%);
+}
+
+.flag-jp { /* Japan - for Japanese */
+    background: #FFFFFF;
+    background-image: radial-gradient(circle, #BC002D 30%, transparent 30%);
+    background-size: 50% 50%;
+    background-position: center;
+}
+
+.flag-kr { /* South Korea - for Korean */
+    background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 50%, #000000 50%, #000000 100%);
+    background-image: 
+        radial-gradient(circle at 50% 50%, #CE1126 20%, transparent 20%),
+        linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 50%, #000000 50%, #000000 100%);
+}
+
+.flag-cn { /* China - for Chinese */
+    background: #DE2910;
+    position: relative;
+}
+
+.flag-cn:before {
+    content: '★';
+    color: #FFDE00;
+    position: absolute;
+    left: 2px;
+    top: -1px;
+    font-size: 12px;
+}
+
+.flag-in { /* India - for Hindi and other Indian languages */
+    background: linear-gradient(to bottom, #FF9933 0%, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%);
+    background-image: 
+        radial-gradient(circle at 50% 50%, #000080 15%, transparent 15%),
+        linear-gradient(to bottom, #FF9933 0%, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%);
+}
+
+.flag-dk { /* Denmark */
+    background: linear-gradient(to bottom, #C8102E 0%, #C8102E 50%, #FFFFFF 50%);
+    background-image: 
+        linear-gradient(to right, #C8102E 0%, #C8102E 50%, #FFFFFF 50%),
+        linear-gradient(to bottom, #C8102E 0%, #C8102E 50%, #FFFFFF 50%);
+    background-size: 30% 30%;
+    background-position: left top;
+}
+
+.flag-gr { /* Greece */
+    background: linear-gradient(to bottom, #0D5EAF 0%, #0D5EAF 25%, #FFFFFF 25%, #FFFFFF 50%, #0D5EAF 50%, #0D5EAF 75%, #FFFFFF 75%);
+}
+
+.flag-ua { /* Ukraine */
+    background: linear-gradient(to bottom, #0057B7 0%, #0057B7 50%, #FFD700 50%);
+}
+
+@media (max-width: 768px) {
+    .languages-modal-window {
+        width: 95%;
+        max-height: 90vh;
+    }
+    
+    .languages-checkbox-container {
+        grid-template-columns: 1fr;
+        max-height: 300px;
+    }
+    
+    .language-item-content .form-row,
+    #language-detail-form .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .skills-checkboxes {
+        grid-template-columns: 1fr;
+    }
+    
+    .languages-modal-footer {
+        flex-direction: column-reverse;
+    }
+    
+    .cancel-languages-btn,
+    .save-languages-btn {
+        width: 100%;
+    }
+    
+    .language-badge {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+        min-height: 32px;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
