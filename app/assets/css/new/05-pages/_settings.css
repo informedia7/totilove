@@ -1,0 +1,500 @@
+/* ============================================
+   SETTINGS PAGE STYLES
+   Extracted from settings.html - Phase 1 CSS Extraction
+   ============================================ */
+
+/* Toggle switch styles */
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background-color: var(--primary);
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(26px);
+}
+
+/* Inline styles converted to classes */
+.settings-grid-gap {
+    display: grid;
+    gap: 1.5rem;
+    padding: 1rem 0;
+}
+
+.label-block {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--dark-color);
+}
+
+.margin-bottom-1 {
+    margin-bottom: 1rem;
+}
+
+.selected-countries-container {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.country-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.2;
+    background: var(--light-color);
+    color: var(--text-color);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.country-badge-all {
+    background: rgba(46, 125, 50, 0.12);
+    color: #2e7d32;
+    border-color: rgba(46, 125, 50, 0.35);
+    font-style: italic;
+}
+
+.country-badge-selected {
+    background: rgba(102, 126, 234, 0.12);
+    color: var(--primary);
+    border-color: rgba(102, 126, 234, 0.35);
+}
+
+.country-badge-remove {
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.country-badge-remove:hover,
+.country-badge-remove:focus-visible {
+    background: rgba(0, 0, 0, 0.08);
+    outline: none;
+}
+
+.country-select-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: var(--white);
+    color: var(--text-color);
+    transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.country-select-input:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.15);
+}
+
+.help-text-muted {
+    font-size: 0.9rem;
+    color: var(--muted-color);
+    margin-top: 0.5rem;
+}
+
+.age-range-container {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.age-range-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.age-range-label {
+    font-size: 0.9rem;
+    color: var(--muted-color);
+}
+
+.age-select-input {
+    width: 80px;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 6px;
+    text-align: center;
+    background: var(--white);
+    font-size: 0.9rem;
+    color: var(--text-color);
+    transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.age-select-input:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.15);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+}
+
+.checkbox-label-text {
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.checkbox-input {
+    width: 18px;
+    height: 18px;
+}
+
+.settings-section-padding {
+    padding: 1rem 0;
+}
+
+.settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.settings-row:last-child {
+    border-bottom: none;
+}
+
+.settings-row-no-border {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+}
+
+.settings-title {
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.settings-description {
+    font-size: 0.9rem;
+    color: var(--muted-color);
+}
+
+.profile-visibility-select {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 8px;
+    background: var(--white);
+    font-size: 0.95rem;
+    color: var(--text-color);
+    min-width: 180px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.profile-visibility-select:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.15);
+}
+
+.visibility-description {
+    font-size: 0.85rem;
+    color: var(--muted-color);
+    padding-left: 0.25rem;
+    line-height: 1.4;
+}
+
+.toggle-switch-label {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.toggle-switch-input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.measurement-select {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 6px;
+    background: white;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.measurement-select:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.15);
+}
+
+.messages-per-day-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.messages-per-day-input {
+    width: 80px;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    text-align: center;
+    background: var(--background-color);
+    color: var(--text-color);
+    transition: border-color 0.3s ease;
+}
+
+.messages-per-day-input:focus {
+    border-color: var(--primary);
+}
+
+.messages-per-day-label {
+    color: var(--muted-color);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.settings-actions {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.save-settings-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 1rem;
+}
+
+.save-settings-btn:hover {
+    background: var(--secondary);
+}
+
+.cancel-settings-btn {
+    background: transparent;
+    color: var(--muted-color);
+    border: 1px solid #ddd;
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cancel-settings-btn:hover {
+    background: var(--light-color);
+}
+
+.margin-top-2 {
+    margin-top: 2rem;
+}
+
+.settings-row-border-top {
+    border-top: 1px solid #f0f0f0;
+}
+
+html[data-theme="dark"] .country-select-input,
+body.dark-mode .country-select-input {
+    background: var(--app-surface);
+    border-color: var(--app-border-color, rgba(255, 255, 255, 0.12));
+    color: var(--app-text-primary);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+}
+
+html[data-theme="dark"] .country-select-input:focus,
+body.dark-mode .country-select-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(143, 122, 255, 0.25);
+}
+
+html[data-theme="dark"] .country-select-input option,
+body.dark-mode .country-select-input option {
+    background: var(--app-surface-muted);
+    color: var(--app-text-primary);
+}
+
+html[data-theme="dark"] .age-select-input,
+body.dark-mode .age-select-input {
+    background: var(--app-surface);
+    border-color: var(--app-border-color, rgba(255, 255, 255, 0.12));
+    color: var(--app-text-primary);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+}
+
+html[data-theme="dark"] .age-select-input:focus,
+body.dark-mode .age-select-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(143, 122, 255, 0.25);
+}
+
+html[data-theme="dark"] .age-select-input option,
+body.dark-mode .age-select-input option {
+    background: var(--app-surface-muted);
+    color: var(--app-text-primary);
+}
+
+html[data-theme="dark"] .measurement-select,
+body.dark-mode .measurement-select {
+    background: var(--app-surface);
+    border-color: var(--app-border-color, rgba(255, 255, 255, 0.12));
+    color: var(--app-text-primary);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+}
+
+html[data-theme="dark"] .measurement-select:focus,
+body.dark-mode .measurement-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(143, 122, 255, 0.25);
+}
+
+html[data-theme="dark"] .measurement-select option,
+body.dark-mode .measurement-select option {
+    background: var(--app-surface-muted);
+    color: var(--app-text-primary);
+}
+
+html[data-theme="dark"] .profile-visibility-select,
+body.dark-mode .profile-visibility-select {
+    background: var(--app-surface);
+    border-color: var(--app-border-color, rgba(255, 255, 255, 0.12));
+    color: var(--app-text-primary);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+}
+
+html[data-theme="dark"] .profile-visibility-select:focus,
+body.dark-mode .profile-visibility-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(143, 122, 255, 0.25);
+}
+
+html[data-theme="dark"] .profile-visibility-select option,
+body.dark-mode .profile-visibility-select option {
+    background: var(--app-surface-muted);
+    color: var(--app-text-primary);
+}
+
+html[data-theme="dark"] .country-badge,
+body.dark-mode .country-badge {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--app-text-primary);
+}
+
+html[data-theme="dark"] .country-badge-all,
+body.dark-mode .country-badge-all {
+    background: rgba(34, 197, 94, 0.2);
+    color: #b6f4c9;
+    border-color: rgba(34, 197, 94, 0.45);
+}
+
+html[data-theme="dark"] .country-badge-selected,
+body.dark-mode .country-badge-selected {
+    background: rgba(143, 122, 255, 0.25);
+    color: #dcdfff;
+    border-color: rgba(143, 122, 255, 0.45);
+}
+
+html[data-theme="dark"] .country-badge-remove:hover,
+body.dark-mode .country-badge-remove:hover,
+html[data-theme="dark"] .country-badge-remove:focus-visible,
+body.dark-mode .country-badge-remove:focus-visible {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
