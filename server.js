@@ -52,6 +52,7 @@ class Server {
         this.bootState = 'starting';
         this.bootError = null;
         this.initCompletedAt = null;
+        configureExpress(this.app);
         const presenceFlags = typeof featureFlags.getPresenceFlags === 'function'
             ? featureFlags.getPresenceFlags()
             : { monitoringEnabled: false, socketEnabled: true };
@@ -170,10 +171,7 @@ class Server {
         this.presenceService = services.presenceService;
         this.stateService = services.stateService;
         
-        // 4. Configure Express
-        configureExpress(this.app);
-        
-        // 5. Setup controllers
+        // 4. Setup controllers
         this.controllers = setupControllers(
             this.db,
             this.redis,
@@ -184,7 +182,7 @@ class Server {
             this.presenceService
         );
         
-        // 6. Setup routes
+        // 5. Setup routes
         setupRoutes(this.app, {
             csrfMiddleware: this.csrfMiddleware,
             authMiddleware: this.authMiddleware,
@@ -202,7 +200,7 @@ class Server {
             // Configure Socket.IO adapter for multi-node fanout
             await this.configureSocketAdapter();
 
-            // 7. Setup WebSocket
+            // 6. Setup WebSocket
             this.websocketHandler = setupWebSocket(
                 this.io,
                 this.messageService,
@@ -215,7 +213,7 @@ class Server {
             console.info('ℹ️ WebSocket handler skipped (socket transport disabled)');
         }
         
-        // 8. Start monitoring
+        // 7. Start monitoring
         this.monitoringUtils.startMonitoring();
         this.bootState = 'ready';
         this.initCompletedAt = new Date().toISOString();

@@ -13,15 +13,6 @@ const path = require('path');
  * @param {Object} app - Express application instance
  */
 function configureExpress(app) {
-    // Lightweight health check endpoint - MUST be before all middleware
-    // This allows Railway healthcheck to succeed without database access
-    app.get('/health', (req, res) => {
-        res.status(200).json({ 
-            status: 'ok',
-            timestamp: new Date().toISOString()
-        });
-    });
-
     // Ensure Express trusts upstream proxies (needed for accurate req.ip)
     const trustProxyValue = process.env.TRUST_PROXY;
     if (trustProxyValue !== undefined) {
@@ -58,6 +49,7 @@ function configureExpress(app) {
     
     // Static file serving - specific paths first
     app.use('/assets', express.static(path.join(__dirname, '../../app', 'assets')));
+    app.use('/pages', express.static(path.join(__dirname, '../../app', 'pages')));
     app.use('/uploads', express.static(path.join(__dirname, '../../app', 'uploads')));
     app.use('/js', express.static(path.join(__dirname, '../../app', 'js')));
     app.use('/components', express.static(path.join(__dirname, '../../app', 'components')));
