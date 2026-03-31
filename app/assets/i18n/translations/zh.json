@@ -1,0 +1,112 @@
+{
+  "app": {
+    "name": "Totilove",
+    "tagline": "跨境寻找真爱",
+    "description": "通过我们的智能匹配系统与世界各地的人们建立联系"
+  },
+  "navigation": {
+    "home": "首页",
+    "about": "关于",
+    "features": "功能", 
+    "pricing": "价格",
+    "contact": "联系",
+    "login": "登录",
+    "register": "免费注册",
+    "profile": "个人资料",
+    "messages": "消息",
+    "matches": "匹配",
+    "settings": "设置",
+    "logout": "退出"
+  },
+  "hero": {
+    "title": "跨境寻找真爱",
+    "subtitle": "通过我们的智能匹配系统与世界各地的人们建立联系。支持25+种语言、文化偏好和您喜欢的计量系统。",
+    "features": {
+      "languages": "25+种语言",
+      "matching": "智能匹配", 
+      "security": "安全可靠",
+      "mobile": "移动优化"
+    },
+    "cta": {
+      "primary": "立即免费加入",
+      "secondary": "了解更多"
+    }
+  },
+  "features": {
+    "title": "为什么选择Totilove？",
+    "subtitle": "我们的平台将尖端技术与文化敏感性相结合，帮助您在全球范围内建立有意义的联系。",
+    "items": {
+      "languages": {
+        "title": "多语言支持",
+        "description": "用您的母语进行连接。我们支持25+种世界语言，具有流利度追踪和文化匹配偏好功能。"
+      },
+      "matching": {
+        "title": "智能匹配算法", 
+        "description": "我们的AI驱动系统考虑共同语言、兴趣、文化背景和个人偏好，以实现最佳兼容性。"
+      },
+      "interests": {
+        "title": "基于兴趣的连接",
+        "description": "找到与您有共同爱好的人。从体育到艺术，从技术到旅行——通过您最爱的事物建立联系。"
+      },
+      "culture": {
+        "title": "文化智能",
+        "description": "通过自动区域偏好、计量系统和文化感知匹配来尊重文化差异。"
+      },
+      "privacy": {
+        "title": "隐私与安全",
+        "description": "您的安全是我们的首要任务。高级验证、隐私控制和安全消息传递保护您的个人信息。"
+      },
+      "mobile": {
+        "title": "移动优化",
+        "description": "随时随地保持连接。我们的响应式设计在桌面、平板电脑和移动设备上完美运行。"
+      }
+    }
+  },
+  "showcase": {
+    "title": "完全表达自己",
+    "subtitle": "以最自然的方式分享您的语言、兴趣和偏好。",
+    "tabs": {
+      "languages": "语言",
+      "interests": "兴趣", 
+      "measurements": "计量"
+    },
+    "languages": {
+      "english": "母语、流利、高级",
+      "vietnamese": "东南亚语言",
+      "thai": "声调语言家族",
+      "chinese": "普通话",
+      "more": "全球覆盖"
+    }
+  },
+  "cta": {
+    "title": "准备好寻找您的完美伴侣了吗？",
+    "description": "加入全球数千人的行列，他们通过我们智能的、具有文化意识的匹配系统找到了爱情。",
+    "primary": "开始您的旅程",
+    "secondary": "登录"
+  },
+  "footer": {
+    "description": "跨越文化和大陆连接心灵。找到超越边界的爱情。",
+    "features": "功能",
+    "support": "支持",
+    "legal": "法律",
+    "copyright": "版权所有。用❤️为无国界的爱情而制作。"
+  },
+  "common": {
+    "save": "保存",
+    "cancel": "取消", 
+    "edit": "编辑",
+    "delete": "删除",
+    "add": "添加",
+    "remove": "移除",
+    "close": "关闭",
+    "next": "下一个",
+    "previous": "上一个",
+    "loading": "加载中...",
+    "error": "发生错误",
+    "success": "成功！",
+    "search": "搜索...",
+    "filter": "筛选",
+    "sort": "排序",
+    "clear": "清除"
+  }
+}
