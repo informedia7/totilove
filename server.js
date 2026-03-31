@@ -119,17 +119,28 @@ class Server {
                 return next();
             }
 
-            const indexPath = path.join(__dirname, 'app', 'pages', 'index.html');
-            if (fs.existsSync(indexPath)) {
-                return res.sendFile(indexPath);
+            return this.serveBootstrapPage('index', res);
+        });
+
+        this.app.get('/pages/:pageName', (req, res, next) => {
+            if (this.bootState === 'ready') {
+                return next();
             }
 
-            return res.status(200).json({
-                ok: true,
-                state: this.bootState,
-                message: 'Application is starting',
-                timestamp: new Date().toISOString()
-            });
+            return this.serveBootstrapPage(req.params.pageName, res);
+        });
+
+        this.app.get('/:pageName', (req, res, next) => {
+            if (this.bootState === 'ready') {
+                return next();
+            }
+
+            const pageName = req.params.pageName;
+            if (!pageName || pageName.startsWith('api') || pageName === 'assets' || pageName === 'uploads' || pageName === 'js' || pageName === 'components' || pageName === 'socket.io' || pageName === 'admin') {
+                return next();
+            }
+
+            return this.serveBootstrapPage(pageName, res, next);
         });
 
         this.app.get('/health', (_req, res) => {
@@ -151,6 +162,29 @@ class Server {
                 error: this.bootError ? this.bootError.message : null,
                 timestamp: new Date().toISOString()
             });
+        });
+    }
+
+    serveBootstrapPage(pageName, res, next = null) {
+        const normalizedPageName = String(pageName || 'index')
+            .replace(/^\/+/, '')
+            .replace(/\.html$/i, '');
+
+        const pageFileName = normalizedPageName === 'index' ? 'index.html' : `${normalizedPageName}.html`;
+        const pagePath = path.join(__dirname, 'app', 'pages', pageFileName);
+
+        if (fs.existsSync(pagePath)) {
+            return res.sendFile(pagePath);
+        }
+
+        if (typeof next === 'function') {
+            return next();
+        }
+
+        return res.status(404).json({
+            ok: false,
+            error: 'page_not_found',
+            page: normalizedPageName
         });
     }
 
