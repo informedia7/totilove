@@ -1,0 +1,182 @@
+{
+  "app": {
+    "name": "Totilove",
+    "tagline": "Encuentra el Amor Sin Fronteras",
+    "description": "Conecta con personas de todo el mundo a través de nuestro sistema de compatibilidad inteligente"
+  },
+  "navigation": {
+    "home": "Inicio",
+    "about": "Acerca de",
+    "features": "Características",
+    "pricing": "Precios", 
+    "contact": "Contacto",
+    "login": "Iniciar Sesión",
+    "register": "Únete Gratis",
+    "profile": "Perfil",
+    "messages": "Mensajes",
+    "matches": "Compatibilidades",
+    "settings": "Configuración",
+    "logout": "Cerrar Sesión"
+  },
+  "hero": {
+    "title": "Encuentra el Amor Sin Fronteras",
+    "subtitle": "Conecta con personas de todo el mundo a través de nuestro sistema de compatibilidad inteligente. Soporte para más de 25 idiomas, preferencias culturales y tu sistema de medidas preferido.",
+    "features": {
+      "languages": "25+ Idiomas",
+      "matching": "Compatibilidad Inteligente",
+      "security": "Seguro y Protegido",
+      "mobile": "Optimizado para Móvil"
+    },
+    "cta": {
+      "primary": "Únete Gratis Hoy",
+      "secondary": "Saber Más"
+    }
+  },
+  "features": {
+    "title": "¿Por Qué Elegir Totilove?",
+    "subtitle": "Nuestra plataforma combina tecnología de vanguardia con sensibilidad cultural para ayudarte a encontrar conexiones significativas en todo el mundo.",
+    "items": {
+      "languages": {
+        "title": "Soporte Multi-idioma",
+        "description": "Conecta en tu idioma nativo. Soportamos más de 25 idiomas mundiales con seguimiento de fluidez y preferencias de compatibilidad cultural."
+      },
+      "matching": {
+        "title": "Algoritmo de Compatibilidad Inteligente",
+        "description": "Nuestro sistema impulsado por IA considera idiomas compartidos, intereses, trasfondo cultural y preferencias personales para una compatibilidad óptima."
+      },
+      "interests": {
+        "title": "Conexiones Basadas en Intereses",
+        "description": "Encuentra personas que compartan tus pasiones. Desde deportes hasta artes, tecnología hasta viajes - conecta por lo que más amas."
+      },
+      "culture": {
+        "title": "Inteligencia Cultural",
+        "description": "Respeta las diferencias culturales con preferencias regionales automáticas, sistemas de medidas y compatibilidad culturalmente consciente."
+      },
+      "privacy": {
+        "title": "Privacidad y Seguridad",
+        "description": "Tu seguridad es nuestra prioridad. Verificación avanzada, controles de privacidad y mensajería segura mantienen tu información personal protegida."
+      },
+      "mobile": {
+        "title": "Optimizado para Móvil",
+        "description": "Mantente conectado en cualquier lugar. Nuestro diseño responsive funciona perfectamente en escritorio, tablet y dispositivos móviles."
+      }
+    }
+  },
+  "showcase": {
+    "title": "Exprésate Completamente",
+    "subtitle": "Comparte tus idiomas, intereses y preferencias de la manera que se sienta más natural para ti.",
+    "tabs": {
+      "languages": "Idiomas",
+      "interests": "Intereses",
+      "measurements": "Medidas"
+    },
+    "languages": {
+      "english": "Nativo, Fluido, Avanzado",
+      "spanish": "Familia de Lenguas Romances",
+      "chinese": "Chino Mandarín",
+      "french": "Seguimiento de Nivel MCER",
+      "vietnamese": "Idioma Vietnamita",
+      "german": "Familia Germánica",
+      "russian": "Lengua Eslava",
+      "italian": "Lengua Romance",
+      "more": "Cobertura Mundial"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Bienvenido de Vuelta",
+      "email": "Dirección de Email",
+      "password": "Contraseña",
+      "remember": "Recordarme",
+      "forgot": "¿Olvidaste tu Contraseña?",
+      "submit": "Iniciar Sesión",
+      "register_link": "¿No tienes cuenta? Únete Gratis"
+    },
+    "register": {
+      "title": "Únete a Totilove",
+      "subtitle": "Comienza tu viaje de amor internacional",
+      "first_name": "Nombre",
+      "last_name": "Apellido",
+      "email": "Dirección de Email",
+      "password": "Contraseña",
+      "confirm_password": "Confirmar Contraseña",
+      "birth_date": "Fecha de Nacimiento",
+      "gender": "Género",
+      "looking_for": "Buscando",
+      "location": "Ubicación",
+      "languages": "Idiomas que Hablo",
+      "interests": "Mis Intereses",
+      "submit": "Crear Cuenta",
+      "login_link": "¿Ya tienes cuenta? Iniciar Sesión",
+      "terms": "Al crear una cuenta, aceptas nuestros Términos de Servicio y Política de Privacidad"
+    }
+  },
+  "profile": {
+    "sections": {
+      "basic": "Información Básica",
+      "languages": "Idiomas que Hablo",
+      "interests": "Mis Intereses",
+      "preferences": "Preferencias",
+      "photos": "Fotos"
+    },
+    "languages": {
+      "add": "Agregar Idioma",
+      "fluency": "Nivel de Fluidez",
+      "skills": "Habilidades",
+      "reading": "Lectura",
+      "writing": "Escritura",
+      "speaking": "Habla",
+      "understanding": "Comprensión",
+      "years": "Años Hablando",
+      "native": "Este es mi idioma nativo",
+      "remove": "Eliminar Idioma"
+    }
+  },
+  "matching": {
+    "compatibility": "Compatibilidad",
+    "shared_languages": "Idiomas Compartidos",
+    "common_interests": "Intereses Comunes",
+    "cultural_match": "Compatibilidad Cultural",
+    "distance": "Distancia"
+  },
+  "messaging": {
+    "type_message": "Escribe un mensaje...",
+    "send": "Enviar",
+    "online": "En línea",
+    "last_seen": "Visto por última vez {{time}}",
+    "translation_hint": "El mensaje puede ser traducido"
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "add": "Agregar",
+    "remove": "Quitar",
+    "close": "Cerrar",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "success": "¡Éxito!",
+    "search": "Buscar...",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "clear": "Limpiar"
+  },
+  "errors": {
+    "required": "Este campo es requerido",
+    "email_invalid": "Por favor ingresa un email válido",
+    "password_weak": "La contraseña debe tener al menos 8 caracteres",
+    "passwords_mismatch": "Las contraseñas no coinciden",
+    "age_restriction": "Debes tener 18 años o más",
+    "network_error": "Error de red. Inténtalo de nuevo.",
+    "server_error": "Error del servidor. Inténtalo más tarde."
+  },
+  "success": {
+    "account_created": "¡Cuenta creada exitosamente!",
+    "profile_updated": "¡Perfil actualizado exitosamente!",
+    "language_added": "¡Idioma agregado a tu perfil!",
+    "message_sent": "¡Mensaje enviado exitosamente!"
+  }
+}
