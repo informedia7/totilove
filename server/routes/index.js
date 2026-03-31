@@ -17,10 +17,12 @@ function loadOptionalModule(modulePath, label) {
     try {
         return require(modulePath);
     } catch (error) {
-        console.warn(`⚠️ Optional ${label} unavailable, skipping legacy route mount`);
+        missingOptionalModules.push(label);
         return null;
     }
 }
+
+const missingOptionalModules = [];
 
 // Route modules
 const AuthRoutes = loadOptionalModule('../../routers/authRoutes', 'AuthRoutes');
@@ -47,6 +49,10 @@ function setupRoutes(app, dependencies) {
         presenceService,
         stateService
     } = dependencies;
+
+    if (missingOptionalModules.length > 0) {
+        console.info(`ℹ️ Optional legacy modules unavailable: ${missingOptionalModules.join(', ')}`);
+    }
     
     // Add CSRF validation middleware (must be before routes that need protection)
     app.use(csrfMiddleware.validate());
@@ -158,6 +164,10 @@ function setupRoutes(app, dependencies) {
     // If legacy page routers are unavailable, this still keeps the service healthy.
     app.get('/healthz', (req, res) => {
         res.status(200).json({ success: true, status: 'ok' });
+    });
+
+    app.get('/favicon.ico', (req, res) => {
+        res.status(204).end();
     });
 
     app.get('/', (req, res) => {
