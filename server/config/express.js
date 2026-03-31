@@ -51,8 +51,8 @@ function configureExpress(app) {
         parameterLimit: 1000
     }));
     
-    // 1 year cache for hashed/versioned assets, 1 day for pages and components.
-    const assetCacheOptions  = { maxAge: '365d', immutable: true, etag: true, lastModified: true };
+    // Assets are not filename-hashed yet, so avoid immutable long-lived caching.
+    const assetCacheOptions  = { maxAge: '1h', immutable: false, etag: true, lastModified: true };
     const pageCacheOptions   = { maxAge: '1d',   etag: true, lastModified: true };
     const uploadCacheOptions = { maxAge: '7d',   etag: true, lastModified: true };
 
