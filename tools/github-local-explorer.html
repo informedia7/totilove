@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>GitHub ⇄ Local · Detailed Upload Progress</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+        }
+
+        :root {
+            --bg-light: #f8fafc;
+            --panel-light: #ffffff;
+            --border-light: #e2e8f0;
+            --accent: #2563eb;
+            --accent-soft: #3b82f6;
+            --danger: #dc2626;
+            --danger-soft: #fee2e2;
+            --warning: #b45309;
+            --warning-soft: #fffbeb;
+            --success: #059669;
+            --selected-bg: #bfdbfe;
+            --selected-border: #3b82f6;
+            --drag-over-bg: #dbeafe;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --text-soft: #64748b;
+            --shadow-sm: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+            --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace;
+        }
+
+        body {
+            background: var(--bg-light);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            padding: 2rem 2rem 1.5rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.75rem;
+            min-height: 100vh;
+        }
+
+        .top-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 0.75rem 1.5rem;
+        }
+        .top-header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0;
+        }
+        .badge {
+            background: #e6f0ff;
+            color: var(--accent);
+            padding: 0.25rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid #b9d5fd;
+        }
+
+        .token-status {
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            border-radius: 40px;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .token-status.valid {
+            background: #d1fae5;
+            border-color: #34d399;
+            color: #065f46;
+        }
+        .token-status.invalid {
+            background: #fee2e2;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+
+        .config-card {
+            background: var(--panel-light);
+            border-radius: 26px;
+            border: 1px solid var(--border-light);
+            padding: 1.5rem 1.8rem;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 1.2rem 2rem;
+        }
+        .config-field {
+            display: flex;
+            flex-direction: column;
+            min-width: 160px;
+            flex: 1 0 160px;
+        }
+        .config-field label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-weight: 600;
+            color: var(--text-soft);
+            margin-bottom: 0.25rem;
+        }
+        .config-field input {
+            border: 1px solid var(--border-light);
+            border-radius: 14px;
+            padding: 0.7rem 1rem;
+            font-size: 0.95rem;
+            background: #fafdff;
+            width: 100%;
+        }
+        .config-field input:focus {
+            outline: 2px solid var(--accent-soft);
+            outline-offset: 2px;
+            border-color: transparent;
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-left: auto;
+            align-items: center;
+        }
+        .btn {
+            border-radius: 40px;
+            padding: 0.6rem 1.4rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border: none;
+            background: white;
+            color: var(--text-main);
+            border: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: var(--shadow-sm);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover { background: #1d4ed8; transform: scale(0.98); }
+        .btn-danger {
+            background: white;
+            border-color: #fecaca;
+            color: var(--danger);
+        }
+        .btn-danger:hover { background: var(--danger-soft); border-color: var(--danger); }
+        .btn-success {
+            background: var(--success);
+            color: white;
+            border: none;
+        }
+        .btn-outline:hover { background: #f1f5f9; }
+        .btn:disabled { opacity: 0.4; pointer-events: none; }
+
+        .selection-toolbar {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            padding: 0.25rem;
+            background: #f8fafc;
+            border-radius: 30px;
+            flex-wrap: wrap;
+        }
+        .selection-count {
+            font-size: 0.8rem;
+            background: #e2e8f0;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            color: var(--text-muted);
+        }
+
+        .pane-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: stretch;
+        }
+        .pane {
+            background: var(--panel-light);
+            border-radius: 30px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem 1.5rem 1.8rem;
+            display: flex;
+            flex-direction: column;
+            transition: box-shadow 0.2s, background-color 0.1s;
+        }
+        .pane.drag-over {
+            background-color: var(--drag-over-bg);
+            border-color: var(--accent);
+            border-width: 2px;
+            border-style: dashed;
+        }
+        .pane-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .pane-header h2 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .status-badge {
+            background: #eef2ff;
+            padding: 0.3rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--accent);
+            max-width: 220px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .tree-zone {
+            background: #fafdff;
+            border-radius: 20px;
+            border: 1px solid #e9eef3;
+            padding: 1rem;
+            overflow: auto;
+            max-height: 350px;
+            min-height: 250px;
+            font-size: 0.9rem;
+        }
+        .tree-zone ul {
+            list-style: none;
+            padding-left: 1.2rem;
+            margin: 0.25rem 0;
+        }
+        .tree-zone li {
+            margin: 0.2rem 0;
+            user-select: none;
+        }
+        .tree-zone li.folder > details {
+            display: block;
+        }
+        .tree-zone li.folder > details > summary {
+            cursor: pointer;
+            font-weight: 550;
+            color: #1e40af;
+            user-select: none;
+            padding: 0.1rem 0.2rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            list-style: none;
+        }
+        .tree-zone li.folder > details > summary::-webkit-details-marker {
+            display: none;
+        }
+        .tree-zone li.folder > details > summary::before {
+            content: '▶';
+            display: inline-block;
+            font-size: 0.7rem;
+            margin-right: 4px;
+            transition: transform 0.1s;
+        }
+        .tree-zone li.folder > details[open] > summary::before {
+            transform: rotate(90deg);
+        }
+        .tree-zone li.folder.selected-item > details > summary,
+        .tree-zone li.file.selected-item button {
+            background: var(--selected-bg);
+            border-left: 3px solid var(--selected-border);
+            border-radius: 8px;
+            padding-left: 0.5rem;
+        }
+        .tree-zone li.file button {
+            border: none;
+            background: transparent;
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+        }
+        .tree-zone li.file button::before {
+            content: '📄';
+            margin-right: 4px;
+            opacity: 0.7;
+        }
+        .tree-zone li.file button:hover {
+            background: #e2e8f0;
+        }
+        .tree-zone li.folder > details > summary:hover {
+            background: #e2e8f0;
+        }
+        .checkbox-marker {
+            width: 18px;
+            height: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .drag-hint {
+            font-size: 0.75rem;
+            color: var(--text-soft);
+            margin: 0.5rem 0 0;
+            padding: 0.3rem 0.8rem;
+            background: #f1f4f9;
+            border-radius: 30px;
+            text-align: center;
+            border: 1px dashed #cbd5e1;
+        }
+        .actions-panel {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .path-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .path-row label {
+            font-size: 0.8rem;
+            color: var(--text-soft);
+            font-weight: 500;
+        }
+        .path-row input {
+            flex: 1;
+            border: 1px solid var(--border-light);
+            border-radius: 30px;
+            padding: 0.4rem 0.8rem;
+            background: #f8fafc;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+        }
+        .path-row input:focus {
+            outline: 2px solid var(--accent-soft);
+            outline-offset: 2px;
+            border-color: transparent;
+        }
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        textarea.preview-box {
+            background: #f2f6fc;
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 0.75rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            resize: vertical;
+            min-height: 100px;
+            max-height: 150px;
+            color: #1e293b;
+        }
+
+        .token-help {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 1rem 1.5rem;
+            border: 1px solid #e2e8f0;
+            margin: 0.5rem 0;
+        }
+        .token-help h4 { margin: 0 0 0.5rem 0; color: #334155; }
+        .token-help ol { margin-left: 1.5rem; color: #475569; }
+
+        .local-note {
+            font-size: 0.75rem;
+            background: #f1f5f9;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            color: #334155;
+            margin: 0.3rem 0;
+        }
+
+        .log-section {
+            background: var(--panel-light);
+            border-radius: 30px;
+            border: 1px solid var(--border-light);
+            padding: 1.2rem 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .log-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .log-container {
+            background: #f5f9ff;
+            border-radius: 16px;
+            padding: 0.6rem 0.8rem;
+            max-height: 250px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+            border: 1px solid #e2e8f0;
+            font-family: var(--font-mono);
+        }
+        .log-entry {
+            padding: 0.3rem 0;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+        .log-entry.error { color: #b91c1c; background: #fee2e2; padding-left: 0.3rem; border-radius: 4px; }
+        .log-entry.success { color: #059669; }
+        .log-entry.info { color: #2563eb; }
+        .log-entry.warning { color: #b45309; }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            margin: 6px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 760px) {
+            .pane-container { grid-template-columns: 1fr; }
+            body { padding: 1rem; }
+            .config-card { flex-direction: column; align-items: stretch; }
+            .button-group { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="top-header">
+    <h1>📁 GitHub ⇄ Local · Detailed Upload Progress</h1>
+    <span class="badge">Folders stay open when clicking files</span>
+</div>
+
+<div id="tokenStatus" class="token-status invalid" style="display: none;">
+    ⚠️ <span id="tokenStatusMessage"></span>
+</div>
+
+<div class="config-card">
+    <div class="config-field">
+        <label>Owner</label>
+        <input id="ghOwner" placeholder="org or user" value="informedia7" />
+    </div>
+    <div class="config-field">
+        <label>Repository</label>
+        <input id="ghRepo" placeholder="repo name" value="totilove" />
+    </div>
+    <div class="config-field">
+        <label>Branch</label>
+        <input id="ghBranch" value="main" />
+    </div>
+    <div class="config-field">
+        <label>GitHub Token (repo scope)</label>
+        <input id="ghToken" type="password" placeholder="github_pat_..." value="" />
+    </div>
+    <div class="button-group">
+        <button class="btn btn-primary" id="loadGithub">📡 Load tree</button>
+        <button class="btn btn-success" id="checkToken">✅ Validate token</button>
+        <button class="btn-outline" id="clearConfig">🧹 forget</button>
+    </div>
+</div>
+<div id="tokenHelp" class="token-help" style="display: block;">
+    <h4>🔑 How to get a GitHub token with write access:</h4>
+    <ol>
+        <li>Go to <a href="https://github.com/settings/tokens" target="_blank">GitHub Token Settings</a></li>
+        <li>Click "Generate new token (classic)"</li>
+        <li>Give it a name (e.g., "Dual Explorer")</li>
+        <li>Select scope: <strong><code>repo</code></strong> (full control of private repositories)</li>
+        <li>Click "Generate token" and copy it</li>
+        <li>Paste it in the token field above and click "Validate token"</li>
+    </ol>
+</div>
+
+<div id="tokenHelp" class="token-help">
+    <h4>🔑 GitHub Token Setup</h4>
+    <ol><li>Go to <a href="https://github.com/settings/tokens" target="_blank">GitHub Token Settings</a></li>
+    <li>Click "Generate new token (classic)"</li>
+    <li>Select scope: <strong><code>repo</code></strong></li>
+    <li>Generate and paste token above</li></ol>
+</div>
+
+<div class="pane-container">
+    <!-- GITHUB PANE (DROP TARGET) -->
+    <section class="pane" id="githubPane" data-pane="github">
+        <div class="pane-header">
+            <h2><span>🐙 GitHub</span> <span style="font-size:0.8rem;">⬅️ Drop files here</span></h2>
+            <span class="status-badge" id="ghStatus">not connected</span>
+        </div>
+        <div class="selection-toolbar">
+            <button class="btn-outline" id="ghSelectAll" style="font-size:0.7rem; padding:0.2rem 0.6rem;">✅ Select All</button>
+            <button class="btn-outline" id="ghClearSelection" style="font-size:0.7rem; padding:0.2rem 0.6rem;">🗑️ Clear</button>
+            <span class="selection-count" id="ghSelectionCount">0 selected</span>
+            <button class="btn-outline" id="setRootFolder" style="font-size:0.7rem; padding:0.2rem 0.6rem;">📁 Set Target to Root</button>
+        </div>
+        <div class="tree-zone" id="githubTree">— click "Load tree" to browse —</div>
+        <div class="drag-hint" style="background: #dbeafe; border-color: var(--accent);">
+            ⬇️ <strong>DROP ZONE:</strong> Drag local files/folders here to upload to SELECTED GitHub folder
+        </div>
+        <div class="actions-panel">
+            <div class="path-row">
+                <label>📂 Target GitHub folder:</label>
+                <input id="githubTargetFolder" placeholder="Click a folder in the tree above" value="" readonly style="background:#f1f5f9; cursor:pointer;" />
+                <button class="btn-outline" id="clearTargetFolder" style="padding:0.2rem 0.8rem;">Clear</button>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="uploadToGithub" disabled>⬆️ Upload Selected to Target</button>
+                <button class="btn-danger" id="deleteGithubSelected" disabled>🗑️ Delete Selected</button>
+                <button class="btn-outline" id="refreshGithub">⟳ Refresh</button>
+            </div>
+            <textarea class="preview-box" id="githubPreview" readonly placeholder="Click a file to preview…"></textarea>
+        </div>
+    </section>
+
+    <!-- LOCAL PANE (DRAG SOURCE) -->
+    <section class="pane" id="localPane" data-pane="local">
+        <div class="pane-header">
+            <h2><span>💻 Local</span> <span style="font-size:0.8rem;">➡️ Drag from here</span></h2>
+            <span class="status-badge" id="localStatus">no folder</span>
+        </div>
+        <div class="selection-toolbar">
+            <button class="btn-outline" id="localSelectAll" style="font-size:0.7rem; padding:0.2rem 0.6rem;">✅ Select All</button>
+            <button class="btn-outline" id="localClearSelection" style="font-size:0.7rem; padding:0.2rem 0.6rem;">🗑️ Clear</button>
+            <span class="selection-count" id="localSelectionCount">0 selected</span>
+        </div>
+        <div class="local-note">🔒 on‑device only · Drag files/folders to GitHub pane</div>
+        <div class="tree-zone" id="localTree">— click "Pick folder" to start —</div>
+        <div class="drag-hint">⬇️ Drag items from here to the GitHub pane to upload</div>
+        <div class="actions-panel">
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="pickLocal">📂 Pick Local Folder</button>
+                <button class="btn-danger" id="deleteLocalSelected" disabled>🗑️ Delete Selected</button>
+            </div>
+            <textarea class="preview-box" id="localPreview" readonly placeholder="Click a local file to preview…"></textarea>
+        </div>
+    </section>
+</div>
+
+<div class="log-section">
+    <h3>📋 Activity Log</h3>
+    <div class="progress-bar" id="uploadProgressBar" style="display: none;">
+        <div class="progress-fill" id="uploadProgressFill"></div>
+    </div>
+    <div class="log-container" id="activityLog">
+        <div class="log-entry">[Ready] Click folders to expand. Click files to preview - folders stay open!</div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const $ = (id) => document.getElementById(id);
+
+        const DEFAULT_CONFIG = { owner: "informedia7", repo: "totilove", branch: "main", token: "" };
+        const ghState = { ...DEFAULT_CONFIG, tree: null, selectedNodes: new Set(), hasWriteAccess: false, targetFolder: "" };
+        const localState = { rootHandle: null, tree: null, selectedNodes: new Set() };
+        const STORAGE_KEY = "githubLocalExplorerConfig";
+        let currentUploadTotal = 0, currentUploadCompleted = 0;
+
+        const refs = {
+            ghOwner: $("ghOwner"), ghRepo: $("ghRepo"), ghBranch: $("ghBranch"), ghToken: $("ghToken"),
+            ghStatus: $("ghStatus"), ghTree: $("githubTree"), ghTargetFolder: $("githubTargetFolder"),
+            clearTargetFolder: $("clearTargetFolder"), setRootFolder: $("setRootFolder"),
+            ghPreview: $("githubPreview"), localPreview: $("localPreview"),
+            refreshGithub: $("refreshGithub"), loadGithub: $("loadGithub"), checkToken: $("checkToken"),
+            clearConfig: $("clearConfig"), pickLocal: $("pickLocal"),
+            uploadToGithub: $("uploadToGithub"), uploadFromLocal: $("uploadFromLocal"),
+            deleteGithubSelected: $("deleteGithubSelected"), deleteLocalSelected: $("deleteLocalSelected"),
+            ghSelectAll: $("ghSelectAll"), ghClearSelection: $("ghClearSelection"),
+            localSelectAll: $("localSelectAll"), localClearSelection: $("localClearSelection"),
+            ghSelectionCount: $("ghSelectionCount"), localSelectionCount: $("localSelectionCount"),
+            log: $("activityLog"), tokenStatus: $("tokenStatus"), tokenStatusMessage: $("tokenStatusMessage"),
+            tokenHelp: $("tokenHelp"), githubPane: $("githubPane"), localPane: $("localPane"),
+            uploadProgressBar: $("uploadProgressBar"), uploadProgressFill: $("uploadProgressFill"),
+            localStatus: $("localStatus"), localTree: $("localTree"),
+        };
+
+        let draggedItem = null;
+        // Store expanded folder states to preserve them after re-renders
+        let expandedFolders = new Set();
+
+        const addLog = (msg, type = "info") => {
+            if (!refs.log) return;
+            const entry = document.createElement("div"); 
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            refs.log.prepend(entry);
+            if (refs.log.children.length > 50) refs.log.removeChild(refs.log.lastElementChild);
+        };
+
+        const updateProgress = (completed, total, operation = "") => {
+            if (!refs.uploadProgressFill || total === 0) return;
+            const percent = (completed / total) * 100;
+            refs.uploadProgressFill.style.width = `${percent}%`;
+            if (refs.uploadProgressBar) {
+                refs.uploadProgressBar.style.display = completed === total ? 'none' : 'block';
+                if (completed === total) {
+                    addLog(`✅ ${operation} Complete: ${completed}/${total} files uploaded`, "success");
+                    setTimeout(() => { if(refs.uploadProgressBar) refs.uploadProgressBar.style.display = 'none'; }, 2000);
+                }
+            }
+        };
+
+        const updateTokenStatus = (isValid, message) => {
+            if (!refs.tokenStatus || !refs.tokenStatusMessage) return;
+            refs.tokenStatusMessage.textContent = message;
+            refs.tokenStatus.style.display = 'flex';
+            refs.tokenStatus.className = `token-status ${isValid ? 'valid' : 'invalid'}`;
+            if (refs.tokenHelp) refs.tokenHelp.style.display = isValid ? 'none' : 'block';
+            ghState.hasWriteAccess = isValid;
+            addLog(isValid ? `✅ ${message}` : `⚠️ ${message}`, isValid ? "success" : "error");
+        };
+
+        const validateToken = async () => {
+            if (!refs.ghToken) return false;
+            const token = refs.ghToken.value.trim();
+            if (!token) { updateTokenStatus(false, "No token provided. Enter token with 'repo' scope."); return false; }
+            try {
+                const response = await fetch('https://api.github.com/user', {
+                    headers: { Authorization: `token ${token}`, Accept: "application/vnd.github+json" }
+                });
+                if (!response.ok) { updateTokenStatus(false, "Invalid token."); return false; }
+                const scopes = response.headers.get('X-OAuth-Scopes');
+                const userData = await response.json();
+                if (scopes && (scopes.includes('repo') || scopes.includes('public_repo'))) {
+                    updateTokenStatus(true, `Valid for @${userData.login} with repo scope.`);
+                    return true;
+                } else if (scopes) {
+                    updateTokenStatus(false, `Missing 'repo' scope. Current: ${scopes}`);
+                    return false;
+                } else {
+                    updateTokenStatus(true, `Valid for @${userData.login}. Assuming write access.`);
+                    return true;
+                }
+            } catch(e) { updateTokenStatus(false, `Error: ${e.message}`); return false; }
+        };
+
+        const githubRequest = async (path, options = {}) => {
+            const owner = refs.ghOwner?.value.trim() || "", repo = refs.ghRepo?.value.trim() || "";
+            if (!owner || !repo) throw new Error("Owner/repo required.");
+            const headers = { Accept: "application/vnd.github+json" };
+            const token = refs.ghToken?.value.trim() || "";
+            if (token) headers.Authorization = `token ${token}`;
+            if (options.body && !headers["Content-Type"]) headers["Content-Type"] = "application/json";
+            const response = await fetch(`https://api.github.com${path}`, { ...options, headers });
+            if (!response.ok) {
+                const err = await response.text();
+                throw new Error(`GitHub ${response.status}: ${err.slice(0,150)}`);
+            }
+            return response.status === 204 ? null : response.json();
+        };
+
+        const encodePath = (p) => p.split('/').filter(Boolean).map(encodeURIComponent).join('/');
+
+        const uploadFile = async (file, targetPath) => {
+            const contentBase64 = await new Promise((res, rej) => {
+                const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.onerror = rej; r.readAsDataURL(file);
+            });
+            const encoded = encodePath(targetPath);
+            let sha;
+            try {
+                const existing = await githubRequest(`/repos/${refs.ghOwner?.value.trim()}/${refs.ghRepo?.value.trim()}/contents/${encoded}?ref=${encodeURIComponent(refs.ghBranch?.value.trim() || "main")}`);
+                sha = existing.sha;
+                addLog(`📝 Updating existing file: ${targetPath}`, "info");
+            } catch(e) { 
+                if (!/404/.test(e.message)) throw e;
+                addLog(`📄 Creating new file: ${targetPath}`, "info");
+            }
+            await githubRequest(`/repos/${refs.ghOwner?.value.trim()}/${refs.ghRepo?.value.trim()}/contents/${encoded}`, {
+                method: "PUT",
+                body: JSON.stringify({ message: `${sha ? 'Update' : 'Add'} ${targetPath}`, content: contentBase64, branch: refs.ghBranch?.value.trim() || "main", sha })
+            });
+        };
+
+        const buildGithubTree = (entries) => {
+            const root = { name: "/", path: "", type: "tree", children: new Map() };
+            for (const entry of entries) {
+                const parts = entry.path.split("/");
+                let current = root, curPath = "";
+                parts.forEach((seg, idx) => {
+                    curPath = curPath ? `${curPath}/${seg}` : seg;
+                    if (!current.children.has(seg)) {
+                        current.children.set(seg, { name: seg, path: curPath, type: "tree", children: new Map() });
+                    }
+                    const node = current.children.get(seg);
+                    if (idx === parts.length - 1) {
+                        node.type = entry.type;
+                        node.sha = entry.sha;
+                        if (entry.type === "blob") delete node.children;
+                        else node.children = node.children || new Map();
+                    }
+                    current = node;
+                });
+            }
+            return root;
+        };
+
+        let ghTreeRoot = null;
+
+        // Function to save current expanded folder states
+        const saveExpandedState = (element) => {
+            if (!element) return;
+            const folders = element.querySelectorAll('li.folder > details');
+            folders.forEach(details => {
+                const summary = details.querySelector('summary');
+                if (summary) {
+                    // Get the folder path from the text content (excluding checkbox marker)
+                    const folderName = summary.childNodes[1]?.textContent || "";
+                    if (folderName && details.open) {
+                        // We need to find the full path - store by folder name relative to parent
+                        // For simplicity, we'll store the folder name and rely on re-opening after render
+                        expandedFolders.add(folderName);
+                    } else if (folderName && !details.open) {
+                        expandedFolders.delete(folderName);
+                    }
+                }
+            });
+        };
+
+        // Function to restore expanded folder states after re-render
+        const restoreExpandedState = (element) => {
+            if (!element) return;
+            const folders = element.querySelectorAll('li.folder > details');
+            folders.forEach(details => {
+                const summary = details.querySelector('summary');
+                if (summary) {
+                    const folderName = summary.childNodes[1]?.textContent || "";
+                    if (expandedFolders.has(folderName)) {
+                        details.open = true;
+                    }
+                }
+            });
+        };
+
+        const renderGithubTree = (root) => {
+            if (!refs.ghTree) return;
+            
+            // Save current expanded state before re-rendering
+            saveExpandedState(refs.ghTree);
+            
+            const container = document.createElement("ul");
+            const children = root.children ? Array.from(root.children.values()) : [];
+            children.sort((a,b)=> (a.type!==b.type) ? (a.type==='tree'?-1:1) : a.name.localeCompare(b.name))
+                .forEach(c => container.appendChild(renderGithubNode(c)));
+            refs.ghTree.innerHTML = ''; 
+            refs.ghTree.appendChild(container);
+            
+            // Restore expanded state after re-render
+            restoreExpandedState(refs.ghTree);
+            
+            updateGhSelectionDisplay();
+        };
+
+        const renderGithubNode = (node) => {
+            const isSelected = ghState.selectedNodes.has(node.path);
+            const isTargetFolder = ghState.targetFolder === node.path && node.type === 'tree';
+            
+            if (node.type === "tree") {
+                const li = document.createElement("li"); 
+                li.className = `folder ${isSelected ? 'selected-item' : ''}`;
+                if (isTargetFolder) li.style.background = '#dbeafe';
+                
+                const details = document.createElement("details");
+                // Don't set open property here - will be restored after render
+                
+                const summary = document.createElement("summary");
+                const marker = document.createElement("span"); 
+                marker.className = "checkbox-marker"; 
+                marker.textContent = isSelected ? '☑' : '☐';
+                marker.style.cursor = "pointer";
+                marker.addEventListener("click", (e) => { 
+                    e.stopPropagation(); 
+                    e.preventDefault();
+                    toggleSelectGithub(node); 
+                });
+                
+                const folderName = document.createElement("span");
+                folderName.textContent = node.name;
+                folderName.style.cursor = "pointer";
+                folderName.addEventListener("click", (e) => { 
+                    e.stopPropagation();
+                    e.preventDefault();
+                    // Toggle the details open state
+                    if (details.open) {
+                        details.open = false;
+                        expandedFolders.delete(node.name);
+                    } else {
+                        details.open = true;
+                        expandedFolders.add(node.name);
+                    }
+                });
+                
+                const targetBadge = document.createElement("span");
+                if (isTargetFolder) {
+                    targetBadge.textContent = " 🎯";
+                    targetBadge.style.fontSize = "0.7rem";
+                    targetBadge.style.color = "var(--accent)";
+                }
+                
+                summary.appendChild(marker);
+                summary.appendChild(folderName);
+                summary.appendChild(targetBadge);
+                summary.style.display = "flex";
+                summary.style.alignItems = "center";
+                summary.style.gap = "4px";
+                summary.style.cursor = "pointer";
+                
+                summary.addEventListener("dragstart", (e) => handleDragStart(e, 'github', node, true));
+                summary.setAttribute("draggable", "true");
+                
+                details.appendChild(summary);
+                
+                const inner = document.createElement("ul");
+                const kids = node.children ? Array.from(node.children.values()) : [];
+                kids.sort((a,b)=> (a.type!==b.type) ? (a.type==='tree'?-1:1) : a.name.localeCompare(b.name))
+                    .forEach(k => inner.appendChild(renderGithubNode(k)));
+                details.appendChild(inner);
+                li.appendChild(details);
+                return li;
+            }
+            const li = document.createElement("li"); li.className = `file ${isSelected ? 'selected-item' : ''}`;
+            const btn = document.createElement("button");
+            const marker = document.createElement("span"); 
+            marker.className = "checkbox-marker"; 
+            marker.textContent = isSelected ? '☑' : '☐';
+            marker.style.cursor = "pointer";
+            marker.addEventListener("click", (e) => { 
+                e.stopPropagation(); 
+                e.preventDefault();
+                toggleSelectGithub(node); 
+            });
+            
+            const fileName = document.createElement("span");
+            fileName.textContent = node.name;
+            
+            btn.appendChild(marker);
+            btn.appendChild(fileName);
+            btn.style.display = "flex";
+            btn.style.alignItems = "center";
+            btn.style.gap = "4px";
+            btn.style.width = "100%";
+            
+            btn.addEventListener("click", (e) => { 
+                e.stopPropagation(); 
+                e.preventDefault();
+                toggleSelectGithub(node);
+                previewGithubFile(node);
+            });
+            btn.addEventListener("dragstart", (e) => handleDragStart(e, 'github', node, false));
+            btn.setAttribute("draggable", "true");
+            li.appendChild(btn);
+            return li;
+        };
+
+        const setGithubTargetFolder = (folderPath) => {
+            ghState.targetFolder = folderPath;
+            if (refs.ghTargetFolder) refs.ghTargetFolder.value = folderPath || "(root)";
+            addLog(`🎯 Upload target set to: ${folderPath || "root"}`, "info");
+            if (ghTreeRoot) renderGithubTree(ghTreeRoot);
+        };
+
+        const previewGithubFile = async (node) => {
+            if (node.type !== 'blob' || !refs.ghPreview) return;
+            refs.ghPreview.value = "⏳ loading preview…";
+            try {
+                const data = await githubRequest(`/repos/${refs.ghOwner?.value.trim()}/${refs.ghRepo?.value.trim()}/contents/${encodePath(node.path)}?ref=${encodeURIComponent(refs.ghBranch?.value.trim() || "main")}`);
+                const decoded = atob(data.content.replace(/\n/g, ''));
+                refs.ghPreview.value = decoded.includes('\u0000') ? '⚠️ binary file' : decoded.slice(0,2000) + (decoded.length>2000?'…':'');
+                addLog(`📄 Preview loaded: ${node.path}`, "info");
+            } catch(err) { 
+                refs.ghPreview.value = `❌ ${err.message}`;
+                addLog(`❌ Failed to load preview: ${node.path}`, "error");
+            }
+        };
+
+        const toggleSelectGithub = (node) => {
+            if (ghState.selectedNodes.has(node.path)) ghState.selectedNodes.delete(node.path);
+            else ghState.selectedNodes.add(node.path);
+            if (ghTreeRoot) renderGithubTree(ghTreeRoot);
+        };
+
+        const updateGhSelectionDisplay = () => {
+            if (!refs.ghSelectionCount || !refs.deleteGithubSelected || !refs.uploadToGithub) return;
+            const count = ghState.selectedNodes.size;
+            refs.ghSelectionCount.textContent = `${count} selected`;
+            refs.deleteGithubSelected.disabled = count === 0 || !ghState.hasWriteAccess;
+            refs.uploadToGithub.disabled = count === 0 || !ghState.hasWriteAccess;
+        };
+
+        const refreshGithubTree = async () => {
+            const owner = refs.ghOwner?.value.trim() || "", repo = refs.ghRepo?.value.trim() || "";
+            if (!owner || !repo) return addLog("Owner/repo required", "error");
+            if (refs.ghStatus) refs.ghStatus.textContent = "🔄 fetching…";
+            try {
+                const tree = await githubRequest(`/repos/${owner}/${repo}/git/trees/${encodeURIComponent(refs.ghBranch?.value.trim() || "main")}?recursive=1`);
+                ghTreeRoot = buildGithubTree(tree.tree || []);
+                renderGithubTree(ghTreeRoot);
+                if (refs.ghStatus) refs.ghStatus.textContent = `${tree.tree.length} items · ${owner}/${repo}`;
+                addLog(`✅ GitHub tree loaded: ${tree.tree.length} items in ${owner}/${repo}`, "success");
+            } catch (err) { 
+                if (refs.ghStatus) refs.ghStatus.textContent = "❌ failed"; 
+                addLog(`❌ ${err.message}`, 'error'); 
+            }
+        };
+
+        // Local tree functions with preserved expansion state
+        let localExpandedFolders = new Set();
+
+        const saveLocalExpandedState = (element) => {
+            if (!element) return;
+            const folders = element.querySelectorAll('li.folder > details');
+            folders.forEach(details => {
+                const summary = details.querySelector('summary');
+                if (summary) {
+                    const folderName = summary.childNodes[1]?.textContent || "";
+                    if (folderName && details.open) {
+                        localExpandedFolders.add(folderName);
+                    } else if (folderName && !details.open) {
+                        localExpandedFolders.delete(folderName);
+                    }
+                }
+            });
+        };
+
+        const restoreLocalExpandedState = (element) => {
+            if (!element) return;
+            const folders = element.querySelectorAll('li.folder > details');
+            folders.forEach(details => {
+                const summary = details.querySelector('summary');
+                if (summary) {
+                    const folderName = summary.childNodes[1]?.textContent || "";
+                    if (localExpandedFolders.has(folderName)) {
+                        details.open = true;
+                    }
+                }
+            });
+        };
+
+        const pickLocalFolder = async () => {
+            if (!window.showDirectoryPicker) return addLog("File System Access API not supported.", "error");
+            try {
+                const handle = await window.showDirectoryPicker();
+                localState.rootHandle = handle;
+                if (refs.localStatus) refs.localStatus.textContent = `📁 ${handle.name}`;
+                localState.selectedNodes.clear();
+                await refreshLocalTree();
+                addLog(`📁 Local folder selected: ${handle.name}`, "success");
+            } catch (err) { if (err.name !== 'AbortError') addLog(err.message, 'error'); }
+        };
+
+        const readDirectoryRecursive = async (handle, basePath) => {
+            const results = [];
+            for await (const [name, child] of handle.entries()) {
+                const path = basePath ? `${basePath}/${name}` : name;
+                if (child.kind === 'directory') {
+                    results.push({ name, path, type:'tree', handle:child, parentHandle:handle, children: await readDirectoryRecursive(child, path) });
+                } else {
+                    results.push({ name, path, type:'blob', handle:child, parentHandle:handle });
+                }
+            }
+            return results;
+        };
+
+        let localTreeRoot = [];
+
+        const refreshLocalTree = async () => {
+            if (!localState.rootHandle || !refs.localTree) return;
+            refs.localTree.innerHTML = "loading…";
+            const tree = await readDirectoryRecursive(localState.rootHandle, "");
+            localTreeRoot = tree;
+            renderLocalTree();
+        };
+
+        const renderLocalTree = () => {
+            if (!refs.localTree) return;
+            
+            saveLocalExpandedState(refs.localTree);
+            
+            const ul = document.createElement('ul');
+            const sortLocal = (a,b) => (a.type!==b.type) ? (a.type==='tree'?-1:1) : a.name.localeCompare(b.name);
+            localTreeRoot.sort(sortLocal).forEach(n => ul.appendChild(renderLocalNode(n)));
+            refs.localTree.innerHTML = ''; 
+            refs.localTree.appendChild(ul);
+            
+            restoreLocalExpandedState(refs.localTree);
+            
+            updateLocalSelectionDisplay();
+        };
+
+        const renderLocalNode = (node) => {
+            const isSelected = localState.selectedNodes.has(node.path);
+            if (node.type === 'tree') {
+                const li = document.createElement("li"); li.className = `folder ${isSelected ? 'selected-item' : ''}`;
+                const details = document.createElement("details");
+                
+                const summary = document.createElement("summary");
+                const marker = document.createElement("span"); 
+                marker.className = "checkbox-marker"; 
+                marker.textContent = isSelected ? '☑' : '☐';
+                marker.style.cursor = "pointer";
+                marker.addEventListener("click", (e) => { 
+                    e.stopPropagation(); 
+                    e.preventDefault();
+                    toggleSelectLocal(node); 
+                });
+                
+                const folderName = document.createElement("span");
+                folderName.textContent = node.name;
+                folderName.style.cursor = "pointer";
+                folderName.addEventListener("click", (e) => { 
+                    e.stopPropagation();
+                    e.preventDefault();
+                    if (details.open) {
+                        details.open = false;
+                        localExpandedFolders.delete(node.name);
+                    } else {
+                        details.open = true;
+                        localExpandedFolders.add(node.name);
+                    }
+                });
+                
+                summary.appendChild(marker);
+                summary.appendChild(folderName);
+                summary.style.display = "flex";
+                summary.style.alignItems = "center";
+                summary.style.gap = "4px";
+                summary.style.cursor = "pointer";
+                
+                summary.addEventListener("dragstart", (e) => handleDragStart(e, 'local', node, true));
+                summary.setAttribute("draggable", "true");
+                
+                details.appendChild(summary);
+                
+                const inner = document.createElement("ul");
+                node.children.sort((a,b)=> (a.type!==b.type) ? (a.type==='tree'?-1:1) : a.name.localeCompare(b.name))
+                    .forEach(c => inner.appendChild(renderLocalNode(c)));
+                details.appendChild(inner);
+                li.appendChild(details);
+                return li;
+            }
+            const li = document.createElement("li"); li.className = `file ${isSelected ? 'selected-item' : ''}`;
+            const btn = document.createElement("button");
+            const marker = document.createElement("span"); 
+            marker.className = "checkbox-marker"; 
+            marker.textContent = isSelected ? '☑' : '☐';
+            marker.style.cursor = "pointer";
+            marker.addEventListener("click", (e) => { 
+                e.stopPropagation(); 
+                e.preventDefault();
+                toggleSelectLocal(node); 
+            });
+            
+            const fileName = document.createElement("span");
+            fileName.textContent = node.name;
+            
+            btn.appendChild(marker);
+            btn.appendChild(fileName);
+            btn.style.display = "flex";
+            btn.style.alignItems = "center";
+            btn.style.gap = "4px";
+            btn.style.width = "100%";
+            
+            btn.addEventListener("click", async (e) => { 
+                e.stopPropagation(); 
+                e.preventDefault();
+                toggleSelectLocal(node);
+                if (refs.localPreview) {
+                    try {
+                        const file = await node.handle.getFile();
+                        const text = await file.text();
+                        refs.localPreview.value = text.includes('\u0000') ? '⚠️ binary file' : text.slice(0,2000) + (text.length>2000?'…':'');
+                        addLog(`📄 Preview loaded: ${node.path}`, "info");
+                    } catch(err) { 
+                        refs.localPreview.value = `❌ ${err.message}`;
+                        addLog(`❌ Failed to load preview: ${node.path}`, "error");
+                    }
+                }
+            });
+            btn.addEventListener("dragstart", (e) => handleDragStart(e, 'local', node, false));
+            btn.setAttribute("draggable", "true");
+            li.appendChild(btn);
+            return li;
+        };
+
+        const toggleSelectLocal = (node) => {
+            if (localState.selectedNodes.has(node.path)) localState.selectedNodes.delete(node.path);
+            else localState.selectedNodes.add(node.path);
+            renderLocalTree();
+        };
+
+        const updateLocalSelectionDisplay = () => {
+            if (!refs.localSelectionCount || !refs.deleteLocalSelected) return;
+            const count = localState.selectedNodes.size;
+            refs.localSelectionCount.textContent = `${count} selected`;
+            refs.deleteLocalSelected.disabled = count === 0;
+        };
+
+        const uploadItemToGithub = async (item, targetPath, sourcePath) => {
+            if (item.type === 'blob') {
+                const file = await item.handle.getFile();
+                addLog(`📤 Uploading: ${sourcePath || item.name} → ${targetPath}`, "info");
+                await uploadFile(file, targetPath);
+                addLog(`✅ Uploaded: ${sourcePath || item.name} → ${targetPath}`, "success");
+                return 1;
+            } else {
+                let count = 0;
+                for (const child of item.children) {
+                    const childTargetPath = `${targetPath}/${child.name}`;
+                    const childSourcePath = sourcePath ? `${sourcePath}/${child.name}` : child.name;
+                    count += await uploadItemToGithub(child, childTargetPath, childSourcePath);
+                }
+                return count;
+            }
+        };
+
+        const uploadSelectedLocalToGithub = async () => {
+            if (localState.selectedNodes.size === 0) return addLog("❌ No local items selected", "error");
+            if (!ghState.hasWriteAccess) return addLog("❌ No write permission", "error");
+            
+            const targetBase = ghState.targetFolder || "";
+            addLog(`📁 Starting upload to GitHub target: ${targetBase || "root"}`, "info");
+            
+            const findNode = (nodes, path) => {
+                for (const node of nodes) {
+                    if (node.path === path) return node;
+                    if (node.children) {
+                        const found = findNode(node.children, path);
+                        if (found) return found;
+                    }
+                }
+                return null;
+            };
+            
+            let totalFiles = 0;
+            const uploadTasks = [];
+            
+            for (const selectedPath of localState.selectedNodes) {
+                const node = findNode(localTreeRoot, selectedPath);
+                if (node) {
+                    const targetPath = targetBase ? `${targetBase}/${node.name}` : node.name;
+                    uploadTasks.push(uploadItemToGithub(node, targetPath, selectedPath));
+                }
+            }
+            
+            addLog(`📊 Uploading ${uploadTasks.length} item(s) (may contain multiple files)...`, "info");
+            currentUploadTotal = uploadTasks.length;
+            currentUploadCompleted = 0;
+            
+            const results = await Promise.all(uploadTasks);
+            totalFiles = results.reduce((a,b) => a + b, 0);
+            
+            addLog(`✅ Upload complete: ${totalFiles} file(s) uploaded to ${targetBase || "root"}`, "success");
+            localState.selectedNodes.clear();
+            renderLocalTree();
+            await refreshGithubTree();
+        };
+
+        const deleteLocalBatch = async () => {
+            if (localState.selectedNodes.size === 0) return addLog("No local items selected", "error");
+            if (!confirm(`Delete ${localState.selectedNodes.size} selected item(s) from disk?`)) return;
+            
+            const deleteNode = async (node) => {
+                if (node.type === 'blob') {
+                    await node.parentHandle.removeEntry(node.name);
+                } else {
+                    for (const child of node.children) await deleteNode(child);
+                    await node.parentHandle.removeEntry(node.name);
+                }
+            };
+            
+            const findNode = (nodes, path) => {
+                for (const node of nodes) {
+                    if (node.path === path) return node;
+                    if (node.children) {
+                        const found = findNode(node.children, path);
+                        if (found) return found;
+                    }
+                }
+                return null;
+            };
+            
+            let deleted = 0;
+            for (const selectedPath of localState.selectedNodes) {
+                const node = findNode(localTreeRoot, selectedPath);
+                if (node) {
+                    try {
+                        await deleteNode(node);
+                        deleted++;
+                        addLog(`🗑️ Deleted: ${node.path}`, "info");
+                    } catch (err) { addLog(`❌ Failed: ${node.path} - ${err.message}`, "error"); }
+                }
+            }
+            addLog(`✅ Deleted ${deleted} items`, "success");
+            localState.selectedNodes.clear();
+            await refreshLocalTree();
+        };
+
+        const deleteGithubBatch = async () => {
+            if (ghState.selectedNodes.size === 0) return addLog("No items selected", "error");
+            if (!ghState.hasWriteAccess) return addLog("No write permission", "error");
+            if (!confirm(`Delete ${ghState.selectedNodes.size} selected item(s) from GitHub?`)) return;
+            
+            const allItems = await githubRequest(`/repos/${refs.ghOwner?.value.trim()}/${refs.ghRepo?.value.trim()}/git/trees/${encodeURIComponent(refs.ghBranch?.value.trim() || "main")}?recursive=1`);
+            const itemsToDelete = [];
+            for (const selectedPath of ghState.selectedNodes) {
+                const matching = allItems.tree.filter(item => item.path === selectedPath || item.path.startsWith(selectedPath + '/'));
+                itemsToDelete.push(...matching);
+            }
+            const uniqueItems = Array.from(new Map(itemsToDelete.map(i => [i.path, i])).values());
+            
+            addLog(`🗑️ Deleting ${uniqueItems.length} item(s) from GitHub...`, "info");
+            let deleted = 0;
+            for (const item of uniqueItems.sort((a,b) => b.path.split('/').length - a.path.split('/').length)) {
+                try {
+                    if (item.type === 'blob') {
+                        const fileData = await githubRequest(`/repos/${refs.ghOwner?.value.trim()}/${refs.ghRepo?.value.trim()}/contents/${encodePath(item.path)}?ref=${encodeURIComponent(refs.ghBranch?.value.trim() || "main")}`);
+                        await githubRequest(`/repos/${refs.ghOwner?.value.trim()}/${refs.ghRepo?.value.trim()}/contents/${encodePath(item.path)}`, {
+                            method: "DELETE",
+                            body: JSON.stringify({ message: `Delete ${item.path}`, sha: fileData.sha, branch: refs.ghBranch?.value.trim() || "main" })
+                        });
+                    }
+                    deleted++;
+                    addLog(`🗑️ Deleted: ${item.path} (${deleted}/${uniqueItems.length})`, "info");
+                } catch (err) { addLog(`❌ Failed: ${item.path} - ${err.message}`, "error"); }
+            }
+            addLog(`✅ Deleted ${deleted} items`, "success");
+            ghState.selectedNodes.clear();
+            await refreshGithubTree();
+        };
+
+        const selectAllGithub = () => {
+            const collectPaths = (node) => {
+                ghState.selectedNodes.add(node.path);
+                if (node.children) {
+                    for (const child of node.children.values()) collectPaths(child);
+                }
+            };
+            if (ghTreeRoot && ghTreeRoot.children) {
+                for (const child of ghTreeRoot.children.values()) collectPaths(child);
+            }
+            if (ghTreeRoot) renderGithubTree(ghTreeRoot);
+            addLog(`✅ Selected all ${ghState.selectedNodes.size} items in GitHub`, "success");
+        };
+
+        const selectAllLocal = () => {
+            const collectPaths = (nodes) => {
+                for (const node of nodes) {
+                    localState.selectedNodes.add(node.path);
+                    if (node.children) collectPaths(node.children);
+                }
+            };
+            collectPaths(localTreeRoot);
+            renderLocalTree();
+            addLog(`✅ Selected all ${localState.selectedNodes.size} items in Local`, "success");
+        };
+
+        // Drag & Drop handlers
+        const handleDragStart = (e, sourceType, node, isFolder) => { 
+            draggedItem = { sourceType, node, isFolder }; 
+            e.dataTransfer.setData('text/plain', node.path); 
+            e.dataTransfer.effectAllowed = 'copy'; 
+            addLog(`🖱️ Dragging: ${node.path}`, "info");
+        };
+        
+        const handleDragOver = (e) => { 
+            e.preventDefault(); 
+            e.dataTransfer.dropEffect = 'copy'; 
+            const pane = e.currentTarget.closest('.pane'); 
+            if (pane) pane.classList.add('drag-over'); 
+        };
+        
+        const handleDragLeave = (e) => { 
+            const pane = e.currentTarget.closest('.pane'); 
+            if (pane) pane.classList.remove('drag-over'); 
+        };
+        
+        const handleDrop = async (e) => {
+            e.preventDefault(); 
+            const pane = e.currentTarget.closest('.pane'); 
+            if (pane) pane.classList.remove('drag-over');
+            const targetPane = pane?.dataset.pane; 
+            
+            if (draggedItem && draggedItem.sourceType === 'local' && targetPane === 'github') {
+                if (!ghState.hasWriteAccess) return addLog("❌ No write permission. Validate token first.", "error");
+                
+                const { node, isFolder } = draggedItem;
+                const targetBase = ghState.targetFolder || "";
+                const targetPath = targetBase ? `${targetBase}/${node.name}` : node.name;
+                
+                addLog(`🖱️ Dropped: ${node.name} → Target: ${targetBase || "root"}`, "info");
+                
+                if (isFolder) {
+                    addLog(`📁 Uploading folder "${node.name}" to ${targetPath}...`, "info");
+                    const count = await uploadItemToGithub(node, targetPath, node.name);
+                    addLog(`✅ Folder upload complete: ${count} files uploaded to ${targetPath}`, "success");
+                } else {
+                    addLog(`📄 Uploading file "${node.name}" to ${targetPath}...`, "info");
+                    await uploadItemToGithub(node, targetPath, node.name);
+                }
+                await refreshGithubTree();
+            }
+            else if (e.dataTransfer.files && e.dataTransfer.files.length > 0 && targetPane === 'github') {
+                if (!ghState.hasWriteAccess) return addLog("❌ No write permission. Validate token first.", "error");
+                const files = Array.from(e.dataTransfer.files);
+                const targetBase = ghState.targetFolder || "";
+                
+                addLog(`📁 Dropped ${files.length} external file(s) to ${targetBase || "root"}`, "info");
+                let uploaded = 0;
+                for (const file of files) {
+                    const targetPath = targetBase ? `${targetBase}/${file.name}` : file.name;
+                    try {
+                        addLog(`📤 Uploading external file: ${file.name} → ${targetPath}`, "info");
+                        await uploadFile(file, targetPath);
+                        uploaded++;
+                        addLog(`✅ Uploaded: ${file.name} → ${targetPath} (${uploaded}/${files.length})`, "success");
+                    } catch (err) {
+                        addLog(`❌ Failed: ${file.name} - ${err.message}`, "error");
+                    }
+                }
+                addLog(`✅ External upload complete: ${uploaded} file(s)`, "success");
+                await refreshGithubTree();
+            }
+            
+            draggedItem = null;
+        };
+
+        // Set up drop targets
+        if (refs.githubPane) {
+            refs.githubPane.addEventListener('dragover', handleDragOver);
+            refs.githubPane.addEventListener('dragleave', handleDragLeave);
+            refs.githubPane.addEventListener('drop', handleDrop);
+        }
+        
+        if (refs.localPane) {
+            refs.localPane.addEventListener('dragover', handleDragOver);
+            refs.localPane.addEventListener('dragleave', handleDragLeave);
+        }
+
+        // Event listeners
+        if (refs.loadGithub) refs.loadGithub.addEventListener("click", refreshGithubTree);
+        if (refs.refreshGithub) refs.refreshGithub.addEventListener("click", refreshGithubTree);
+        if (refs.checkToken) refs.checkToken.addEventListener("click", validateToken);
+        if (refs.clearConfig) refs.clearConfig.addEventListener("click", () => { localStorage.removeItem(STORAGE_KEY); location.reload(); });
+        if (refs.pickLocal) refs.pickLocal.addEventListener("click", pickLocalFolder);
+        if (refs.uploadToGithub) refs.uploadToGithub.addEventListener("click", uploadSelectedLocalToGithub);
+        if (refs.deleteLocalSelected) refs.deleteLocalSelected.addEventListener("click", deleteLocalBatch);
+        if (refs.deleteGithubSelected) refs.deleteGithubSelected.addEventListener("click", deleteGithubBatch);
+        if (refs.ghSelectAll) refs.ghSelectAll.addEventListener("click", selectAllGithub);
+        if (refs.ghClearSelection) refs.ghClearSelection.addEventListener("click", () => { ghState.selectedNodes.clear(); if (ghTreeRoot) renderGithubTree(ghTreeRoot); addLog("Cleared GitHub selection", "info"); });
+        if (refs.localSelectAll) refs.localSelectAll.addEventListener("click", selectAllLocal);
+        if (refs.localClearSelection) refs.localClearSelection.addEventListener("click", () => { localState.selectedNodes.clear(); renderLocalTree(); addLog("Cleared Local selection", "info"); });
+        if (refs.clearTargetFolder) refs.clearTargetFolder.addEventListener("click", () => setGithubTargetFolder(""));
+        if (refs.setRootFolder) refs.setRootFolder.addEventListener("click", () => setGithubTargetFolder(""));
+
+        // Persist config
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved && refs.ghOwner && refs.ghRepo && refs.ghBranch && refs.ghToken) {
+            try { 
+                const p = JSON.parse(saved); 
+                refs.ghOwner.value = p.owner || "informedia7"; 
+                refs.ghRepo.value = p.repo || "totilove"; 
+                refs.ghBranch.value = p.branch || "main"; 
+                refs.ghToken.value = p.token || ""; 
+            } catch(e) {}
+        }
+        const persist = () => {
+            if (refs.ghOwner && refs.ghRepo && refs.ghBranch && refs.ghToken) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({ 
+                    owner: refs.ghOwner.value, 
+                    repo: refs.ghRepo.value, 
+                    branch: refs.ghBranch.value, 
+                    token: refs.ghToken.value 
+                }));
+            }
+        };
+        if (refs.ghOwner) refs.ghOwner.addEventListener("input", persist);
+        if (refs.ghRepo) refs.ghRepo.addEventListener("input", persist);
+        if (refs.ghBranch) refs.ghBranch.addEventListener("input", persist);
+        if (refs.ghToken) refs.ghToken.addEventListener("input", persist);
+        
+        if (refs.ghToken && refs.ghToken.value.trim()) validateToken();
+        addLog("✅ Ready. Click folders to expand (they stay open!). Click files to preview.", "success");
+    })();
+</script>
+</body>
+</html>
