@@ -4,26 +4,7 @@
  */
 
 const redis = require('redis');
-const fs = require('fs');
-const path = require('path');
-
-function loadCSRFMiddleware() {
-    const candidatePaths = [
-        path.resolve(__dirname, '../../middleware/csrf'),
-        path.resolve(__dirname, '../middleware/csrf'),
-        path.resolve(process.cwd(), 'middleware/csrf')
-    ];
-
-    for (const candidate of candidatePaths) {
-        if (fs.existsSync(candidate) || fs.existsSync(`${candidate}.js`)) {
-            return require(candidate);
-        }
-    }
-
-    throw new Error(`CSRF middleware not found. Checked: ${candidatePaths.join(', ')}`);
-}
-
-const CSRFMiddleware = loadCSRFMiddleware();
+const CSRFMiddleware = require('../../middleware/csrf');
 
 /**
  * Setup Redis connection with clustering support
@@ -31,18 +12,22 @@ const CSRFMiddleware = loadCSRFMiddleware();
  */
 async function setupRedis() {
     const redisClient = redis.createClient({
-        host: process.env.REDIS_HOST || 'localhost',
-        port: process.env.REDIS_PORT || 6379,
+        socket: {
+            host: process.env.REDIS_HOST || 'localhost',
+            port: parseInt(process.env.REDIS_PORT || '6379', 10),
+            connectTimeout: 2000,
+            keepAlive: true,
+            noDelay: true,
+            family: 4
+        },
+        password: process.env.REDIS_PASSWORD || undefined,
+        username: process.env.REDIS_USER || undefined,
         lazyConnect: true,
         maxRetriesPerRequest: 1,
         retryDelayOnFailover: 50,
         enableReadyCheck: false,
         maxLoadingTimeout: 2000,
-        connectTimeout: 2000,
-        commandTimeout: 1000,
-        family: 4,
-        keepAlive: true,
-        noDelay: true
+        commandTimeout: 1000
     });
 
     redisClient.on('error', (err) => {
