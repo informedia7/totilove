@@ -3,7 +3,12 @@
  * Creates route-specific middleware (rate limiting, etc.)
  */
 
-const { statusReadLimiter } = require('../../routers/middleware/rateLimiter');
+let statusReadLimiter = null;
+try {
+    ({ statusReadLimiter } = require('../../routers/middleware/rateLimiter'));
+} catch (error) {
+    console.warn('⚠️ Optional statusReadLimiter unavailable, using in-file fallback limiter');
+}
 
 /**
  * Create rate limiting middleware for user status endpoints
