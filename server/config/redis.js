@@ -42,20 +42,23 @@ const CSRFMiddleware = loadCSRFMiddleware();
  * @returns {Promise<{redis: Object|null, csrfMiddleware: Object}>} Redis client and CSRF middleware
  */
 async function setupRedis() {
-    const redisClient = redis.createClient({
-        host: process.env.REDIS_HOST || 'localhost',
-        port: process.env.REDIS_PORT || 6379,
-        lazyConnect: true,
-        maxRetriesPerRequest: 1,
-        retryDelayOnFailover: 50,
-        enableReadyCheck: false,
-        maxLoadingTimeout: 2000,
-        connectTimeout: 2000,
-        commandTimeout: 1000,
-        family: 4,
-        keepAlive: true,
-        noDelay: true
-    });
+    const redisUrl = process.env.REDIS_URL;
+    const redisClient = redisUrl
+        ? redis.createClient({
+              url: redisUrl,
+              socket: {
+                  connectTimeout: 2000,
+                  reconnectStrategy: () => false
+              }
+          })
+        : redis.createClient({
+              socket: {
+                  host: process.env.REDIS_HOST || 'localhost',
+                  port: Number(process.env.REDIS_PORT || 6379),
+                  connectTimeout: 2000,
+                  reconnectStrategy: () => false
+              }
+          });
 
     redisClient.on('error', (err) => {
         // Redis warning - non-critical
@@ -63,7 +66,11 @@ async function setupRedis() {
 
     let connectedRedis = null;
     try {
-        await redisClient.connect();
+        const connectTimeoutMs = Number(process.env.REDIS_CONNECT_TIMEOUT_MS || 2500);
+        await Promise.race([
+            redisClient.connect(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('redis_connect_timeout')), connectTimeoutMs))
+        ]);
         
         // Configure Redis for high-load operations
         await redisClient.configSet('maxmemory-policy', 'allkeys-lru');
@@ -71,6 +78,13 @@ async function setupRedis() {
         connectedRedis = redisClient;
     } catch (error) {
         // Redis not available, using memory cache
+        try {
+            if (redisClient.isOpen) {
+                await redisClient.disconnect();
+            }
+        } catch (_) {
+            // ignore disconnect cleanup errors
+        }
         connectedRedis = null;
     }
     
