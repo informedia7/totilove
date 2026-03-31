@@ -1,9 +1,11 @@
 // Lightning-Fast Server - Modular Architecture
 const express = require('express');
+const fs = require('fs');
 const http = require('http');
 const socketIo = require('socket.io');
 const cluster = require('cluster');
 const os = require('os');
+const path = require('path');
 const { createClient: createRedisClient } = require('redis');
 const { createAdapter } = require('@socket.io/redis-adapter');
 
@@ -111,6 +113,24 @@ class Server {
     }
 
     registerBootstrapRoutes() {
+        this.app.get('/', (req, res, next) => {
+            if (this.bootState === 'ready') {
+                return next();
+            }
+
+            const indexPath = path.join(__dirname, 'app', 'pages', 'index.html');
+            if (fs.existsSync(indexPath)) {
+                return res.sendFile(indexPath);
+            }
+
+            return res.status(200).json({
+                ok: true,
+                state: this.bootState,
+                message: 'Application is starting',
+                timestamp: new Date().toISOString()
+            });
+        });
+
         this.app.get('/health', (_req, res) => {
             res.status(200).json({
                 ok: true,
@@ -199,6 +219,7 @@ class Server {
         this.monitoringUtils.startMonitoring();
         this.bootState = 'ready';
         this.initCompletedAt = new Date().toISOString();
+        console.log(`✅ Server initialization complete at ${this.initCompletedAt}`);
     }
 
     async configureSocketAdapter() {
