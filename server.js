@@ -301,10 +301,20 @@ class Server {
             return;
         }
 
+        // Do not block app startup when Redis is unavailable.
+        if (!this.redis) {
+            console.info('ℹ️ Socket.IO Redis adapter skipped (base Redis unavailable)');
+            return;
+        }
+
         try {
             const pubClient = createRedisClient(appConfig.redis);
             const subClient = pubClient.duplicate();
-            await Promise.all([pubClient.connect(), subClient.connect()]);
+            const connectTimeoutMs = Number(process.env.SOCKET_ADAPTER_CONNECT_TIMEOUT_MS || 2000);
+            await Promise.race([
+                Promise.all([pubClient.connect(), subClient.connect()]),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('adapter_connect_timeout')), connectTimeoutMs))
+            ]);
             this.io.adapter(createAdapter(pubClient, subClient));
             this.socketAdapterClients = { pubClient, subClient };
             this.socketAdapterEnabled = true;
