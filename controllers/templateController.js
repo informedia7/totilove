@@ -256,9 +256,9 @@ class TemplateController {
         // Resolve body art and english ability names when tables may vary
         if (!user.body_art_name && user.body_art_id) {
             user.body_art_name = await resolveLookupName(user.body_art_id, [
+                'user_body_art_types',
                 'user_body_art',
                 'user_body_arts',
-                'user_body_art_types',
                 'body_art',
                 'body_art_types'
             ]);
@@ -403,7 +403,7 @@ class TemplateController {
                 lookupTables: ['user_lifestyle_preferences', 'lifestyles']
             }),
             formatPreferenceDisplay(user.preferred_body_art, {
-                lookupTables: ['user_body_art', 'user_body_arts', 'body_art', 'body_art_types']
+                lookupTables: ['user_body_art_types', 'user_body_art', 'user_body_arts', 'body_art', 'body_art_types']
             }),
             formatPreferenceDisplay(user.preferred_english_ability, {
                 lookupTables: ['user_english_ability', 'user_english_abilities', 'english_ability', 'english_levels', 'language_ability']
