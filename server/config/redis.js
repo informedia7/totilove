@@ -42,14 +42,21 @@ const CSRFMiddleware = loadCSRFMiddleware();
  * @returns {Promise<{redis: Object|null, csrfMiddleware: Object}>} Redis client and CSRF middleware
  */
 async function setupRedis() {
-    const redisUrl = process.env.REDIS_URL || process.env.REDIS_PRIVATE_URL;
+    const redisUrl =
+        process.env.REDIS_URL ||
+        process.env.REDIS_PRIVATE_URL ||
+        process.env.REDIS_PUBLIC_URL ||
+        process.env.REDIS_URI ||
+        process.env.REDIS_CONNECTION_STRING;
     const redisClient = redis.createClient({
         ...(redisUrl ? { url: redisUrl } : {}),
-        ...(process.env.REDIS_PASSWORD ? { password: process.env.REDIS_PASSWORD } : {}),
-        database: Number(process.env.REDIS_DB || 0),
+        ...((process.env.REDIS_PASSWORD || process.env.REDISPASSWORD)
+            ? { password: process.env.REDIS_PASSWORD || process.env.REDISPASSWORD }
+            : {}),
+        database: Number(process.env.REDIS_DB || process.env.REDIS_DATABASE || 0),
         socket: {
-            host: process.env.REDIS_HOST || 'localhost',
-            port: Number(process.env.REDIS_PORT || 6379),
+            host: process.env.REDIS_HOST || process.env.REDISHOST || 'localhost',
+            port: Number(process.env.REDIS_PORT || process.env.REDISPORT || 6379),
             connectTimeout: Number(process.env.REDIS_CONNECT_TIMEOUT_MS || 5000),
             reconnectStrategy: () => false
         }

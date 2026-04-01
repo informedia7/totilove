@@ -30,17 +30,23 @@ module.exports = {
 
     // Redis Configuration
     redis: (() => {
-        const redisUrl = process.env.REDIS_URL || process.env.REDIS_PRIVATE_URL || null;
-        const host = process.env.REDIS_HOST || 'localhost';
-        const port = Number(process.env.REDIS_PORT || 6379);
-        const db = Number(process.env.REDIS_DB || 0);
+        const redisUrl =
+            process.env.REDIS_URL ||
+            process.env.REDIS_PRIVATE_URL ||
+            process.env.REDIS_PUBLIC_URL ||
+            process.env.REDIS_URI ||
+            process.env.REDIS_CONNECTION_STRING ||
+            null;
+        const host = process.env.REDIS_HOST || process.env.REDISHOST || 'localhost';
+        const port = Number(process.env.REDIS_PORT || process.env.REDISPORT || 6379);
+        const db = Number(process.env.REDIS_DB || process.env.REDIS_DATABASE || 0);
 
         return {
             // Keep both URL and host/port for compatibility across modules.
             url: redisUrl || undefined,
             host,
             port,
-            password: process.env.REDIS_PASSWORD || null,
+            password: process.env.REDIS_PASSWORD || process.env.REDISPASSWORD || null,
             db,
             socket: {
                 host,

@@ -13,14 +13,22 @@ class RedisManager {
         try {
             console.log('🔄 Setting up Redis cluster for 10K+ users...');
 
-            const redisUrl = process.env.REDIS_URL || process.env.REDIS_PRIVATE_URL || config.redis.url;
+            const redisUrl =
+                process.env.REDIS_URL ||
+                process.env.REDIS_PRIVATE_URL ||
+                process.env.REDIS_PUBLIC_URL ||
+                process.env.REDIS_URI ||
+                process.env.REDIS_CONNECTION_STRING ||
+                config.redis.url;
             const redisOptions = {
                 ...(redisUrl ? { url: redisUrl } : {}),
-                ...(config.redis.password ? { password: config.redis.password } : {}),
-                database: Number(config.redis.db || 0),
+                ...((process.env.REDIS_PASSWORD || process.env.REDISPASSWORD || config.redis.password)
+                    ? { password: process.env.REDIS_PASSWORD || process.env.REDISPASSWORD || config.redis.password }
+                    : {}),
+                database: Number(process.env.REDIS_DB || process.env.REDIS_DATABASE || config.redis.db || 0),
                 socket: {
-                    host: config.redis.host,
-                    port: Number(config.redis.port),
+                    host: process.env.REDIS_HOST || process.env.REDISHOST || config.redis.host,
+                    port: Number(process.env.REDIS_PORT || process.env.REDISPORT || config.redis.port),
                     connectTimeout: Number(process.env.REDIS_CONNECT_TIMEOUT_MS || 5000)
                 }
             };

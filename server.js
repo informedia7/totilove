@@ -308,14 +308,22 @@ class Server {
         }
 
         try {
-            const redisUrl = process.env.REDIS_URL || process.env.REDIS_PRIVATE_URL || appConfig.redis.url;
+            const redisUrl =
+                process.env.REDIS_URL ||
+                process.env.REDIS_PRIVATE_URL ||
+                process.env.REDIS_PUBLIC_URL ||
+                process.env.REDIS_URI ||
+                process.env.REDIS_CONNECTION_STRING ||
+                appConfig.redis.url;
             const redisOptions = {
                 ...(redisUrl ? { url: redisUrl } : {}),
-                ...(process.env.REDIS_PASSWORD ? { password: process.env.REDIS_PASSWORD } : {}),
-                database: Number(process.env.REDIS_DB || appConfig.redis.db || 0),
+                ...((process.env.REDIS_PASSWORD || process.env.REDISPASSWORD)
+                    ? { password: process.env.REDIS_PASSWORD || process.env.REDISPASSWORD }
+                    : {}),
+                database: Number(process.env.REDIS_DB || process.env.REDIS_DATABASE || appConfig.redis.db || 0),
                 socket: {
-                    host: process.env.REDIS_HOST || appConfig.redis.host || 'localhost',
-                    port: Number(process.env.REDIS_PORT || appConfig.redis.port || 6379),
+                    host: process.env.REDIS_HOST || process.env.REDISHOST || appConfig.redis.host || 'localhost',
+                    port: Number(process.env.REDIS_PORT || process.env.REDISPORT || appConfig.redis.port || 6379),
                     connectTimeout: Number(process.env.SOCKET_ADAPTER_CONNECT_TIMEOUT_MS || 5000)
                 }
             };
