@@ -1,0 +1,198 @@
+/* Talk Modals CSS */
+/* Modal styles for talk page */
+
+/* Block Confirmation Modal Styles */
+.block-confirm-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.block-confirm-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+}
+
+.block-confirm-content {
+    position: relative;
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 450px !important;
+    width: 90% !important;
+    box-sizing: border-box;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+    text-align: center;
+}
+
+@media (min-width: 500px) {
+    .block-confirm-content {
+        width: 450px !important;
+    }
+}
+
+/* Mobile optimizations for modals */
+@media (max-width: 768px) {
+    .block-confirm-content {
+        max-width: 225px;
+        width: 203px;
+        padding: 1rem;
+        margin: 1rem;
+    }
+
+    .block-confirm-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+        margin: 0 auto 0.75rem;
+    }
+
+    .block-confirm-title {
+        font-size: 0.75rem;
+        margin: 0.5rem 0 0.5rem;
+    }
+
+    .block-confirm-message {
+        font-size: 0.5rem;
+        line-height: 1.4;
+        margin-bottom: 1rem;
+    }
+
+    .block-confirm-actions {
+        flex-direction: row;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+
+    .block-confirm-cancel,
+    .block-confirm-yes {
+        flex: 1;
+        padding: 0.4rem 0.75rem;
+        font-size: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .block-confirm-content {
+        width: 95% !important;
+        padding: 1.25rem !important;
+        margin: 0.5rem !important;
+    }
+
+    .block-confirm-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+
+    .block-confirm-title {
+        font-size: 1.1rem;
+        margin: 0.75rem 0 0.5rem;
+    }
+
+    .block-confirm-message {
+        font-size: 0.85rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .block-confirm-cancel,
+    .block-confirm-yes {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.85rem;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.block-confirm-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, #d63031, #e74c3c);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+}
+
+.block-confirm-title {
+    font-size: 1.5rem;
+    color: #2d3436;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.block-confirm-message {
+    color: #636e72;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+}
+
+.block-confirm-message strong {
+    color: #2d3436;
+    font-weight: 600;
+}
+
+.block-confirm-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.block-confirm-cancel,
+.block-confirm-yes {
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.block-confirm-cancel {
+    background: #dfe6e9;
+    color: #2d3436;
+}
+
+.block-confirm-cancel:hover {
+    background: #b2bec3;
+}
+
+.block-confirm-yes {
+    background: linear-gradient(135deg, #d63031, #e74c3c);
+    color: white;
+}
+
+.block-confirm-yes:hover {
+    background: linear-gradient(135deg, #c0392b, #d63031);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(214, 48, 49, 0.3);
+}

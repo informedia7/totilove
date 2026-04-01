@@ -1,0 +1,112 @@
+{
+  "app": {
+    "name": "Totilove",
+    "tagline": "Tìm Kiếm Tình Yêu Vượt Biên Giới",
+    "description": "Kết nối với mọi người trên thế giới thông qua hệ thống ghép đôi thông minh"
+  },
+  "navigation": {
+    "home": "Trang Chủ",
+    "about": "Giới Thiệu",
+    "features": "Tính Năng", 
+    "pricing": "Bảng Giá",
+    "contact": "Liên Hệ",
+    "login": "Đăng Nhập",
+    "register": "Tham Gia Miễn Phí",
+    "profile": "Hồ Sơ",
+    "messages": "Tin Nhắn",
+    "matches": "Kết Nối",
+    "settings": "Cài Đặt",
+    "logout": "Đăng Xuất"
+  },
+  "hero": {
+    "title": "Tìm Kiếm Tình Yêu Vượt Biên Giới",
+    "subtitle": "Kết nối với mọi người trên thế giới thông qua hệ thống ghép đôi thông minh. Hỗ trợ hơn 25 ngôn ngữ, sở thích văn hóa và hệ thống đo lường ưa thích của bạn.",
+    "features": {
+      "languages": "25+ Ngôn Ngữ",
+      "matching": "Ghép Đôi Thông Minh", 
+      "security": "An Toàn & Bảo Mật",
+      "mobile": "Tối Ưu Di Động"
+    },
+    "cta": {
+      "primary": "Tham Gia Miễn Phí Ngay",
+      "secondary": "Tìm Hiểu Thêm"
+    }
+  },
+  "features": {
+    "title": "Tại Sao Chọn Totilove?",
+    "subtitle": "Nền tảng của chúng tôi kết hợp công nghệ tiên tiến với sự nhạy cảm văn hóa để giúp bạn tìm thấy những kết nối ý nghĩa trên toàn thế giới.",
+    "items": {
+      "languages": {
+        "title": "Hỗ Trợ Đa Ngôn Ngữ",
+        "description": "Kết nối bằng ngôn ngữ mẹ đẻ của bạn. Chúng tôi hỗ trợ hơn 25 ngôn ngữ thế giới với theo dõi độ thành thạo và sở thích ghép đôi văn hóa."
+      },
+      "matching": {
+        "title": "Thuật Toán Ghép Đôi Thông Minh", 
+        "description": "Hệ thống AI của chúng tôi xem xét ngôn ngữ chung, sở thích, nền tảng văn hóa và sở thích cá nhân để có tính tương thích tối ưu."
+      },
+      "interests": {
+        "title": "Kết Nối Dựa Trên Sở Thích",
+        "description": "Tìm những người chia sẻ đam mê của bạn. Từ thể thao đến nghệ thuật, công nghệ đến du lịch - kết nối qua những gì bạn yêu thích nhất."
+      },
+      "culture": {
+        "title": "Trí Tuệ Văn Hóa",
+        "description": "Tôn trọng sự khác biệt văn hóa với sở thích khu vực tự động, hệ thống đo lường và ghép đôi có ý thức văn hóa."
+      },
+      "privacy": {
+        "title": "Riêng Tư & Bảo Mật",
+        "description": "Sự an toàn của bạn là ưu tiên hàng đầu. Xác minh nâng cao, kiểm soát quyền riêng tư và nhắn tin bảo mật giữ thông tin cá nhân của bạn được bảo vệ."
+      },
+      "mobile": {
+        "title": "Tối Ưu Di Động",
+        "description": "Kết nối mọi lúc mọi nơi. Thiết kế đáp ứng của chúng tôi hoạt động hoàn hảo trên máy tính để bàn, máy tính bảng và thiết bị di động."
+      }
+    }
+  },
+  "showcase": {
+    "title": "Thể Hiện Bản Thân Hoàn Toàn",
+    "subtitle": "Chia sẻ ngôn ngữ, sở thích và sở thích của bạn theo cách cảm thấy tự nhiên nhất.",
+    "tabs": {
+      "languages": "Ngôn Ngữ",
+      "interests": "Sở Thích", 
+      "measurements": "Đo Lường"
+    },
+    "languages": {
+      "english": "Bản Ngữ, Thành Thạo, Nâng Cao",
+      "vietnamese": "Ngôn Ngữ Đông Nam Á",
+      "thai": "Họ Ngôn Ngữ Thanh Điệu",
+      "chinese": "Tiếng Trung Phổ Thông",
+      "more": "Phủ Sóng Toàn Cầu"
+    }
+  },
+  "cta": {
+    "title": "Sẵn Sàng Tìm Kiếm Người Bạn Đời Hoàn Hảo?",
+    "description": "Tham gia cùng hàng nghìn người trên thế giới đã tìm thấy tình yêu thông qua hệ thống ghép đôi thông minh, có ý thức văn hóa của chúng tôi.",
+    "primary": "Bắt Đầu Hành Trình",
+    "secondary": "Đăng Nhập"
+  },
+  "footer": {
+    "description": "Kết nối trái tim qua các nền văn hóa và lục địa. Tìm tình yêu vượt qua biên giới.",
+    "features": "Tính Năng",
+    "support": "Hỗ Trợ",
+    "legal": "Pháp Lý",
+    "copyright": "Bản quyền thuộc về. Được tạo với ❤️ cho tình yêu không biên giới."
+  },
+  "common": {
+    "save": "Lưu",
+    "cancel": "Hủy", 
+    "edit": "Chỉnh Sửa",
+    "delete": "Xóa",
+    "add": "Thêm",
+    "remove": "Gỡ Bỏ",
+    "close": "Đóng",
+    "next": "Tiếp Theo",
+    "previous": "Trước",
+    "loading": "Đang Tải...",
+    "error": "Đã xảy ra lỗi",
+    "success": "Thành Công!",
+    "search": "Tìm Kiếm...",
+    "filter": "Lọc",
+    "sort": "Sắp Xếp",
+    "clear": "Xóa"
+  }
+}

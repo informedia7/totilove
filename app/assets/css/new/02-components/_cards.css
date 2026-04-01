@@ -1,0 +1,508 @@
+/* ========================================
+   CARDS & UTILITY COMPONENTS
+   Extracted from: 
+   - app/assets/css/02-components.css
+   - app/assets/css/profile-edit.css
+   Migration Phase 1: Week 6
+   
+   This file contains generic card patterns and utility components.
+   Old files still exist and work - this is parallel extraction.
+   ======================================== */
+
+/* ===== GENERIC CARD PATTERNS ===== */
+.card-wrapper {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.5rem;
+    width: auto;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.card-header {
+    padding: var(--md, 1rem);
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    background: var(--bg-light, #f8f9fa);
+    border-radius: var(--r-md, 12px) var(--r-md, 12px) 0 0;
+}
+
+.card-title {
+    font-size: var(--f-lg, 1.125rem);
+    font-weight: 600;
+    color: var(--text-color, #333);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--sm, 0.5rem);
+}
+
+.card-title i {
+    color: var(--primary, #667eea);
+    font-size: 1.1rem;
+}
+
+.card-title-above {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 0.25rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.card-title-above i {
+    color: #667eea;
+    font-size: 1.1rem;
+}
+
+.card-content {
+    padding: var(--md, 1rem);
+    flex: 1;
+}
+
+.card-content-inner {
+    padding: 0;
+    width: auto;
+    min-width: 0;
+}
+
+.card-footer {
+    padding: var(--md, 1rem);
+    border-top: 1px solid var(--border-color, #e0e0e0);
+    background: var(--bg-light, #f8f9fa);
+    border-radius: 0 0 var(--r-md, 12px) var(--r-md, 12px);
+}
+
+/* Compact card variant */
+.inner-card.compact-card,
+.edit-card.compact-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+    width: auto;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.inner-card.compact-card:hover,
+.edit-card.compact-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+/* ===== EMPTY STATES ===== */
+#app-root .empty-state,
+#app-root .no-results,
+#app-root .empty-state-wrapper {
+    text-align: center;
+    padding: var(--xl, 2rem);
+    color: var(--text-muted, #777);
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: var(--md, 1rem);
+    opacity: 0.5;
+}
+
+.empty-state-title {
+    font-size: var(--f-xl, 1.25rem);
+    font-weight: 600;
+    color: var(--text-color, #333);
+    margin-bottom: var(--sm, 0.5rem);
+}
+
+.empty-state-message {
+    font-size: var(--f-md, 1rem);
+    color: var(--text-muted, #777);
+    margin-bottom: var(--lg, 1.5rem);
+}
+
+.empty-state-action {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sm, 0.5rem);
+}
+
+/* ===== BADGES & TAGS ===== */
+#app-root .badge,
+#app-root .tag,
+#app-root .age-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--xs, 0.25rem) var(--sm, 0.5rem);
+    border-radius: var(--r-full, 9999px);
+    font-size: var(--f-xs, 0.75rem);
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.badge-primary {
+    background: var(--primary, #667eea);
+    color: white;
+}
+
+.badge-secondary {
+    background: var(--secondary, #764ba2);
+    color: white;
+}
+
+.badge-success {
+    background: var(--success, #00b894);
+    color: white;
+}
+
+.badge-danger {
+    background: var(--danger, #d63031);
+    color: white;
+}
+
+.badge-warning {
+    background: var(--warning, #ffc107);
+    color: var(--text-color, #333);
+}
+
+.badge-info {
+    background: var(--info, #17a2b8);
+    color: white;
+}
+
+.badge-outline {
+    background: transparent;
+    border: 1px solid var(--border-color, #e0e0e0);
+    color: var(--text-color, #333);
+}
+
+/* ===== TABS ===== */
+#app-root .tab-btn,
+#app-root .tab-button {
+    min-height: var(--touch-target, 44px);
+    height: auto;
+    padding: var(--sm, 0.5rem) var(--md, 1rem);
+    border-radius: var(--r-md, 12px);
+    font-size: var(--f-md, 1rem);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition, all 0.3s ease);
+    box-sizing: border-box;
+    background: transparent;
+    border: none;
+    color: var(--text-muted, #777);
+}
+
+.tab-btn:hover,
+.tab-button:hover {
+    background: var(--bg-hover, #f5f5f5);
+    color: var(--text-color, #333);
+}
+
+.tab-btn.active,
+.tab-button.active {
+    background: var(--primary, #667eea);
+    color: white;
+    font-weight: 600;
+}
+
+.tab-group {
+    display: flex;
+    gap: var(--sm, 0.5rem);
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    margin-bottom: var(--md, 1rem);
+}
+
+.tab-group .tab-btn,
+.tab-group .tab-button {
+    border-radius: var(--r-md, 12px) var(--r-md, 12px) 0 0;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+}
+
+.tab-group .tab-btn.active,
+.tab-group .tab-button.active {
+    border-bottom-color: var(--primary, #667eea);
+}
+
+/* ===== DROPDOWNS ===== */
+#app-root .dropdown-toggle,
+#app-root .dropdown-btn {
+    min-height: var(--touch-target, 44px);
+    padding: var(--sm, 0.5rem) var(--md, 1rem);
+    border-radius: var(--r-md, 12px);
+    font-size: var(--f-md, 1rem);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sm, 0.5rem);
+    cursor: pointer;
+    transition: var(--transition, all 0.3s ease);
+    border: 1px solid var(--border-color, #e0e0e0);
+    background: var(--card, #fff);
+}
+
+.dropdown-toggle:hover,
+.dropdown-btn:hover {
+    border-color: var(--primary, #667eea);
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--card, #fff);
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: var(--r-md, 12px);
+    box-shadow: var(--shadow-lg, 0 8px 24px rgba(0, 0, 0, 0.2));
+    padding: var(--sm, 0.5rem);
+    z-index: var(--z-dropdown, 100);
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: var(--xs, 0.25rem);
+}
+
+#app-root .dropdown-item,
+#app-root .dropdown-content a {
+    min-height: var(--touch-target, 44px);
+    padding: var(--sm, 0.5rem) var(--md, 1rem);
+    display: flex;
+    align-items: center;
+    gap: var(--sm, 0.5rem);
+    border-radius: var(--r-md, 12px);
+    cursor: pointer;
+    transition: var(--transition, all 0.3s ease);
+    text-decoration: none;
+    color: var(--text-color, #333);
+}
+
+.dropdown-item:hover,
+.dropdown-content a:hover {
+    background: var(--bg-hover, #f5f5f5);
+    color: var(--primary, #667eea);
+}
+
+.dropdown-item.active,
+.dropdown-content a.active {
+    background: rgba(102, 126, 234, 0.1);
+    color: var(--primary, #667eea);
+    font-weight: 500;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: var(--border-color, #e0e0e0);
+    margin: var(--sm, 0.5rem) 0;
+}
+
+/* ===== NOTIFICATIONS & ALERTS ===== */
+#app-root .notification,
+#app-root .alert,
+#app-root .toast {
+    padding: var(--md, 1rem);
+    border-radius: var(--r-md, 12px);
+    margin-bottom: var(--sm, 0.5rem);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sm, 0.5rem);
+    box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.15));
+    min-height: var(--touch-target, 44px);
+    position: relative;
+}
+
+.notification-success,
+.alert-success {
+    background: rgba(0, 184, 148, 0.1);
+    border-left: 4px solid var(--success, #00b894);
+    color: #155724;
+}
+
+.notification-error,
+.alert-error,
+.notification-danger,
+.alert-danger {
+    background: rgba(214, 48, 49, 0.1);
+    border-left: 4px solid var(--danger, #d63031);
+    color: #721c24;
+}
+
+.notification-warning,
+.alert-warning {
+    background: rgba(255, 193, 7, 0.1);
+    border-left: 4px solid var(--warning, #ffc107);
+    color: #856404;
+}
+
+.notification-info,
+.alert-info {
+    background: rgba(23, 162, 184, 0.1);
+    border-left: 4px solid var(--info, #17a2b8);
+    color: #0c5460;
+}
+
+.notification-icon,
+.alert-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.notification-content,
+.alert-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-title,
+.alert-title {
+    font-weight: 600;
+    margin-bottom: var(--xs, 0.25rem);
+}
+
+.notification-message,
+.alert-message {
+    font-size: var(--f-sm, 0.875rem);
+    line-height: 1.5;
+}
+
+#app-root .notification-close,
+#app-root .alert-close {
+    min-width: var(--touch-target, 44px);
+    min-height: var(--touch-target, 44px);
+    padding: var(--xs, 0.25rem);
+    border-radius: var(--r-sm, 8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    margin-left: auto;
+    transition: var(--transition, all 0.3s ease);
+    color: inherit;
+    opacity: 0.7;
+}
+
+.notification-close:hover,
+.alert-close:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* Toast positioning */
+.toast {
+    position: fixed;
+    top: var(--md, 1rem);
+    right: var(--md, 1rem);
+    z-index: var(--z-tooltip, 700);
+    max-width: 400px;
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .card-wrapper {
+        margin-bottom: 1rem;
+    }
+
+    .card-header,
+    .card-content,
+    .card-footer {
+        padding: var(--sm, 0.5rem);
+    }
+
+    .card-title {
+        font-size: var(--f-md, 1rem);
+    }
+
+    .tab-group {
+        flex-wrap: wrap;
+        gap: var(--xs, 0.25rem);
+    }
+
+    .tab-btn,
+    .tab-button {
+        font-size: var(--f-sm, 0.875rem);
+        padding: var(--xs, 0.25rem) var(--sm, 0.5rem);
+    }
+
+    .dropdown-menu {
+        max-width: 100%;
+        left: 0;
+        right: 0;
+    }
+
+    .toast {
+        left: var(--sm, 0.5rem);
+        right: var(--sm, 0.5rem);
+        max-width: none;
+    }
+
+    .empty-state-icon {
+        font-size: 2rem;
+    }
+
+    .empty-state-title {
+        font-size: var(--f-lg, 1.125rem);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

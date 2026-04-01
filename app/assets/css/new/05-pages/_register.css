@@ -1,0 +1,601 @@
+/**
+ * Register Page Styles
+ * Extracted from register.html - Phase 1 CSS Extraction
+ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 8px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    height: var(--global-nav-height, 60px);
+    min-height: var(--global-nav-height, 60px);
+    padding: 0 30px;
+    text-align: center;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.header h1 {
+    font-size: 1.2rem;
+    margin-bottom: 0;
+    line-height: 1.2;
+}
+
+.header p {
+    opacity: 0.9;
+    font-size: 0.95rem;
+    line-height: 1.2;
+}
+
+.content {
+    padding: 12px;
+}
+
+.welcome-card {
+    background: white;
+    border-radius: 15px;
+    padding: 14px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.welcome-card.half-width {
+    max-width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cards-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+@media (max-width: 768px) {
+    .welcome-card.half-width {
+        max-width: 100%;
+    }
+    .cards-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.welcome-card h2 {
+    color: #667eea;
+    margin-bottom: 12px;
+    font-size: 1.05rem;
+}
+
+.welcome-card p {
+    color: #666;
+    line-height: 1.6;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.5rem;
+    min-height: 40px;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 8px 10px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.form-control.error, .form-select.error, input.error, select.error {
+    border-color: #dc3545;
+}
+
+.form-control.success, .form-select.success {
+    border-color: #28a745;
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: block;
+}
+
+.success-message {
+    color: #28a745;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: block;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.form-footer {
+    text-align: center;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.form-footer a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.form-footer a:hover {
+    text-decoration: underline;
+}
+
+.password-requirements {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.password-requirements ul {
+    margin: 0.5rem 0 0 1rem;
+    color: #666;
+}
+
+.password-requirements .valid {
+    color: #28a745;
+}
+
+.password-requirements .invalid {
+    color: #dc3545;
+}
+
+/* Notification System */
+.notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 3001;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 400px;
+}
+
+.notification {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 1rem 1.25rem;
+    border-left: 4px solid #667eea;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-width: 300px;
+}
+
+.notification.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.notification i:first-child {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.notification-message {
+    font-size: 0.875rem;
+    color: #333;
+    line-height: 1.4;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.notification-close:hover {
+    background: #f8f9fa;
+    color: #333;
+}
+
+.notification-success {
+    border-left-color: #28a745;
+}
+
+.notification-success i:first-child {
+    color: #28a745;
+}
+
+.notification-error {
+    border-left-color: #dc3545;
+}
+
+.notification-error i:first-child {
+    color: #dc3545;
+}
+
+.notification-warning {
+    border-left-color: #f59e0b;
+}
+
+.notification-warning i:first-child {
+    color: #f59e0b;
+}
+
+.notification-info {
+    border-left-color: #667eea;
+}
+
+.notification-info i:first-child {
+    color: #667eea;
+}
+
+.password-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.password-input-container .register-form-input {
+    flex: 1;
+    width: auto;
+}
+
+.password-toggle {
+    position: static;
+    transform: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    font-size: 1.1rem;
+    padding: 5px;
+    transition: color 0.3s ease;
+}
+
+.password-toggle:hover {
+    color: #667eea;
+}
+
+.password-toggle:focus {
+    outline: none;
+    color: #667eea;
+}
+
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    .welcome-card[style*="max-width: calc(50% - 12px)"] {
+        max-width: 100% !important;
+    }
+}
+
+/* Always reserve space for state/city dropdowns */
+#state-container, #city-container {
+    position: relative;
+    min-height: 80px;
+    width: 100%;
+}
+
+#state-container[style*="display: none"], #city-container[style*="display: none"] {
+    visibility: hidden !important;
+    position: absolute !important;
+}
+
+/* ============================================
+   Inline Style Extraction - Phase 2
+   Classes to replace inline styles in register.html
+   ============================================ */
+
+/* Form Input Styles - Replace inline input styles */
+.register-form-input {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* Form Label Styles - Replace inline label styles */
+.register-form-label {
+    display: block;
+    margin-bottom: 6px;
+    color: #333;
+    font-weight: 500;
+}
+
+/* Info Button Styles - Replace inline info button styles */
+.info-button {
+    background: none;
+    border: none;
+    color: #667eea;
+    cursor: pointer;
+    margin-left: 8px;
+    font-size: 16px;
+    padding: 0;
+    position: relative;
+}
+
+.info-button:hover {
+    color: #5568d3;
+}
+
+.info-button:focus {
+    outline: none;
+    color: #5568d3;
+}
+
+/* Tooltip/Popup Styles - Replace inline tooltip styles */
+.tooltip-popup {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    z-index: 1000;
+    background: #667eea;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    max-width: 400px;
+    min-width: 280px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    line-height: 1.4;
+}
+
+.tooltip-popup.show {
+    display: block;
+}
+
+.tooltip-popup.tooltip-popup-wide {
+    min-width: 320px;
+}
+
+#genderInfo {
+    left: -35px;
+}
+
+.tooltip-popup-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.tooltip-popup-icon {
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    margin-top: 0.05rem;
+}
+
+.tooltip-popup-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.tooltip-popup-list {
+    margin: 0;
+    padding-left: 1.2rem;
+    list-style: none;
+}
+
+.tooltip-popup-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.tooltip-popup-item:last-child {
+    margin-bottom: 0;
+}
+
+.tooltip-popup-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.tooltip-popup-indicator.valid {
+    background: #28a745;
+}
+
+.tooltip-popup-indicator.invalid {
+    background: #dc3545;
+}
+
+.tooltip-popup-arrow {
+    position: absolute;
+    top: 100%;
+    left: 20px;
+    border: 6px solid transparent;
+    border-top-color: #667eea;
+}
+
+/* Submit Button Styles - Replace inline submit button styles */
+.submit-button {
+    padding: 10px 24px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    max-width: 400px;
+    transition: background 0.3s ease;
+}
+
+.submit-button:hover {
+    background: #5568d3;
+}
+
+.submit-button:focus {
+    outline: none;
+    background: #5568d3;
+}
+
+/* Small Helper Text - Replace inline small text styles */
+.helper-text {
+    display: block;
+    margin-top: 0.25rem;
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+/* Form Group Wrapper - Replace inline wrapper styles */
+.form-group-wrapper {
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.form-group-wrapper.form-group-wrapper-large {
+    margin-bottom: 10px;
+}
+
+/* Button Container Styles */
+.button-container {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+}
+
+/* Welcome Card with Max Width */
+.welcome-card.max-width-center {
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+@media (max-width: 768px) {
+    .welcome-card.max-width-center {
+        max-width: 100%;
+    }
+}
+
+
+

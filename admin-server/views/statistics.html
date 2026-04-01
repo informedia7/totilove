@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics & Analytics - Totilove Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <script src="/js/chart.umd.min.js"></script>
+    <style>
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stat-box h4 {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        .stat-box .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none;">← Back to Dashboard</a>
+                <form method="POST" action="/logout" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+            <h1>📊 Statistics & Analytics</h1>
+            <p>View comprehensive statistics, growth metrics, and activity analytics</p>
+        </div>
+        
+        <div class="content">
+            <!-- Date Range Selector -->
+            <div class="date-range-selector">
+                <button class="active" onclick="changeDateRange('7d', event)">Last 7 Days</button>
+                <button onclick="changeDateRange('30d', event)">Last 30 Days</button>
+                <button onclick="changeDateRange('90d', event)">Last 90 Days</button>
+                <button onclick="changeDateRange('1y', event)">Last Year</button>
+            </div>
+
+            <!-- Dashboard Overview Stats -->
+            <div class="stats-overview" id="dashboardStats">
+                <!-- Stats will be loaded here -->
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('overview', event)">Overview</button>
+                <button class="tab-btn" onclick="switchTab('users', event)">Users</button>
+                <button class="tab-btn" onclick="switchTab('activity', event)">Activity</button>
+                <button class="tab-btn" onclick="switchTab('growth', event)">Growth</button>
+                <button class="tab-btn" onclick="switchTab('quality', event)">Quality</button>
+            </div>
+
+            <!-- Overview Tab -->
+            <div class="tab-content active" id="overviewTab">
+                <div class="chart-container">
+                    <h3>User Growth</h3>
+                    <canvas id="userGrowthChart"></canvas>
+                </div>
+                <div class="chart-grid">
+                    <div class="chart-container">
+                        <h3>Gender Distribution</h3>
+                        <canvas id="genderChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Age Distribution</h3>
+                        <canvas id="ageChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>Top Countries</h3>
+                    <canvas id="countriesChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Users Tab -->
+            <div class="tab-content" id="usersTab">
+                <div class="chart-container">
+                    <h3>User Growth Over Time</h3>
+                    <canvas id="userGrowthTimeChart"></canvas>
+                </div>
+                <div class="chart-grid">
+                    <div class="chart-container">
+                        <h3>Activity Distribution</h3>
+                        <canvas id="activityDistributionChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Profile Completeness</h3>
+                        <canvas id="completenessChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Tab -->
+            <div class="tab-content" id="activityTab">
+                <div class="chart-container">
+                    <h3>Daily Activity Trends</h3>
+                    <canvas id="dailyActivityChart"></canvas>
+                </div>
+                <div class="chart-grid">
+                    <div class="chart-container">
+                        <h3>Messages Over Time</h3>
+                        <canvas id="messagesChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Likes Over Time</h3>
+                        <canvas id="likesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Growth Tab -->
+            <div class="tab-content" id="growthTab">
+                <div class="chart-container">
+                    <h3>Daily User Growth</h3>
+                    <canvas id="dailyGrowthChart"></canvas>
+                </div>
+                <div class="chart-grid">
+                    <div class="chart-container">
+                        <h3>Weekly User Growth</h3>
+                        <canvas id="weeklyGrowthChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Monthly User Growth</h3>
+                        <canvas id="monthlyGrowthChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quality Tab -->
+            <div class="tab-content" id="qualityTab">
+                <div class="stats-overview" id="qualityStats">
+                    <!-- Quality stats will be loaded here -->
+                </div>
+                <div class="chart-container">
+                    <h3>Quality Metrics Overview</h3>
+                    <canvas id="qualityMetricsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/admin-statistics.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

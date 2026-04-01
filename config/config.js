@@ -1,0 +1,168 @@
+// Centralized configuration for Lightning Server
+require('dotenv').config();
+
+module.exports = {
+    // Server Configuration
+    server: {
+        port: process.env.PORT || 3001,
+        host: process.env.HOST || 'localhost',
+        environment: process.env.NODE_ENV || 'development',
+        cluster: process.env.ENABLE_CLUSTER === 'true',
+        maxConcurrentUsers: 10000,
+        loadThreshold: 8000
+    },
+
+    // Database Configuration
+    database: {
+        connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.POSTGRESQL_URL || null,
+        host: process.env.DB_HOST || process.env.PGHOST || 'localhost',
+        port: Number(process.env.DB_PORT || process.env.PGPORT || 5432),
+        database: process.env.DB_NAME || process.env.PGDATABASE || 'totilove',
+        user: process.env.DB_USER || process.env.PGUSER || 'postgres',
+        password: process.env.DB_PASSWORD || process.env.PGPASSWORD || 'password',
+        max: 20,
+        idleTimeoutMillis: 30010,
+        connectionTimeoutMillis: 2000,
+        ssl: process.env.DB_SSL === 'true' || process.env.PGSSLMODE === 'require'
+            ? { rejectUnauthorized: false }
+            : false
+    },
+
+    // Redis Configuration
+    redis: (() => {
+        const redisUrl =
+            process.env.REDIS_URL ||
+            process.env.REDIS_PRIVATE_URL ||
+            process.env.REDIS_PUBLIC_URL ||
+            process.env.REDIS_URI ||
+            process.env.REDIS_CONNECTION_STRING ||
+            null;
+        const host = process.env.REDIS_HOST || process.env.REDISHOST || 'localhost';
+        const port = Number(process.env.REDIS_PORT || process.env.REDISPORT || 6379);
+        const db = Number(process.env.REDIS_DB || process.env.REDIS_DATABASE || 0);
+
+        return {
+            // Keep both URL and host/port for compatibility across modules.
+            url: redisUrl || undefined,
+            host,
+            port,
+            password: process.env.REDIS_PASSWORD || process.env.REDISPASSWORD || null,
+            db,
+            socket: {
+                host,
+                port,
+                connectTimeout: Number(process.env.REDIS_CONNECT_TIMEOUT_MS || 5000)
+            },
+            retryDelayOnFailover: 100,
+            enableReadyCheck: false,
+            maxRetriesPerRequest: null
+        };
+    })(),
+
+    // WebSocket Configuration
+    websocket: {
+        cors: {
+            origin: "*",
+            methods: ["GET", "POST"]
+        },
+        pingTimeout: 30010,
+        pingInterval: 12000,
+        maxHttpBufferSize: 1e6,
+        transports: ['websocket', 'polling'],
+        perMessageDeflate: {
+            zlibDeflateOptions: {
+                level: 1,
+                windowBits: 13,
+            },
+            threshold: 1024,
+            concurrencyLimit: 20,
+        },
+        allowEIO3: true
+    },
+
+    // Session Configuration
+    session: {
+        secret: process.env.SESSION_SECRET || 'lightning-secret-key',
+        duration: 2 * 60 * 60 * 1000, // 2 hours
+        cleanupInterval: 5 * 60 * 1000 // 5 minutes
+    },
+
+    // Rate Limiting Configuration
+    rateLimit: {
+        windowMs: 60 * 1000, // 1 minute
+        maxRequests: 200,
+        highLoadMaxRequests: 100,
+        skipSuccessfulRequests: false,
+        skipFailedRequests: false
+    },
+
+    // Template Configuration
+    template: {
+        basePath: './templates',
+        pagesPath: './app/pages',
+        layoutsPath: './templates/layouts',
+        componentsPath: './templates/components',
+        cacheEnabled: true,
+        cacheDuration: 5 * 60 * 1000 // 5 minutes
+    },
+
+    // Analytics Configuration
+    analytics: {
+        enabled: true,
+        batchSize: 10,
+        flushInterval: 30 * 1000, // 30 seconds
+        tableName: 'analytics_events'
+    },
+
+    // Performance Monitoring
+    monitoring: {
+        enabled: true,
+        metricsInterval: 10 * 1000, // 10 seconds
+        memoryThreshold: 0.8, // 80% memory usage
+        cpuThreshold: 0.7, // 70% CPU usage
+        cleanupInterval: 60 * 1000 // 1 minute
+    },
+
+    // Security Configuration
+    security: {
+        bcryptRounds: 12,
+        jwtSecret: process.env.JWT_SECRET || 'jwt-secret-key',
+        jwtExpiresIn: '1h',
+        corsOrigins: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['*']
+    },
+
+    // File Upload Configuration
+    upload: {
+        maxFileSize: 5 * 1024 * 1024, // 5MB
+        allowedTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+        uploadPath: './public/uploads/profile_images',
+        tempPath: './temp'
+    },
+
+    // Logging Configuration
+    logging: {
+        level: process.env.LOG_LEVEL || 'info',
+        format: process.env.LOG_FORMAT || 'combined',
+        file: process.env.LOG_FILE || null,
+        console: true
+    },
+
+    // Email Configuration
+    email: {
+        enabled: process.env.EMAIL_ENABLED === 'true',
+        smtp: {
+            host: process.env.SMTP_HOST || 'smtp.gmail.com',
+            port: parseInt(process.env.SMTP_PORT || '587'),
+            secure: process.env.SMTP_SECURE === 'true',
+            user: process.env.SMTP_USER || '',
+            password: process.env.SMTP_PASSWORD || '',
+            fromName: process.env.SMTP_FROM_NAME || 'Totilove'
+        },
+        resend: {
+            apiKey: process.env.RESEND_API_KEY || '',
+            fromEmail: process.env.RESEND_FROM_EMAIL || process.env.EMAIL_FROM || ''
+        },
+        baseUrl: process.env.BASE_URL || 'http://localhost:3001',
+        tokenExpiry: 24 * 60 * 60 * 1000 // 24 hours in milliseconds
+    }
+}; 
