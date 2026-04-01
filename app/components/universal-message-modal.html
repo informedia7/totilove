@@ -30,8 +30,10 @@
                         <i class="fas fa-smile"></i>
                     </button>
                 </div>
-                <div class="rich-text-editor" id="messageModalEditor" contenteditable="true" placeholder="Write your message here..."></div>
-                <div id="messageModalCharCount" style="text-align:right;font-size:0.95rem;color:#888;margin-top:4px;">0/1000</div>
+                <div class="rich-text-editor" id="messageModalEditor" contenteditable="true"
+                    placeholder="Write your message here..."></div>
+                <div id="messageModalCharCount" style="text-align:right;font-size:0.95rem;color:#888;margin-top:4px;">
+                    0/1000</div>
                 <textarea class="form-input form-textarea" id="messageModalContent" style="display: none;"></textarea>
             </div>
         </div>
@@ -113,7 +115,6 @@
         max-height: 80vh;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     }
 
@@ -152,15 +153,12 @@
         display: flex;
         flex-direction: column;
         gap: 1rem;
-        min-height: 0;
-        overflow-y: auto;
     }
 
     .form-group {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
-        min-height: 0;
     }
 
     .form-label {
@@ -211,7 +209,6 @@
 
     .rich-text-editor {
         min-height: 150px;
-        max-height: 35vh;
         padding: 1rem;
         border: 1px solid #ddd;
         border-radius: 0 0 8px 8px;
@@ -232,8 +229,6 @@
         gap: 1rem;
         padding: 1.5rem;
         border-top: 1px solid #eee;
-        flex-shrink: 0;
-        background: #fff;
     }
 
     .cancel-btn {
@@ -434,6 +429,7 @@
             transform: translateX(100%);
             opacity: 0;
         }
+
         to {
             transform: translateX(0);
             opacity: 1;
@@ -459,7 +455,7 @@
     }
 
     // Universal Message Modal Functions
-    window.openUniversalMessageModal = async function(recipient, isReply = false, messageId = null, onSuccess = null, onError = null) {
+    window.openUniversalMessageModal = async function (recipient, isReply = false, messageId = null, onSuccess = null, onError = null) {
         // Check email verification before opening modal
         if (window.checkEmailVerificationStatus) {
             const isVerified = await window.checkEmailVerificationStatus();
@@ -468,7 +464,7 @@
                 return;
             }
         }
-        
+
         universalMessageData = {
             recipient: recipient,
             isReply: isReply,
@@ -476,14 +472,14 @@
             onSuccess: onSuccess,
             onError: onError
         };
-        
+
         // Set recipient name
         document.getElementById('messageModalRecipient').textContent = recipient;
-        
+
         // Update modal title and button text
         const modalTitle = document.getElementById('messageModalTitle');
         const sendBtnText = document.getElementById('messageModalSendBtnText');
-        
+
         if (isReply) {
             modalTitle.textContent = 'Reply to Message';
             sendBtnText.textContent = 'Send Reply';
@@ -491,17 +487,17 @@
             modalTitle.textContent = 'Send New Message';
             sendBtnText.textContent = 'Send Message';
         }
-        
+
         // Clear previous content
         document.getElementById('messageModalEditor').innerHTML = '';
         document.getElementById('messageModalContent').value = '';
         document.getElementById('messageModalCharCount').textContent = '0/1000';
-        
+
         // Show modal
         const modal = document.getElementById('universalMessageModal');
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
-        
+
         // Focus on editor
         setTimeout(() => {
             document.getElementById('messageModalEditor').focus();
@@ -512,7 +508,7 @@
         const modal = document.getElementById('universalMessageModal');
         modal.style.display = 'none';
         document.body.style.overflow = '';
-        
+
         // Reset data
         universalMessageData = {
             recipient: '',
@@ -527,82 +523,82 @@
         const editor = document.getElementById('messageModalEditor');
         const content = editor.innerHTML.trim();
         const charCount = document.getElementById('messageModalCharCount');
-        
+
         if (!content || content === '') {
             showUniversalToast('Please enter a message', 'error');
             return;
         }
-        
+
         if (content.length > 1000) {
             showUniversalToast('Message too long (max 1000 characters)', 'error');
             return;
         }
-        
+
         // Get current user ID from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const currentUserId = urlParams.get('currentUser');
-        
+
         if (!currentUserId || !universalMessageData.recipient) {
             showUniversalToast('Please log in to send messages', 'error');
             return;
         }
-        
-                            // Note: Self-message prevention is handled by the server-side API
+
+        // Note: Self-message prevention is handled by the server-side API
         // The server will return an error if user tries to message themselves
-        
+
         try {
             // Disable send button
             const sendBtn = document.querySelector('.send-btn');
             sendBtn.disabled = true;
             sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-            
+
             // Prepare request data
             const requestData = {
                 receiverUsername: universalMessageData.recipient,
                 content: content,
                 senderId: currentUserId
             };
-            
+
             // Send message via API
             const response = await window.sessionManager.apiRequest('/api/messages/send', {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'x-user-id': currentUserId
                 },
                 body: JSON.stringify(requestData)
             });
-            
+
             if (response.ok) {
                 const data = await response.json();
                 if (data.success) {
                     // Show success confirmation
                     const receiverName = universalMessageData.recipient;
                     const isReply = universalMessageData.isReply;
-                    
+
                     showUniversalToast(`✅ ${isReply ? 'Reply' : 'Message'} sent successfully to ${receiverName}!`, 'success');
-                    
+
                     // Show confirmation modal
                     showUniversalMessageConfirmation(receiverName, isReply);
-                    
+
                     // Call success callback if provided
                     if (universalMessageData.onSuccess) {
                         universalMessageData.onSuccess(data);
                     }
-                    
+
                     closeUniversalMessageModal();
                 } else {
                     throw new Error(data.message || data.error || 'Failed to send message');
                 }
             } else {
                 const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-                
+
                 // Check for email verification error
                 if (errorData.requiresEmailVerification || errorData.code === 'EMAIL_VERIFICATION_REQUIRED') {
                     showUniversalToast('📧 Please verify your email address to send messages. Check your inbox for the verification email.', 'warning');
                     return;
                 }
-                
+
                 throw new Error(errorData.error || errorData.message || `HTTP ${response.status}: Failed to send message`);
             }
         } catch (error) {
@@ -612,7 +608,7 @@
             } else {
                 showUniversalToast('Failed to send message. Please try again.', 'error');
             }
-            
+
             // Call error callback if provided
             if (universalMessageData.onError) {
                 universalMessageData.onError(error);
@@ -636,7 +632,7 @@
     function updateModalToolbarState() {
         const editor = document.getElementById('messageModalEditor');
         const toolbar = document.querySelector('.rich-text-toolbar');
-        
+
         // Update toolbar button states
         toolbar.querySelectorAll('.toolbar-btn').forEach(btn => {
             const command = btn.getAttribute('onclick')?.match(/formatModalText\('(\w+)'\)/)?.[1];
@@ -648,13 +644,13 @@
                 }
             }
         });
-        
+
         // Update character count
         const content = editor.textContent || editor.innerText || '';
         const charCount = document.getElementById('messageModalCharCount');
         const count = content.length;
         charCount.textContent = `${count}/1000`;
-        
+
         // Update hidden textarea for form submission
         document.getElementById('messageModalContent').value = editor.innerHTML;
     }
@@ -664,33 +660,33 @@
         console.log('Opening universal emoji picker...');
         const modal = document.getElementById('universalEmojiPickerModal');
         const grid = document.getElementById('universalEmojiGrid');
-        
+
         if (!modal || !grid) {
             console.error('Universal emoji picker elements not found');
             return;
         }
-        
+
         // Populate emoji grid
         const emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠', '💩', '👻', '💀', '☠️', '👽', '👾', '🤖', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾', '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '👍', '👎', '👌', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '👋', '🤚', '🖐️', '✋', '🖖', '👌', '🤌', '🤏', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '👋', '🤚', '🖐️', '✋', '🖖', '👌', '🤌', '🤏'];
-        
+
         // Clear previous content and add emojis
         grid.innerHTML = '';
         emojis.forEach(emoji => {
             const emojiDiv = document.createElement('div');
             emojiDiv.className = 'emoji-item';
             emojiDiv.textContent = emoji;
-            emojiDiv.addEventListener('click', function(e) {
+            emojiDiv.addEventListener('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
                 insertUniversalEmoji(emoji);
             });
             grid.appendChild(emojiDiv);
         });
-        
+
         // Show modal
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
-        
+
         console.log('Universal emoji picker opened successfully');
     }
 
@@ -704,13 +700,13 @@
 
     function insertUniversalEmoji(emoji) {
         const editor = document.getElementById('messageModalEditor');
-        
+
         // Ensure the editor is focused
         editor.focus();
-        
+
         // Get current selection
         const selection = window.getSelection();
-        
+
         if (selection.rangeCount > 0) {
             // Insert at cursor position
             const range = selection.getRangeAt(0);
@@ -726,7 +722,7 @@
             // Insert at end if no selection
             const textNode = document.createTextNode(emoji);
             editor.appendChild(textNode);
-            
+
             // Set cursor after the emoji
             const range = document.createRange();
             range.setStartAfter(textNode);
@@ -734,16 +730,16 @@
             selection.removeAllRanges();
             selection.addRange(range);
         }
-        
+
         // Update the toolbar and character count
         updateModalToolbarState();
-        
+
         // Hide the emoji picker
         hideUniversalEmojiPicker();
-        
+
         // Keep focus on editor
         editor.focus();
-        
+
         console.log('Universal emoji inserted successfully:', emoji);
     }
 
@@ -758,11 +754,11 @@
         receiverEl.textContent = receiverName;
         timestampEl.textContent = new Date().toLocaleString();
         confirmationTitle.textContent = isReply ? 'Reply Sent Successfully!' : 'Message Sent Successfully!';
-        
+
         // Show modal
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
-        
+
         // Auto-hide after 5 seconds
         setTimeout(() => {
             if (modal.style.display === 'flex') {
@@ -798,14 +794,14 @@
             align-items: center;
             gap: 0.5rem;
         `;
-        
+
         toast.innerHTML = `
             <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
             <span>${message}</span>
         `;
-        
+
         document.body.appendChild(toast);
-        
+
         // Auto remove after 5 seconds
         setTimeout(() => {
             if (toast.parentNode) {
@@ -815,31 +811,31 @@
     }
 
     // Initialize universal modal event listeners
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // Universal message modal outside click
         const universalModal = document.getElementById('universalMessageModal');
         if (universalModal) {
-            universalModal.addEventListener('click', function(e) {
+            universalModal.addEventListener('click', function (e) {
                 if (e.target === this) closeUniversalMessageModal();
             });
         }
-        
+
         // Universal emoji picker outside click
         const universalEmojiModal = document.getElementById('universalEmojiPickerModal');
         if (universalEmojiModal) {
-            universalEmojiModal.addEventListener('click', function(e) {
+            universalEmojiModal.addEventListener('click', function (e) {
                 if (e.target === this) hideUniversalEmojiPicker();
             });
-            
+
             // Prevent clicks inside the emoji picker from closing it
             const emojiPicker = universalEmojiModal.querySelector('.universal-emoji-picker');
             if (emojiPicker) {
-                emojiPicker.addEventListener('click', function(e) {
+                emojiPicker.addEventListener('click', function (e) {
                     e.stopPropagation();
                 });
             }
         }
-        
+
         // Universal rich text editor event listeners
         const universalEditor = document.getElementById('messageModalEditor');
         if (universalEditor) {
@@ -847,9 +843,9 @@
             universalEditor.addEventListener('keyup', updateModalToolbarState);
             universalEditor.addEventListener('mouseup', updateModalToolbarState);
         }
-        
+
         // Close modals with Escape key
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 if (universalModal && universalModal.style.display === 'flex') {
                     closeUniversalMessageModal();
@@ -860,4 +856,4 @@
             }
         });
     });
-</script> 
+</script>

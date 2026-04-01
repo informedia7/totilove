@@ -1,5 +1,6 @@
 <!-- Universal Message Modal Component -->
-<div class="universal-message-modal" id="universalMessageModal" role="dialog" aria-modal="true" aria-labelledby="messageModalTitle" aria-describedby="messageModalContent" tabindex="-1" style="display: none;">
+<div class="universal-message-modal" id="universalMessageModal" role="dialog" aria-modal="true"
+    aria-labelledby="messageModalTitle" aria-describedby="messageModalContent" tabindex="-1" style="display: none;">
     <div class="message-modal-window">
         <div class="message-modal-header">
             <div class="message-modal-title" id="messageModalTitle">Send New Message</div>
@@ -30,8 +31,10 @@
                         <i class="fas fa-smile"></i>
                     </button>
                 </div>
-                <div class="rich-text-editor" id="messageModalEditor" contenteditable="true" placeholder="Write your message here..."></div>
-                <div id="messageModalCharCount" style="text-align:right;font-size:0.95rem;color:#888;margin-top:4px;">0/1000</div>
+                <div class="rich-text-editor" id="messageModalEditor" contenteditable="true"
+                    placeholder="Write your message here..."></div>
+                <div id="messageModalCharCount" style="text-align:right;font-size:0.95rem;color:#888;margin-top:4px;">
+                    0/1000</div>
                 <div class="message-modal-footer message-modal-footer--inline">
                     <button class="cancel-btn" id="universalMessageCancelBtn">Cancel</button>
                     <button class="send-btn" id="universalMessageSendBtn">
@@ -47,11 +50,13 @@
 
 
 
-    <!-- Include shared emoji picker utility -->
-    <script src="/assets/js/new/components/emoji-picker.js"></script>
+<!-- Include shared emoji picker utility -->
+<script src="/assets/js/new/components/emoji-picker.js"></script>
 
-    <!-- Universal Message Confirmation Modal -->
-<div id="universalMessageConfirmationModal" class="universal-message-confirmation-modal" role="dialog" aria-modal="true" aria-labelledby="universalConfirmationTitle" aria-describedby="universalConfirmationDetails" tabindex="-1" style="display: none;">
+<!-- Universal Message Confirmation Modal -->
+<div id="universalMessageConfirmationModal" class="universal-message-confirmation-modal" role="dialog" aria-modal="true"
+    aria-labelledby="universalConfirmationTitle" aria-describedby="universalConfirmationDetails" tabindex="-1"
+    style="display: none;">
     <div class="universal-message-confirmation-content">
         <div class="confirmation-icon">
             <i class="fas fa-check-circle"></i>
@@ -102,7 +107,6 @@
         max-height: 80vh;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     }
 
@@ -141,15 +145,12 @@
         display: flex;
         flex-direction: column;
         gap: 1rem;
-        min-height: 0;
-        overflow-y: auto;
     }
 
     .form-group {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
-        min-height: 0;
     }
 
     .form-label {
@@ -200,7 +201,6 @@
 
     .rich-text-editor {
         min-height: 150px;
-        max-height: 35vh;
         padding: 1rem;
         border: 1px solid #ddd;
         border-radius: 0 0 8px 8px;
@@ -221,16 +221,6 @@
         gap: 1rem;
         padding: 1.5rem;
         border-top: 1px solid #eee;
-        flex-shrink: 0;
-        background: #fff;
-    }
-
-    .message-modal-footer--inline {
-        position: sticky;
-        bottom: 0;
-        margin: 0 -1.5rem -1.5rem;
-        padding: 1rem 1.5rem;
-        z-index: 2;
     }
 
     .cancel-btn {
@@ -431,6 +421,7 @@
             transform: translateX(100%);
             opacity: 0;
         }
+
         to {
             transform: translateX(0);
             opacity: 1;
@@ -450,7 +441,7 @@
 
     // Match talk.html message limits for consistency
     const UNIVERSAL_MESSAGE_MAX_LENGTH = 2000; // Same as MESSAGE_CONFIG.MAX_LENGTH in talk.html
-    
+
     // Load email verification check utility if not already loaded
     if (!window.checkEmailVerificationStatus) {
         const script = document.createElement('script');
@@ -459,7 +450,7 @@
     }
 
     // Universal Message Modal Functions
-    window.openUniversalMessageModal = async function(recipient, isReply = false, messageId = null, onSuccess = null, onError = null) {
+    window.openUniversalMessageModal = async function (recipient, isReply = false, messageId = null, onSuccess = null, onError = null) {
         // Check email verification before opening modal
         if (window.checkEmailVerificationStatus) {
             const isVerified = await window.checkEmailVerificationStatus();
@@ -468,7 +459,7 @@
                 return; // Don't open modal
             }
         }
-        
+
         universalMessageData = {
             recipient: recipient,
             isReply: isReply,
@@ -477,17 +468,17 @@
             onError: onError,
             receiverId: null // Will be set by caller if available
         };
-        
+
         // Store in window for external access
         window.universalMessageData = universalMessageData;
-        
+
         // Set recipient name
         document.getElementById('messageModalRecipient').textContent = recipient;
-        
+
         // Update modal title and button text
         const modalTitle = document.getElementById('messageModalTitle');
         const sendBtnText = document.getElementById('messageModalSendBtnText');
-        
+
         if (isReply) {
             modalTitle.textContent = 'Reply to Message';
             sendBtnText.textContent = 'Send Reply';
@@ -495,7 +486,7 @@
             modalTitle.textContent = 'Send New Message';
             sendBtnText.textContent = 'Send Message';
         }
-        
+
         // Clear previous content
         document.getElementById('messageModalEditor').innerHTML = '';
         document.getElementById('messageModalContent').value = '';
@@ -504,21 +495,21 @@
             charCountEl.textContent = `0 / ${UNIVERSAL_MESSAGE_MAX_LENGTH}`;
             charCountEl.style.color = '#6c757d';
         }
-        
+
         // Show modal
         const modal = document.getElementById('universalMessageModal');
         modal.style.display = 'flex';
-        
+
         // Focus on editor
         setTimeout(() => {
             document.getElementById('messageModalEditor').focus();
         }, 100);
     }
 
-    window.closeUniversalMessageModal = function() {
+    window.closeUniversalMessageModal = function () {
         const modal = document.getElementById('universalMessageModal');
         modal.style.display = 'none';
-        
+
         // Reset data
         universalMessageData = {
             recipient: '',
@@ -528,31 +519,31 @@
             onError: null
         };
     }
-    
+
     // Validate message content for the universal modal (uses backend badWordsFilter via /api/messages/validate)
     async function validateUniversalMessageContent(htmlContent) {
         const raw = htmlContent || '';
         // Strip HTML tags to get plain text for length/empty checks
         const textOnly = raw.replace(/<[^>]*>/g, '');
         const trimmed = textOnly.trim();
-        
+
         if (!trimmed) {
             return { valid: false, error: 'Please enter a message' };
         }
-        
+
         // Match talk.html limit (2000 characters)
         if (trimmed.length > UNIVERSAL_MESSAGE_MAX_LENGTH) {
-            return { 
-                valid: false, 
-                error: `Message is too long. Maximum ${UNIVERSAL_MESSAGE_MAX_LENGTH} characters allowed.` 
+            return {
+                valid: false,
+                error: `Message is too long. Maximum ${UNIVERSAL_MESSAGE_MAX_LENGTH} characters allowed.`
             };
         }
-        
+
         // Check for bad words via backend API (non-blocking: backend will enforce again on /send)
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 2000); // 2s timeout
-            
+
             const response = await fetch('/api/messages/validate', {
                 method: 'POST',
                 headers: {
@@ -561,9 +552,9 @@
                 body: JSON.stringify({ content: raw }),
                 signal: controller.signal
             });
-            
+
             clearTimeout(timeoutId);
-            
+
             if (response.ok) {
                 const data = await response.json();
                 if (data && (data.success === false || data.valid === false)) {
@@ -581,47 +572,47 @@
                 console.warn('Bad words validation check failed for universal modal, backend will enforce:', error.message);
             }
         }
-        
+
         // If everything is fine (or API failed), allow send; backend send endpoint will re-validate
         return { valid: true, sanitizedHtml: raw, plainText: trimmed };
     }
-    
-    window.sendUniversalMessage = async function() {
+
+    window.sendUniversalMessage = async function () {
         const editor = document.getElementById('messageModalEditor');
         const content = editor.innerHTML.trim();
         const charCount = document.getElementById('messageModalCharCount');
-        
+
         // Frontend validation (length, empty, bad words via backend)
         const validation = await validateUniversalMessageContent(content);
         if (!validation.valid) {
             showUniversalToast(validation.error, 'error');
             return;
         }
-        
+
         // Get current user object - try multiple sources
         let currentUser = window.currentUser || window.sessionManager?.getCurrentUser();
-        
+
         // Validate we have a current user with an ID
         if (!currentUser || !currentUser.id) {
             showUniversalToast('Please log in to send messages', 'error');
             console.error('❌ No current user found');
             return;
         }
-        
+
         if (!universalMessageData.recipient) {
             showUniversalToast('No recipient specified', 'error');
             return;
         }
-        
-                            // Note: Self-message prevention is handled by the server-side API
+
+        // Note: Self-message prevention is handled by the server-side API
         // The server will return an error if user tries to message themselves
-        
+
         try {
             // Disable send button
             const sendBtn = document.querySelector('.send-btn');
             sendBtn.disabled = true;
             sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-            
+
             // Prepare request data
             // Note: receiverUsername is used for backward compatibility with backend
             // The backend looks up by email, but we pass the recipient name
@@ -632,52 +623,52 @@
                 content: validation.sanitizedHtml || content,
                 senderId: currentUser.id
             };
-            
+
             // If receiverId is available, include it (this is more reliable than name lookup)
             if (universalMessageData.receiverId) {
                 requestData.receiverId = universalMessageData.receiverId;
             }
-            
+
             // Send message via API
             const response = await window.sessionManager.apiRequest('/api/messages/send', {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'x-user-id': currentUser.id
                 },
                 body: JSON.stringify(requestData)
             });
-            
+
             if (response.ok) {
                 const data = await response.json();
                 if (data.success) {
                     // Show success confirmation
                     const receiverName = universalMessageData.recipient;
                     const isReply = universalMessageData.isReply;
-                    
+
                     showUniversalToast(`✅ ${isReply ? 'Reply' : 'Message'} sent successfully to ${receiverName}!`, 'success');
-                    
+
                     // Show confirmation modal
                     showUniversalMessageConfirmation(receiverName, isReply);
-                    
+
                     // Call success callback if provided
                     if (universalMessageData.onSuccess) {
                         universalMessageData.onSuccess(data);
                     }
-                    
+
                     closeUniversalMessageModal();
                 } else {
                     throw new Error(data.message || data.error || 'Failed to send message');
                 }
             } else {
                 const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-                
+
                 // Check for email verification error
                 if (errorData.requiresEmailVerification || errorData.code === 'EMAIL_VERIFICATION_REQUIRED') {
                     showUniversalToast('📧 Please verify your email address to send messages. Check your inbox for the verification email.', 'warning');
                     return;
                 }
-                
+
                 throw new Error(errorData.error || errorData.message || `HTTP ${response.status}: Failed to send message`);
             }
         } catch (error) {
@@ -687,7 +678,7 @@
             } else {
                 showUniversalToast('Failed to send message. Please try again.', 'error');
             }
-            
+
             // Call error callback if provided
             if (universalMessageData.onError) {
                 universalMessageData.onError(error);
@@ -703,15 +694,15 @@
     }
 
     // Universal Rich Text Editor Functions
-    window.formatModalText = function(command) {
+    window.formatModalText = function (command) {
         document.execCommand(command, false, null);
         updateModalToolbarState();
     }
 
-    window.updateModalToolbarState = function() {
+    window.updateModalToolbarState = function () {
         const editor = document.getElementById('messageModalEditor');
         const toolbar = document.querySelector('.rich-text-toolbar');
-        
+
         // Update toolbar button states
         toolbar.querySelectorAll('.toolbar-btn').forEach(btn => {
             const command = btn.getAttribute('onclick')?.match(/formatModalText\('(\w+)'\)/)?.[1];
@@ -723,7 +714,7 @@
                 }
             }
         });
-        
+
         // Update character count (match behavior from talk.html)
         const content = editor.textContent || editor.innerText || '';
         const charCount = document.getElementById('messageModalCharCount');
@@ -731,7 +722,7 @@
         const maxLength = UNIVERSAL_MESSAGE_MAX_LENGTH;
         if (charCount) {
             charCount.textContent = `${count} / ${maxLength}`;
-            
+
             // Change color when approaching limit (same thresholds as talk.html)
             if (count > maxLength * 0.9) {
                 charCount.style.color = '#dc3545'; // Red
@@ -741,7 +732,7 @@
                 charCount.style.color = '#6c757d'; // Gray
             }
         }
-        
+
         // Update hidden textarea for form submission
         document.getElementById('messageModalContent').value = editor.innerHTML;
     }
@@ -752,7 +743,7 @@
 
 
     // Universal Message Confirmation Functions
-    window.showUniversalMessageConfirmation = function(receiverName, isReply = false) {
+    window.showUniversalMessageConfirmation = function (receiverName, isReply = false) {
         const modal = document.getElementById('universalMessageConfirmationModal');
         const receiverEl = document.getElementById('universalConfirmationReceiver');
         const timestampEl = document.getElementById('universalConfirmationTimestamp');
@@ -762,11 +753,11 @@
         receiverEl.textContent = receiverName;
         timestampEl.textContent = new Date().toLocaleString();
         confirmationTitle.textContent = isReply ? 'Reply Sent Successfully!' : 'Message Sent Successfully!';
-        
+
         // Show modal
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
-        
+
         // Auto-hide after 5 seconds
         setTimeout(() => {
             if (modal.style.display === 'flex') {
@@ -775,14 +766,14 @@
         }, 5000);
     }
 
-    window.hideUniversalMessageConfirmation = function() {
+    window.hideUniversalMessageConfirmation = function () {
         const modal = document.getElementById('universalMessageConfirmationModal');
         modal.style.display = 'none';
         document.body.style.overflow = '';
     }
 
     // Universal Toast notification function
-    window.showUniversalToast = function(message, type = 'info') {
+    window.showUniversalToast = function (message, type = 'info') {
         // Create toast element
         const toast = document.createElement('div');
         toast.className = `universal-toast universal-toast-${type}`;
@@ -802,14 +793,14 @@
             align-items: center;
             gap: 0.5rem;
         `;
-        
+
         toast.innerHTML = `
             <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
             <span>${message}</span>
         `;
-        
+
         document.body.appendChild(toast);
-        
+
         // Auto remove after 5 seconds
         setTimeout(() => {
             if (toast.parentNode) {
@@ -819,17 +810,17 @@
     }
 
     // Initialize universal modal event listeners
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // Universal message modal outside click
         const universalModal = document.getElementById('universalMessageModal');
         if (universalModal) {
-            universalModal.addEventListener('click', function(e) {
+            universalModal.addEventListener('click', function (e) {
                 if (e.target === this) closeUniversalMessageModal();
             });
         }
-        
 
-        
+
+
         // Universal rich text editor event listeners
         const universalEditor = document.getElementById('messageModalEditor');
         if (universalEditor) {
@@ -837,9 +828,9 @@
             universalEditor.addEventListener('keyup', updateModalToolbarState);
             universalEditor.addEventListener('mouseup', updateModalToolbarState);
         }
-        
+
         // Close modals with Escape key
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 if (universalModal && universalModal.style.display === 'flex') {
                     closeUniversalMessageModal();
@@ -848,114 +839,114 @@
             }
         });
     });
-</script> 
+</script>
 
 <script>
-// Accessibility & focus management for universal message modals
-(function() {
-    const focusableSelector = 'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    // Accessibility & focus management for universal message modals
+    (function () {
+        const focusableSelector = 'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-    const modals = [
-        {
-            id: 'universalMessageModal',
-            close: () => (typeof closeUniversalMessageModal === 'function' ? closeUniversalMessageModal() : hideModalById('universalMessageModal'))
-        },
-        {
-            id: 'universalMessageConfirmationModal',
-            close: () => (typeof hideUniversalMessageConfirmation === 'function' ? hideUniversalMessageConfirmation() : hideModalById('universalMessageConfirmationModal'))
-        }
-    ];
-
-    function hideModalById(id) {
-        const el = document.getElementById(id);
-        if (el) el.style.display = 'none';
-    }
-
-    function setupModal(entry) {
-        const modal = document.getElementById(entry.id);
-        if (!modal) return;
-
-        let previousFocus = null;
-        let previousOverflow = null;
-        let active = false;
-
-        function trapFocus(e) {
-            if (e.key !== 'Tab') return;
-            const focusable = Array.from(modal.querySelectorAll(focusableSelector)).filter(el => el.offsetParent !== null);
-            if (focusable.length === 0) {
-                e.preventDefault();
-                modal.focus();
-                return;
+        const modals = [
+            {
+                id: 'universalMessageModal',
+                close: () => (typeof closeUniversalMessageModal === 'function' ? closeUniversalMessageModal() : hideModalById('universalMessageModal'))
+            },
+            {
+                id: 'universalMessageConfirmationModal',
+                close: () => (typeof hideUniversalMessageConfirmation === 'function' ? hideUniversalMessageConfirmation() : hideModalById('universalMessageConfirmationModal'))
             }
-            const first = focusable[0];
-            const last = focusable[focusable.length - 1];
-            if (e.shiftKey && document.activeElement === first) {
-                e.preventDefault();
-                last.focus();
-            } else if (!e.shiftKey && document.activeElement === last) {
-                e.preventDefault();
-                first.focus();
+        ];
+
+        function hideModalById(id) {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        }
+
+        function setupModal(entry) {
+            const modal = document.getElementById(entry.id);
+            if (!modal) return;
+
+            let previousFocus = null;
+            let previousOverflow = null;
+            let active = false;
+
+            function trapFocus(e) {
+                if (e.key !== 'Tab') return;
+                const focusable = Array.from(modal.querySelectorAll(focusableSelector)).filter(el => el.offsetParent !== null);
+                if (focusable.length === 0) {
+                    e.preventDefault();
+                    modal.focus();
+                    return;
+                }
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
             }
-        }
 
-        function handleKeydown(e) {
-            if (e.key === 'Escape') {
-                e.stopPropagation();
-                entry.close?.();
-                return;
+            function handleKeydown(e) {
+                if (e.key === 'Escape') {
+                    e.stopPropagation();
+                    entry.close?.();
+                    return;
+                }
+                trapFocus(e);
             }
-            trapFocus(e);
-        }
 
-        function onOpen() {
-            if (active) return;
-            active = true;
-            previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-            previousOverflow = document.body.style.overflow;
-            document.body.style.overflow = 'hidden';
-            const wrapper = document.querySelector('.search-wrapper');
-            if (wrapper) { wrapper.style.overflow = 'hidden'; }
-            modal.addEventListener('keydown', handleKeydown, true);
-            setTimeout(() => {
-                const focusTarget = modal.querySelector(focusableSelector) || modal;
-                focusTarget?.focus();
-            }, 0);
-        }
-
-        function onClose() {
-            if (!active) return;
-            active = false;
-            modal.removeEventListener('keydown', handleKeydown, true);
-            document.body.style.overflow = previousOverflow;
-            const wrapper = document.querySelector('.search-wrapper');
-            if (wrapper) { wrapper.style.overflow = ''; }
-            previousFocus?.focus?.();
-        }
-
-        const observer = new MutationObserver(() => {
-            const isVisible = getComputedStyle(modal).display !== 'none';
-            if (isVisible) {
-                onOpen();
-            } else {
-                onClose();
+            function onOpen() {
+                if (active) return;
+                active = true;
+                previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+                previousOverflow = document.body.style.overflow;
+                document.body.style.overflow = 'hidden';
+                const wrapper = document.querySelector('.search-wrapper');
+                if (wrapper) { wrapper.style.overflow = 'hidden'; }
+                modal.addEventListener('keydown', handleKeydown, true);
+                setTimeout(() => {
+                    const focusTarget = modal.querySelector(focusableSelector) || modal;
+                    focusTarget?.focus();
+                }, 0);
             }
-        });
-        observer.observe(modal, { attributes: true, attributeFilter: ['style'] });
-        window.addEventListener('pagehide', () => observer.disconnect());
-    }
 
-    modals.forEach(setupModal);
-})();
+            function onClose() {
+                if (!active) return;
+                active = false;
+                modal.removeEventListener('keydown', handleKeydown, true);
+                document.body.style.overflow = previousOverflow;
+                const wrapper = document.querySelector('.search-wrapper');
+                if (wrapper) { wrapper.style.overflow = ''; }
+                previousFocus?.focus?.();
+            }
+
+            const observer = new MutationObserver(() => {
+                const isVisible = getComputedStyle(modal).display !== 'none';
+                if (isVisible) {
+                    onOpen();
+                } else {
+                    onClose();
+                }
+            });
+            observer.observe(modal, { attributes: true, attributeFilter: ['style'] });
+            window.addEventListener('pagehide', () => observer.disconnect());
+        }
+
+        modals.forEach(setupModal);
+    })();
 </script>
 <script>
-document.addEventListener('DOMContentLoaded',function(){
-document.getElementById('closeUniversalMessageModalBtn')?.addEventListener('click',closeUniversalMessageModal);
-document.getElementById('formatBoldBtn')?.addEventListener('click',()=>formatModalText('bold'));
-document.getElementById('formatItalicBtn')?.addEventListener('click',()=>formatModalText('italic'));
-document.getElementById('formatUnderlineBtn')?.addEventListener('click',()=>formatModalText('underline'));
-document.getElementById('showEmojiPickerBtn')?.addEventListener('click',()=>showEmojiPicker('messageModalEditor'));
-document.getElementById('universalMessageCancelBtn')?.addEventListener('click',closeUniversalMessageModal);
-document.getElementById('universalMessageSendBtn')?.addEventListener('click',sendUniversalMessage);
-document.getElementById('hideUniversalMessageConfirmationBtn')?.addEventListener('click',hideUniversalMessageConfirmation);
-});
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('closeUniversalMessageModalBtn')?.addEventListener('click', closeUniversalMessageModal);
+        document.getElementById('formatBoldBtn')?.addEventListener('click', () => formatModalText('bold'));
+        document.getElementById('formatItalicBtn')?.addEventListener('click', () => formatModalText('italic'));
+        document.getElementById('formatUnderlineBtn')?.addEventListener('click', () => formatModalText('underline'));
+        document.getElementById('showEmojiPickerBtn')?.addEventListener('click', () => showEmojiPicker('messageModalEditor'));
+        document.getElementById('universalMessageCancelBtn')?.addEventListener('click', closeUniversalMessageModal);
+        document.getElementById('universalMessageSendBtn')?.addEventListener('click', sendUniversalMessage);
+        document.getElementById('hideUniversalMessageConfirmationBtn')?.addEventListener('click', hideUniversalMessageConfirmation);
+    });
 </script>
