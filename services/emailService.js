@@ -2,6 +2,8 @@ const nodemailer = require('nodemailer');
 const { Resend } = require('resend');
 const config = require('../config/config');
 
+const RESEND_FALLBACK_FROM = config.email?.resend?.defaultFromEmail || 'onboarding@resend.dev';
+
 class EmailService {
     constructor() {
         this.transporter = null;
@@ -9,30 +11,31 @@ class EmailService {
         this.isConfigured = false;
         this.provider = 'none';
         this.fromName = process.env.SMTP_FROM_NAME || config.email?.smtp?.fromName || 'Totilove';
-        this.fromEmail =
-            process.env.EMAIL_FROM ||
-            process.env.RESEND_FROM_EMAIL ||
-            process.env.SMTP_USER ||
-            config.email?.smtp?.user ||
-            '';
+        this.usingDefaultFromEmail = false;
+        this.fromEmail = this.determineFromEmail();
         this.baseUrl = config.email?.baseUrl || process.env.BASE_URL || 'http://localhost:3001';
         this.init();
     }
 
     init() {
         const resendKey = process.env.RESEND_API_KEY || config.email?.resend?.apiKey;
-        if (resendKey && this.fromEmail) {
+        if (resendKey) {
             try {
                 this.resendClient = new Resend(resendKey);
                 this.isConfigured = true;
                 this.provider = 'resend';
-                console.log('✅ Email service configured with Resend');
+                if (this.usingDefaultFromEmail) {
+                    console.warn(
+                        '⚠️ EMAIL_FROM not provided. Using fallback sender %s – set RESEND_FROM_EMAIL to customize.',
+                        this.fromEmail
+                    );
+                } else {
+                    console.log('✅ Email service configured with Resend');
+                }
                 return;
             } catch (error) {
                 console.error('❌ Failed to configure Resend email service:', error.message);
             }
-        } else if (resendKey && !this.fromEmail) {
-            console.warn('⚠️ RESEND_API_KEY is set but EMAIL_FROM is missing. Set EMAIL_FROM or RESEND_FROM_EMAIL.');
         }
 
         // Email configuration from environment variables (SMTP fallback)
@@ -310,6 +313,24 @@ class EmailService {
             console.error('❌ Email connection test failed:', error);
             return false;
         }
+    }
+
+    determineFromEmail() {
+        const configuredFromEmail =
+            process.env.EMAIL_FROM ||
+            process.env.RESEND_FROM_EMAIL ||
+            config.email?.resend?.fromEmail ||
+            process.env.SMTP_USER ||
+            config.email?.smtp?.user ||
+            '';
+
+        if (configuredFromEmail) {
+            this.usingDefaultFromEmail = false;
+            return configuredFromEmail;
+        }
+
+        this.usingDefaultFromEmail = true;
+        return RESEND_FALLBACK_FROM;
     }
 }
 

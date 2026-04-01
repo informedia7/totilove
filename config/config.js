@@ -160,7 +160,8 @@ module.exports = {
         },
         resend: {
             apiKey: process.env.RESEND_API_KEY || '',
-            fromEmail: process.env.RESEND_FROM_EMAIL || process.env.EMAIL_FROM || ''
+            fromEmail: process.env.RESEND_FROM_EMAIL || process.env.EMAIL_FROM || '',
+            defaultFromEmail: process.env.RESEND_DEFAULT_FROM_EMAIL || 'onboarding@resend.dev'
         },
         baseUrl: process.env.BASE_URL || 'http://localhost:3001',
         tokenExpiry: 24 * 60 * 60 * 1000 // 24 hours in milliseconds
