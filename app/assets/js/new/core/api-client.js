@@ -203,7 +203,7 @@ export class ApiClient {
             } catch (e) {
                 errorData = { message: `HTTP ${response.status}: ${response.statusText}` };
             }
-            throw new Error(errorData.message || `HTTP ${response.status}`);
+            throw new Error(errorData.error || errorData.message || `HTTP ${response.status}`);
         }
         
         const contentType = response.headers.get('content-type');

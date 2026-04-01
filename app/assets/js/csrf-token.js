@@ -46,9 +46,11 @@
   let tokenPromise = null;
   let initialized = false;
   let last429Error = null; // Track 429 errors to avoid retry loops
+  let authRedirectInProgress = false;
 
   const CSRF_HEADER = 'X-CSRF-Token';
   const CSRF_ENDPOINT = '/api/csrf-token';
+  const LOGIN_REDIRECT_BASE = '/login?sessionExpired=1';
 
   // -------------------------------
   // 3️⃣ Helpers
@@ -67,6 +69,82 @@
       url.startsWith('/') ||
       url.startsWith(window.location.origin)
     );
+  }
+
+  function isLoginPage() {
+    return window.location.pathname === '/login';
+  }
+
+  function buildLoginRedirectUrl() {
+    const currentPath = `${window.location.pathname || ''}${window.location.search || ''}`;
+    if (!currentPath || currentPath === '/login') {
+      return LOGIN_REDIRECT_BASE;
+    }
+
+    const separator = LOGIN_REDIRECT_BASE.includes('?') ? '&' : '?';
+    return `${LOGIN_REDIRECT_BASE}${separator}redirect=${encodeURIComponent(currentPath)}`;
+  }
+
+  function redirectToLogin() {
+    if (authRedirectInProgress || isLoginPage()) {
+      return true;
+    }
+
+    authRedirectInProgress = true;
+    window.location.replace(buildLoginRedirectUrl());
+    return true;
+  }
+
+  function hasSessionAuthError(message) {
+    const normalizedMessage = (message || '').toLowerCase();
+    return normalizedMessage.includes('session token is required') ||
+      normalizedMessage.includes('invalid or expired session') ||
+      normalizedMessage.includes('session expired') ||
+      normalizedMessage.includes('authentication required') ||
+      normalizedMessage.includes('no session token provided');
+  }
+
+  async function maybeRedirectForAuthFailure(response, requestUrl) {
+    if (!response || !isSameOrigin(requestUrl) || isLoginPage()) {
+      return false;
+    }
+
+    if (![401, 403].includes(response.status)) {
+      return false;
+    }
+
+    const responsePath = (() => {
+      try {
+        return new URL(response.url || requestUrl, window.location.origin).pathname;
+      } catch {
+        return '';
+      }
+    })();
+
+    if (response.status === 401 && responsePath === CSRF_ENDPOINT) {
+      return redirectToLogin();
+    }
+
+    let message = '';
+    try {
+      const clonedResponse = response.clone();
+      const contentType = clonedResponse.headers.get('content-type') || '';
+
+      if (contentType.includes('application/json')) {
+        const payload = await clonedResponse.json();
+        message = payload?.error || payload?.message || '';
+      } else {
+        message = await clonedResponse.text();
+      }
+    } catch {
+      message = '';
+    }
+
+    if (hasSessionAuthError(message)) {
+      return redirectToLogin();
+    }
+
+    return false;
   }
 
 
@@ -99,6 +177,7 @@
           if (res.status === 401) {
             csrfToken = null;
             tokenExpiry = null;
+            redirectToLogin();
             throw new Error('Session expired - please log in again');
           }
           // If 429, track it and wait longer before retrying
@@ -226,6 +305,10 @@
 
     const response = await nativeFetch(input, normalizedOptions);
 
+    if (await maybeRedirectForAuthFailure(response, url)) {
+      return response;
+    }
+
     // Auto-refresh token if server rejects it and retry once with fresh token
     if ([403, 419].includes(response.status) && isSameOrigin(url)) {
       csrfToken = null;
@@ -255,6 +338,50 @@
   XMLHttpRequest.prototype.open = function (method, url, ...args) {
     this._csrfMethod = method.toUpperCase();
     this._csrfURL = url;
+
+    if (!this._authRedirectListenerAttached) {
+      this.addEventListener('loadend', function () {
+        if (!isSameOrigin(this._csrfURL) || isLoginPage()) {
+          return;
+        }
+
+        if (![401, 403].includes(this.status)) {
+          return;
+        }
+
+        if (this.status === 401) {
+          try {
+            const responsePath = new URL(this.responseURL || this._csrfURL, window.location.origin).pathname;
+            if (responsePath === CSRF_ENDPOINT) {
+              redirectToLogin();
+              return;
+            }
+          } catch {
+            // Ignore response URL parsing errors
+          }
+        }
+
+        let message = '';
+        try {
+          const contentType = this.getResponseHeader('content-type') || '';
+          if (contentType.includes('application/json')) {
+            const payload = JSON.parse(this.responseText || '{}');
+            message = payload?.error || payload?.message || '';
+          } else {
+            message = this.responseText || '';
+          }
+        } catch {
+          message = this.responseText || '';
+        }
+
+        if (hasSessionAuthError(message)) {
+          redirectToLogin();
+        }
+      });
+
+      this._authRedirectListenerAttached = true;
+    }
+
     return nativeXHROpen.call(this, method, url, ...args);
   };
 

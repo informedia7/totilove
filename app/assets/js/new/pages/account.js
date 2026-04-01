@@ -316,14 +316,6 @@ async function handleChangePassword(event) {
     submitBtn.textContent = 'Changing...';
     
     try {
-        const token = getSessionToken();
-        if (!token) {
-            alert('Session token not found. Please log in again.');
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Change Password';
-            return;
-        }
-        
         const response = await fetch('/api/account/change-password', {
             method: 'POST',
             headers: {
@@ -336,14 +328,18 @@ async function handleChangePassword(event) {
                 confirmPassword
             })
         });
+        let data = null;
+        try {
+            data = await response.json();
+        } catch (jsonError) {
+            data = null;
+        }
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const data = await response.json();
-        
-        if (data.success) {
+        if (data?.success) {
             messageDiv.textContent = 'Password changed successfully!';
             messageDiv.style.background = '#e8f5e9';
             messageDiv.style.color = '#28a745';
@@ -357,7 +353,7 @@ async function handleChangePassword(event) {
                 closeChangePasswordModal();
             }, 2000);
         } else {
-            messageDiv.textContent = data.error || 'Failed to change password';
+            messageDiv.textContent = data?.error || 'Failed to change password';
             messageDiv.style.background = '#ffe6e6';
             messageDiv.style.color = '#dc3545';
             messageDiv.style.display = 'block';
@@ -412,12 +408,11 @@ async function resendVerificationEmail() {
             },
             body: JSON.stringify({ email: accountData.email })
         });
+        const data = await response.json();
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
-        const data = await response.json();
         
         if (data.success) {
             // Show success message
@@ -587,40 +582,6 @@ async function loadCurrentPlan() {
     }
 }
 
-function getSessionToken() {
-    // CSRF implementation moves token from URL to cookie, so check cookie first
-    const cookies = document.cookie.split(';');
-    for (let cookie of cookies) {
-        const trimmed = cookie.trim();
-        const equalIndex = trimmed.indexOf('=');
-        if (equalIndex === -1) continue;
-        
-        const name = trimmed.substring(0, equalIndex).trim();
-        const value = trimmed.substring(equalIndex + 1).trim();
-        
-        if (name === 'sessionToken') {
-            return decodeURIComponent(value);
-        }
-    }
-    
-    // Fallback to URL (in case CSRF hasn't run yet)
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlToken = urlParams.get('token');
-    if (urlToken) {
-        return urlToken;
-    }
-    
-    // Try sessionManager if available
-    if (window.sessionManager && typeof window.sessionManager.getToken === 'function') {
-        const token = window.sessionManager.getToken();
-        if (token) {
-            return token;
-        }
-    }
-    
-    return null;
-}
-
 function toggleEmailVerificationDetails() {
     const detailsSection = document.getElementById('email-verification-details');
     const chevron = document.getElementById('email-verification-chevron');
@@ -688,12 +649,11 @@ async function verifyEmailByCode() {
                 userId: accountData.userId
             })
         });
+        const data = await response.json();
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
-        const data = await response.json();
         
         if (data.success) {
             // Show success message

@@ -10,9 +10,6 @@
  * - Global functions: getUserIdFromToken, handleError, renderConversations
  */
 
-const SESSION_ERROR_REGEX = /invalid or expired session|session expired|authentication required/i;
-const redirectToLogin = () => window.location.replace('/login?redirect=' + encodeURIComponent(location.pathname + location.search));
-
 /**
  * Debounced version of loadConversations
  */
@@ -44,10 +41,6 @@ async function loadConversations() {
         });
 
         if (!response.ok) {
-            if ([401, 403, 419, 440].includes(response.status)) {
-                redirectToLogin();
-                return;
-            }
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
@@ -206,19 +199,11 @@ async function loadConversations() {
                 renderConversations();
             }
         } else {
-            if (SESSION_ERROR_REGEX.test(data.error || '')) {
-                redirectToLogin();
-                return;
-            }
             if (typeof handleError === 'function') {
                 handleError(data.error || 'Failed to load conversations', 'loadConversations');
             }
         }
     } catch (error) {
-        if (SESSION_ERROR_REGEX.test(error?.message || '')) {
-            redirectToLogin();
-            return;
-        }
         if (typeof handleError === 'function') {
             handleError(error, 'loadConversations');
         }
