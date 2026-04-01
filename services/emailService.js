@@ -1,22 +1,48 @@
 const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const config = require('../config/config');
 
 class EmailService {
     constructor() {
         this.transporter = null;
+        this.resendClient = null;
         this.isConfigured = false;
+        this.provider = 'none';
+        this.fromName = process.env.SMTP_FROM_NAME || config.email?.smtp?.fromName || 'Totilove';
+        this.fromEmail =
+            process.env.EMAIL_FROM ||
+            process.env.RESEND_FROM_EMAIL ||
+            process.env.SMTP_USER ||
+            config.email?.smtp?.user ||
+            '';
+        this.baseUrl = config.email?.baseUrl || process.env.BASE_URL || 'http://localhost:3001';
         this.init();
     }
 
     init() {
-        // Email configuration from environment variables
+        const resendKey = process.env.RESEND_API_KEY || config.email?.resend?.apiKey;
+        if (resendKey && this.fromEmail) {
+            try {
+                this.resendClient = new Resend(resendKey);
+                this.isConfigured = true;
+                this.provider = 'resend';
+                console.log('✅ Email service configured with Resend');
+                return;
+            } catch (error) {
+                console.error('❌ Failed to configure Resend email service:', error.message);
+            }
+        } else if (resendKey && !this.fromEmail) {
+            console.warn('⚠️ RESEND_API_KEY is set but EMAIL_FROM is missing. Set EMAIL_FROM or RESEND_FROM_EMAIL.');
+        }
+
+        // Email configuration from environment variables (SMTP fallback)
         const emailConfig = {
-            host: process.env.SMTP_HOST || 'smtp.gmail.com',
-            port: parseInt(process.env.SMTP_PORT || '587'),
-            secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+            host: process.env.SMTP_HOST || config.email?.smtp?.host || 'smtp.gmail.com',
+            port: parseInt(process.env.SMTP_PORT || (config.email?.smtp?.port ?? '587')),
+            secure: process.env.SMTP_SECURE === 'true' || Boolean(config.email?.smtp?.secure),
             auth: {
-                user: process.env.SMTP_USER || '',
-                pass: process.env.SMTP_PASSWORD || ''
+                user: process.env.SMTP_USER || config.email?.smtp?.user || '',
+                pass: process.env.SMTP_PASSWORD || config.email?.smtp?.password || ''
             }
         };
 
@@ -25,38 +51,27 @@ class EmailService {
             try {
                 this.transporter = nodemailer.createTransport(emailConfig);
                 this.isConfigured = true;
-                console.log('✅ Email service configured successfully');
+                this.provider = 'smtp';
+                console.log('✅ Email service configured with SMTP');
             } catch (error) {
                 console.error('❌ Failed to configure email service:', error.message);
                 this.isConfigured = false;
             }
         } else {
-            console.warn('⚠️ Email service not configured - SMTP credentials missing');
-            console.warn('   Set SMTP_USER and SMTP_PASSWORD environment variables to enable email');
+            console.warn('⚠️ Email service not configured - provide RESEND_API_KEY or SMTP credentials');
         }
     }
 
-    /**
-     * Send email verification email
-     * @param {string} to - Recipient email address
-     * @param {string} real_name - Username
-     * @param {string} token - Verification token
-     * @returns {Promise<Object>}
-     */
-    async sendVerificationEmail(to, real_name, token, verificationCode = null) {
-        if (!this.isConfigured) {
-            console.warn('⚠️ Email service not configured - cannot send verification email');
-            return { success: false, error: 'Email service not configured' };
+    getFromHeader() {
+        if (!this.fromEmail) {
+            return `${this.fromName} <no-reply@totilove.com>`;
         }
+        return `${this.fromName} <${this.fromEmail}>`;
+    }
 
-        const baseUrl = process.env.BASE_URL || 'http://localhost:3001';
-        const confirmationUrl = `${baseUrl}/api/verify-email?token=${token}`;
-
-        const mailOptions = {
-            from: `"${process.env.SMTP_FROM_NAME || 'Totilove'}" <${process.env.SMTP_USER}>`,
-            to: to,
-            subject: 'Verify Your Email Address - Totilove',
-            html: `
+    buildVerificationEmail(realName, confirmationUrl, verificationCode) {
+        const subject = 'Verify Your Email Address - Totilove';
+        const html = `
                 <!DOCTYPE html>
                 <html>
                 <head>
@@ -77,7 +92,7 @@ class EmailService {
                             <h1>Welcome to Totilove!</h1>
                         </div>
                         <div class="content">
-                            <p>Hi ${real_name},</p>
+                            <p>Hi ${realName},</p>
                             <p>Thank you for registering with Totilove! To complete your registration and start connecting with others, please verify your email address using one of the methods below:</p>
                             
                             <div style="background: white; padding: 1.5rem; border-radius: 8px; margin: 1.5rem 0; border: 2px solid #667eea;">
@@ -109,11 +124,11 @@ class EmailService {
                     </div>
                 </body>
                 </html>
-            `,
-            text: `
+            `;
+        const text = `
                 Welcome to Totilove!
                 
-                Hi ${real_name},
+                Hi ${realName},
                 
                 Thank you for registering with Totilove! To complete your registration, please verify your email address using one of these methods:
                 
@@ -126,39 +141,13 @@ class EmailService {
                 Both methods will expire in 24 hours.
                 
                 If you didn't create an account with Totilove, please ignore this email.
-            `
-        };
-
-        try {
-            const info = await this.transporter.sendMail(mailOptions);
-            console.log('✅ Verification email sent:', info.messageId);
-            return { success: true, messageId: info.messageId };
-        } catch (error) {
-            console.error('❌ Failed to send verification email:', error);
-            return { success: false, error: error.message };
-        }
+            `;
+        return { subject, html, text };
     }
 
-    /**
-     * Send password reset email
-     * @param {string} to - Recipient email address
-     * @param {string} real_name - Username
-     * @param {string} token - Reset token
-     * @returns {Promise<Object>}
-     */
-    async sendPasswordResetEmail(to, real_name, token) {
-        if (!this.isConfigured) {
-            return { success: false, error: 'Email service not configured' };
-        }
-
-        const baseUrl = process.env.BASE_URL || 'http://localhost:3001';
-        const resetUrl = `${baseUrl}/reset-password?token=${token}`;
-
-        const mailOptions = {
-            from: `"${process.env.SMTP_FROM_NAME || 'Totilove'}" <${process.env.SMTP_USER}>`,
-            to: to,
-            subject: 'Reset Your Password - Totilove',
-            html: `
+    buildPasswordResetEmail(realName, resetUrl) {
+        const subject = 'Reset Your Password - Totilove';
+        const html = `
                 <!DOCTYPE html>
                 <html>
                 <head>
@@ -178,7 +167,7 @@ class EmailService {
                             <h1>Password Reset Request</h1>
                         </div>
                         <div class="content">
-                            <p>Hi ${real_name},</p>
+                            <p>Hi ${realName},</p>
                             <p>We received a request to reset your password. Click the button below to reset it:</p>
                             <div style="text-align: center;">
                                 <a href="${resetUrl}" class="button">Reset Password</a>
@@ -194,16 +183,107 @@ class EmailService {
                     </div>
                 </body>
                 </html>
-            `
+            `;
+        const text = `
+                Password Reset Request
+                
+                Hi ${realName},
+                
+                We received a request to reset your password. Use this link to continue:
+                ${resetUrl}
+                
+                The link will expire in 1 hour.
+                
+                If you didn't request a password reset, you can ignore this email.
+            `;
+        return { subject, html, text };
+    }
+
+    async dispatchEmail(to, payload) {
+        if (this.provider === 'resend' && this.resendClient) {
+            return this.sendWithResend(to, payload);
+        }
+
+        if (this.transporter) {
+            return this.sendWithSmtp(to, payload);
+        }
+
+        return { success: false, error: 'Email service not configured' };
+    }
+
+    async sendWithResend(to, payload) {
+        try {
+            const response = await this.resendClient.emails.send({
+                from: this.getFromHeader(),
+                to: Array.isArray(to) ? to : [to],
+                subject: payload.subject,
+                html: payload.html,
+                text: payload.text
+            });
+            console.log('✅ Email sent via Resend:', response?.id || response);
+            return { success: true, messageId: response?.id || 'resend-message' };
+        } catch (error) {
+            console.error('❌ Failed to send email via Resend:', error?.message || error);
+            return { success: false, error: error?.message || 'Failed to send email via Resend' };
+        }
+    }
+
+    async sendWithSmtp(to, payload) {
+        if (!this.transporter) {
+            return { success: false, error: 'SMTP transporter not configured' };
+        }
+
+        const mailOptions = {
+            from: this.getFromHeader(),
+            to,
+            subject: payload.subject,
+            html: payload.html,
+            text: payload.text
         };
 
         try {
             const info = await this.transporter.sendMail(mailOptions);
+            console.log('✅ Email sent via SMTP:', info.messageId);
             return { success: true, messageId: info.messageId };
         } catch (error) {
-            console.error('❌ Failed to send password reset email:', error);
+            console.error('❌ Failed to send email via SMTP:', error);
             return { success: false, error: error.message };
         }
+    }
+
+    /**
+     * Send email verification email
+     * @param {string} to - Recipient email address
+     * @param {string} real_name - Username
+     * @param {string} token - Verification token
+     * @returns {Promise<Object>}
+     */
+    async sendVerificationEmail(to, real_name, token, verificationCode = null) {
+        if (!this.isConfigured) {
+            console.warn('⚠️ Email service not configured - cannot send verification email');
+            return { success: false, error: 'Email service not configured' };
+        }
+
+        const confirmationUrl = `${this.baseUrl}/api/verify-email?token=${token}`;
+        const payload = this.buildVerificationEmail(real_name, confirmationUrl, verificationCode);
+        return this.dispatchEmail(to, payload);
+    }
+
+    /**
+     * Send password reset email
+     * @param {string} to - Recipient email address
+     * @param {string} real_name - Username
+     * @param {string} token - Reset token
+     * @returns {Promise<Object>}
+     */
+    async sendPasswordResetEmail(to, real_name, token) {
+        if (!this.isConfigured) {
+            return { success: false, error: 'Email service not configured' };
+        }
+
+        const resetUrl = `${this.baseUrl}/reset-password?token=${token}`;
+        const payload = this.buildPasswordResetEmail(real_name, resetUrl);
+        return this.dispatchEmail(to, payload);
     }
 
     /**
@@ -212,6 +292,14 @@ class EmailService {
      */
     async testConnection() {
         if (!this.isConfigured) {
+            return false;
+        }
+
+        if (this.provider === 'resend' && this.resendClient) {
+            return true;
+        }
+
+        if (!this.transporter) {
             return false;
         }
 

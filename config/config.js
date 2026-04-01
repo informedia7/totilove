@@ -158,6 +158,10 @@ module.exports = {
             password: process.env.SMTP_PASSWORD || '',
             fromName: process.env.SMTP_FROM_NAME || 'Totilove'
         },
+        resend: {
+            apiKey: process.env.RESEND_API_KEY || '',
+            fromEmail: process.env.RESEND_FROM_EMAIL || process.env.EMAIL_FROM || ''
+        },
         baseUrl: process.env.BASE_URL || 'http://localhost:3001',
         tokenExpiry: 24 * 60 * 60 * 1000 // 24 hours in milliseconds
     }
