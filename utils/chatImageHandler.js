@@ -2,6 +2,7 @@ const multer = require('multer');
 const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs').promises;
+const fsSync = require('fs');
 const crypto = require('crypto');
 
 let ClamScan = null;
@@ -21,6 +22,7 @@ class ChatImageHandler {
         this.imagesDir = path.join(this.uploadDir, 'images');
         this.thumbnailsDir = path.join(this.uploadDir, 'thumbnails');
         this.tempDir = path.join(this.uploadDir, 'temp');
+        this.ensureUploadDirectories();
         
         // Supported image formats
         this.allowedMimeTypes = [
@@ -34,6 +36,15 @@ class ChatImageHandler {
         this.maxFileSize = 5 * 1024 * 1024; // 5MB
         this.thumbnailSize = 300; // 300x300 pixels (increased by 50% from 200px)
         this.maxImageDimension = 1920; // Max width/height for resizing
+    }
+
+    ensureUploadDirectories() {
+        const dirs = [this.uploadDir, this.imagesDir, this.thumbnailsDir, this.tempDir];
+        for (const dir of dirs) {
+            if (!fsSync.existsSync(dir)) {
+                fsSync.mkdirSync(dir, { recursive: true });
+            }
+        }
     }
 
     isVirusScannerEnabled() {
