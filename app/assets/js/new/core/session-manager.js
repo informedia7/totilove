@@ -11,6 +11,7 @@ class SessionManager {
         this.MIN_TOKEN_LENGTH = 32;
         this.LANGUAGE_CACHE_TTL = 2 * 60 * 1000; // cache for 2 minutes
         this.languageCache = new Map();
+        this.redirectInProgress = false;
         
         // Initialize on load
         this.init();
@@ -124,6 +125,44 @@ class SessionManager {
         document.cookie = 'sessionToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         window.currentUser = null;
         console.log('🗑️ Session cleared');
+    }
+
+    handleSessionAuthFailure(reason = 'expired', serverMessage = '') {
+        if (reason === 'expired') {
+            this.clearSession();
+        }
+
+        const defaultMessage = reason === 'missing'
+            ? 'Please log in to continue.'
+            : 'Your session has expired. Please log in again.';
+
+        this.redirectToLogin(serverMessage || defaultMessage);
+    }
+
+    redirectToLogin(message = 'Please log in to continue.') {
+        if (this.redirectInProgress) {
+            return;
+        }
+
+        const currentPath = window.location.pathname;
+        if (currentPath === '/login') {
+            return;
+        }
+
+        this.redirectInProgress = true;
+
+        const loginUrl = new URL('/login', window.location.origin);
+        const redirectTarget = `${currentPath}${window.location.search}`;
+
+        if (redirectTarget && currentPath !== '/login') {
+            loginUrl.searchParams.set('redirect', redirectTarget);
+        }
+
+        if (message) {
+            loginUrl.searchParams.set('message', message);
+        }
+
+        window.location.replace(loginUrl.toString());
     }
 
     /**
@@ -242,37 +281,24 @@ class SessionManager {
         if (response.status === 401) {
             try {
                 const errorData = await response.clone().json();
-                const errorMessage = errorData.error || '';
-                
-                // Only clear session if:
-                // 1. We had a token in JavaScript AND backend says it's expired/invalid
-                // 2. OR backend explicitly says session expired/invalid
-                const isExpired = errorMessage.includes('expired') || 
-                                 errorMessage.includes('invalid') ||
-                                 errorMessage.includes('Session expired');
-                
-                if (token && isExpired) {
-                    // We had a token but backend says it's expired - clear session
-                    console.log('🔒 Session expired or invalid, clearing session');
-                    this.clearSession();
-                    throw new Error(errorMessage || 'Authentication expired');
-                } else if (!token && errorMessage.includes('Session token required')) {
-                    // No token in JS and backend can't find it in cookies either
-                    // This might be a real auth issue, but don't clear if we never had a token
-                    throw new Error(errorMessage || 'Authentication required');
-                } else if (isExpired) {
-                    // Backend says expired but we didn't have token - might be cookie issue
-                    console.log('⚠️ Backend reports expired session, but no token in JavaScript');
-                    throw new Error(errorMessage || 'Authentication expired');
-                } else {
-                    // Other 401 error - don't clear session
-                    throw new Error(errorMessage || 'Authentication required');
+                const errorMessage = errorData.error || errorData.message || '';
+                const normalizedMessage = errorMessage.toLowerCase();
+                const missingSession = normalizedMessage.includes('session token is required') ||
+                                       normalizedMessage.includes('session token required');
+                const expiredSession = normalizedMessage.includes('invalid or expired session') ||
+                                       normalizedMessage.includes('session expired') ||
+                                       normalizedMessage.includes('expired session');
+
+                if (missingSession) {
+                    this.handleSessionAuthFailure('missing', errorMessage);
+                } else if (expiredSession || token) {
+                    this.handleSessionAuthFailure('expired', errorMessage);
                 }
+
+                throw new Error(errorMessage || 'Authentication required');
             } catch (parseError) {
-                // If we can't parse the error, only clear if we had a token
                 if (token) {
-                    console.log('🔒 401 response received with token, clearing session');
-                    this.clearSession();
+                    this.handleSessionAuthFailure('expired', 'Authentication failed');
                 }
                 throw new Error('Authentication failed');
             }
@@ -442,7 +468,11 @@ class SessionManager {
     requireAuthentication(redirectUrl = '/pages/login.html') {
         if (!this.isAuthenticated()) {
             console.log('🔒 Authentication required, redirecting to login');
-            window.location.href = redirectUrl;
+            if (redirectUrl === '/pages/login.html') {
+                this.redirectToLogin();
+            } else {
+                window.location.href = redirectUrl;
+            }
             return false;
         }
         return true;
