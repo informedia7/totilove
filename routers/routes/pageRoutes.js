@@ -15,6 +15,7 @@
  * - GET /search - Search page
  * - GET /results - Results page
  * - GET /activity - Activity page
+ * - GET /matches - Matches page
  * - GET /profile/:userId - View other user's profile
  */
 
@@ -132,6 +133,7 @@ function createPageRoutes(templateController, authMiddleware) {
                 'search': 'search',
                 'results': 'results',
                 'activity': 'activity',
+                'matches': 'matches',
                 'settings': 'settings',
                 'account': 'account'
             };
@@ -221,6 +223,18 @@ function createPageRoutes(templateController, authMiddleware) {
         } catch (error) {
             console.error('[PageRoutes] Error rendering activity page:', error);
             res.status(500).send('<h1>Activity page not available</h1>');
+        }
+    });
+
+    /**
+     * GET /matches, /matches.html - Matches page
+     */
+    router.get(['/matches', '/matches.html'], async (req, res) => {
+        try {
+            await renderTemplatePage(req, res, 'matches');
+        } catch (error) {
+            console.error('[PageRoutes] Error rendering matches page:', error);
+            res.status(500).send('<h1>Matches page not available</h1>');
         }
     });
 

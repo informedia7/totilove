@@ -59,9 +59,9 @@ function setupRoutes(app, dependencies) {
         app.use(authMiddleware.optionalAuth.bind(authMiddleware));
     }
     
-    // Redirect expired sessions for full page refreshes before any HTML route logic runs
+    // Redirect unauthenticated or expired sessions for full page refreshes before any HTML route logic runs
     if (authMiddleware?.sessions) {
-        app.use(createSessionExpiryRedirect(authMiddleware));
+        app.use(createDocumentAuthRedirect(authMiddleware));
     }
 
     // Apply rate limiting to user status endpoints
@@ -148,12 +148,32 @@ function setupRoutes(app, dependencies) {
     });
 }
 
-function createSessionExpiryRedirect(authMiddleware) {
+function createDocumentAuthRedirect(authMiddleware) {
     const publicPaths = new Set([
         '/login',
         '/register',
         '/logout'
     ]);
+
+    const protectedExactPaths = new Map([
+        ['/billing', 'billing'],
+        ['/billing.html', 'billing'],
+        ['/profile-full', 'your profile'],
+        ['/profile-edit', 'your profile'],
+        ['/profile-photos', 'your profile photos'],
+        ['/search', 'search'],
+        ['/results', 'results'],
+        ['/activity', 'activity'],
+        ['/settings', 'settings'],
+        ['/account', 'account'],
+        ['/matches', 'matches'],
+        ['/matches.html', 'matches'],
+        ['/talk', 'chat']
+    ]);
+
+    const protectedPrefixes = [
+        '/profile/'
+    ];
 
     const ignoredPrefixes = [
         '/api',
@@ -177,7 +197,19 @@ function createSessionExpiryRedirect(authMiddleware) {
             req.query?.token;
     };
 
-    return function expiredSessionRedirect(req, res, next) {
+    const getProtectedPageLabel = (path) => {
+        if (protectedExactPaths.has(path)) {
+            return protectedExactPaths.get(path);
+        }
+
+        if (protectedPrefixes.some(prefix => path.startsWith(prefix))) {
+            return 'this page';
+        }
+
+        return null;
+    };
+
+    return function documentAuthRedirect(req, res, next) {
         if (req.method !== 'GET') {
             return next();
         }
@@ -197,10 +229,17 @@ function createSessionExpiryRedirect(authMiddleware) {
             return next();
         }
 
+        const protectedPageLabel = getProtectedPageLabel(path);
+        if (!protectedPageLabel) {
+            return next();
+        }
+
         const sessionToken = getSessionToken(req);
 
         if (!sessionToken) {
-            return next();
+            const message = encodeURIComponent(`Please log in to access ${protectedPageLabel}`);
+            const returnTo = encodeURIComponent(req.originalUrl || req.url || '/');
+            return res.redirect(302, `/login?message=${message}&return=${returnTo}`);
         }
 
         const session = authMiddleware.sessions.get(sessionToken);
