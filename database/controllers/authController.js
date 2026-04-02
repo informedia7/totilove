@@ -423,6 +423,11 @@ class AuthController {
                 }
             } catch (tokenError) {
                 console.error('❌ Error creating verification token:', tokenError);
+                emailDispatch = {
+                    success: false,
+                    provider: null,
+                    error: tokenError.message || 'Failed to create verification token'
+                };
                 // If token creation fails, we still want to complete registration
                 // The user can request a new verification email later
             }

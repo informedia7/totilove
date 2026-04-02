@@ -542,7 +542,11 @@ async function onFormSubmit(e) {
                     }
                 });
                 
-                showNotification('Registration successful! Please check your email to verify your account.', 'success');
+                if (result.emailDispatch && result.emailDispatch.success === false) {
+                    showNotification('Account created, but verification email was not sent. Use the resend button now.', 'warning');
+                } else {
+                    showNotification('Registration successful! Please check your email to verify your account.', 'success');
+                }
             } else {
                 // Old behavior - auto-login (for backward compatibility)
                 if (window.sessionManager) {
