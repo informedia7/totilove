@@ -204,7 +204,22 @@ class EmailService {
 
     async dispatchEmail(to, payload) {
         if (this.provider === 'resend' && this.resendClient) {
-            return this.sendWithResend(to, payload);
+            const resendResult = await this.sendWithResend(to, payload);
+            if (resendResult.success || !this.transporter) {
+                return resendResult;
+            }
+
+            console.warn('⚠️ Falling back to SMTP after Resend failure');
+            const smtpResult = await this.sendWithSmtp(to, payload);
+            if (smtpResult.success) {
+                return smtpResult;
+            }
+
+            return {
+                success: false,
+                provider: 'resend+smtp',
+                error: `Resend: ${resendResult.error}; SMTP: ${smtpResult.error}`
+            };
         }
 
         if (this.transporter) {
@@ -223,11 +238,19 @@ class EmailService {
                 html: payload.html,
                 text: payload.text
             });
-            console.log('✅ Email sent via Resend:', response?.id || response);
-            return { success: true, messageId: response?.id || 'resend-message' };
+
+            if (response?.error) {
+                const resendError = response.error.message || 'Unknown Resend API error';
+                console.error('❌ Resend API rejected email:', response.error);
+                return { success: false, provider: 'resend', error: resendError };
+            }
+
+            const messageId = response?.data?.id || response?.id || 'resend-message';
+            console.log('✅ Email sent via Resend:', messageId);
+            return { success: true, provider: 'resend', messageId };
         } catch (error) {
             console.error('❌ Failed to send email via Resend:', error?.message || error);
-            return { success: false, error: error?.message || 'Failed to send email via Resend' };
+            return { success: false, provider: 'resend', error: error?.message || 'Failed to send email via Resend' };
         }
     }
 
@@ -247,10 +270,10 @@ class EmailService {
         try {
             const info = await this.transporter.sendMail(mailOptions);
             console.log('✅ Email sent via SMTP:', info.messageId);
-            return { success: true, messageId: info.messageId };
+            return { success: true, provider: 'smtp', messageId: info.messageId };
         } catch (error) {
             console.error('❌ Failed to send email via SMTP:', error);
-            return { success: false, error: error.message };
+            return { success: false, provider: 'smtp', error: error.message };
         }
     }
 
