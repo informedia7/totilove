@@ -851,6 +851,73 @@ html[data-theme="dark"] #delete-account-modal .margin-0-color-muted {
     color: #cbd5e1;
 }
 
+/* Theme-hook compatibility: support dark mode when class is set on :root */
+:root.theme-dark #change-password-modal.modal-overlay,
+:root.theme-dark #delete-account-modal.modal-overlay {
+    background: rgba(0, 0, 0, 0.78) !important;
+}
+
+:root.theme-dark #change-password-modal .modal-content,
+:root.theme-dark #delete-account-modal .modal-content {
+    background: #111827 !important;
+    background-color: #111827 !important;
+    color: #f8fafc !important;
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55) !important;
+}
+
+:root.theme-dark #change-password-modal .margin-0-0-0-5-0-color-dark-color-font-size-1-5,
+:root.theme-dark #change-password-modal .display-block-mb-0-5-font-weight-600-color-dark-color,
+:root.theme-dark #change-password-modal .display-block-mb-0-5-font-weight-600-color-dark-color-position-relative,
+:root.theme-dark #delete-account-modal .margin-0-0-0-5-0-color-dark-color-font-size-1-5,
+:root.theme-dark #delete-account-modal .margin-0-0-0-5-0-color-dark-color {
+    color: #f8fafc;
+}
+
+:root.theme-dark #change-password-modal .margin-0-color-muted-font-size-0-95,
+:root.theme-dark #delete-account-modal .margin-0-color-muted-font-size-0-95,
+:root.theme-dark #delete-account-modal .margin-0-color-muted {
+    color: #cbd5e1;
+}
+
+:root.theme-dark #change-password-modal .width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-box-sizing-border-box,
+:root.theme-dark #delete-account-modal .width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-text-align-center-text-transform-uppercase-box-sizing-border-box {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+:root.theme-dark #change-password-modal .width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-box-sizing-border-box::placeholder,
+:root.theme-dark #delete-account-modal .width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-text-align-center-text-transform-uppercase-box-sizing-border-box::placeholder {
+    color: #94a3b8;
+}
+
+:root.theme-dark #change-password-modal .bg-light-gray-color-dark-color-border-1-solid-light-gray-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-pointer-font-size-0-95,
+:root.theme-dark #delete-account-modal .bg-light-gray-color-dark-color-border-1-solid-light-gray-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-pointer-font-size-0-95 {
+    background: #1e293b;
+    color: #e2e8f0;
+    border-color: #334155;
+}
+
+:root.theme-dark #change-password-modal .password-requirements-tooltip {
+    background: #1e293b;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+}
+
+:root.theme-dark #change-password-modal .position-absolute-top-100-left-20-border-6-solid-transparent-border-top-color-purple {
+    border-top-color: #1e293b;
+}
+
+:root.theme-dark #delete-account-modal .bg-yellow-light-border-1-solid-yellow-border-radius-8-padding-1-mb-1-5 {
+    background: rgba(245, 158, 11, 0.14);
+    border-color: rgba(245, 158, 11, 0.4);
+}
+
+:root.theme-dark #delete-account-modal .font-weight-600-color-dark-yellow-text-align-center {
+    color: #fcd34d;
+}
+
 .text-align-center-mb-1-5 {
     text-align: center;
     margin-bottom: 1.5rem;
