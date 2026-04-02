@@ -126,6 +126,7 @@
 
     // Upload images
     async function uploadImages(files) {
+        let uploadToast = null;
         try {
             const formData = new FormData();
             files.forEach(file => {
@@ -142,24 +143,29 @@
 
             formData.append('userId', currentUserId);
 
-            const response = await fetch('/api/profile/upload-images', {
-                method: 'POST',
-                headers: sessionToken ? {
-                    'Authorization': `Bearer ${sessionToken}`,
-                    'X-Session-Token': sessionToken
-                } : {},
-                body: formData
-            });
+            uploadToast = showProgressNotification('Your Image uploading.', 'info');
 
-            const result = await response.json();
+            const result = await uploadImagesWithProgress(formData, (percent) => {
+                if (uploadToast) {
+                    uploadToast.updateProgress(percent);
+                }
+            });
 
             if (result.success) {
                 // Check for errors even on success
                 if (result.errors && result.errors.length > 0) {
                     const errorMessages = result.errors.map(e => `${e.filename}: ${e.error}`).join('\n');
-                    showNotification(`Upload completed with errors:\n${errorMessages}`, 'error');
+                    if (uploadToast) {
+                        uploadToast.complete(`Upload completed with errors:\n${errorMessages}`, 'error');
+                    } else {
+                        showNotification(`Upload completed with errors:\n${errorMessages}`, 'error');
+                    }
                 } else {
-                    showNotification('Photos uploaded successfully!', 'success');
+                    if (uploadToast) {
+                        uploadToast.complete('Your image uploaded successfully!', 'success');
+                    } else {
+                        showNotification('Your image uploaded successfully!', 'success');
+                    }
                 }
                 
                 // Reload images immediately, then again after a short delay to ensure they're in the database
@@ -172,8 +178,55 @@
             }
 
         } catch (error) {
-            showNotification(`Upload failed: ${error.message}`, 'error');
+            if (uploadToast) {
+                uploadToast.complete(`Upload failed: ${error.message}`, 'error');
+            } else {
+                showNotification(`Upload failed: ${error.message}`, 'error');
+            }
         }
+    }
+
+    function uploadImagesWithProgress(formData, onProgress) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/profile/upload-images');
+
+            if (sessionToken) {
+                xhr.setRequestHeader('Authorization', `Bearer ${sessionToken}`);
+                xhr.setRequestHeader('X-Session-Token', sessionToken);
+            }
+
+            xhr.upload.onprogress = (event) => {
+                if (!event.lengthComputable || typeof onProgress !== 'function') {
+                    return;
+                }
+                const percent = Math.min(99, Math.round((event.loaded / event.total) * 100));
+                onProgress(percent);
+            };
+
+            xhr.onload = () => {
+                let result;
+                try {
+                    result = JSON.parse(xhr.responseText || '{}');
+                } catch (error) {
+                    reject(new Error('Invalid upload response from server'));
+                    return;
+                }
+
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    resolve(result);
+                    return;
+                }
+
+                reject(new Error(result.error || result.message || `Upload failed with status ${xhr.status}`));
+            };
+
+            xhr.onerror = () => {
+                reject(new Error('Network error during upload'));
+            };
+
+            xhr.send(formData);
+        });
     }
 
     // Load user images
@@ -530,37 +583,76 @@
         }
     };
 
-    // Show notification
-    function showNotification(message, type = 'info') {
-        // Create notification element
+    function getNotificationIcon(type) {
+        return type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
+    }
+
+    function createNotificationElement(message, type = 'info', withProgress = false) {
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
-        const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
-        notification.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--dark, #2c3e50);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 10000;
-            animation: slideInUp 0.4s ease-out;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 0.95rem;
+        const icon = getNotificationIcon(type);
+
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="fas fa-${icon}"></i>
+                <span class="notification-message">${String(message).replace(/\n/g, '<br>')}</span>
+            </div>
+            ${withProgress ? `
+            <div class="notification-progress">
+                <div class="notification-progress-bar"></div>
+            </div>
+            ` : ''}
         `;
-        notification.innerHTML = `<i class="fas fa-${icon}"></i> <span>${message}</span>`;
-        
+
         document.body.appendChild(notification);
-        
+        setTimeout(() => notification.classList.add('show'), 100);
+
+        return notification;
+    }
+
+    function showProgressNotification(message, type = 'info') {
+        const notification = createNotificationElement(message, type, true);
+        const progressBar = notification.querySelector('.notification-progress-bar');
+        const messageEl = notification.querySelector('.notification-message');
+        const iconEl = notification.querySelector('.notification-content i');
+
+        return {
+            updateProgress(percent) {
+                if (!progressBar) {
+                    return;
+                }
+                const safePercent = Math.max(0, Math.min(100, Number(percent) || 0));
+                progressBar.style.width = `${safePercent}%`;
+            },
+            complete(finalMessage, finalType = 'success') {
+                if (messageEl) {
+                    messageEl.innerHTML = String(finalMessage).replace(/\n/g, '<br>');
+                }
+
+                if (iconEl) {
+                    iconEl.className = `fas fa-${getNotificationIcon(finalType)}`;
+                }
+
+                notification.classList.remove('notification-info', 'notification-success', 'notification-error');
+                notification.classList.add(`notification-${finalType}`);
+                this.updateProgress(100);
+
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                }, 1500);
+            }
+        };
+    }
+
+    // Show notification (same toast UI pattern as profile-edit, with progress bar)
+    function showNotification(message, type = 'info') {
+        const notification = createNotificationElement(message, type, false);
+
         setTimeout(() => {
-            notification.style.animation = 'slideOutDown 0.4s ease-in';
-            setTimeout(() => notification.remove(), 400);
-        }, 3001);
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 5000);
     }
 
     function updateLayoutAvatarImage(fileName) {
