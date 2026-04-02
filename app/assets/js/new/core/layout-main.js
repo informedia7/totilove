@@ -144,6 +144,43 @@ function initializePresenceEngine() {
 let layoutSocket = null;
 let layoutSocketInitializing = false;
 let socketIoClientPromise = null;
+let layoutNotificationRetryTimer = null;
+
+function getLayoutCurrentUser() {
+    const body = document.body;
+    const bodyUserId = body?.getAttribute('data-user-id');
+    const parsedBodyUserId = bodyUserId && bodyUserId !== 'null' && bodyUserId !== ''
+        ? parseInt(bodyUserId, 10)
+        : null;
+
+    const sessionUser = window.sessionManager?.getCurrentUser?.() || null;
+    const mergedUser = {
+        ...(sessionUser || {}),
+        ...(window.currentUser || {})
+    };
+
+    const resolvedId = mergedUser.id || parsedBodyUserId;
+    if (!resolvedId) {
+        return null;
+    }
+
+    return {
+        ...mergedUser,
+        id: resolvedId,
+        real_name: mergedUser.real_name || body?.getAttribute('data-user-real-name') || mergedUser.email || ''
+    };
+}
+
+function scheduleLayoutNotificationInitialization() {
+    if (layoutNotificationRetryTimer || layoutSocketInitializing || (layoutSocket && layoutSocket.connected)) {
+        return;
+    }
+
+    layoutNotificationRetryTimer = setTimeout(() => {
+        layoutNotificationRetryTimer = null;
+        initializeLayoutNotifications();
+    }, 250);
+}
 
 function ensureSocketIoClient() {
     if (typeof window.io !== 'undefined') {
@@ -176,9 +213,16 @@ function ensureSocketIoClient() {
 }
 
 function initializeLayoutNotifications() {
-    if (!window.currentUser || !window.currentUser.id) {
+    const currentUser = getLayoutCurrentUser();
+    if (!currentUser || !currentUser.id) {
+        scheduleLayoutNotificationInitialization();
         return;
     }
+
+    window.currentUser = {
+        ...(window.currentUser || {}),
+        ...currentUser
+    };
 
     if (window.PresenceConfig && window.PresenceConfig.socketEnabled === false) {
         return;
@@ -210,10 +254,15 @@ function initializeLayoutNotifications() {
 
         layoutSocket.on('connect', () => {
             layoutSocketInitializing = false;
+            const connectedUser = getLayoutCurrentUser();
+            if (!connectedUser || !connectedUser.id) {
+                scheduleLayoutNotificationInitialization();
+                return;
+            }
             // Authenticate the socket connection
             const authData = {
-                userId: window.currentUser.id,
-                real_name: window.currentUser.real_name || window.currentUser.email
+                userId: connectedUser.id,
+                real_name: connectedUser.real_name || connectedUser.email
             };
             layoutSocket.emit('authenticate', authData);
         });
@@ -239,8 +288,13 @@ function initializeLayoutNotifications() {
 
         // Listen for new messages
         layoutSocket.on('new_message', async (messageData) => {
+            const activeUser = getLayoutCurrentUser();
+            if (!activeUser || !activeUser.id) {
+                return;
+            }
+
             // Check if this message is for the current user
-            if (messageData.receiverId == window.currentUser.id) {
+            if (messageData.receiverId == activeUser.id) {
                 // Prevent duplicate notifications by checking source and message ID
                 const messageKey = `${messageData.id}_${messageData.source || 'unknown'}`;
                 if (window.processedMessages && window.processedMessages.has(messageKey)) {
@@ -345,6 +399,16 @@ window.updateTalkNotificationBadge = async function() {
                     talkBadge.style.display = 'none';
                 }
             }
+            
+                const talkBadgeMobile = document.getElementById('talk-notification-badge-mobile');
+                if (talkBadgeMobile) {
+                    if (unreadCount > 0) {
+                        talkBadgeMobile.textContent = unreadCount;
+                        talkBadgeMobile.style.display = 'flex';
+                    } else {
+                        talkBadgeMobile.style.display = 'none';
+                    }
+                }
         }
     } catch (error) {
         // Silent error handling
@@ -353,29 +417,67 @@ window.updateTalkNotificationBadge = async function() {
 
 // Show notification in layout
 function showLayoutNotification(messageData) {
-    // Create notification element
+    const senderName = messageData.senderUsername || messageData.sender_real_name || 'Someone';
+
+    // Create a dedicated host node outside any scroll container
     const notification = document.createElement('div');
-    notification.className = 'layout-notification';
+    notification.setAttribute('data-layout-toast', '1');
+
+    // Use fully inline styles — immune to CSS class conflicts and overflow-x:hidden on body
+    Object.assign(notification.style, {
+        position: 'fixed',
+        top: '20px',
+        right: '20px',
+        background: 'rgba(30, 30, 50, 0.97)',
+        color: '#fff',
+        borderRadius: '12px',
+        boxShadow: '0 8px 28px rgba(0,0,0,0.45)',
+        zIndex: '2147483647',
+        maxWidth: '340px',
+        minWidth: '240px',
+        padding: '14px 16px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        border: '1px solid rgba(255,255,255,0.18)',
+        cursor: 'pointer',
+        fontFamily: 'inherit',
+        fontSize: '14px',
+        lineHeight: '1.45',
+        transition: 'opacity 0.3s ease',
+        opacity: '1',
+        boxSizing: 'border-box',
+        userSelect: 'none',
+    });
+
     notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas fa-envelope notification-icon"></i>
-            <div class="notification-text">
-                <span class="notification-title">New Message!</span>
-                <span class="notification-message">From ${messageData.senderUsername || 'Someone'}</span>
-            </div>
-            <button class="notification-close">
-                <i class="fas fa-times"></i>
-            </button>
+        <span style="font-size:1.3rem;flex-shrink:0;line-height:1;">&#9993;</span>
+        <div style="flex:1;min-width:0;overflow:hidden;">
+            <div style="font-weight:700;font-size:0.9rem;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">New Message!</div>
+            <div style="font-size:0.82rem;opacity:0.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">From ${senderName}</div>
         </div>
+        <button data-close-toast style="background:none;border:none;color:rgba(255,255,255,0.55);cursor:pointer;padding:2px 4px;font-size:1rem;line-height:1;flex-shrink:0;border-radius:4px;" aria-label="Close">&#x2715;</button>
     `;
 
-    // Add to page
-    document.body.appendChild(notification);
+    // Close button
+    notification.querySelector('[data-close-toast]').addEventListener('click', (e) => {
+        e.stopPropagation();
+        notification.remove();
+    });
 
-    // Auto-remove after 5 seconds
+    // Click anywhere on notification (except close) to go to Talk
+    notification.addEventListener('click', () => {
+        window.location.href = '/talk.html';
+    });
+
+    // Append to documentElement (<html>) to escape overflow-x:hidden on body
+    document.documentElement.appendChild(notification);
+
+    // Fade out then remove after 5 seconds
     setTimeout(() => {
         if (notification.parentNode) {
-            notification.remove();
+            notification.style.opacity = '0';
+            setTimeout(() => notification.parentNode && notification.remove(), 350);
         }
     }, 5000);
 }
@@ -462,9 +564,16 @@ function playNotificationSound(type = 'receiver') {
 
 // Initialize message badge on page load
 document.addEventListener('DOMContentLoaded', function() {
-    if (window.currentUser && window.currentUser.id) {
+    const currentUser = getLayoutCurrentUser();
+    if (currentUser && currentUser.id) {
+        window.currentUser = {
+            ...(window.currentUser || {}),
+            ...currentUser
+        };
         updateMessageBadge();
         updateTalkNotificationBadge();
+    } else {
+        scheduleLayoutNotificationInitialization();
     }
     
     // Set up logout handling for online tracker

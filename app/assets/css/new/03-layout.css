@@ -992,6 +992,7 @@ html[data-theme="dark"] .profile-header .header-btn.theme-toggle,
 }
 
 .mobile-menu-item {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1020,6 +1021,12 @@ html[data-theme="dark"] .profile-header .header-btn.theme-toggle,
 .mobile-menu-item i {
     font-size: 1.35rem;
     color: currentColor;
+}
+
+.mobile-menu-item .talk-notification-badge {
+    top: 0.2rem;
+    left: calc(50% + 0.15rem);
+    right: auto;
 }
 
 /* Light mode overrides for the mobile dropdown so text stays readable */
