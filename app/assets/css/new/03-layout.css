@@ -1027,6 +1027,10 @@ html[data-theme="dark"] .profile-header .header-btn.theme-toggle,
     top: 0.2rem;
     left: calc(50% + 0.15rem);
     right: auto;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
 }
 
 /* Light mode overrides for the mobile dropdown so text stays readable */
