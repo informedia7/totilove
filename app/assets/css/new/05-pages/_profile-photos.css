@@ -849,7 +849,7 @@ html[data-theme="dark"] .gallery-section.enhanced-gallery .gallery-content {
     animation: slideUp 0.3s ease-out;
 }
 
-.modal-content {
+#delete-confirmation-modal .modal-content {
     background: white;
     border-radius: 16px;
     padding: 2rem;
@@ -860,9 +860,13 @@ html[data-theme="dark"] .gallery-section.enhanced-gallery .gallery-content {
 }
 
 html[data-theme="dark"] #delete-confirmation-modal .modal-content,
-body.dark-mode #delete-confirmation-modal .modal-content {
-    background: #111827;
-    border: 1px solid #374151;
+body.dark-mode #delete-confirmation-modal .modal-content,
+:root.theme-dark #delete-confirmation-modal .modal-content,
+html.theme-dark #delete-confirmation-modal .modal-content,
+#delete-confirmation-modal.theme-dark-active .modal-content {
+    background: #111827 !important;
+    background-color: #111827 !important;
+    border: 1px solid #374151 !important;
     box-shadow: 0 14px 42px rgba(0, 0, 0, 0.6);
 }
 
@@ -880,7 +884,10 @@ body.dark-mode #delete-confirmation-modal .modal-content {
 }
 
 html[data-theme="dark"] #delete-confirmation-modal .modal-title,
-body.dark-mode #delete-confirmation-modal .modal-title {
+body.dark-mode #delete-confirmation-modal .modal-title,
+:root.theme-dark #delete-confirmation-modal .modal-title,
+html.theme-dark #delete-confirmation-modal .modal-title,
+#delete-confirmation-modal.theme-dark-active .modal-title {
     color: #f3f4f6;
 }
 
@@ -892,7 +899,10 @@ body.dark-mode #delete-confirmation-modal .modal-title {
 }
 
 html[data-theme="dark"] #delete-confirmation-modal .modal-message,
-body.dark-mode #delete-confirmation-modal .modal-message {
+body.dark-mode #delete-confirmation-modal .modal-message,
+:root.theme-dark #delete-confirmation-modal .modal-message,
+html.theme-dark #delete-confirmation-modal .modal-message,
+#delete-confirmation-modal.theme-dark-active .modal-message {
     color: #d1d5db;
 }
 
@@ -920,7 +930,10 @@ body.dark-mode #delete-confirmation-modal .modal-message {
 }
 
 html[data-theme="dark"] #delete-confirmation-modal .btn-cancel,
-body.dark-mode #delete-confirmation-modal .btn-cancel {
+body.dark-mode #delete-confirmation-modal .btn-cancel,
+:root.theme-dark #delete-confirmation-modal .btn-cancel,
+html.theme-dark #delete-confirmation-modal .btn-cancel,
+#delete-confirmation-modal.theme-dark-active .btn-cancel {
     background: #1f2937;
     color: #e5e7eb;
     border-color: #4b5563;
@@ -932,7 +945,10 @@ body.dark-mode #delete-confirmation-modal .btn-cancel {
 }
 
 html[data-theme="dark"] #delete-confirmation-modal .btn-cancel:hover,
-body.dark-mode #delete-confirmation-modal .btn-cancel:hover {
+body.dark-mode #delete-confirmation-modal .btn-cancel:hover,
+:root.theme-dark #delete-confirmation-modal .btn-cancel:hover,
+html.theme-dark #delete-confirmation-modal .btn-cancel:hover,
+#delete-confirmation-modal.theme-dark-active .btn-cancel:hover {
     background: #374151;
     border-color: #6b7280;
 }
