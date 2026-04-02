@@ -737,6 +737,120 @@
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
 }
 
+body.dark-mode #change-password-modal.modal-overlay,
+body.dark-mode #app-root #change-password-modal.modal-overlay,
+html.theme-dark #change-password-modal.modal-overlay,
+html[data-theme="dark"] #change-password-modal.modal-overlay {
+    background: rgba(0, 0, 0, 0.78) !important;
+}
+
+body.dark-mode #change-password-modal .modal-content,
+body.dark-mode #app-root #change-password-modal .modal-content,
+html.theme-dark #change-password-modal .modal-content,
+html[data-theme="dark"] #change-password-modal .modal-content {
+    background: #111827 !important;
+    background-color: #111827 !important;
+    color: #f8fafc !important;
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55) !important;
+}
+
+body.dark-mode #change-password-modal .margin-0-0-0-5-0-color-dark-color-font-size-1-5,
+body.dark-mode #change-password-modal .display-block-mb-0-5-font-weight-600-color-dark-color,
+body.dark-mode #change-password-modal .display-block-mb-0-5-font-weight-600-color-dark-color-position-relative,
+html.theme-dark #change-password-modal .margin-0-0-0-5-0-color-dark-color-font-size-1-5,
+html.theme-dark #change-password-modal .display-block-mb-0-5-font-weight-600-color-dark-color,
+html.theme-dark #change-password-modal .display-block-mb-0-5-font-weight-600-color-dark-color-position-relative,
+html[data-theme="dark"] #change-password-modal .margin-0-0-0-5-0-color-dark-color-font-size-1-5,
+html[data-theme="dark"] #change-password-modal .display-block-mb-0-5-font-weight-600-color-dark-color,
+html[data-theme="dark"] #change-password-modal .display-block-mb-0-5-font-weight-600-color-dark-color-position-relative {
+    color: #f8fafc;
+}
+
+body.dark-mode #change-password-modal .margin-0-color-muted-font-size-0-95,
+html.theme-dark #change-password-modal .margin-0-color-muted-font-size-0-95,
+html[data-theme="dark"] #change-password-modal .margin-0-color-muted-font-size-0-95 {
+    color: #cbd5e1;
+}
+
+body.dark-mode #change-password-modal .width-64-height-64-bg-blue-light-border-radius-50-display-flex-align-center-justify-center-margin-0-auto-1,
+html.theme-dark #change-password-modal .width-64-height-64-bg-blue-light-border-radius-50-display-flex-align-center-justify-center-margin-0-auto-1,
+html[data-theme="dark"] #change-password-modal .width-64-height-64-bg-blue-light-border-radius-50-display-flex-align-center-justify-center-margin-0-auto-1 {
+    background: rgba(59, 130, 246, 0.18);
+}
+
+body.dark-mode #change-password-modal .width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-box-sizing-border-box,
+html.theme-dark #change-password-modal .width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-box-sizing-border-box,
+html[data-theme="dark"] #change-password-modal .width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-box-sizing-border-box {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+body.dark-mode #change-password-modal .width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-box-sizing-border-box::placeholder,
+html.theme-dark #change-password-modal .width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-box-sizing-border-box::placeholder,
+html[data-theme="dark"] #change-password-modal .width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-box-sizing-border-box::placeholder {
+    color: #94a3b8;
+}
+
+body.dark-mode #change-password-modal .bg-light-gray-color-dark-color-border-1-solid-light-gray-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-pointer-font-size-0-95,
+html.theme-dark #change-password-modal .bg-light-gray-color-dark-color-border-1-solid-light-gray-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-pointer-font-size-0-95,
+html[data-theme="dark"] #change-password-modal .bg-light-gray-color-dark-color-border-1-solid-light-gray-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-pointer-font-size-0-95 {
+    background: #1e293b;
+    color: #e2e8f0;
+    border-color: #334155;
+}
+
+body.dark-mode #change-password-modal .password-requirements-tooltip,
+html.theme-dark #change-password-modal .password-requirements-tooltip,
+html[data-theme="dark"] #change-password-modal .password-requirements-tooltip {
+    background: #1e293b;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+}
+
+body.dark-mode #change-password-modal .position-absolute-top-100-left-20-border-6-solid-transparent-border-top-color-purple,
+html.theme-dark #change-password-modal .position-absolute-top-100-left-20-border-6-solid-transparent-border-top-color-purple,
+html[data-theme="dark"] #change-password-modal .position-absolute-top-100-left-20-border-6-solid-transparent-border-top-color-purple {
+    border-top-color: #1e293b;
+}
+
+body.dark-mode #delete-account-modal.modal-overlay,
+body.dark-mode #app-root #delete-account-modal.modal-overlay,
+html.theme-dark #delete-account-modal.modal-overlay,
+html[data-theme="dark"] #delete-account-modal.modal-overlay {
+    background: rgba(0, 0, 0, 0.78) !important;
+}
+
+body.dark-mode #delete-account-modal .modal-content,
+body.dark-mode #app-root #delete-account-modal .modal-content,
+html.theme-dark #delete-account-modal .modal-content,
+html[data-theme="dark"] #delete-account-modal .modal-content {
+    background: #111827 !important;
+    background-color: #111827 !important;
+    color: #f8fafc !important;
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55) !important;
+}
+
+body.dark-mode #delete-account-modal .margin-0-0-0-5-0-color-dark-color-font-size-1-5,
+body.dark-mode #delete-account-modal .margin-0-0-0-5-0-color-dark-color,
+html.theme-dark #delete-account-modal .margin-0-0-0-5-0-color-dark-color-font-size-1-5,
+html.theme-dark #delete-account-modal .margin-0-0-0-5-0-color-dark-color,
+html[data-theme="dark"] #delete-account-modal .margin-0-0-0-5-0-color-dark-color-font-size-1-5,
+html[data-theme="dark"] #delete-account-modal .margin-0-0-0-5-0-color-dark-color {
+    color: #f8fafc;
+}
+
+body.dark-mode #delete-account-modal .margin-0-color-muted-font-size-0-95,
+body.dark-mode #delete-account-modal .margin-0-color-muted,
+html.theme-dark #delete-account-modal .margin-0-color-muted-font-size-0-95,
+html.theme-dark #delete-account-modal .margin-0-color-muted,
+html[data-theme="dark"] #delete-account-modal .margin-0-color-muted-font-size-0-95,
+html[data-theme="dark"] #delete-account-modal .margin-0-color-muted {
+    color: #cbd5e1;
+}
+
 .text-align-center-mb-1-5 {
     text-align: center;
     margin-bottom: 1.5rem;
@@ -921,6 +1035,12 @@
     margin: 0 auto 1rem;
 }
 
+body.dark-mode #delete-account-modal .width-64-height-64-bg-red-light-border-radius-50-display-flex-align-items-center-justify-content-center-margin-0-auto-1,
+html.theme-dark #delete-account-modal .width-64-height-64-bg-red-light-border-radius-50-display-flex-align-items-center-justify-content-center-margin-0-auto-1,
+html[data-theme="dark"] #delete-account-modal .width-64-height-64-bg-red-light-border-radius-50-display-flex-align-items-center-justify-content-center-margin-0-auto-1 {
+    background: rgba(220, 53, 69, 0.18);
+}
+
 .font-size-2-color-red {
     font-size: 2rem;
     color: #dc3545;
@@ -934,10 +1054,23 @@
     margin-bottom: 1.5rem;
 }
 
+body.dark-mode #delete-account-modal .bg-yellow-light-border-1-solid-yellow-border-radius-8-padding-1-mb-1-5,
+html.theme-dark #delete-account-modal .bg-yellow-light-border-1-solid-yellow-border-radius-8-padding-1-mb-1-5,
+html[data-theme="dark"] #delete-account-modal .bg-yellow-light-border-1-solid-yellow-border-radius-8-padding-1-mb-1-5 {
+    background: rgba(245, 158, 11, 0.14);
+    border-color: rgba(245, 158, 11, 0.4);
+}
+
 .font-weight-600-color-dark-yellow-text-align-center {
     font-weight: 600;
     color: #856404;
     text-align: center;
+}
+
+body.dark-mode #delete-account-modal .font-weight-600-color-dark-yellow-text-align-center,
+html.theme-dark #delete-account-modal .font-weight-600-color-dark-yellow-text-align-center,
+html[data-theme="dark"] #delete-account-modal .font-weight-600-color-dark-yellow-text-align-center {
+    color: #fcd34d;
 }
 
 .bg-gray-color-white-border-none-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-not-allowed-font-size-0-95 {
@@ -975,6 +1108,28 @@
     text-align: center;
     text-transform: uppercase;
     box-sizing: border-box;
+}
+
+body.dark-mode #delete-account-modal .width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-text-align-center-text-transform-uppercase-box-sizing-border-box,
+html.theme-dark #delete-account-modal .width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-text-align-center-text-transform-uppercase-box-sizing-border-box,
+html[data-theme="dark"] #delete-account-modal .width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-text-align-center-text-transform-uppercase-box-sizing-border-box {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+body.dark-mode #delete-account-modal .width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-text-align-center-text-transform-uppercase-box-sizing-border-box::placeholder,
+html.theme-dark #delete-account-modal .width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-text-align-center-text-transform-uppercase-box-sizing-border-box::placeholder,
+html[data-theme="dark"] #delete-account-modal .width-100-padding-0-75-border-2-solid-light-gray-border-radius-8-font-size-1-text-align-center-text-transform-uppercase-box-sizing-border-box::placeholder {
+    color: #94a3b8;
+}
+
+body.dark-mode #delete-account-modal .bg-light-gray-color-dark-color-border-1-solid-light-gray-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-pointer-font-size-0-95,
+html.theme-dark #delete-account-modal .bg-light-gray-color-dark-color-border-1-solid-light-gray-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-pointer-font-size-0-95,
+html[data-theme="dark"] #delete-account-modal .bg-light-gray-color-dark-color-border-1-solid-light-gray-padding-0-75-1-5-border-radius-8-font-weight-600-cursor-pointer-font-size-0-95 {
+    background: #1e293b;
+    color: #e2e8f0;
+    border-color: #334155;
 }
 
 .color-red-font-size-0-85-mt-0-5-text-align-center {
