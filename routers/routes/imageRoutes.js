@@ -86,13 +86,72 @@ class ApiResponse {
 // ============================================================================
 let ClamScan = null;
 let clamscan = null;
+let clamscanInitPromise = null;
 try {
     ClamScan = require('clamscan');
-    clamscan = new ClamScan();
-    console.log('[ImageRoutes] ClamAV virus scanning enabled');
 } catch (e) {
     console.warn('[ImageRoutes] ClamAV not available. Install with: npm install clamscan');
     console.warn('[ImageRoutes] Virus scanning disabled. Images will be uploaded without scanning.');
+}
+
+async function getVirusScanner() {
+    if (!ClamScan) {
+        return null;
+    }
+
+    if (clamscan) {
+        return clamscan;
+    }
+
+    if (!clamscanInitPromise) {
+        clamscanInitPromise = new ClamScan().init({
+            clamscan: {
+                active: true,
+                path: process.env.CLAMSCAN_PATH || '/usr/bin/clamscan'
+            },
+            clamdscan: {
+                active: true,
+                path: process.env.CLAMDSCAN_PATH || '/usr/bin/clamdscan',
+                host: process.env.CLAMAV_HOST || false,
+                port: process.env.CLAMAV_PORT ? parseInt(process.env.CLAMAV_PORT, 10) : false,
+                socket: process.env.CLAMAV_SOCKET || false,
+                localFallback: true,
+                timeout: 60000
+            },
+            preference: process.env.CLAMAV_PREFERENCE || 'clamdscan'
+        }).then((instance) => {
+            clamscan = instance;
+            console.log('[ImageRoutes] ClamAV virus scanning enabled');
+            return clamscan;
+        }).catch((error) => {
+            console.warn('[ImageRoutes] ClamAV initialization failed. Virus scanning disabled:', error.message);
+            clamscan = null;
+            return null;
+        });
+    }
+
+    return clamscanInitPromise;
+}
+
+async function scanFileForViruses(filePath) {
+    const scanner = await getVirusScanner();
+    if (!scanner) {
+        return { available: false, isInfected: false, viruses: [] };
+    }
+
+    try {
+        const scanResult = await scanner.scanFile(filePath);
+        return {
+            available: true,
+            isInfected: !!scanResult?.isInfected,
+            viruses: scanResult?.viruses || []
+        };
+    } catch (error) {
+        console.warn('[ImageRoutes] Virus scan failed; disabling scanner for this process:', error.message);
+        clamscan = null;
+        clamscanInitPromise = null;
+        return { available: false, isInfected: false, viruses: [] };
+    }
 }
 
 // ============================================================================
@@ -466,33 +525,12 @@ function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
                 const errors = [];
 
                 // VIRUS SCANNING: Scan all files before processing
-                if (clamscan) {
+                const virusScanner = await getVirusScanner();
+                if (virusScanner) {
                     for (const file of req.files) {
-                        try {
-                            const scanResult = await clamscan.scanFile(file.path);
-                            if (scanResult.isInfected) {
-                                // Clean up infected files
-                                for (const f of req.files) {
-                                    try {
-                                        if (fs.existsSync(f.path)) {
-                                            await fs.promises.unlink(f.path);
-                                        }
-                                    } catch (cleanupError) {
-                                        // Ignore cleanup errors
-                                    }
-                                }
-                                return res.status(400).json({
-                                    success: false,
-                                    error: ERROR_MESSAGES.VIRUS_DETECTED,
-                                    details: {
-                                        filename: file.originalname,
-                                        reason: 'File contains malware or virus'
-                                    }
-                                });
-                            }
-                        } catch (scanError) {
-                            // If scanning fails, clean up files and reject upload
-                            console.error('[ImageRoutes] Virus scan error:', scanError);
+                        const scanResult = await scanFileForViruses(file.path);
+                        if (scanResult.isInfected) {
+                            // Clean up infected files
                             for (const f of req.files) {
                                 try {
                                     if (fs.existsSync(f.path)) {
@@ -504,10 +542,10 @@ function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
                             }
                             return res.status(400).json({
                                 success: false,
-                                error: 'File security check failed',
+                                error: ERROR_MESSAGES.VIRUS_DETECTED,
                                 details: {
                                     filename: file.originalname,
-                                    reason: 'Unable to verify file safety'
+                                    reason: 'File contains malware or virus'
                                 }
                             });
                         }

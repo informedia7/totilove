@@ -6,8 +6,10 @@
 (function() {
     // Get session token and user ID
     const urlParams = new URLSearchParams(window.location.search);
-    const sessionToken = urlParams.get('token');
+    let sessionToken = urlParams.get('token');
     let currentUserId = null;
+    const ALLOWED_IMAGE_MIME_TYPES = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']);
+    const ALLOWED_IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.gif', '.webp']);
 
     // Initialize on DOM ready
     if (document.readyState === 'loading') {
@@ -29,6 +31,17 @@
     let currentUserGender = null;
     const MOBILE_PORTRAIT_QUERY = '(max-width: 600px) and (orientation: portrait)';
     let mobileDocClickHandler = null;
+
+    function isSupportedImageFile(file) {
+        if (!file) {
+            return false;
+        }
+
+        const fileName = typeof file.name === 'string' ? file.name.toLowerCase() : '';
+        const extension = fileName.includes('.') ? fileName.slice(fileName.lastIndexOf('.')) : '';
+
+        return ALLOWED_IMAGE_MIME_TYPES.has(file.type) || ALLOWED_IMAGE_EXTENSIONS.has(extension);
+    }
 
     async function init() {
         // Get user ID - same way as stats-count.js (from window.currentUser)
@@ -80,7 +93,15 @@
             });
             
             fileInput.addEventListener('change', (e) => {
-                const files = Array.from(e.target.files).filter(file => file.type.startsWith('image/'));
+                const selectedFiles = Array.from(e.target.files || []);
+                const unsupportedFiles = selectedFiles.filter(file => !isSupportedImageFile(file));
+                const files = selectedFiles.filter(isSupportedImageFile);
+
+                if (unsupportedFiles.length > 0) {
+                    const unsupportedNames = unsupportedFiles.map(file => file.name).join(', ');
+                    showNotification(`Unsupported image format: ${unsupportedNames}. Please use JPEG, PNG, GIF, or WebP.`, 'error');
+                }
+
                 if (files.length > 0) {
                     uploadImages(files);
                 }
@@ -108,6 +129,10 @@
         try {
             const formData = new FormData();
             files.forEach(file => {
+                if (!isSupportedImageFile(file)) {
+                    throw new Error(`Unsupported file type for ${file.name}. Please use JPEG, PNG, GIF, or WebP.`);
+                }
+
                 // Check file size (5MB limit)
                 if (file.size > 5 * 1024 * 1024) {
                     throw new Error(`File ${file.name} exceeds 5MB limit`);

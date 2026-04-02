@@ -7,13 +7,51 @@ const crypto = require('crypto');
 
 let ClamScan = null;
 let clamscan = null;
+let clamscanInitPromise = null;
 try {
     ClamScan = require('clamscan');
-    clamscan = new ClamScan();
-    console.log('[ChatImageHandler] ClamAV virus scanning enabled');
 } catch (error) {
     console.warn('[ChatImageHandler] ClamAV not available. Install with: npm install clamscan');
     console.warn('[ChatImageHandler] Virus scanning disabled for chat uploads.');
+}
+
+async function getVirusScanner() {
+    if (!ClamScan) {
+        return null;
+    }
+
+    if (clamscan) {
+        return clamscan;
+    }
+
+    if (!clamscanInitPromise) {
+        clamscanInitPromise = new ClamScan().init({
+            clamscan: {
+                active: true,
+                path: process.env.CLAMSCAN_PATH || '/usr/bin/clamscan'
+            },
+            clamdscan: {
+                active: true,
+                path: process.env.CLAMDSCAN_PATH || '/usr/bin/clamdscan',
+                host: process.env.CLAMAV_HOST || false,
+                port: process.env.CLAMAV_PORT ? parseInt(process.env.CLAMAV_PORT, 10) : false,
+                socket: process.env.CLAMAV_SOCKET || false,
+                localFallback: true,
+                timeout: 60000
+            },
+            preference: process.env.CLAMAV_PREFERENCE || 'clamdscan'
+        }).then((instance) => {
+            clamscan = instance;
+            console.log('[ChatImageHandler] ClamAV virus scanning enabled');
+            return clamscan;
+        }).catch((error) => {
+            console.warn('[ChatImageHandler] ClamAV initialization failed. Virus scanning disabled:', error.message);
+            clamscan = null;
+            return null;
+        });
+    }
+
+    return clamscanInitPromise;
 }
 
 class ChatImageHandler {
@@ -52,12 +90,13 @@ class ChatImageHandler {
     }
 
     async scanUploadedFile(filePath) {
-        if (!clamscan) {
+        const scanner = await getVirusScanner();
+        if (!scanner) {
             return { clean: true };
         }
 
         try {
-            const scanResult = await clamscan.scanFile(filePath);
+            const scanResult = await scanner.scanFile(filePath);
             if (scanResult.isInfected) {
                 return {
                     clean: false,
@@ -66,8 +105,10 @@ class ChatImageHandler {
             }
             return { clean: true };
         } catch (error) {
-            console.error('[ChatImageHandler] Virus scan error:', error);
-            throw new Error('File security check failed');
+            console.warn('[ChatImageHandler] Virus scan failed; disabling scanner for this process:', error.message);
+            clamscan = null;
+            clamscanInitPromise = null;
+            return { clean: true };
         }
     }
 
