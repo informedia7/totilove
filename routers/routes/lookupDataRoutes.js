@@ -205,6 +205,27 @@ function createLookupDataRoutes(authController, authMiddleware) {
                     lookupData.hobbiesReference = [];
                 }
 
+                // Preferred countries for current user (table-only source of truth)
+                try {
+                    const currentUserId = session?.user?.id;
+                    if (!currentUserId) {
+                        throw new Error('Session user ID not available for preferred countries lookup');
+                    }
+
+                    const preferredCountriesResult = await authController.db.query(`
+                        SELECT c.id, c.name, COALESCE(c.emoji, '') AS emoji
+                        FROM user_preferred_countries upc
+                        JOIN country c ON c.id = upc.country_id
+                        WHERE upc.user_id = $1
+                        ORDER BY c.name ASC
+                    `, [currentUserId]);
+
+                    lookupData.preferred_countries = preferredCountriesResult.rows;
+                } catch (preferredCountriesError) {
+                    console.error('[LookupData] Failed to load preferred countries from user_preferred_countries:', preferredCountriesError.message);
+                    lookupData.preferred_countries = [];
+                }
+
                 // Try body art and english ability with fallbacks
                 try {
                     const bodyArtResult = await authController.db.query('SELECT id, name FROM user_body_art WHERE is_active = true ORDER BY display_order ASC, name ASC');

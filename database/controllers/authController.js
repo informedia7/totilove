@@ -71,7 +71,7 @@ class AuthController {
         this.sessions = null; // Initialize sessions as null
         this.rateLimiter = new ActivityRateLimiter(db);
         this.tableExistenceCache = new Map();
-        this.columnExistenceCache = new Map();
+        this.columnExistenceCache = new Map(); // { value: bool, expiresAt: timestamp }
     }
 
     async tableExists(tableName, runner = null) {
@@ -106,8 +106,9 @@ class AuthController {
         }
 
         const cacheKey = `${tableName}.${columnName}`;
-        if (this.columnExistenceCache.has(cacheKey)) {
-            return this.columnExistenceCache.get(cacheKey);
+        const cached = this.columnExistenceCache.get(cacheKey);
+        if (cached && cached.expiresAt > Date.now()) {
+            return cached.value;
         }
 
         const queryRunner = runner || this.db;
@@ -126,11 +127,11 @@ class AuthController {
             `, [tableName, columnName]);
 
             const exists = Boolean(result.rows && result.rows[0] && result.rows[0].column_exists);
-            this.columnExistenceCache.set(cacheKey, exists);
+            this.columnExistenceCache.set(cacheKey, { value: exists, expiresAt: Date.now() + 5 * 60 * 1000 });
             return exists;
         } catch (error) {
             console.warn(`⚠️ Could not verify ${tableName}.${columnName} column:`, error.message);
-            this.columnExistenceCache.set(cacheKey, false);
+            this.columnExistenceCache.set(cacheKey, { value: false, expiresAt: Date.now() + 60 * 1000 });
             return false;
         }
     }
@@ -3284,26 +3285,22 @@ class AuthController {
             }
 
             if (Object.prototype.hasOwnProperty.call(body, 'preferred_countries')) {
-                const supportsPreferredCountries = await this.tableExists('user_preferred_countries', client);
-                if (supportsPreferredCountries) {
-                    const countryIds = ensureArray(body.preferred_countries)
-                        .map(country => parseNullableInt(country?.id ?? country?.country_id ?? country))
-                        .filter(id => id !== null);
-                    await client.query('DELETE FROM user_preferred_countries WHERE user_id = $1', [targetUserId]);
-                    if (countryIds.length > 0) {
-                        const uniqueCountryIds = Array.from(new Set(countryIds));
-                        const params = [targetUserId];
-                        const valuesSql = uniqueCountryIds.map((id, idx) => {
-                            params.push(id);
-                            return `($1, $${idx + 2})`;
-                        }).join(', ');
-                        await client.query(
-                            `INSERT INTO user_preferred_countries (user_id, country_id) VALUES ${valuesSql} ON CONFLICT DO NOTHING`,
-                            params
-                        );
-                    }
-                } else {
-                    console.warn('⚠️ Skipping preferred countries sync: user_preferred_countries table not available');
+                const countryIds = ensureArray(body.preferred_countries)
+                    .map(country => parseNullableInt(country?.id ?? country?.country_id ?? country))
+                    .filter(id => id !== null);
+
+                await client.query('DELETE FROM user_preferred_countries WHERE user_id = $1', [targetUserId]);
+                if (countryIds.length > 0) {
+                    const uniqueCountryIds = Array.from(new Set(countryIds));
+                    const params = [targetUserId];
+                    const valuesSql = uniqueCountryIds.map((id, idx) => {
+                        params.push(id);
+                        return `($1, $${idx + 2})`;
+                    }).join(', ');
+                    await client.query(
+                        `INSERT INTO user_preferred_countries (user_id, country_id) VALUES ${valuesSql} ON CONFLICT DO NOTHING`,
+                        params
+                    );
                 }
             }
 
