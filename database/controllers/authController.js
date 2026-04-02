@@ -71,6 +71,7 @@ class AuthController {
         this.sessions = null; // Initialize sessions as null
         this.rateLimiter = new ActivityRateLimiter(db);
         this.tableExistenceCache = new Map();
+        this.columnExistenceCache = new Map();
     }
 
     async tableExists(tableName, runner = null) {
@@ -95,6 +96,41 @@ class AuthController {
         } catch (error) {
             console.warn(`⚠️ Could not verify ${tableName} table:`, error.message);
             this.tableExistenceCache.set(tableName, false);
+            return false;
+        }
+    }
+
+    async columnExists(tableName, columnName, runner = null) {
+        if (!tableName || !columnName) {
+            return false;
+        }
+
+        const cacheKey = `${tableName}.${columnName}`;
+        if (this.columnExistenceCache.has(cacheKey)) {
+            return this.columnExistenceCache.get(cacheKey);
+        }
+
+        const queryRunner = runner || this.db;
+        if (!queryRunner || typeof queryRunner.query !== 'function') {
+            return false;
+        }
+
+        try {
+            const result = await queryRunner.query(`
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM information_schema.columns
+                    WHERE table_name = $1
+                    AND column_name = $2
+                ) AS column_exists
+            `, [tableName, columnName]);
+
+            const exists = Boolean(result.rows && result.rows[0] && result.rows[0].column_exists);
+            this.columnExistenceCache.set(cacheKey, exists);
+            return exists;
+        } catch (error) {
+            console.warn(`⚠️ Could not verify ${tableName}.${columnName} column:`, error.message);
+            this.columnExistenceCache.set(cacheKey, false);
             return false;
         }
     }
@@ -193,6 +229,7 @@ class AuthController {
             
             // Use real_name
             const displayName = real_name;
+            const normalizedEmail = String(email || '').trim().toLowerCase();
             
             // Validate required fields
             if (!displayName || !email || !password || !birthdate || !gender || !country) {
@@ -219,14 +256,68 @@ class AuthController {
             
             // Check if user already exists (only check email, real_name doesn't need to be unique)
             const existingUser = await this.db.query(
-                'SELECT id FROM users WHERE email = $1',
-                [email]
+                'SELECT id, real_name, email, COALESCE(email_verified, false) AS email_verified FROM users WHERE LOWER(email) = $1',
+                [normalizedEmail]
             );
             
             if (existingUser.rows.length > 0) {
-                return res.status(400).json({
-                    success: false,
-                    error: 'User with this email already exists'
+                const existing = existingUser.rows[0];
+
+                if (existing.email_verified) {
+                    return res.status(400).json({
+                        success: false,
+                        error: 'User with this email already exists'
+                    });
+                }
+
+                // Existing but unverified account: regenerate and resend verification email.
+                const verificationToken = crypto.randomBytes(32).toString('hex');
+                const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+                const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+                const supportsVerificationCode = await this.columnExists('email_verification_tokens', 'verification_code');
+
+                await this.db.query(`
+                    DELETE FROM email_verification_tokens
+                    WHERE user_id = $1
+                    AND used_at IS NULL
+                `, [existing.id]);
+
+                if (supportsVerificationCode) {
+                    await this.db.query(`
+                        INSERT INTO email_verification_tokens (user_id, token, verification_code, expires_at)
+                        VALUES ($1, $2, $3, $4)
+                    `, [existing.id, verificationToken, verificationCode, expiresAt]);
+                } else {
+                    await this.db.query(`
+                        INSERT INTO email_verification_tokens (user_id, token, expires_at)
+                        VALUES ($1, $2, $3)
+                    `, [existing.id, verificationToken, expiresAt]);
+                }
+
+                const resendResult = await emailService.sendVerificationEmail(
+                    existing.email,
+                    existing.real_name || displayName,
+                    verificationToken,
+                    supportsVerificationCode ? verificationCode : null
+                );
+
+                return res.json({
+                    success: true,
+                    message: resendResult.success
+                        ? 'Account already exists but is not verified. We sent a new verification email.'
+                        : 'Account exists but is not verified. We could not send email right now, please use resend verification.',
+                    requiresEmailVerification: true,
+                    emailDispatch: {
+                        success: Boolean(resendResult.success),
+                        provider: resendResult.provider || null,
+                        error: resendResult.error || null
+                    },
+                    user: {
+                        id: existing.id,
+                        real_name: existing.real_name,
+                        email: existing.email,
+                        email_verified: false
+                    }
                 });
             }
             
@@ -241,7 +332,7 @@ class AuthController {
             // Log the values being inserted for debugging
             console.log('Inserting user with values:', {
                 real_name: displayName,
-                email,
+                email: normalizedEmail,
                 passwordLength: hashedPassword.length,
                 birthdate,
                 gender,
@@ -257,7 +348,7 @@ class AuthController {
                 RETURNING id, real_name, email, birthdate, gender, country_id, state_id, city_id, date_joined, email_verified
             `, [
                 displayName.trim(), // real_name
-                email, 
+                normalizedEmail,
                 hashedPassword, 
                 birthdate, 
                 gender, 
@@ -296,21 +387,35 @@ class AuthController {
             const verificationToken = crypto.randomBytes(32).toString('hex');
             const verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
             const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
+            const supportsVerificationCode = await this.columnExists('email_verification_tokens', 'verification_code');
             
             // Store verification token and code in database
+            let emailDispatch = { success: true, provider: null, error: null };
             try {
-                await this.db.query(`
-                    INSERT INTO email_verification_tokens (user_id, token, verification_code, expires_at)
-                    VALUES ($1, $2, $3, $4)
-                `, [newUser.id, verificationToken, verificationCode, expiresAt]);
+                if (supportsVerificationCode) {
+                    await this.db.query(`
+                        INSERT INTO email_verification_tokens (user_id, token, verification_code, expires_at)
+                        VALUES ($1, $2, $3, $4)
+                    `, [newUser.id, verificationToken, verificationCode, expiresAt]);
+                } else {
+                    await this.db.query(`
+                        INSERT INTO email_verification_tokens (user_id, token, expires_at)
+                        VALUES ($1, $2, $3)
+                    `, [newUser.id, verificationToken, expiresAt]);
+                }
                 
-                // Send verification email with both link and code
+                // Send verification email with a code only when the database supports it.
                 const emailResult = await emailService.sendVerificationEmail(
-                    email,
+                    normalizedEmail,
                     displayName, // Use real_name for email
                     verificationToken,
-                    verificationCode
+                    supportsVerificationCode ? verificationCode : null
                 );
+                emailDispatch = {
+                    success: Boolean(emailResult.success),
+                    provider: emailResult.provider || null,
+                    error: emailResult.error || null
+                };
                 
                 if (!emailResult.success) {
                     console.warn('⚠️ Failed to send verification email:', emailResult.error);
@@ -326,8 +431,11 @@ class AuthController {
             // But we can still return success so they know registration worked
             res.json({
                 success: true,
-                message: 'Registration successful! Please check your email to verify your account.',
+                message: emailDispatch.success
+                    ? 'Registration successful! Please check your email to verify your account.'
+                    : 'Registration successful, but we could not send the verification email right now. Please use resend verification.',
                 requiresEmailVerification: true,
+                emailDispatch,
                 user: {
                     id: newUser.id,
                     real_name: newUser.real_name,
@@ -1965,8 +2073,19 @@ class AuthController {
     async verifyEmail(req, res) {
         try {
             const { token } = req.query;
+            const wantsHtmlResponse = (() => {
+                const acceptHeader = req.get('accept') || '';
+                const fetchDestination = req.get('sec-fetch-dest') || '';
+                return fetchDestination === 'document' || acceptHeader.includes('text/html');
+            })();
+
+            const redirectToLogin = (message) => res.redirect(303, `/login?message=${encodeURIComponent(message)}`);
 
             if (!token) {
+                if (wantsHtmlResponse) {
+                    return redirectToLogin('Verification token is required.');
+                }
+
                 return res.status(400).json({
                     success: false,
                     error: 'Verification token is required'
@@ -1984,6 +2103,10 @@ class AuthController {
             `, [token]);
 
             if (tokenResult.rows.length === 0) {
+                if (wantsHtmlResponse) {
+                    return redirectToLogin('Invalid or expired verification link. Please request a new one.');
+                }
+
                 return res.status(400).json({
                     success: false,
                     error: 'Invalid or expired verification token'
@@ -1994,6 +2117,10 @@ class AuthController {
 
             // Check if email is already verified
             if (tokenData.email_verified) {
+                if (wantsHtmlResponse) {
+                    return redirectToLogin('Email is already verified. Please log in.');
+                }
+
                 return res.status(400).json({
                     success: false,
                     error: 'Email is already verified'
@@ -2024,6 +2151,10 @@ class AuthController {
 
             console.log(`✅ Email verified for user ${tokenData.user_id} (${tokenData.email})`);
 
+            if (wantsHtmlResponse) {
+                return redirectToLogin('Email verified successfully. You can now log in.');
+            }
+
             res.json({
                 success: true,
                 message: 'Email verified successfully! You can now log in.',
@@ -2036,6 +2167,13 @@ class AuthController {
 
         } catch (error) {
             console.error('❌ Email verification error:', error);
+
+            const acceptHeader = req.get('accept') || '';
+            const fetchDestination = req.get('sec-fetch-dest') || '';
+            if (fetchDestination === 'document' || acceptHeader.includes('text/html')) {
+                return res.redirect(303, '/login?message=' + encodeURIComponent('Email verification failed. Please try again.'));
+            }
+
             res.status(500).json({
                 success: false,
                 error: 'Failed to verify email',
@@ -2182,6 +2320,7 @@ class AuthController {
             const verificationToken = crypto.randomBytes(32).toString('hex');
             const verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
             const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+            const supportsVerificationCode = await this.columnExists('email_verification_tokens', 'verification_code');
 
             // Delete old unused tokens for this user
             await this.db.query(`
@@ -2190,18 +2329,25 @@ class AuthController {
                 AND used_at IS NULL
             `, [user.id]);
 
-            // Store new verification token and code
-            await this.db.query(`
-                INSERT INTO email_verification_tokens (user_id, token, verification_code, expires_at)
-                VALUES ($1, $2, $3, $4)
-            `, [user.id, verificationToken, verificationCode, expiresAt]);
+            // Store new verification token and code when the schema supports it.
+            if (supportsVerificationCode) {
+                await this.db.query(`
+                    INSERT INTO email_verification_tokens (user_id, token, verification_code, expires_at)
+                    VALUES ($1, $2, $3, $4)
+                `, [user.id, verificationToken, verificationCode, expiresAt]);
+            } else {
+                await this.db.query(`
+                    INSERT INTO email_verification_tokens (user_id, token, expires_at)
+                    VALUES ($1, $2, $3)
+                `, [user.id, verificationToken, expiresAt]);
+            }
 
-            // Send verification email with both link and code
+            // Send verification email with a code only when the database supports it.
             const emailResult = await emailService.sendVerificationEmail(
                 user.email,
                 user.real_name,
                 verificationToken,
-                verificationCode
+                supportsVerificationCode ? verificationCode : null
             );
 
             if (!emailResult.success) {

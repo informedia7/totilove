@@ -147,6 +147,8 @@ class CSRFMiddleware {
             const publicEndpoints = [
                 '/api/login',
                 '/api/register',
+                '/api/resend-verification',
+                '/api/verify-email-code',
                 '/api/auth/check-session',
                 '/login',
                 '/register',
