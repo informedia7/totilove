@@ -113,6 +113,7 @@ class TemplateController {
                         date_joined: this.templateUtils.getRelativeTime(user.date_joined),
                         lastActive: this.templateUtils.getRelativeTime(user.last_login || user.date_joined),
                         pageTitle: 'Profile',
+                        pageDescription: 'View and update your Totilove dating profile.',
                         currentPage: 'profile',
                         activeTab: req.query.tab || 'basic',
                         sessionToken: ''

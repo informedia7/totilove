@@ -256,9 +256,9 @@ class TemplateController {
         // Resolve body art and english ability names when tables may vary
         if (!user.body_art_name && user.body_art_id) {
             user.body_art_name = await resolveLookupName(user.body_art_id, [
-                'user_body_art_types',
                 'user_body_art',
                 'user_body_arts',
+                'user_body_art_types',
                 'body_art',
                 'body_art_types'
             ]);
@@ -403,7 +403,7 @@ class TemplateController {
                 lookupTables: ['user_lifestyle_preferences', 'lifestyles']
             }),
             formatPreferenceDisplay(user.preferred_body_art, {
-                lookupTables: ['user_body_art_types', 'user_body_art', 'user_body_arts', 'body_art', 'body_art_types']
+                lookupTables: ['user_body_art', 'user_body_arts', 'user_body_art_types', 'body_art', 'body_art_types']
             }),
             formatPreferenceDisplay(user.preferred_english_ability, {
                 lookupTables: ['user_english_ability', 'user_english_abilities', 'english_ability', 'english_levels', 'language_ability']
@@ -470,7 +470,22 @@ class TemplateController {
             return 'Profile';
         })();
 
+        const pageDescription = (() => {
+            if (isMatchesPage) return 'Browse your mutual matches on Totilove and discover people who share your interests.';
+            if (isSearchPage) return 'Search for compatible partners on Totilove using advanced filters for age, location, interests and more.';
+            if (isResultsPage) return 'View your search results and find your ideal match on Totilove.';
+            if (isMessagesPage) return 'Read and send messages to your connections on Totilove.';
+            if (isTalkPage) return 'Chat in real time with your matches on Totilove.';
+            if (isActivityPage) return 'See who liked your profile, viewed you, and your latest activity on Totilove.';
+            if (isBillingPage) return 'Manage your Totilove subscription plan and billing details.';
+            if (isSettingsPage) return 'Update your Totilove account preferences, privacy settings and notifications.';
+            if (isAccountPage) return 'Manage your Totilove account, security settings and personal data.';
+            return 'View and update your Totilove dating profile.';
+        })();
+
         const userData = {
+                        pageTitle,
+                        pageDescription,
                         userId: user.id,
                         real_name: user.real_name,
                         realName: user.real_name || '', // For template use (camelCase)
@@ -539,6 +554,7 @@ class TemplateController {
                         messageCount: 0,
                         isOwnProfile: true,
             pageTitle,
+            pageDescription,
                         currentPage: 'profile',
             activeTab,
             accountIconColor: '#28a745',
