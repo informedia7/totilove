@@ -499,6 +499,15 @@
         }
     };
 
+    // Apply current dark-mode class to modal (mirrors account.js pattern)
+    function applyThemeToDeleteModal(modal) {
+        const root = document.documentElement;
+        const isDark = root.dataset.theme === 'dark' ||
+            root.classList.contains('theme-dark') ||
+            document.body.classList.contains('dark-mode');
+        modal.classList.toggle('theme-dark-active', isDark);
+    }
+
     // Show delete confirmation modal
     function showDeleteConfirmation() {
         return new Promise((resolve) => {
@@ -506,6 +515,7 @@
             const cancelBtn = document.getElementById('delete-cancel-btn');
             const confirmBtn = document.getElementById('delete-confirm-btn');
 
+            applyThemeToDeleteModal(modal);
             modal.style.display = 'flex';
 
             const handleCancel = () => {
