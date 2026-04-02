@@ -67,6 +67,9 @@ class AccountDeleteManager {
     deleteAccount() {
         const modal = document.getElementById('delete-account-modal');
         if (modal) {
+            if (typeof window.syncAccountModalTheme === 'function') {
+                window.syncAccountModalTheme();
+            }
             modal.style.display = 'flex';
             this.showDeleteConfirmStep1();
         }

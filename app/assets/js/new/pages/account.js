@@ -1,7 +1,34 @@
 // Account Page JavaScript - Extracted from account.html - Phase 1 CSS/JS Extraction
 
+function isDarkThemeActive() {
+    const root = document.documentElement;
+    return root?.dataset?.theme === 'dark' ||
+        root?.classList?.contains('theme-dark') ||
+        document.body?.classList?.contains('dark-mode');
+}
+
+function syncAccountModalTheme() {
+    const isDark = isDarkThemeActive();
+    const modalIds = ['change-password-modal', 'delete-account-modal'];
+
+    modalIds.forEach((id) => {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.classList.toggle('theme-dark-active', isDark);
+        }
+    });
+}
+
+window.syncAccountModalTheme = syncAccountModalTheme;
+
 // Load account data on page load
 document.addEventListener('DOMContentLoaded', async function() {
+    syncAccountModalTheme();
+
+    window.addEventListener('totilove:theme-change', () => {
+        syncAccountModalTheme();
+    });
+
     await loadAccountData();
     await loadProfileCompletion();
     await checkEmailVerification();
@@ -253,6 +280,7 @@ async function checkEmailVerification() {
 }
 
 function changePassword() {
+    syncAccountModalTheme();
     document.getElementById('change-password-modal').style.display = 'flex';
     document.getElementById('change-password-form').reset();
     document.getElementById('password-change-message').style.display = 'none';
