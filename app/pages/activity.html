@@ -68,27 +68,31 @@
     <div class="activity-tabs">
         <button class="activity-tab active" data-tab="all" title="All Activity">
             <i class="fas fa-bell"></i>
-            <span>All Activity</span>
+            <span class="tab-label">All Activity</span>
         </button>
-        <button class="activity-tab" data-tab="messages" title="Messages">
+        <button class="activity-tab has-tab-badge" data-tab="messages" title="Messages">
             <i class="fas fa-envelope"></i>
+            <span class="activity-tab-badge messages-tab-badge" style="display: none;">0</span>
         </button>
-        <button class="activity-tab" data-tab="views" style="position: relative;" title="Who Viewed Me">
+        <button class="activity-tab has-tab-badge" data-tab="views" title="Who Viewed Me">
             <i class="fas fa-eye"></i>
-            <span class="views-badge notification-badge"
-                style="position: absolute; top: -15px; right: -5px; background: #00b894; border-radius: 50%; width: 19px; height: 19px; border: 3px solid #fff; box-shadow: 0 0 0 2px #fff; animation: online-blink 3s infinite; z-index: 2; display: none; align-items: center; justify-content: center; box-sizing: border-box;"></span>
+            <span class="activity-tab-badge views-tab-badge" style="display: none;">0</span>
         </button>
-        <button class="activity-tab" data-tab="favorites" title="My Favorites">
+        <button class="activity-tab has-tab-badge" data-tab="favorites" title="My Favorites">
             <i class="fas fa-heart" style="color: var(--danger-color);"></i>
+            <span class="activity-tab-badge favorites-tab-badge" style="display: none;">0</span>
         </button>
-        <button class="activity-tab" data-tab="likes" title="Who Liked Me">
+        <button class="activity-tab has-tab-badge" data-tab="likes" title="Who Liked Me">
             <i class="fas fa-thumbs-up" style="color: #f39c12;"></i>
+            <span class="activity-tab-badge likes-tab-badge" style="display: none;">0</span>
         </button>
-        <button class="activity-tab" data-tab="my-likes" title="Who I Like">
+        <button class="activity-tab has-tab-badge" data-tab="my-likes" title="Who I Like">
             <i class="fas fa-user-plus" style="color: #f39c12;"></i>
+            <span class="activity-tab-badge my-likes-tab-badge" style="display: none;">0</span>
         </button>
-        <button class="activity-tab" data-tab="blocked" title="Blocked Users">
+        <button class="activity-tab has-tab-badge" data-tab="blocked" title="Blocked Users">
             <i class="fas fa-ban"></i>
+            <span class="activity-tab-badge blocked-tab-badge" style="display: none;">0</span>
         </button>
     </div>
 

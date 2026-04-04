@@ -147,6 +147,10 @@
     font-size: 0.9rem;
 }
 
+.activity-tab.has-tab-badge {
+    position: relative;
+}
+
 .activity-tab.active {
     background: var(--primary);
     color: white;
@@ -160,8 +164,73 @@
     font-size: 1.1rem;
 }
 
-.activity-tab span {
+.activity-tab .tab-label {
     display: none;
+}
+
+.activity-tab-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: #fff;
+    border-radius: 50%;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 3px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    animation: activity-tab-badge-pulse 2s infinite;
+    z-index: 2;
+    box-sizing: border-box;
+}
+
+.messages-tab-badge {
+    background: linear-gradient(135deg, #2f80ed 0%, #1366d6 100%);
+    box-shadow: 0 2px 8px rgba(47, 128, 237, 0.35);
+}
+
+.views-tab-badge {
+    background: linear-gradient(135deg, #00b894 0%, #00a383 100%);
+    box-shadow: 0 2px 8px rgba(0, 184, 148, 0.35);
+}
+
+.favorites-tab-badge {
+    background: linear-gradient(135deg, #ff5d8f 0%, #e64980 100%);
+    box-shadow: 0 2px 8px rgba(255, 93, 143, 0.35);
+}
+
+.likes-tab-badge,
+.my-likes-tab-badge {
+    background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
+    box-shadow: 0 2px 8px rgba(243, 156, 18, 0.35);
+}
+
+.blocked-tab-badge {
+    background: linear-gradient(135deg, #d63031 0%, #b71c1c 100%);
+    box-shadow: 0 2px 8px rgba(214, 48, 49, 0.35);
+}
+
+@keyframes activity-tab-badge-pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    }
+
+    50% {
+        transform: scale(1.08);
+        box-shadow: 0 4px 14px rgba(220, 53, 69, 0.4);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    }
 }
 
 @media (max-width: 420px) {
@@ -560,10 +629,19 @@
     display: flex;
     align-items: flex-start;
     padding: 0.75rem;
-    background: white;
+    background: var(--app-surface, #fff);
+    color: var(--app-text-primary, var(--dark-color));
     border-radius: 10px;
     box-shadow: 0 1px 4px rgba(31, 38, 135, 0.08);
+    border: 1px solid var(--app-border-color, rgba(31, 38, 135, 0.08));
     transition: transform 0.2s;
+}
+
+html[data-theme="dark"] .message-card,
+body.dark-mode .message-card {
+    background: var(--app-surface, #1f2937);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+    border-color: var(--app-border-color, rgba(148, 163, 184, 0.35));
 }
 
 .message-card-deleted {
@@ -744,26 +822,6 @@ body.dark-mode .unblock-confirm-yes {
     box-shadow: 0 12px 32px rgba(0, 184, 148, 0.45);
 }
 
-/* Badges */
-.views-badge {
-    position: absolute;
-    top: -12px;
-    right: -5px;
-    background: #00b894;
-    border-radius: 50%;
-    width: 16px;
-    height: 16px;
-    border: 2px solid #fff;
-    box-shadow: 0 0 0 1px #fff;
-    animation: online-blink 3s infinite;
-    z-index: 2;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    font-size: 0.6rem;
-}
-
 /* Section Toggle */
 .section-toggle-btn {
     background: transparent;
@@ -942,7 +1000,7 @@ body.dark-mode .unblock-confirm-yes {
         padding: 0.5rem 1rem;
     }
 
-    .activity-tab span {
+    .activity-tab .tab-label {
         display: inline;
     }
 

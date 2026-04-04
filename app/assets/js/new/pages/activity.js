@@ -124,6 +124,7 @@
         lazyLoadedSections: null,
         lazyLoadingPromises: null,
         lazySectionHandlers: null,
+        latestMessages: [],
         tabVisibilityMap: {
             all: ['viewers'],
             messages: ['messages'],
@@ -317,6 +318,17 @@
             }
 
             section.classList.toggle('is-collapsed', !shouldExpand);
+            const messagesList = section.querySelector('.messages-list');
+            if (messagesList) {
+                messagesList.style.display = shouldExpand ? 'grid' : 'none';
+                messagesList.classList.toggle('grid', shouldExpand);
+            }
+
+            const messagesToggleIcon = section.querySelector('.messages-toggle-icon');
+            if (messagesToggleIcon) {
+                messagesToggleIcon.textContent = shouldExpand ? '−' : '+';
+            }
+
             this.updateSectionToggleUI(section, shouldExpand);
             const header = section.querySelector('.section-header[role="button"]');
             if (header) {
@@ -399,11 +411,13 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    this.renderMessages(data.messages);
+                    this.latestMessages = Array.isArray(data.messages) ? data.messages : [];
+                    this.renderMessages(this.latestMessages);
                     this.updateMessagesCount(data.unreadCount);
                 }
             } catch (error) {
                 console.error('Error loading messages:', error);
+                this.latestMessages = [];
                 this.showError('.messages-list', 'Failed to load messages');
             }
         },
@@ -523,9 +537,11 @@
                 const displayName = isDeleted ? 'Account Deactivated' : this.escapeHtml(message.sender_name);
                 const defaultImg = (message.gender && message.gender.toString().toLowerCase() === 'f') ? '/assets/images/default_profile_female.svg' : '/assets/images/default_profile_male.svg';
                 const profileImage = isDeleted ? '/assets/images/account_deactivated.svg' : (message.profile_image || defaultImg);
+                const rawMessageText = typeof message.message_text === 'string' ? message.message_text.trim() : '';
+                const previewText = rawMessageText ? this.escapeHtml(rawMessageText) : 'Sent a message';
                 const messageText = isDeleted 
-                    ? `<span class="message-deleted-text">"${this.truncateText(this.escapeHtml(message.message_text), 50)}"</span>`
-                    : `"${this.truncateText(this.escapeHtml(message.message_text), 50)}"`;
+                    ? `<span class="message-deleted-text">"${this.truncateText(previewText, 80)}"</span>`
+                    : `"${this.truncateText(previewText, 80)}"`;
                 
                 return `
                 <div class="message-card ${isDeleted ? 'message-card-deleted' : ''}" ${isDeleted ? `onclick="window.location.href='/talk?token=${sessionToken}&user=${message.sender_id}'"` : ''}>
@@ -581,6 +597,23 @@
         },
         
         // Update count badges
+        setTabBadge(selector, count) {
+            const badge = document.querySelector(selector);
+            if (!badge) {
+                return;
+            }
+
+            const numericCount = Number(count);
+            const safeCount = Number.isFinite(numericCount) ? Math.max(0, numericCount) : 0;
+            if (safeCount <= 0) {
+                badge.style.display = 'none';
+                return;
+            }
+
+            badge.textContent = safeCount > 99 ? '99+' : String(safeCount);
+            badge.style.display = 'flex';
+        },
+
         updateViewersCount(todayCount, totalCount) {
             const badge = document.querySelector('.viewers-count-badge');
             
@@ -597,13 +630,12 @@
             if (totalCount > 3) {
                 document.querySelector('.viewers-view-all').style.display = 'block';
             }
-            
-            if (todayCount > 0) {
-                document.querySelector('.views-badge').style.display = 'flex';
-            }
+
+            this.setTabBadge('.views-tab-badge', totalCount || todayCount || 0);
         },
         
         updateFavoritesCount(count) {
+            this.setTabBadge('.favorites-tab-badge', count || 0);
             document.querySelector('.total-favorites-count').textContent = count || 0;
             
             const viewAllSection = document.querySelector('.favorites-view-all');
@@ -636,6 +668,7 @@
         },
         
         updateMessagesCount(count) {
+            this.setTabBadge('.messages-tab-badge', count || 0);
             const badge = document.querySelector('.messages-count-badge');
             if (count > 0) {
                 badge.textContent = `${count} new`;
@@ -649,6 +682,7 @@
         
 
         updateWhoLikedMeCount(todayCount, totalCount) {
+            this.setTabBadge('.likes-tab-badge', totalCount || todayCount || 0);
             const badge = document.querySelector('.who-liked-me-count-badge');
             
             // Hide badge if count is 0, show if 1 or more
@@ -667,6 +701,7 @@
         },
 
         updateWhoILikeCount(count) {
+            this.setTabBadge('.my-likes-tab-badge', count || 0);
             document.querySelector('.total-who-i-like-count').textContent = count || 0;
             
             const viewAllSection = document.querySelector('.who-i-like-view-all');
@@ -699,6 +734,7 @@
         },
 
         updateBlockedUsersCount(count) {
+            this.setTabBadge('.blocked-tab-badge', count || 0);
             const badge = document.querySelector('.blocked-users-count-badge');
             badge.textContent = `${count} blocked`;
         },
@@ -920,6 +956,50 @@
         
         // Setup event listeners
         setupEventListeners() {
+            const messagesHeaderTitle = document.querySelector('.messages-section .section-header h3');
+            if (messagesHeaderTitle) {
+                messagesHeaderTitle.setAttribute('role', 'button');
+                messagesHeaderTitle.setAttribute('tabindex', '0');
+                messagesHeaderTitle.style.cursor = 'pointer';
+
+                const messagesToggleIcon = messagesHeaderTitle.querySelector('.messages-toggle-icon');
+                if (messagesToggleIcon) {
+                    messagesToggleIcon.setAttribute('role', 'button');
+                    messagesToggleIcon.setAttribute('tabindex', '0');
+                    messagesToggleIcon.style.cursor = 'pointer';
+
+                    const toggleMessagesFromPlusIcon = (event) => {
+                        if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') {
+                            return;
+                        }
+
+                        event.preventDefault();
+                        event.stopPropagation();
+                        this.toggleSection('messages');
+                    };
+
+                    messagesToggleIcon.addEventListener('click', toggleMessagesFromPlusIcon);
+                    messagesToggleIcon.addEventListener('keydown', toggleMessagesFromPlusIcon);
+                }
+
+                const toggleMessagesFromHeader = (event) => {
+                    if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') {
+                        return;
+                    }
+
+                    if (event.target.closest('.messages-toggle-icon')) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.toggleSection('messages');
+                };
+
+                messagesHeaderTitle.addEventListener('click', toggleMessagesFromHeader);
+                messagesHeaderTitle.addEventListener('keydown', toggleMessagesFromHeader);
+            }
+
             // Tab switching
             document.querySelectorAll('.activity-tab').forEach(tab => {
                 tab.addEventListener('click', (e) => this.switchTab(e.currentTarget));
@@ -1273,6 +1353,33 @@
                 console.error('❌ Session token not available');
                 this.showToast('Session expired. Please log in again.', 'error');
             }
+        },
+
+        navigateToTalk() {
+            const firstMessage = Array.isArray(this.latestMessages) && this.latestMessages.length > 0
+                ? this.latestMessages[0]
+                : null;
+            const senderId = firstMessage
+                ? (firstMessage.sender_id || firstMessage.senderId || firstMessage.user_id || null)
+                : null;
+            const sessionToken = getSessionToken();
+
+            if (sessionToken) {
+                if (senderId) {
+                    window.location.href = `/talk?token=${encodeURIComponent(sessionToken)}&user=${encodeURIComponent(senderId)}`;
+                    return;
+                }
+
+                window.location.href = `/talk?token=${encodeURIComponent(sessionToken)}`;
+                return;
+            }
+
+            if (senderId) {
+                window.location.href = `/talk?user=${encodeURIComponent(senderId)}`;
+                return;
+            }
+
+            window.location.href = '/talk';
         },
         
         async removeFavorite(userId) {
