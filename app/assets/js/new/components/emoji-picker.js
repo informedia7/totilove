@@ -16,6 +16,9 @@ const EMOJI_LIST = [
 
 // Show emoji picker
 function showEmojiPicker(targetInputId = null) {
+    const isDarkTheme = document.documentElement.classList.contains('theme-dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark-mode');
     
     // Remove existing picker if any
     const existingPicker = document.getElementById('emojiPickerModal');
@@ -33,24 +36,35 @@ function showEmojiPicker(targetInputId = null) {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.5);
+        box-sizing: border-box;
+        padding: 12px;
+        background: ${isDarkTheme ? 'rgba(3, 5, 15, 0.82)' : 'rgba(0, 0, 0, 0.5)'};
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 10000;
+        overflow-x: hidden;
     `;
     
     // Create picker content
     const pickerContent = document.createElement('div');
     pickerContent.className = 'emoji-picker-content';
     pickerContent.style.cssText = `
-        background: white;
+        background: ${isDarkTheme ? 'var(--app-surface, #111827)' : 'white'};
+        color: ${isDarkTheme ? 'var(--app-text-primary, #f8fafc)' : '#111827'};
+        border: 1px solid ${isDarkTheme ? 'var(--app-border-color, rgba(148, 163, 184, 0.25))' : '#e5e7eb'};
         border-radius: 12px;
+        box-sizing: border-box;
         padding: 20px;
+        width: min(100%, 400px);
         max-width: 400px;
         max-height: 500px;
-        overflow-y: auto;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow-x: hidden;
+        overflow-y: hidden;
+        box-shadow: ${isDarkTheme ? '0 25px 65px rgba(2, 6, 23, 0.75)' : '0 20px 60px rgba(0, 0, 0, 0.3)'};
     `;
     
     // Create header
@@ -61,12 +75,13 @@ function showEmojiPicker(targetInputId = null) {
         align-items: center;
         margin-bottom: 20px;
         padding-bottom: 10px;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid ${isDarkTheme ? 'var(--app-border-color, rgba(148, 163, 184, 0.2))' : '#eee'};
     `;
     
     const title = document.createElement('h3');
     title.textContent = 'Select Emoji';
     title.style.margin = '0';
+    title.style.color = isDarkTheme ? 'var(--app-text-primary, #f8fafc)' : '#333';
     
     const closeBtn = document.createElement('button');
     closeBtn.innerHTML = '✕';
@@ -75,7 +90,7 @@ function showEmojiPicker(targetInputId = null) {
         border: none;
         font-size: 18px;
         cursor: pointer;
-        color: #666;
+        color: ${isDarkTheme ? 'var(--app-text-muted, #cbd5e1)' : '#666'};
         padding: 5px 10px;
         border-radius: 50%;
     `;
@@ -89,8 +104,13 @@ function showEmojiPicker(targetInputId = null) {
     emojiGrid.id = 'emojiGrid';
     emojiGrid.style.cssText = `
         display: grid;
-        grid-template-columns: repeat(8, 1fr);
-        gap: 8px;
+        grid-template-columns: repeat(8, minmax(36px, 1fr));
+        gap: 6px;
+        flex: 1;
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        overflow-x: hidden;
         max-height: 400px;
         overflow-y: auto;
     `;
@@ -101,17 +121,26 @@ function showEmojiPicker(targetInputId = null) {
         emojiDiv.className = 'emoji-item';
         emojiDiv.textContent = emoji;
         emojiDiv.style.cssText = `
-            font-size: 33.6px; /* Increased by 40% from 24px */
-            padding: 8px;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            min-height: 38px;
+            font-size: clamp(24px, 5.2vw, 30px);
+            line-height: 1;
+            padding: 0;
             text-align: center;
             cursor: pointer;
             border-radius: 8px;
             transition: background-color 0.2s;
             user-select: none;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
         `;
         
         emojiDiv.addEventListener('mouseenter', function() {
-            this.style.backgroundColor = '#f0f0f0';
+            this.style.backgroundColor = isDarkTheme ? 'rgba(148, 163, 184, 0.18)' : '#f0f0f0';
         });
         
         emojiDiv.addEventListener('mouseleave', function() {

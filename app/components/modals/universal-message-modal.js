@@ -39,18 +39,6 @@ function setupModalEventListeners() {
         });
     }
     
-
-    
-    // Message confirmation modal outside click
-    const confirmationModal = document.getElementById('messageConfirmationModal');
-    if (confirmationModal) {
-        confirmationModal.addEventListener('click', function(e) {
-            if (e.target === confirmationModal) {
-                hideMessageConfirmation();
-            }
-        });
-    }
-    
     // Close modals with Escape key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
@@ -59,9 +47,6 @@ function setupModalEventListeners() {
             }
             if (emojiModal && emojiModal.style.display === 'flex') {
                 hideEmojiPicker();
-            }
-            if (confirmationModal && confirmationModal.style.display === 'flex') {
-                hideMessageConfirmation();
             }
         }
     });
@@ -207,13 +192,8 @@ async function sendMessage() {
             const data = await response.json();
             
             if (data.success) {
-                const messageId = data.message?.id || data.message?.messageId || 'unknown';
-                const isReply = currentReplyMessageId !== null;
-                
-                showToast(`✅ ${isReply ? 'Reply' : 'Message'} sent successfully to ${currentReceiverName}! (ID: ${messageId})`, 'success');
-                
-                // Show confirmation modal
-                showMessageConfirmation(currentReceiverName, isReply);
+                const sentAt = new Date().toLocaleString();
+                showToast(`Message sent successfully!\nTo: ${currentReceiverName}\nSent at: ${sentAt}`, 'success');
                 
                 // Close compose modal
                 closeCompose();
@@ -263,63 +243,6 @@ function formatText(command) {
     document.execCommand(command, false, null);
     editor.focus();
 }
-
-
-
-// Show message confirmation
-function showMessageConfirmation(receiverName, isReply = false) {
-    const modal = document.getElementById('messageConfirmationModal');
-    const confirmationTitle = document.getElementById('confirmation-title');
-    const confirmationReceiver = document.getElementById('confirmation-receiver');
-    const confirmationTimestamp = document.getElementById('confirmation-timestamp');
-    const viewSentBtn = document.getElementById('viewSentBtn');
-    
-    if (!modal || !confirmationTitle || !confirmationReceiver || !confirmationTimestamp) {
-        console.error('❌ Confirmation modal elements not found');
-        return;
-    }
-    
-    // Update modal content
-    confirmationTitle.textContent = isReply ? 'Reply Sent Successfully!' : 'Message Sent Successfully!';
-    confirmationReceiver.textContent = receiverName || 'Unknown User';
-    confirmationTimestamp.textContent = new Date().toLocaleString();
-    
-    // Show/hide "View Sent Messages" button based on current page
-    if (viewSentBtn) {
-        const isMessagesPage = window.location.pathname.includes('/messages');
-        viewSentBtn.style.display = isMessagesPage ? 'inline-flex' : 'none';
-    }
-    
-    // Show modal with animation
-    modal.style.display = 'flex';
-    setTimeout(() => {
-        modal.classList.add('show');
-    }, 10);
-}
-
-// Hide message confirmation
-function hideMessageConfirmation() {
-    const modal = document.getElementById('messageConfirmationModal');
-    if (modal) {
-        modal.classList.remove('show');
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 300);
-    }
-}
-
-// View sent messages (only available on messages page)
-function viewSentMessages() {
-    // This function should be implemented on the messages page
-    // For now, we'll just close the confirmation modal
-    hideMessageConfirmation();
-    
-    // If we're on the messages page, switch to sent tab
-    if (window.location.pathname.includes('/messages') && typeof showMessageTab === 'function') {
-        showMessageTab('sent');
-    }
-}
-
 // Toast notification function (fallback if not provided by the page)
 function showToast(message, type = 'info', actionText = null, actionCallback = null) {
     // Check if the page has its own toast function
@@ -343,13 +266,27 @@ function showToast(message, type = 'info', actionText = null, actionCallback = n
         z-index: 10000;
         max-width: 300px;
         word-wrap: break-word;
+        white-space: pre-line;
         animation: slideIn 0.3s ease-out;
     `;
-    
-    toast.innerHTML = `
-        <span>${message}</span>
-        ${actionText ? `<button onclick="this.parentElement.remove(); ${actionCallback}()" style="margin-left: 10px; background: rgba(255,255,255,0.2); border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">${actionText}</button>` : ''}
-    `;
+
+    const messageSpan = document.createElement('span');
+    messageSpan.style.whiteSpace = 'pre-line';
+    messageSpan.textContent = message;
+    toast.appendChild(messageSpan);
+
+    if (actionText) {
+        const actionBtn = document.createElement('button');
+        actionBtn.textContent = actionText;
+        actionBtn.style.cssText = 'margin-left: 10px; background: rgba(255,255,255,0.2); border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;';
+        actionBtn.addEventListener('click', () => {
+            toast.remove();
+            if (typeof actionCallback === 'function') {
+                actionCallback();
+            }
+        });
+        toast.appendChild(actionBtn);
+    }
     
     document.body.appendChild(toast);
     
@@ -380,8 +317,6 @@ window.UniversalMessageModal = {
     openCompose: openComposeModal,
     closeCompose: closeCompose,
     sendMessage: sendMessage,
-    showConfirmation: showMessageConfirmation,
-    hideConfirmation: hideMessageConfirmation,
     showToast: showToast
 };
 
