@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Export/Import - Totilove Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none;">← Back to Dashboard</a>
+                <form method="POST" action="/logout" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+            <h1>📥 Export/Import</h1>
+            <p>Export user data and import users in bulk</p>
+        </div>
+        
+        <div class="content">
+            <!-- Export Section -->
+            <div class="export-import-section">
+                <h2>📤 Export Data</h2>
+                
+                <div class="filters-panel" style="margin-bottom: 20px;">
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label>Export Type</label>
+                            <select id="exportType">
+                                <option value="users">Users</option>
+                                <option value="payments">Payments</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Format</label>
+                            <select id="exportFormat">
+                                <option value="csv">CSV</option>
+                                <option value="json">JSON</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Search</label>
+                            <input type="text" id="exportSearch" placeholder="Search by username or email...">
+                        </div>
+                        <div class="filter-group">
+                            <label>Status</label>
+                            <select id="exportStatus">
+                                <option value="">All</option>
+                                <option value="active">Active</option>
+                                <option value="banned">Banned</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="export-options">
+                    <div class="export-option">
+                        <input type="radio" name="exportScope" id="exportAll" value="all" checked>
+                        <label for="exportAll">Export All</label>
+                        <p style="font-size: 12px; color: #666; margin-top: 4px;">Export all matching records</p>
+                    </div>
+                    <div class="export-option">
+                        <input type="radio" name="exportScope" id="exportFiltered" value="filtered">
+                        <label for="exportFiltered">Export Filtered</label>
+                        <p style="font-size: 12px; color: #666; margin-top: 4px;">Export based on current filters</p>
+                    </div>
+                    <div class="export-option">
+                        <input type="radio" name="exportScope" id="exportSelected" value="selected">
+                        <label for="exportSelected">Export Selected</label>
+                        <p style="font-size: 12px; color: #666; margin-top: 4px;">Export selected user IDs (comma-separated)</p>
+                    </div>
+                </div>
+
+                <div class="filter-group" id="selectedIdsGroup" style="display: none; margin-top: 16px;">
+                    <label>User IDs (comma-separated)</label>
+                    <input type="text" id="selectedUserIds" placeholder="e.g., 1,2,3,4,5">
+                </div>
+
+                <button class="btn btn-primary" onclick="exportData()" style="margin-top: 20px;">Export Data</button>
+            </div>
+
+            <!-- Import Section -->
+            <div class="export-import-section">
+                <h2>📥 Import Users</h2>
+                
+                <div class="filter-group" style="margin-bottom: 16px;">
+                    <label>Import Format</label>
+                    <select id="importFormat">
+                        <option value="json">JSON</option>
+                        <option value="csv">CSV</option>
+                    </select>
+                </div>
+
+                <div class="file-upload-area" id="fileUploadArea" onclick="document.getElementById('fileInput').click()">
+                    <input type="file" id="fileInput" accept=".json,.csv" onchange="handleFileSelect(event)">
+                    <p>📁 Click to select file or drag and drop</p>
+                    <p style="font-size: 12px; color: #666; margin-top: 8px;">Supports JSON and CSV files</p>
+                </div>
+
+                <div class="file-info" id="fileInfo"></div>
+
+                <div class="import-preview" id="importPreview" style="display: none;"></div>
+
+                <div class="status-message" id="importStatus"></div>
+
+                <button class="btn btn-primary" onclick="importData()" id="importButton" style="margin-top: 20px; display: none;">Import Users</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/notifications.js"></script>
+    <script src="/js/admin-export-import.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

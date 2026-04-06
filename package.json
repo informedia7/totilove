@@ -11,7 +11,8 @@
     "build:dev": "vite build --mode development",
     "build:watch": "vite build --watch",
     "build:css": "postcss app/assets/css/new/**/*.css -d dist/css --base app/assets/css/new --ext .css",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "email:test": "node scripts/test-email.js"
   },
   "dependencies": {
     "@socket.io/redis-adapter": "^8.3.0",
