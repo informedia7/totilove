@@ -1,4 +1,5 @@
 /**
+ * Sync note: comment touch for requested push
  * TALK BLOCK MANAGER
  * Handles user blocking functionality
  * Extracted from talk.html (lines 944-1052)
