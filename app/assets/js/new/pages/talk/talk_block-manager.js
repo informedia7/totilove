@@ -88,61 +88,15 @@ function blockCurrentUser() {
     pendingBlockUserId = partnerId;
     pendingBlockUserName = partnerName;
     
-    // Prefer the universal block modal used by talk.html.
-    // Keep inline modal compatibility if an inline variant exists.
-    const blockConfirmModal = document.getElementById('blockConfirmModal') ||
-        document.querySelector('.remove-user-modal#blockConfirmModal');
-    const blockButton = document.getElementById('blockUserButton');
-    
+    // Show block confirmation modal (full-screen overlay)
+    const blockConfirmModal = document.getElementById('blockConfirmModal');
+
     if (blockConfirmModal) {
         const blockUsernameEl = blockConfirmModal.querySelector('#blockUsername');
         if (blockUsernameEl) {
             blockUsernameEl.textContent = partnerName;
         }
-        
-        const usesUniversalModal = blockConfirmModal.classList.contains('block-confirm-modal');
-        const modalContent = blockConfirmModal.querySelector('.remove-user-content');
-        
-        if (usesUniversalModal) {
-            // Universal modal is centered by CSS.
-            blockConfirmModal.style.display = 'flex';
-        } else if (blockButton && modalContent) {
-            // Inline fallback: position above the 3-dots menu button.
-            const buttonRect = blockButton.getBoundingClientRect();
-            const modalHeight = 120;
-            const spacing = 8;
-
-            blockConfirmModal.style.display = 'block';
-            blockConfirmModal.style.top = (buttonRect.top - modalHeight - spacing) + 'px';
-            blockConfirmModal.style.left = (buttonRect.left + (buttonRect.width / 2)) + 'px';
-            blockConfirmModal.style.transform = 'translateX(-50%)';
-
-            setTimeout(() => {
-                const modalRect = modalContent.getBoundingClientRect();
-                if (modalRect.top < 10) {
-                    blockConfirmModal.style.top = (buttonRect.bottom + spacing) + 'px';
-                }
-                if (modalRect.left < 10) {
-                    blockConfirmModal.style.left = '10px';
-                    blockConfirmModal.style.transform = 'none';
-                } else if (modalRect.right > window.innerWidth - 10) {
-                    blockConfirmModal.style.left = (window.innerWidth - modalRect.width - 10) + 'px';
-                    blockConfirmModal.style.transform = 'none';
-                }
-            }, 0);
-        }
-        
-        // Close modal when clicking outside
-        const closeOnOutsideClick = (e) => {
-            const clickedBlockButton = blockButton ? blockButton.contains(e.target) : false;
-            if (!blockConfirmModal.contains(e.target) && !clickedBlockButton) {
-                closeBlockConfirm();
-                document.removeEventListener('click', closeOnOutsideClick);
-            }
-        };
-        setTimeout(() => {
-            document.addEventListener('click', closeOnOutsideClick);
-        }, 0);
+        blockConfirmModal.style.display = 'flex';
     }
     
     // Close menu
@@ -226,17 +180,10 @@ function checkReceivedMessagesViaAPI(partnerId, currentUserId) {
  * closeBlockConfirm();
  */
 function closeBlockConfirm() {
-    // Close inline/universal modal (for 3-dots menu and profile modal)
-    const blockConfirmModal = document.getElementById('blockConfirmModal') ||
-        document.querySelector('.remove-user-modal#blockConfirmModal');
+    // Close block confirmation modal
+    const blockConfirmModal = document.getElementById('blockConfirmModal');
     if (blockConfirmModal) {
         blockConfirmModal.style.display = 'none';
-    }
-    
-    // Also close universal modal if it exists (for user profile modal)
-    const universalModal = document.querySelector('.block-confirm-modal');
-    if (universalModal) {
-        universalModal.style.display = 'none';
     }
     
     pendingBlockUserId = null;

@@ -124,3 +124,70 @@
     color: white;
     transition: all 0.2s;
 }
+
+/* Dark mode support for talk action menu and inline confirmation modals */
+html[data-theme="dark"] .chat-more-menu,
+html.theme-dark .chat-more-menu,
+body.dark-mode .chat-more-menu,
+:root.theme-dark .chat-more-menu {
+    background: #0f172a;
+    box-shadow: 0 16px 35px rgba(2, 6, 23, 0.7);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+html[data-theme="dark"] .chat-menu-item,
+html.theme-dark .chat-menu-item,
+body.dark-mode .chat-menu-item,
+:root.theme-dark .chat-menu-item {
+    color: #e2e8f0;
+}
+
+html[data-theme="dark"] .chat-menu-item:last-child,
+html.theme-dark .chat-menu-item:last-child,
+body.dark-mode .chat-menu-item:last-child,
+:root.theme-dark .chat-menu-item:last-child {
+    border-top-color: rgba(148, 163, 184, 0.2);
+}
+
+html[data-theme="dark"] .remove-user-content,
+html.theme-dark .remove-user-content,
+body.dark-mode .remove-user-content,
+:root.theme-dark .remove-user-content {
+    background: #0f172a;
+    box-shadow: 0 20px 45px rgba(2, 6, 23, 0.75);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+html[data-theme="dark"] .remove-user-title,
+html.theme-dark .remove-user-title,
+body.dark-mode .remove-user-title,
+:root.theme-dark .remove-user-title {
+    color: #f8fafc;
+}
+
+html[data-theme="dark"] .remove-user-message,
+html.theme-dark .remove-user-message,
+body.dark-mode .remove-user-message,
+:root.theme-dark .remove-user-message {
+    color: #cbd5e1;
+}
+
+html[data-theme="dark"] .remove-user-message strong,
+html.theme-dark .remove-user-message strong,
+body.dark-mode .remove-user-message strong,
+:root.theme-dark .remove-user-message strong {
+    color: #fde68a;
+}
+
+html[data-theme="dark"] .inline-block-cancel-btn,
+html[data-theme="dark"] .inline-remove-cancel-btn,
+html.theme-dark .inline-block-cancel-btn,
+html.theme-dark .inline-remove-cancel-btn,
+body.dark-mode .inline-block-cancel-btn,
+body.dark-mode .inline-remove-cancel-btn,
+:root.theme-dark .inline-block-cancel-btn,
+:root.theme-dark .inline-remove-cancel-btn {
+    background: rgba(148, 163, 184, 0.15);
+    border-color: rgba(148, 163, 184, 0.35);
+    color: #e2e8f0;
+}

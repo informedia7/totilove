@@ -153,13 +153,17 @@
 /* Dark mode overrides */
 .block-confirm-modal.dark .block-confirm-overlay,
 html[data-theme="dark"] .block-confirm-modal .block-confirm-overlay,
-body.dark-mode .block-confirm-modal .block-confirm-overlay {
+html.theme-dark .block-confirm-modal .block-confirm-overlay,
+body.dark-mode .block-confirm-modal .block-confirm-overlay,
+:root.theme-dark .block-confirm-modal .block-confirm-overlay {
     background: rgba(2, 6, 23, 0.85);
 }
 
 .block-confirm-modal.dark .block-confirm-content,
 html[data-theme="dark"] .block-confirm-modal .block-confirm-content,
-body.dark-mode .block-confirm-modal .block-confirm-content {
+html.theme-dark .block-confirm-modal .block-confirm-content,
+body.dark-mode .block-confirm-modal .block-confirm-content,
+:root.theme-dark .block-confirm-modal .block-confirm-content {
     background: #0f172a;
     color: #e2e8f0;
     box-shadow: 0 30px 80px rgba(2, 6, 23, 0.9);
@@ -167,44 +171,58 @@ body.dark-mode .block-confirm-modal .block-confirm-content {
 
 .block-confirm-modal.dark .block-confirm-title,
 html[data-theme="dark"] .block-confirm-modal .block-confirm-title,
-body.dark-mode .block-confirm-modal .block-confirm-title {
+html.theme-dark .block-confirm-modal .block-confirm-title,
+body.dark-mode .block-confirm-modal .block-confirm-title,
+:root.theme-dark .block-confirm-modal .block-confirm-title {
     color: #f8fafc;
 }
 
 .block-confirm-modal.dark .block-confirm-message,
 html[data-theme="dark"] .block-confirm-modal .block-confirm-message,
-body.dark-mode .block-confirm-modal .block-confirm-message {
+html.theme-dark .block-confirm-modal .block-confirm-message,
+body.dark-mode .block-confirm-modal .block-confirm-message,
+:root.theme-dark .block-confirm-modal .block-confirm-message {
     color: #cbd5f5;
 }
 
 .block-confirm-modal.dark .block-confirm-message strong,
 html[data-theme="dark"] .block-confirm-modal .block-confirm-message strong,
-body.dark-mode .block-confirm-modal .block-confirm-message strong {
+html.theme-dark .block-confirm-modal .block-confirm-message strong,
+body.dark-mode .block-confirm-modal .block-confirm-message strong,
+:root.theme-dark .block-confirm-modal .block-confirm-message strong {
     color: #fde68a;
 }
 
 .block-confirm-modal.dark .block-confirm-cancel,
 html[data-theme="dark"] .block-confirm-modal .block-confirm-cancel,
-body.dark-mode .block-confirm-modal .block-confirm-cancel {
+html.theme-dark .block-confirm-modal .block-confirm-cancel,
+body.dark-mode .block-confirm-modal .block-confirm-cancel,
+:root.theme-dark .block-confirm-modal .block-confirm-cancel {
     border-color: rgba(148, 163, 184, 0.4);
     color: #e2e8f0;
 }
 
 .block-confirm-modal.dark .block-confirm-cancel:hover,
 html[data-theme="dark"] .block-confirm-modal .block-confirm-cancel:hover,
-body.dark-mode .block-confirm-modal .block-confirm-cancel:hover {
+html.theme-dark .block-confirm-modal .block-confirm-cancel:hover,
+body.dark-mode .block-confirm-modal .block-confirm-cancel:hover,
+:root.theme-dark .block-confirm-modal .block-confirm-cancel:hover {
     border-color: rgba(129, 140, 248, 0.7);
 }
 
 .block-confirm-modal.dark .block-confirm-yes,
 html[data-theme="dark"] .block-confirm-modal .block-confirm-yes,
-body.dark-mode .block-confirm-modal .block-confirm-yes {
+html.theme-dark .block-confirm-modal .block-confirm-yes,
+body.dark-mode .block-confirm-modal .block-confirm-yes,
+:root.theme-dark .block-confirm-modal .block-confirm-yes {
     box-shadow: 0 10px 32px rgba(248, 113, 113, 0.4);
 }
 
 .block-confirm-modal.dark .block-confirm-content::after,
 html[data-theme="dark"] .block-confirm-modal .block-confirm-content::after,
-body.dark-mode .block-confirm-modal .block-confirm-content::after {
+html.theme-dark .block-confirm-modal .block-confirm-content::after,
+body.dark-mode .block-confirm-modal .block-confirm-content::after,
+:root.theme-dark .block-confirm-modal .block-confirm-content::after {
     content: '';
     position: absolute;
     inset: 0;
