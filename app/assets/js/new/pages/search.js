@@ -1128,6 +1128,47 @@ function updateSelectedCountriesDisplay() {
     const countrySelect = document.getElementById('search-country');
     
     if (!container || !countSpan) return;
+
+    const isDarkTheme = document.documentElement.classList.contains('theme-dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark-mode');
+
+    const applyBadgeFallbackStyle = (el, type) => {
+        if (!el) return;
+
+        el.style.display = 'inline-flex';
+        el.style.alignItems = 'center';
+        el.style.gap = '0.5rem';
+        el.style.padding = '0.25rem 0.75rem';
+        el.style.borderRadius = '20px';
+        el.style.fontSize = '0.85rem';
+        el.style.borderStyle = 'solid';
+        el.style.borderWidth = '1px';
+
+        if (type === 'default') {
+            el.style.fontStyle = 'italic';
+            if (isDarkTheme) {
+                el.style.background = 'rgba(34, 197, 94, 0.16)';
+                el.style.color = '#bbf7d0';
+                el.style.borderColor = 'rgba(34, 197, 94, 0.45)';
+            } else {
+                el.style.background = '#e8f5e8';
+                el.style.color = '#2e7d32';
+                el.style.borderColor = '#c8e6c9';
+            }
+            return;
+        }
+
+        if (isDarkTheme) {
+            el.style.background = 'rgba(59, 130, 246, 0.2)';
+            el.style.color = '#bfdbfe';
+            el.style.borderColor = 'rgba(96, 165, 250, 0.5)';
+        } else {
+            el.style.background = '#e3f2fd';
+            el.style.color = '#1976d2';
+            el.style.borderColor = '#bbdefb';
+        }
+    };
     
     container.innerHTML = '';
     
@@ -1136,6 +1177,7 @@ function updateSelectedCountriesDisplay() {
         const allCountriesSpan = document.createElement('span');
         allCountriesSpan.className = 'country-badge country-badge-default';
         allCountriesSpan.textContent = '🌍 All Countries (default)';
+        applyBadgeFallbackStyle(allCountriesSpan, 'default');
         container.appendChild(allCountriesSpan);
         countSpan.textContent = 'All';
         
@@ -1157,6 +1199,7 @@ function updateSelectedCountriesDisplay() {
         selectedCountries.forEach(country => {
             const span = document.createElement('span');
             span.className = 'country-badge country-badge-selected';
+            applyBadgeFallbackStyle(span, 'selected');
             // Remove country code prefix if present
             let displayName = country.name;
             if (/^[a-z]{2} /.test(displayName)) {
