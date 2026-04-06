@@ -405,7 +405,7 @@ class LanguageMultiSelectManager {
         // Create inline form container
         const formContainer = document.createElement('div');
         formContainer.className = 'inline-language-form';
-        formContainer.style.cssText = 'background: white; border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem; margin-top: 0.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);';
+        formContainer.style.cssText = 'background: var(--app-surface, #ffffff); color: var(--app-text-primary, #222222); border: 1px solid var(--app-border-color, #ddd); border-radius: 8px; padding: 1.5rem; margin-top: 0.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);';
         formContainer.dataset.languageIndex = languageIndex;
         formContainer.dataset.languageId = userLanguage.language_id;
         
@@ -418,18 +418,18 @@ class LanguageMultiSelectManager {
         
         // Create form HTML
         formContainer.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 1rem 1.5rem; margin: -1.5rem -1.5rem 1rem -1.5rem; background: #f5f5f5; border-radius: 8px 8px 0 0; border-bottom: 1px solid #e1e5e9;">
-                <h4 style="margin: 0; font-size: 1.1rem; color: #333; display: flex; align-items: center; font-weight: 600;">${flagIconHtml}${langName} Details</h4>
-                <button type="button" class="close-inline-form" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #666; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; transition: opacity 0.3s ease;">×</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 1rem 1.5rem; margin: -1.5rem -1.5rem 1rem -1.5rem; background: var(--app-surface-muted, #f5f5f5); border-radius: 8px 8px 0 0; border-bottom: 1px solid var(--app-border-color, #e1e5e9);">
+                <h4 style="margin: 0; font-size: 1.1rem; color: var(--app-text-primary, #333333); display: flex; align-items: center; font-weight: 600;">${flagIconHtml}${langName} Details</h4>
+                <button type="button" class="close-inline-form" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--app-text-muted, #666666); padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; transition: opacity 0.3s ease;">×</button>
             </div>
             <form class="language-detail-inline-form">
                 <input type="hidden" class="detail-language-id" value="${userLanguage.language_id}">
                 <input type="hidden" class="detail-language-index" value="${languageIndex}">
                 
                 <div class="form-group" style="margin-bottom: 1rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #555;">Fluency Level:</label>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--app-text-primary, #555555);">Fluency Level:</label>
                     <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-                        <select class="detail-fluency-level" style="flex: 1; max-width: 250px; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                        <select class="detail-fluency-level" style="flex: 1; max-width: 250px; padding: 0.5rem; border: 1px solid var(--app-border-color, #ddd); border-radius: 6px; background: var(--app-surface-muted, #f8f9fa); color: var(--app-text-primary, #222222);">
                             <option value="">Select fluency level (optional)</option>
                         </select>
                         <label style="display: flex; align-items: center; gap: 0.5rem; margin: 0; white-space: nowrap; cursor: pointer;">
@@ -440,7 +440,7 @@ class LanguageMultiSelectManager {
                 </div>
                 
                 <div class="form-group" style="margin-bottom: 1rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #555;">Skills: * <span style="font-weight: normal; color: #666; font-size: 0.9rem;">(Select at least one)</span></label>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--app-text-primary, #555555);">Skills: * <span style="font-weight: normal; color: var(--app-text-muted, #666666); font-size: 0.9rem;">(Select at least one)</span></label>
                     <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
                         <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                             <input type="checkbox" class="detail-can-read" data-skill="read" ${userLanguage.can_read ? 'checked' : ''}>
@@ -461,8 +461,8 @@ class LanguageMultiSelectManager {
                     </div>
                 </div>
                 
-                <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #eee;">
-                    <button type="button" class="cancel-inline-form" style="padding: 0.5rem 1rem; border: 1px solid #ddd; border-radius: 6px; background: white; cursor: pointer; color: #333;">Cancel</button>
+                <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--app-border-color, #eee);">
+                    <button type="button" class="cancel-inline-form" style="padding: 0.5rem 1rem; border: 1px solid var(--app-border-color, #ddd); border-radius: 6px; background: var(--app-surface, #ffffff); cursor: pointer; color: var(--app-text-primary, #333333);">Cancel</button>
                     <button type="button" class="save-inline-form" style="padding: 0.5rem 1rem; border: none; border-radius: 6px; background: #667eea; color: white; cursor: pointer;">Save Details</button>
                 </div>
             </form>
