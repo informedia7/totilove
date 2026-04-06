@@ -8,7 +8,7 @@
     position: fixed;
     background: white;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 10000;
     min-width: 200px;
     padding: 8px 0;
@@ -52,7 +52,7 @@
 .remove-user-content {
     background: white;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     padding: 16px;
     min-width: 280px;
     max-width: 320px;
@@ -125,69 +125,93 @@
     transition: all 0.2s;
 }
 
-/* Dark mode support for talk action menu and inline confirmation modals */
+/* Dark mode overrides for remove-user modal and chat menu */
+:root.theme-dark .chat-more-menu,
 html[data-theme="dark"] .chat-more-menu,
-html.theme-dark .chat-more-menu,
-body.dark-mode .chat-more-menu,
-:root.theme-dark .chat-more-menu {
-    background: #0f172a;
-    box-shadow: 0 16px 35px rgba(2, 6, 23, 0.7);
-    border: 1px solid rgba(148, 163, 184, 0.2);
+body.dark-mode .chat-more-menu {
+    background: #1a2332;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
+:root.theme-dark .chat-menu-item,
 html[data-theme="dark"] .chat-menu-item,
-html.theme-dark .chat-menu-item,
-body.dark-mode .chat-menu-item,
-:root.theme-dark .chat-menu-item {
+body.dark-mode .chat-menu-item {
     color: #e2e8f0;
 }
 
+:root.theme-dark .chat-menu-item:last-child,
 html[data-theme="dark"] .chat-menu-item:last-child,
-html.theme-dark .chat-menu-item:last-child,
-body.dark-mode .chat-menu-item:last-child,
-:root.theme-dark .chat-menu-item:last-child {
+body.dark-mode .chat-menu-item:last-child {
     border-top-color: rgba(148, 163, 184, 0.2);
 }
 
+:root.theme-dark .remove-user-modal,
+html[data-theme="dark"] .remove-user-modal,
+body.dark-mode .remove-user-modal {
+    z-index: 10001;
+}
+
+:root.theme-dark .remove-user-content,
 html[data-theme="dark"] .remove-user-content,
-html.theme-dark .remove-user-content,
-body.dark-mode .remove-user-content,
-:root.theme-dark .remove-user-content {
+body.dark-mode .remove-user-content {
     background: #0f172a;
-    box-shadow: 0 20px 45px rgba(2, 6, 23, 0.75);
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(148, 163, 184, 0.18);
 }
 
+:root.theme-dark .remove-user-icon,
+html[data-theme="dark"] .remove-user-icon,
+body.dark-mode .remove-user-icon {
+    background: rgba(220, 53, 69, 0.2);
+    color: #f87171;
+}
+
+:root.theme-dark .remove-user-title,
 html[data-theme="dark"] .remove-user-title,
-html.theme-dark .remove-user-title,
-body.dark-mode .remove-user-title,
-:root.theme-dark .remove-user-title {
-    color: #f8fafc;
+body.dark-mode .remove-user-title {
+    color: #f1f5f9;
 }
 
+:root.theme-dark .remove-user-message,
 html[data-theme="dark"] .remove-user-message,
-html.theme-dark .remove-user-message,
-body.dark-mode .remove-user-message,
-:root.theme-dark .remove-user-message {
+body.dark-mode .remove-user-message {
     color: #cbd5e1;
 }
 
-html[data-theme="dark"] .remove-user-message strong,
-html.theme-dark .remove-user-message strong,
-body.dark-mode .remove-user-message strong,
-:root.theme-dark .remove-user-message strong {
-    color: #fde68a;
-}
-
+:root.theme-dark .inline-block-cancel-btn,
+:root.theme-dark .inline-remove-cancel-btn,
 html[data-theme="dark"] .inline-block-cancel-btn,
 html[data-theme="dark"] .inline-remove-cancel-btn,
-html.theme-dark .inline-block-cancel-btn,
-html.theme-dark .inline-remove-cancel-btn,
 body.dark-mode .inline-block-cancel-btn,
-body.dark-mode .inline-remove-cancel-btn,
-:root.theme-dark .inline-block-cancel-btn,
-:root.theme-dark .inline-remove-cancel-btn {
+body.dark-mode .inline-remove-cancel-btn {
+    background: #1a2332;
+    border-color: rgba(148, 163, 184, 0.25);
+    color: #cbd5e1;
+}
+
+:root.theme-dark .inline-block-cancel-btn:hover,
+:root.theme-dark .inline-remove-cancel-btn:hover,
+html[data-theme="dark"] .inline-block-cancel-btn:hover,
+html[data-theme="dark"] .inline-remove-cancel-btn:hover,
+body.dark-mode .inline-block-cancel-btn:hover,
+body.dark-mode .inline-remove-cancel-btn:hover {
     background: rgba(148, 163, 184, 0.15);
-    border-color: rgba(148, 163, 184, 0.35);
-    color: #e2e8f0;
+}
+
+:root.theme-dark .inline-block-yes-btn,
+:root.theme-dark .inline-remove-yes-btn,
+html[data-theme="dark"] .inline-block-yes-btn,
+html[data-theme="dark"] .inline-remove-yes-btn,
+body.dark-mode .inline-block-yes-btn,
+body.dark-mode .inline-remove-yes-btn {
+    background: #dc3545;
+}
+
+:root.theme-dark .inline-block-yes-btn:hover,
+:root.theme-dark .inline-remove-yes-btn:hover,
+html[data-theme="dark"] .inline-block-yes-btn:hover,
+html[data-theme="dark"] .inline-remove-yes-btn:hover,
+body.dark-mode .inline-block-yes-btn:hover,
+body.dark-mode .inline-remove-yes-btn:hover {
+    background: #c82333;
 }
