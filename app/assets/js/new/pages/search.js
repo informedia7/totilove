@@ -1134,8 +1134,8 @@ function updateSelectedCountriesDisplay() {
     if (selectedCountries.length === 0) {
         // Show "All Countries" when no specific countries are selected
         const allCountriesSpan = document.createElement('span');
-        allCountriesSpan.style.cssText = 'background: #e8f5e8; color: #2e7d32; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem; font-style: italic;';
-        allCountriesSpan.innerHTML = '🌍 All Countries (default)';
+        allCountriesSpan.className = 'country-badge country-badge-default';
+        allCountriesSpan.textContent = '🌍 All Countries (default)';
         container.appendChild(allCountriesSpan);
         countSpan.textContent = 'All';
         
@@ -1156,13 +1156,24 @@ function updateSelectedCountriesDisplay() {
         
         selectedCountries.forEach(country => {
             const span = document.createElement('span');
-            span.style.cssText = 'background: #e3f2fd; color: #1976d2; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem;';
+            span.className = 'country-badge country-badge-selected';
             // Remove country code prefix if present
             let displayName = country.name;
             if (/^[a-z]{2} /.test(displayName)) {
                 displayName = displayName.substring(3);
             }
-            span.innerHTML = `${displayName} <button type="button" class="remove-country-btn" data-remove-country="${country.id}" onclick="removeSearchCountry('${country.id}')">x</button>`;
+            const nameNode = document.createElement('span');
+            nameNode.textContent = displayName;
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'remove-country-btn';
+            removeBtn.setAttribute('data-remove-country', String(country.id));
+            removeBtn.textContent = 'x';
+            removeBtn.addEventListener('click', () => removeSearchCountry(String(country.id)));
+
+            span.appendChild(nameNode);
+            span.appendChild(removeBtn);
             container.appendChild(span);
         });
         

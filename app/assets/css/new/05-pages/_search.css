@@ -1082,6 +1082,43 @@ html[data-theme="dark"] #app-root .search-results .online-user-card {
     width: 100%;
 }
 
+.country-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    border: 1px solid transparent;
+}
+
+.country-badge-default {
+    background: #e8f5e8;
+    color: #2e7d32;
+    border-color: #c8e6c9;
+    font-style: italic;
+}
+
+.country-badge-selected {
+    background: #e3f2fd;
+    color: #1976d2;
+    border-color: #bbdefb;
+}
+
+:root.theme-dark #app-root .country-badge-default,
+html[data-theme="dark"] #app-root .country-badge-default {
+    background: rgba(34, 197, 94, 0.16);
+    color: #bbf7d0;
+    border-color: rgba(34, 197, 94, 0.45);
+}
+
+:root.theme-dark #app-root .country-badge-selected,
+html[data-theme="dark"] #app-root .country-badge-selected {
+    background: rgba(59, 130, 246, 0.2);
+    color: #bfdbfe;
+    border-color: rgba(96, 165, 250, 0.5);
+}
+
 .help-text-muted {
     font-size: 0.8rem;
     color: var(--muted-color);
