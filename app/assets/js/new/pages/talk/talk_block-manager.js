@@ -95,28 +95,28 @@ function positionBlockConfirmModal(modal) {
 function blockCurrentUser() {
     const currentConversation = TalkState.getCurrentConversation();
     const conversations = TalkState.getConversations();
-    
+
     if (!currentConversation || !conversations[currentConversation]) {
         if (typeof showNotification === 'function') {
             showNotification('No conversation selected', 'error');
         }
         return;
     }
-    
+
     const conversation = conversations[currentConversation];
     const partnerId = conversation.partnerId;
     const partnerName = conversation.name;
     const currentUserId = TalkState.getCurrentUserId();
-    
+
     // Check if user has received any messages from this partner
     const hasReceivedMessages = checkIfReceivedMessages(conversation, partnerId, currentUserId);
-    
+
     if (!hasReceivedMessages) {
         // User hasn't received messages from this partner - don't allow blocking
         if (typeof showNotification === 'function') {
             showNotification('You can only block users who have sent you messages', 'error');
         }
-        
+
         // Close menu
         const menu = document.getElementById('chatMoreMenu');
         if (menu) {
@@ -124,11 +124,11 @@ function blockCurrentUser() {
         }
         return;
     }
-    
+
     // Store for confirmation
     pendingBlockUserId = partnerId;
     pendingBlockUserName = partnerName;
-    
+
     // Show block confirmation modal (full-screen overlay)
     const blockConfirmModal = document.getElementById('blockConfirmModal');
 
@@ -140,7 +140,7 @@ function blockCurrentUser() {
         positionBlockConfirmModal(blockConfirmModal);
         blockConfirmModal.style.display = 'flex';
     }
-    
+
     // Close menu
     const menu = document.getElementById('chatMoreMenu');
     if (menu) {
@@ -162,19 +162,19 @@ function checkIfReceivedMessages(conversation, partnerId, currentUserId) {
         const hasReceived = conversation.messages.some(message => {
             const senderId = message.sender_id || message.senderId;
             const receiverId = message.receiver_id || message.receiverId;
-            
+
             // Check if message was sent by partner (sender) to current user (receiver)
-            return senderId && 
-                   parseInt(senderId) === parseInt(partnerId) &&
-                   receiverId &&
-                   parseInt(receiverId) === parseInt(currentUserId);
+            return senderId &&
+                parseInt(senderId) === parseInt(partnerId) &&
+                receiverId &&
+                parseInt(receiverId) === parseInt(currentUserId);
         });
-        
+
         if (hasReceived) {
             return true;
         }
     }
-    
+
     // If no messages in conversation object, check via cache/API
     return checkReceivedMessagesViaAPI(partnerId, currentUserId);
 }
@@ -197,17 +197,17 @@ function checkReceivedMessagesViaAPI(partnerId, currentUserId) {
                     const senderId = msg.sender_id || msg.senderId;
                     const receiverId = msg.receiver_id || msg.receiverId;
                     // Verify message was sent by partner to current user
-                    return senderId && 
-                           parseInt(senderId) === parseInt(partnerId) &&
-                           receiverId &&
-                           parseInt(receiverId) === parseInt(currentUserId);
+                    return senderId &&
+                        parseInt(senderId) === parseInt(partnerId) &&
+                        receiverId &&
+                        parseInt(receiverId) === parseInt(currentUserId);
                 })) {
                     return true;
                 }
             }
         }
     }
-    
+
     // Default to false if we can't determine
     // This prevents blocking if we can't verify messages were received
     return false;
@@ -235,13 +235,13 @@ function closeBlockConfirm() {
         }
         blockConfirmModal.style.display = 'none';
     }
-    
+
     pendingBlockUserId = null;
     pendingBlockUserName = null;
-    
+
     // Remove any event listeners
     // Event listener is removed automatically when modal closes
-    
+
     // Also clear window-level pending block data (for profile modal)
     if (typeof window !== 'undefined') {
         window.pendingBlockUserId = null;
@@ -267,7 +267,7 @@ async function confirmBlock() {
     }
 
     const currentUserId = TalkState.getCurrentUserId();
-    
+
     try {
         const response = await fetch(`/api/users/${userIdToBlock}/block`, {
             method: 'POST',
@@ -277,13 +277,13 @@ async function confirmBlock() {
             },
             body: JSON.stringify({ reason: 'Blocked from chat' })
         });
-        
+
         const data = await response.json();
         if (data.success) {
             if (typeof showNotification === 'function') {
                 showNotification('User blocked successfully', 'success');
             }
-            
+
             // Clear blocked users cache if it exists
             if (typeof window.blockedUsersCache !== 'undefined' && window.blockedUsersCache) {
                 window.blockedUsersCache.clear();
@@ -291,20 +291,20 @@ async function confirmBlock() {
             if (typeof window.blockedUsersCacheTimestamp !== 'undefined') {
                 window.blockedUsersCacheTimestamp = 0;
             }
-            
+
             // Clear messages area
             const messagesArea = document.getElementById('messagesArea');
             if (messagesArea) {
                 messagesArea.innerHTML = '';
             }
-            
+
             // Clear conversation from memory
             const conversations = TalkState.getConversations();
             const currentConversation = TalkState.getCurrentConversation();
             if (currentConversation && conversations[currentConversation]) {
                 delete conversations[currentConversation];
             }
-            
+
             // Clear message cache for this conversation
             const messageCache = TalkState.getMessageCache ? TalkState.getMessageCache() : (window.messageCache || new Map());
             if (userIdToBlock && messageCache && typeof messageCache.delete === 'function') {
@@ -316,20 +316,20 @@ async function confirmBlock() {
                 }
                 cacheKeysToDelete.forEach(key => messageCache.delete(key));
             }
-            
+
             // If blocking from profile modal, close the modal
             if (window.pendingBlockContext === 'talk' && typeof closeProfileModal === 'function') {
                 closeProfileModal();
             }
-            
+
             // Reset conversation state
             TalkState.setCurrentConversation(null);
-            
+
             // Refresh conversations list (will remove blocked user)
             if (typeof loadConversations === 'function') {
                 await loadConversations();
             }
-            
+
             // Switch to empty state
             const emptyState = document.getElementById('emptyState');
             const chatHeader = document.getElementById('chatHeader');
@@ -340,9 +340,9 @@ async function confirmBlock() {
                 chatHeader.classList.remove('is-active');
             }
             if (messageInputArea) messageInputArea.style.display = 'none';
-            
+
             showConversationListAfterBlock();
-            
+
             // Clear any active conversation highlights
             document.querySelectorAll('.conversation-item').forEach(item => {
                 item.classList.remove('active');
