@@ -723,6 +723,7 @@
     justify-content: center;
     font-size: var(--font-size-lg);
     transition: all var(--transition-fast);
+    position: relative;
   }
 
   .chat-action-btn:hover {
