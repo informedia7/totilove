@@ -43,6 +43,47 @@ let pendingBlockUserId = null;
 let pendingBlockUserName = null;
 
 /**
+ * Position block confirm modal against chat window bounds on desktop.
+ * Keeps mobile behavior unchanged.
+ * @param {HTMLElement|null} modal - Block confirm modal element
+ * @returns {void}
+ */
+function positionBlockConfirmModal(modal) {
+    if (!modal) {
+        return;
+    }
+
+    const modalContent = modal.querySelector('.block-confirm-content');
+    if (!modalContent) {
+        return;
+    }
+
+    const isDesktop = window.innerWidth >= 768;
+    if (!isDesktop) {
+        modalContent.style.position = '';
+        modalContent.style.left = '';
+        modalContent.style.top = '';
+        modalContent.style.transform = '';
+        modalContent.style.animation = '';
+        return;
+    }
+
+    const chatArea = document.querySelector('.chat-area') || document.getElementById('appContainer');
+    if (!chatArea) {
+        return;
+    }
+
+    const chatRect = chatArea.getBoundingClientRect();
+    const chatCenterX = chatRect.left + (chatRect.width / 2);
+
+    modalContent.style.position = 'fixed';
+    modalContent.style.left = `${chatCenterX}px`;
+    modalContent.style.top = '50%';
+    modalContent.style.transform = 'translate(-50%, -50%)';
+    modalContent.style.animation = 'none';
+}
+
+/**
  * Block current user from chat
  * Shows confirmation modal before blocking
  * Checks if user has received messages from the partner before allowing block
@@ -96,6 +137,7 @@ function blockCurrentUser() {
         if (blockUsernameEl) {
             blockUsernameEl.textContent = partnerName;
         }
+        positionBlockConfirmModal(blockConfirmModal);
         blockConfirmModal.style.display = 'flex';
     }
     
@@ -183,6 +225,14 @@ function closeBlockConfirm() {
     // Close block confirmation modal
     const blockConfirmModal = document.getElementById('blockConfirmModal');
     if (blockConfirmModal) {
+        const modalContent = blockConfirmModal.querySelector('.block-confirm-content');
+        if (modalContent) {
+            modalContent.style.position = '';
+            modalContent.style.left = '';
+            modalContent.style.top = '';
+            modalContent.style.transform = '';
+            modalContent.style.animation = '';
+        }
         blockConfirmModal.style.display = 'none';
     }
     
