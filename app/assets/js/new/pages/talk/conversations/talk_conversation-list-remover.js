@@ -13,12 +13,12 @@
 function updateRemoveUserButtonVisibility() {
     const removeButton = document.getElementById('removeUserButton');
     if (!removeButton) return;
-    
+
     const currentConversation = TalkState.getCurrentConversation();
     if (currentConversation) {
         const conversations = TalkState.getConversations();
         const conversation = conversations[currentConversation];
-        
+
         if (conversation && conversation.partnerId) {
             // Show remove button for all active conversations (not deleted users)
             const isDeleted = conversation.isDeleted || conversation.name === 'Deleted User' || conversation.name === 'Account Deactivated';
@@ -50,50 +50,53 @@ function showRemoveUserConfirm() {
         }
         return;
     }
-    
+
     const conversations = TalkState.getConversations();
     const conversation = conversations[currentConversation];
-    
+
     if (!conversation || !conversation.partnerId) {
         if (typeof showNotification === 'function') {
             showNotification('Invalid conversation', 'error');
         }
         return;
     }
-    
+
     const partnerName = conversation.name || 'this user';
-    
+
     // Update modal content
     const usernameElement = document.getElementById('removeUsername');
     if (usernameElement) {
         usernameElement.textContent = partnerName;
     }
-    
+
     // Show modal positioned above the remove button
     const modal = document.getElementById('removeUserConfirmModal');
     const removeButton = document.getElementById('removeUserButton');
-    
+
     if (modal && removeButton) {
         // Get button position
         const buttonRect = removeButton.getBoundingClientRect();
         const modalContent = modal.querySelector('.remove-user-content');
-        
+        const isDesktop = window.innerWidth >= 768;
+        const desktopOffsetX = isDesktop ? -20 : 0;
+        const desktopOffsetY = isDesktop ? 50 : 0;
+
         if (modalContent) {
             // Position modal above the button
             const modalHeight = 120; // Approximate height
             const spacing = 8; // Space between button and modal
-            
+
             modal.style.display = 'block';
-            modal.style.top = (buttonRect.top - modalHeight - spacing) + 'px';
-            modal.style.left = (buttonRect.left + (buttonRect.width / 2)) + 'px';
+            modal.style.top = (buttonRect.top - modalHeight - spacing + desktopOffsetY) + 'px';
+            modal.style.left = (buttonRect.left + (buttonRect.width / 2) + desktopOffsetX) + 'px';
             modal.style.transform = 'translateX(-50%)';
-            
+
             // Adjust if modal goes off screen
             setTimeout(() => {
                 const modalRect = modalContent.getBoundingClientRect();
                 if (modalRect.top < 10) {
                     // Position below button if not enough space above
-                    modal.style.top = (buttonRect.bottom + spacing) + 'px';
+                    modal.style.top = (buttonRect.bottom + spacing + desktopOffsetY) + 'px';
                 }
                 if (modalRect.left < 10) {
                     modal.style.left = '10px';
@@ -104,7 +107,7 @@ function showRemoveUserConfirm() {
                 }
             }, 0);
         }
-        
+
         // Close modal when clicking outside
         const closeOnOutsideClick = (e) => {
             if (!modal.contains(e.target) && !removeButton.contains(e.target)) {
@@ -126,7 +129,7 @@ function closeRemoveUserConfirm() {
     if (modal) {
         modal.style.display = 'none';
     }
-    
+
     // Remove any event listeners
     const removeButton = document.getElementById('removeUserButton');
     if (removeButton) {
@@ -143,21 +146,21 @@ async function confirmRemoveUser() {
         closeRemoveUserConfirm();
         return;
     }
-    
+
     const conversations = TalkState.getConversations();
     const conversation = conversations[currentConversation];
-    
+
     if (!conversation || !conversation.partnerId) {
         closeRemoveUserConfirm();
         return;
     }
-    
+
     const partnerId = conversation.partnerId;
     const partnerName = conversation.name || 'this user';
-    
+
     // Close modal
     closeRemoveUserConfirm();
-    
+
     // Perform removal
     await performRemoveUser(partnerId, partnerName, currentConversation);
 }
@@ -169,7 +172,7 @@ async function performRemoveUser(partnerId, partnerName, currentConversation) {
     try {
         const currentUserId = TalkState.getCurrentUserId();
         const token = typeof getSessionToken === 'function' ? getSessionToken() : null;
-        
+
         const response = await fetch('/api/messages/remove-user-from-conversation', {
             method: 'POST',
             headers: {
@@ -183,36 +186,36 @@ async function performRemoveUser(partnerId, partnerName, currentConversation) {
                 partnerId: partnerId
             })
         });
-        
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             if (typeof showNotification === 'function') {
                 showNotification(`${partnerName} removed from conversation`, 'success');
             }
-            
+
             // Hide message input form
             const messageInputArea = document.getElementById('messageInputArea');
             if (messageInputArea) {
                 messageInputArea.style.display = 'none';
             }
-            
+
             // Clear messages area
             const messagesArea = document.getElementById('messagesArea');
             if (messagesArea) {
                 messagesArea.innerHTML = '<div class="empty-state" id="emptyState"><div class="empty-state-icon">💬</div><div class="empty-state-title">User removed</div><div class="empty-state-text">This user has been removed from the conversation. Their messages are no longer visible.</div></div>';
             }
-            
+
             // Remove conversation from list
             const conversationItem = document.querySelector(`[data-conversation-id="${currentConversation}"]`);
             if (conversationItem) {
                 conversationItem.remove();
             }
-            
+
             // Remove from TalkState
             if (TalkState && TalkState.removeConversation) {
                 TalkState.removeConversation(currentConversation);
@@ -221,22 +224,22 @@ async function performRemoveUser(partnerId, partnerName, currentConversation) {
                 delete convs[currentConversation];
                 TalkState.setConversations(convs);
             }
-            
+
             // Clear current conversation
             TalkState.setCurrentConversation(null);
-            
+
             // Hide chat header
             const chatHeader = document.getElementById('chatHeader');
             if (chatHeader) {
                 chatHeader.style.display = 'none';
                 chatHeader.classList.remove('is-active');
             }
-            
+
             // Reload conversations list
             if (typeof loadConversations === 'function') {
                 loadConversations();
             }
-            
+
             // Close menu
             const menu = document.getElementById('chatMoreMenu');
             if (menu) {
