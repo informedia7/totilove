@@ -15,6 +15,7 @@
 
   /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
@@ -38,7 +39,7 @@
     --color-primary-rgb: 102, 126, 234;
     --color-primary-dark-rgb: 118, 75, 162;
     --color-white-rgb: 255, 255, 255;
-    
+
     /* Colors */
     --color-white: #ffffff;
     --color-black: #000000;
@@ -151,7 +152,12 @@
     min-height: 100dvh;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-weight: 600;
     line-height: var(--line-height-tight);
   }
@@ -232,7 +238,7 @@
     position: relative;
   }
 
-  .app-container > .main-content {
+  .app-container>.main-content {
     display: flex;
     width: 100%;
     height: 100%;
@@ -277,7 +283,7 @@
       position: relative;
     }
 
-    .app-container > .main-content {
+    .app-container>.main-content {
       flex-direction: column;
       height: calc(100vh - var(--header-height-mobile));
       height: calc(100svh - var(--header-height-mobile));
@@ -288,7 +294,7 @@
     .chat-back-btn-mobile {
       display: none;
     }
-    
+
     body[data-nav-state="NAV_CHAT"] .chat-back-btn-mobile {
       display: inline-flex;
     }
@@ -311,7 +317,7 @@
       max-height: 900px;
     }
 
-    .app-container > .main-content {
+    .app-container>.main-content {
       flex-direction: row;
       height: calc(100% - var(--header-height-desktop));
     }
@@ -339,6 +345,7 @@
    4. COMPONENTS
 ------------------------------- */
 @layer components {
+
   /* HEADER */
   .header {
     height: var(--header-height-mobile);
@@ -1032,7 +1039,9 @@
   }
 
   @media (max-width: 768px) {
-    .search-panel { top: 86px; }
+    .search-panel {
+      top: 86px;
+    }
   }
 
   .search-panel.show {
@@ -1160,133 +1169,316 @@
    5. UTILITIES
 ------------------------------- */
 @layer utilities {
+
   /* Flexbox utilities */
-  .flex { display: flex; }
-  .flex-col { flex-direction: column; }
-  .items-center { align-items: center; }
-  .justify-center { justify-content: center; }
-  .justify-between { justify-content: space-between; }
-  .flex-1 { flex: 1; }
-  .flex-shrink-0 { flex-shrink: 0; }
-  .flex-grow { flex-grow: 1; }
-  
+  .flex {
+    display: flex;
+  }
+
+  .flex-col {
+    flex-direction: column;
+  }
+
+  .items-center {
+    align-items: center;
+  }
+
+  .justify-center {
+    justify-content: center;
+  }
+
+  .justify-between {
+    justify-content: space-between;
+  }
+
+  .flex-1 {
+    flex: 1;
+  }
+
+  .flex-shrink-0 {
+    flex-shrink: 0;
+  }
+
+  .flex-grow {
+    flex-grow: 1;
+  }
+
   /* Sizing utilities */
-  .w-full { width: 100%; }
-  .h-full { height: 100%; }
-  
+  .w-full {
+    width: 100%;
+  }
+
+  .h-full {
+    height: 100%;
+  }
+
   /* Visibility utilities */
-  .hidden { display: none !important; }
-  .visible { visibility: visible; }
-  .invisible { visibility: hidden; }
-  .opacity-0 { opacity: 0; }
-  .opacity-100 { opacity: 1; }
-  .pointer-events-none { pointer-events: none; }
-  .pointer-events-auto { pointer-events: auto; }
-  
+  .hidden {
+    display: none !important;
+  }
+
+  .visible {
+    visibility: visible;
+  }
+
+  .invisible {
+    visibility: hidden;
+  }
+
+  .opacity-0 {
+    opacity: 0;
+  }
+
+  .opacity-100 {
+    opacity: 1;
+  }
+
+  .pointer-events-none {
+    pointer-events: none;
+  }
+
+  .pointer-events-auto {
+    pointer-events: auto;
+  }
+
   /* Transition utilities */
-  .transition-all { transition: all var(--transition-base); }
-  .transform { transform: translateX(0); }
-  .transform-hidden { transform: translateX(-100%); }
-  .transform-shown { transform: translateX(0); }
-  
+  .transition-all {
+    transition: all var(--transition-base);
+  }
+
+  .transform {
+    transform: translateX(0);
+  }
+
+  .transform-hidden {
+    transform: translateX(-100%);
+  }
+
+  .transform-shown {
+    transform: translateX(0);
+  }
+
   /* Position utilities */
-  .absolute { position: absolute; }
-  .relative { position: relative; }
-  .sticky { position: sticky; }
-  
+  .absolute {
+    position: absolute;
+  }
+
+  .relative {
+    position: relative;
+  }
+
+  .sticky {
+    position: sticky;
+  }
+
   /* Overflow utilities */
-  .overflow-hidden { overflow: hidden; }
-  .overflow-auto { overflow: auto; }
-  .overflow-y-auto { overflow-y: auto; }
-  
+  .overflow-hidden {
+    overflow: hidden;
+  }
+
+  .overflow-auto {
+    overflow: auto;
+  }
+
+  .overflow-y-auto {
+    overflow-y: auto;
+  }
+
   /* Text utilities */
   .text-ellipsis {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .text-center { text-align: center; }
-  .text-left { text-align: left; }
-  .text-right { text-align: right; }
-  
+
+  .text-center {
+    text-align: center;
+  }
+
+  .text-left {
+    text-align: left;
+  }
+
+  .text-right {
+    text-align: right;
+  }
+
   /* Font utilities */
-  .font-semibold { font-weight: 600; }
-  .font-bold { font-weight: 700; }
-  .text-sm { font-size: var(--font-size-sm); }
-  .text-md { font-size: var(--font-size-md); }
-  .text-lg { font-size: var(--font-size-lg); }
-  .text-xl { font-size: var(--font-size-xl); }
-  
+  .font-semibold {
+    font-weight: 600;
+  }
+
+  .font-bold {
+    font-weight: 700;
+  }
+
+  .text-sm {
+    font-size: var(--font-size-sm);
+  }
+
+  .text-md {
+    font-size: var(--font-size-md);
+  }
+
+  .text-lg {
+    font-size: var(--font-size-lg);
+  }
+
+  .text-xl {
+    font-size: var(--font-size-xl);
+  }
+
   /* Border utilities */
-  .rounded { border-radius: var(--border-radius-sm); }
-  .rounded-md { border-radius: var(--border-radius-md); }
-  .rounded-lg { border-radius: var(--border-radius-lg); }
-  .rounded-full { border-radius: 50%; }
-  
+  .rounded {
+    border-radius: var(--border-radius-sm);
+  }
+
+  .rounded-md {
+    border-radius: var(--border-radius-md);
+  }
+
+  .rounded-lg {
+    border-radius: var(--border-radius-lg);
+  }
+
+  .rounded-full {
+    border-radius: 50%;
+  }
+
   /* Shadow utilities */
-  .shadow-sm { box-shadow: var(--shadow-sm); }
-  .shadow-md { box-shadow: var(--shadow-md); }
-  .shadow-lg { box-shadow: var(--shadow-lg); }
-  
+  .shadow-sm {
+    box-shadow: var(--shadow-sm);
+  }
+
+  .shadow-md {
+    box-shadow: var(--shadow-md);
+  }
+
+  .shadow-lg {
+    box-shadow: var(--shadow-lg);
+  }
+
   /* Background utilities */
-  .bg-white { background-color: var(--color-white); }
-  .bg-gray-100 { background-color: var(--color-gray-100); }
-  .bg-gray-200 { background-color: var(--color-gray-200); }
-  .bg-primary { background-color: var(--color-primary); }
-  
+  .bg-white {
+    background-color: var(--color-white);
+  }
+
+  .bg-gray-100 {
+    background-color: var(--color-gray-100);
+  }
+
+  .bg-gray-200 {
+    background-color: var(--color-gray-200);
+  }
+
+  .bg-primary {
+    background-color: var(--color-primary);
+  }
+
   /* Text color utilities */
-  .text-primary { color: var(--color-text-primary); }
-  .text-secondary { color: var(--color-text-secondary); }
-  .text-gray-400 { color: var(--color-gray-400); }
-  .text-gray-900 { color: var(--color-gray-900); }
-  
+  .text-primary {
+    color: var(--color-text-primary);
+  }
+
+  .text-secondary {
+    color: var(--color-text-secondary);
+  }
+
+  .text-gray-400 {
+    color: var(--color-gray-400);
+  }
+
+  .text-gray-900 {
+    color: var(--color-gray-900);
+  }
+
   /* Spacing utilities */
-  .gap-1 { gap: var(--spacing-xs); }
-  .gap-2 { gap: var(--spacing-sm); }
-  .gap-3 { gap: var(--spacing-md); }
-  .gap-4 { gap: var(--spacing-lg); }
-  
-  .p-2 { padding: var(--spacing-sm); }
-  .p-3 { padding: var(--spacing-md); }
-  .p-4 { padding: var(--spacing-lg); }
-  
+  .gap-1 {
+    gap: var(--spacing-xs);
+  }
+
+  .gap-2 {
+    gap: var(--spacing-sm);
+  }
+
+  .gap-3 {
+    gap: var(--spacing-md);
+  }
+
+  .gap-4 {
+    gap: var(--spacing-lg);
+  }
+
+  .p-2 {
+    padding: var(--spacing-sm);
+  }
+
+  .p-3 {
+    padding: var(--spacing-md);
+  }
+
+  .p-4 {
+    padding: var(--spacing-lg);
+  }
+
   .px-3 {
     padding-left: var(--spacing-md);
     padding-right: var(--spacing-md);
   }
+
   .px-4 {
     padding-left: var(--spacing-lg);
     padding-right: var(--spacing-lg);
   }
-  
+
   .py-2 {
     padding-top: var(--spacing-sm);
     padding-bottom: var(--spacing-sm);
   }
+
   .py-3 {
     padding-top: var(--spacing-md);
     padding-bottom: var(--spacing-md);
   }
-  
+
   /* Margin utilities */
-  .m-0 { margin: 0; }
-  .mb-2 { margin-bottom: var(--spacing-sm); }
-  .mb-3 { margin-bottom: var(--spacing-md); }
-  .mb-4 { margin-bottom: var(--spacing-lg); }
-  .ml-auto { margin-left: auto; }
-  .mr-auto { margin-right: auto; }
+  .m-0 {
+    margin: 0;
+  }
+
+  .mb-2 {
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .mb-3 {
+    margin-bottom: var(--spacing-md);
+  }
+
+  .mb-4 {
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .ml-auto {
+    margin-left: auto;
+  }
+
+  .mr-auto {
+    margin-right: auto;
+  }
 }
 
 /* -------------------------------
    6. THEMES
 ------------------------------- */
 @layer themes {
+
   /* Animations */
   @keyframes flyIn {
     from {
       opacity: 0;
       transform: translateY(20px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -1298,6 +1490,7 @@
       opacity: 0;
       transform: scale(0.95);
     }
+
     to {
       opacity: 1;
       transform: scale(1);
@@ -1305,10 +1498,14 @@
   }
 
   @keyframes typingBlink {
-    0%, 80%, 100% {
+
+    0%,
+    80%,
+    100% {
       opacity: 0.3;
       transform: translateY(0);
     }
+
     40% {
       opacity: 1;
       transform: translateY(-3px);
@@ -1562,7 +1759,7 @@
     box-shadow: none !important;
   }
 
-  body.dark-mode .app-container > .main-content {
+  body.dark-mode .app-container>.main-content {
     background: #0a0a0a !important;
   }
 
@@ -1669,6 +1866,7 @@
 
   /* Print styles */
   @media print {
+
     .header,
     .sidebar,
     .message-input-area,
@@ -1698,8 +1896,50 @@
    7. RESPONSIVE STYLES
 ------------------------------- */
 @layer responsive {
+
   /* MOBILE (Default for all phones) */
   @media (max-width: 767px) {
+
+    /* Move chat menu (3 dots dropdown) up 80px on mobile portrait */
+    .chat-more-menu {
+      transform: translateY(-80px) !important;
+    }
+
+    /* Make block confirm modal text same size as desktop */
+    .block-confirm-title {
+      font-size: 1rem !important;
+    }
+
+    .block-confirm-message {
+      font-size: 0.78rem !important;
+      margin-bottom: 1rem !important;
+      line-height: 1.4 !important;
+    }
+
+    .block-confirm-actions {
+      display: flex !important;
+      flex-direction: row !important;
+      gap: 0.6rem !important;
+    }
+
+    .block-confirm-btn {
+      padding: 0.6rem 0.8rem !important;
+      font-size: 0.8rem !important;
+      flex: 1 !important;
+    }
+
+    .block-confirm-icon {
+      width: 45px !important;
+      height: 45px !important;
+      margin: 0 auto 0.7rem !important;
+      font-size: 1.2rem !important;
+    }
+
+    .block-confirm-content {
+      padding: 1.2rem !important;
+      max-width: 300px !important;
+    }
+
     body {
       padding: 0 !important;
       margin: 0 !important;
@@ -1728,6 +1968,7 @@
 
     /* iPhone 12 & small mobile (390px and below) */
     @media (max-width: 390px) {
+
       html,
       body {
         width: 100vw !important;
@@ -1736,7 +1977,7 @@
       }
 
       .app-container,
-      .app-container > .main-content,
+      .app-container>.main-content,
       .sidebar,
       .chat-area,
       .messages-area,
@@ -1843,7 +2084,7 @@
         max-width: none !important;
       }
 
-      .app-container > .main-content {
+      .app-container>.main-content {
         height: calc(100vh - 86px) !important;
         height: calc(100svh - 86px) !important;
         height: calc(100dvh - 86px) !important;
@@ -2069,19 +2310,8 @@
         box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55) !important;
       }
 
-      .block-confirm-modal .block-confirm-content {
-        width: 95% !important;
-        padding: var(--spacing-lg) !important;
-        margin: var(--spacing-sm) !important;
-        background: var(--color-white) !important;
-        border-radius: 12px !important;
-      }
-
-      body.dark-mode .block-confirm-modal .block-confirm-content {
-        background: #0a0a0a !important;
-      }
-
       @supports (padding: max(0px)) {
+
         .header,
         .chat-header {
           padding-left: max(var(--spacing-xs), env(safe-area-inset-left)) !important;
@@ -2201,7 +2431,7 @@
         padding: 0 !important;
       }
 
-      .app-container > .main-content {
+      .app-container>.main-content {
         height: calc(100vh - 70px) !important;
         height: calc(100svh - 70px) !important;
         height: calc(100dvh - 70px) !important;
@@ -2340,10 +2570,11 @@
 
       /* Samsung Galaxy S-series 360x740 portrait */
       @media (orientation: portrait) and (min-width: 355px) and (max-width: 365px) and (min-height: 735px) and (max-height: 745px) {
+
         html,
         body,
         .app-container,
-        .app-container > .main-content,
+        .app-container>.main-content,
         .sidebar,
         .chat-area,
         .messages-area,
@@ -2514,6 +2745,7 @@
 
   /* iPad Pro 1024x1366 portrait clamp */
   @media (orientation: portrait) and (min-width: 1020px) and (max-width: 1035px) and (min-height: 1350px) and (max-height: 1385px) {
+
     html,
     body {
       width: 100vw !important;
@@ -2575,7 +2807,7 @@
       border-radius: 0 !important;
     }
 
-    .app-container > .main-content {
+    .app-container>.main-content {
       height: calc(100dvh - var(--header-height-desktop)) !important;
       min-height: 0 !important;
       max-height: calc(100dvh - var(--header-height-desktop)) !important;
@@ -2693,6 +2925,7 @@
 
   /* PERFORMANCE OPTIMIZATIONS */
   @media (max-width: 767px) {
+
     .messages-area,
     .conversations {
       will-change: transform;
@@ -2717,6 +2950,7 @@
 
     /* Improved touch targets */
     @media (pointer: coarse) {
+
       .header-btn,
       .chat-action-btn,
       .input-action-btn,
