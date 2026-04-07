@@ -1071,6 +1071,7 @@
     align-items: center;
     justify-content: center;
     padding: var(--spacing-md);
+    overflow-y: auto;
   }
 
   .block-confirm-content {
@@ -1079,6 +1080,8 @@
     padding: var(--spacing-lg);
     max-width: 400px;
     width: 100%;
+    max-height: calc(100dvh - (var(--spacing-md) * 2));
+    overflow-y: auto;
     box-shadow: var(--shadow-lg);
   }
 
@@ -1739,6 +1742,15 @@
     .block-confirm-content {
       padding: 1.2rem !important;
       max-width: 300px !important;
+      width: min(100%, 300px) !important;
+      max-height: calc(100dvh - 2rem) !important;
+      margin: auto 0 !important;
+    }
+
+    .block-confirm-modal {
+      align-items: flex-start !important;
+      padding-top: max(1rem, env(safe-area-inset-top)) !important;
+      padding-bottom: max(1rem, env(safe-area-inset-bottom)) !important;
     }
 
     body {

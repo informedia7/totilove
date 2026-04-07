@@ -31,6 +31,8 @@
     align-items: center;
     justify-content: center;
     padding: 1.5rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .block-confirm-overlay {
@@ -43,6 +45,9 @@
 .block-confirm-content {
     position: relative;
     width: min(420px, 100%);
+    max-width: 420px;
+    max-height: calc(100dvh - 3rem);
+    overflow-y: auto;
     background: #ffffff;
     border-radius: 20px;
     padding: 2rem;
@@ -138,12 +143,15 @@
 
 @media (max-width: 540px) {
     .block-confirm-modal {
-        padding: 1rem;
+        align-items: flex-start;
+        padding: max(1rem, env(safe-area-inset-top)) 1rem max(1rem, env(safe-area-inset-bottom));
     }
 
     .block-confirm-content {
         padding: 1.4rem;
-        transform: translateY(-40px);
+        width: min(100%, 360px);
+        max-height: calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        margin: auto 0;
     }
 
     .block-confirm-actions {
