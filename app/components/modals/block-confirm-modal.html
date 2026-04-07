@@ -1,5 +1,4 @@
 <!-- Universal Block Confirmation Modal Component -->
-<!-- Sync note: comment touch for requested push -->
 <div id="blockConfirmModal" class="block-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="blockConfirmTitle" aria-describedby="blockConfirmMessage" tabindex="-1" style="display: none;">
     <div class="block-confirm-overlay" aria-hidden="true"></div>
     <div class="block-confirm-content">
@@ -32,14 +31,13 @@
     align-items: center;
     justify-content: center;
     padding: 1.5rem;
-    backdrop-filter: none;
 }
 
 .block-confirm-overlay {
     position: absolute;
     inset: 0;
-    background: transparent;
-    backdrop-filter: none;
+    background: rgba(5, 12, 24, 0.75);
+    backdrop-filter: blur(4px);
 }
 
 .block-confirm-content {
@@ -145,7 +143,11 @@
 
     .block-confirm-content {
         padding: 1.4rem;
-        animation: blockConfirmSlideUp 0.3s ease;
+        transform: translateY(-40px);
+    }
+
+    .block-confirm-actions {
+        flex-direction: column;
     }
 }
 
@@ -154,7 +156,7 @@
 .block-confirm-modal.dark .block-confirm-overlay,
 html[data-theme="dark"] .block-confirm-modal .block-confirm-overlay,
 body.dark-mode .block-confirm-modal .block-confirm-overlay {
-    background: transparent;
+    background: rgba(2, 6, 23, 0.85);
 }
 
 :root.theme-dark .block-confirm-modal .block-confirm-content,
@@ -253,6 +255,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-
-
 
