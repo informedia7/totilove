@@ -96,6 +96,7 @@ function positionBlockConfirmModal(modal) {
 function blockCurrentUser() {
     const currentConversation = TalkState.getCurrentConversation();
     const conversations = TalkState.getConversations();
+    const menu = document.getElementById('chatMoreMenu');
 
     if (!currentConversation || !conversations[currentConversation]) {
         if (typeof showNotification === 'function') {
@@ -119,7 +120,6 @@ function blockCurrentUser() {
         }
 
         // Close menu
-        const menu = document.getElementById('chatMoreMenu');
         if (menu) {
             menu.style.display = 'none';
         }
@@ -129,6 +129,10 @@ function blockCurrentUser() {
     // Store for confirmation
     pendingBlockUserId = partnerId;
     pendingBlockUserName = partnerName;
+
+    if (menu) {
+        menu.style.display = 'none';
+    }
 
     // Show block confirmation modal (full-screen overlay)
     const blockConfirmModal = document.getElementById('blockConfirmModal');
@@ -140,12 +144,6 @@ function blockCurrentUser() {
         }
         positionBlockConfirmModal(blockConfirmModal);
         blockConfirmModal.style.display = 'flex';
-    }
-
-    // Close menu
-    const menu = document.getElementById('chatMoreMenu');
-    if (menu) {
-        menu.style.display = 'none';
     }
 }
 

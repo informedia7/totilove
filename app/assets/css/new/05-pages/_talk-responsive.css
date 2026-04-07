@@ -127,7 +127,7 @@
     --z-base: 1;
     --z-dropdown: 20;
     --z-sticky: 30;
-    --z-modal: 40;
+    --z-modal: 2001;
     --z-popover: 50;
     --z-tooltip: 60;
   }
@@ -1072,6 +1072,7 @@
     justify-content: center;
     padding: var(--spacing-md);
     overflow-y: auto;
+    isolation: isolate;
   }
 
   .block-confirm-content {
