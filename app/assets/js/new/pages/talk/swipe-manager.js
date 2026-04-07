@@ -4,10 +4,11 @@
     const DEFAULTS = {
         container: null,
         containerSelector: '.main-content',
-        minDistance: 80,
+        minDistance: 100,
         maxDuration: 600,
-        verticalThreshold: 90,
-        horizontalLockThreshold: 14,
+        verticalThreshold: 70,
+        horizontalLockThreshold: 24,
+        edgeStartWidth: 28,
         maxWidth: 768,
         ignoreAttribute: 'data-disable-swipe',
         ignoreSelectors: ['.search-panel.show', '.modal.show'],
@@ -108,6 +109,37 @@
             return false;
         }
 
+        isScrollableElement(element) {
+            if (!element || element === document.body || element === document.documentElement) {
+                return false;
+            }
+
+            const style = window.getComputedStyle(element);
+            const overflowY = style.overflowY;
+            const scrollableOverflow = overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay';
+
+            return scrollableOverflow && element.scrollHeight > element.clientHeight;
+        }
+
+        hasScrollableAncestor(target) {
+            let node = target;
+            while (node && node !== this.container && node !== document.body) {
+                if (this.isScrollableElement(node)) {
+                    return true;
+                }
+                node = node.parentElement;
+            }
+            return false;
+        }
+
+        startedFromEdge(touch) {
+            const edge = this.options.edgeStartWidth;
+            if (!edge || edge <= 0) {
+                return true;
+            }
+            return touch.clientX <= edge || touch.clientX >= (window.innerWidth - edge);
+        }
+
         onTouchStart(event) {
             if (!this.shouldHandle() || event.touches.length !== 1 || this.matchesIgnoredTarget(event.target)) {
                 this.resetGesture();
@@ -115,6 +147,11 @@
             }
 
             const touch = event.touches[0];
+            if (!this.startedFromEdge(touch) || this.hasScrollableAncestor(event.target)) {
+                this.resetGesture();
+                return;
+            }
+
             this.touchIdentifier = touch.identifier;
             this.startX = touch.clientX;
             this.startY = touch.clientY;
@@ -141,7 +178,7 @@
                     this.resetGesture();
                     return;
                 }
-                if (Math.abs(deltaX) > this.options.horizontalLockThreshold) {
+                if (Math.abs(deltaX) > this.options.horizontalLockThreshold && Math.abs(deltaX) > (Math.abs(deltaY) * 1.35)) {
                     this.swipeLocked = true;
                 }
             }
