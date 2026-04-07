@@ -8,10 +8,10 @@
         maxDuration: 600,
         verticalThreshold: 70,
         horizontalLockThreshold: 24,
-        edgeStartWidth: 28,
         maxWidth: 768,
         ignoreAttribute: 'data-disable-swipe',
         ignoreSelectors: ['.search-panel.show', '.modal.show'],
+        scrollableSelectors: ['.conversations', '.messages-area', '.search-panel-content'],
         hasActiveConversation: null,
         onShowChat: null,
         onShowList: null
@@ -109,35 +109,11 @@
             return false;
         }
 
-        isScrollableElement(element) {
-            if (!element || element === document.body || element === document.documentElement) {
+        startsInScrollableContainer(target) {
+            if (!target || !target.closest || !Array.isArray(this.options.scrollableSelectors)) {
                 return false;
             }
-
-            const style = window.getComputedStyle(element);
-            const overflowY = style.overflowY;
-            const scrollableOverflow = overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay';
-
-            return scrollableOverflow && element.scrollHeight > element.clientHeight;
-        }
-
-        hasScrollableAncestor(target) {
-            let node = target;
-            while (node && node !== this.container && node !== document.body) {
-                if (this.isScrollableElement(node)) {
-                    return true;
-                }
-                node = node.parentElement;
-            }
-            return false;
-        }
-
-        startedFromEdge(touch) {
-            const edge = this.options.edgeStartWidth;
-            if (!edge || edge <= 0) {
-                return true;
-            }
-            return touch.clientX <= edge || touch.clientX >= (window.innerWidth - edge);
+            return this.options.scrollableSelectors.some((selector) => selector && target.closest(selector));
         }
 
         onTouchStart(event) {
@@ -146,11 +122,12 @@
                 return;
             }
 
-            const touch = event.touches[0];
-            if (!this.startedFromEdge(touch) || this.hasScrollableAncestor(event.target)) {
+            if (this.startsInScrollableContainer(event.target)) {
                 this.resetGesture();
                 return;
             }
+
+            const touch = event.touches[0];
 
             this.touchIdentifier = touch.identifier;
             this.startX = touch.clientX;

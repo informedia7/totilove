@@ -241,14 +241,7 @@ function registerOnlineIndicators() {
 }
 
 function shouldVirtualizeConversations(count, container) {
-    if (!window.VirtualizedPresenceList || !container) {
-        return false;
-    }
-    if (container.dataset.virtualize === 'false') {
-        return false;
-    }
-    const threshold = parseInt(container.dataset.virtualThreshold, 10) || CONVERSATION_VIRTUALIZATION_THRESHOLD;
-    return count >= threshold;
+    return false;
 }
 
 function getConversationVirtualizer(container) {

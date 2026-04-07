@@ -2660,6 +2660,13 @@
       max-height: calc(100dvh - var(--header-height-desktop) - 140px) !important;
     }
 
+    .conversations,
+    .messages-area,
+    .search-panel-content {
+      touch-action: pan-y !important;
+      overscroll-behavior-y: contain !important;
+    }
+
     .message-input-area {
       flex: 0 0 auto !important;
       padding-left: var(--spacing-lg) !important;
