@@ -44,6 +44,8 @@ if (typeof window.ProfileModalActions === 'undefined') {
 }
 
 let currentPage = 1;
+let totalSearchResults = 0;
+let currentSearchParams = {};
 let searchResults = [];
 const resultsPerPage = 20;
 let resultsPresenceReadyPoller = null;
@@ -276,6 +278,12 @@ function waitForWebSocketInitialization() {
 
 // Perform search
 async function performSearch(params) {
+    // Track params for paginated re-fetches; reset to page 1 on a new search
+    if (!params.page || params.page == 1) {
+        currentPage = 1;
+    }
+    currentSearchParams = { ...params };
+
     try {
         document.getElementById('loadingContainer').style.display = 'flex';
         document.getElementById('resultsSection').style.display = 'none';
@@ -308,7 +316,7 @@ async function performSearch(params) {
             }
         });
         
-        searchParams.append('page', '1');
+        searchParams.append('page', params.page || currentPage);
         
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000);
@@ -357,15 +365,12 @@ async function performSearch(params) {
             });
             
             searchResults = normalizedResults;
+            totalSearchResults = data.pagination?.totalResults ?? normalizedResults.length;
             
             document.getElementById('loadingContainer').style.display = 'none';
             document.getElementById('resultsSection').style.display = 'block';
             
-            displayResults(normalizedResults);
-            
-            if ((data.results || []).length > resultsPerPage) {
-                showPagination((data.results || []).length);
-            }
+            displayResults(normalizedResults, totalSearchResults);
         } else {
             throw new Error(data.error || 'Search failed');
         }
@@ -391,7 +396,7 @@ async function performSearch(params) {
 }
 
 // Display results
-function displayResults(results) {
+function displayResults(results, totalCount) {
     const grid = document.getElementById('resultsGrid');
     const countEl = document.getElementById('resultsCount');
     
@@ -400,7 +405,8 @@ function displayResults(results) {
         results = [];
     }
     
-    countEl.textContent = `${results.length} matches found`;
+    const displayCount = typeof totalCount === 'number' ? totalCount : results.length;
+    countEl.textContent = `${displayCount} matches found`;
 
     if (results.length === 0) {
         const sessionToken = getSessionToken();
@@ -418,17 +424,12 @@ function displayResults(results) {
         return;
     }
 
-    const totalPages = Math.ceil(results.length / resultsPerPage);
-    const startIndex = (currentPage - 1) * resultsPerPage;
-    const endIndex = startIndex + resultsPerPage;
-    const currentPageResults = results.slice(startIndex, endIndex);
-
-    // Validate and filter out invalid profiles
-    const validProfiles = currentPageResults.filter(profile => {
+    // Validate and filter out invalid profiles (server already pages the results)
+    const validProfiles = results.filter(profile => {
         return profile && typeof profile === 'object' && profile.id;
     });
     
-    if (validProfiles.length === 0 && currentPageResults.length > 0) {
+    if (validProfiles.length === 0 && results.length > 0) {
         grid.innerHTML = `
             <div class="no-results" style="grid-column: 1 / -1;">
                 <i class="fas fa-exclamation-triangle"></i>
@@ -472,8 +473,8 @@ function displayResults(results) {
             });
         }, 100);
     }
-    if (totalPages > 1) {
-        showPagination(results.length);
+    if (totalCount > resultsPerPage) {
+        showPagination(totalCount);
     } else {
         document.getElementById('paginationContainer').style.display = 'none';
     }
@@ -537,7 +538,7 @@ function showPagination(totalResults) {
     const totalPages = Math.ceil(totalResults / resultsPerPage);
     const paginationContainer = document.getElementById('paginationContainer');
     const pageNumbers = document.getElementById('pageNumbers');
-    
+
     if (totalPages <= 1) {
         paginationContainer.style.display = 'none';
         return;
@@ -545,63 +546,55 @@ function showPagination(totalResults) {
 
     paginationContainer.style.display = 'flex';
 
+    // Build page number buttons with ellipsis
     let pagesHTML = '';
-    const maxVisiblePages = 7;
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    
-    if (endPage - startPage < maxVisiblePages - 1) {
-        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    const maxVisible = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+    if (endPage - startPage < maxVisible - 1) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
     }
 
     if (startPage > 1) {
-        pagesHTML += `<button class="page-btn" onclick="goToPage(1)">1</button>`;
-        if (startPage > 2) {
-            pagesHTML += `<span class="page-ellipsis">...</span>`;
-        }
+        pagesHTML += `<button class="page-btn" data-page="1">1</button>`;
+        if (startPage > 2) pagesHTML += `<span class="page-ellipsis">…</span>`;
     }
-
     for (let i = startPage; i <= endPage; i++) {
-        const isActive = i === currentPage;
-        pagesHTML += `<button class="page-btn ${isActive ? 'active' : ''}" data-page="${i}">${i}</button>`;
+        pagesHTML += `<button class="page-btn${i === currentPage ? ' active' : ''}" data-page="${i}">${i}</button>`;
     }
-
     if (endPage < totalPages) {
-        if (endPage < totalPages - 1) {
-            pagesHTML += `<span class="page-ellipsis">...</span>`;
-        }
+        if (endPage < totalPages - 1) pagesHTML += `<span class="page-ellipsis">…</span>`;
         pagesHTML += `<button class="page-btn" data-page="${totalPages}">${totalPages}</button>`;
     }
 
     pageNumbers.innerHTML = pagesHTML;
-    pageNumbers.querySelectorAll('[data-page]').forEach(btn=>{btn.addEventListener('click',function(){goToPage(parseInt(this.dataset.page));});});
+    pageNumbers.querySelectorAll('[data-page]').forEach(btn => {
+        btn.addEventListener('click', function () {
+            goToPage(parseInt(this.dataset.page));
+        });
+    });
+
     const prevButton = document.getElementById('prevPage');
     const nextButton = document.getElementById('nextPage');
-    
-    prevButton.disabled = currentPage === 1;
-    nextButton.disabled = currentPage === totalPages;
+    if (prevButton) prevButton.style.display = currentPage === 1 ? 'none' : '';
+    if (nextButton) nextButton.style.display = currentPage === totalPages ? 'none' : '';
 }
 
-// Page navigation
+// Page navigation — calls the server for each page
 function changePage(direction) {
-    const totalPages = Math.ceil(searchResults.length / resultsPerPage);
+    const totalPages = Math.ceil(totalSearchResults / resultsPerPage);
     const newPage = currentPage + direction;
-    
     if (newPage >= 1 && newPage <= totalPages) {
-        currentPage = newPage;
-        displayResults(searchResults);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        goToPage(newPage);
     }
 }
 
 function goToPage(page) {
-    const totalPages = Math.ceil(searchResults.length / resultsPerPage);
-    
-    if (page >= 1 && page <= totalPages) {
-        currentPage = page;
-        displayResults(searchResults);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    const totalPages = Math.ceil(totalSearchResults / resultsPerPage);
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    performSearch({ ...currentSearchParams, page });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Profile actions
@@ -1617,8 +1610,12 @@ document.addEventListener('DOMContentLoaded', async function() {
             toggleView(view);
         });
     });
-    
-// Handle window resize to ensure mobile CSS (2 columns) is always applied
+
+    // Prev / Next pagination buttons
+    const prevBtn = document.getElementById('prevPage');
+    const nextBtn = document.getElementById('nextPage');
+    if (prevBtn) prevBtn.addEventListener('click', () => changePage(-1));
+    if (nextBtn) nextBtn.addEventListener('click', () => changePage(1));
 let resizeTimeout;
 window.addEventListener('resize', function() {
     clearTimeout(resizeTimeout);
@@ -1717,8 +1714,9 @@ window.addEventListener('orientationchange', function() {
     const sortSelect = document.getElementById('sortBy');
     if (sortSelect) {
         sortSelect.addEventListener('change', function() {
-            const params = getSearchParams();
+            const params = { ...currentSearchParams };
             params.sortBy = this.value;
+            delete params.page; // reset to page 1
             performSearch(params);
         });
     }

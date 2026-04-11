@@ -324,11 +324,32 @@
 /* ===== PAGINATION LAYOUT ===== */
 #app-root .pagination {
     display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
     justify-content: center;
     align-items: center;
     gap: var(--sm, 0.5rem);
     padding: var(--md, 1rem);
+    overflow-x: auto;
+}
+
+#app-root .page-numbers {
+    display: flex;
+    flex-direction: row;
     flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+#app-root .prev-next-btn {
+    flex-shrink: 0;
+}
+
+#app-root .page-btn {
+    min-height: 36px;
+    width: auto;
+    flex-shrink: 0;
 }
 
 #app-root .page-info {
@@ -1027,10 +1048,6 @@ html[data-theme="dark"] .profile-header .header-btn.theme-toggle,
     top: 0.2rem;
     left: calc(50% + 0.15rem);
     right: auto;
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-    border-radius: 50%;
 }
 
 /* Light mode overrides for the mobile dropdown so text stays readable */
