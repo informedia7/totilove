@@ -1,34 +1,7 @@
 // Account Page JavaScript - Extracted from account.html - Phase 1 CSS/JS Extraction
 
-function isDarkThemeActive() {
-    const root = document.documentElement;
-    return root?.dataset?.theme === 'dark' ||
-        root?.classList?.contains('theme-dark') ||
-        document.body?.classList?.contains('dark-mode');
-}
-
-function syncAccountModalTheme() {
-    const isDark = isDarkThemeActive();
-    const modalIds = ['change-password-modal', 'delete-account-modal'];
-
-    modalIds.forEach((id) => {
-        const modal = document.getElementById(id);
-        if (modal) {
-            modal.classList.toggle('theme-dark-active', isDark);
-        }
-    });
-}
-
-window.syncAccountModalTheme = syncAccountModalTheme;
-
 // Load account data on page load
 document.addEventListener('DOMContentLoaded', async function() {
-    syncAccountModalTheme();
-
-    window.addEventListener('totilove:theme-change', () => {
-        syncAccountModalTheme();
-    });
-
     await loadAccountData();
     await loadProfileCompletion();
     await checkEmailVerification();
@@ -40,15 +13,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         requirementsId: 'passwordRequirements'
     });
     
-    // Close modals when clicking outside
-    const passwordModal = document.getElementById('change-password-modal');
-    if (passwordModal) {
-        passwordModal.addEventListener('click', function(event) {
-            if (event.target === passwordModal) {
-                closeChangePasswordModal();
-            }
-        });
-    }
+    // Change password modal is intentionally only closable via the top-right X button
     
     // Event listeners for buttons
     document.getElementById('verify-code-btn')?.addEventListener('click', verifyEmailByCode);
@@ -58,6 +23,12 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById('pauseAccountBtn')?.addEventListener('click', pauseAccount);
     document.getElementById('downloadAccountDataBtn')?.addEventListener('click', downloadAccountData);
     document.getElementById('closeChangePasswordModalBtn')?.addEventListener('click', closeChangePasswordModal);
+    document.getElementById('toggle-new-password-btn')?.addEventListener('click', function() {
+        togglePasswordVisibility('new-password-input', 'toggle-new-password-icon');
+    });
+    document.getElementById('toggle-confirm-password-btn')?.addEventListener('click', function() {
+        togglePasswordVisibility('confirm-password-input', 'toggle-confirm-password-icon');
+    });
     
     // Verification code input handler
     const verifyInput = document.getElementById('verification-code-input');
@@ -280,7 +251,6 @@ async function checkEmailVerification() {
 }
 
 function changePassword() {
-    syncAccountModalTheme();
     document.getElementById('change-password-modal').style.display = 'flex';
     document.getElementById('change-password-form').reset();
     document.getElementById('password-change-message').style.display = 'none';
@@ -298,6 +268,38 @@ function closeChangePasswordModal() {
     document.getElementById('change-password-form').reset();
     document.getElementById('password-change-message').style.display = 'none';
     document.getElementById('passwordRequirements').style.display = 'none';
+
+    // Reset password visibility and icons when closing
+    const newPasswordInput = document.getElementById('new-password-input');
+    const confirmPasswordInput = document.getElementById('confirm-password-input');
+    const newPasswordIcon = document.getElementById('toggle-new-password-icon');
+    const confirmPasswordIcon = document.getElementById('toggle-confirm-password-icon');
+
+    if (newPasswordInput) {
+        newPasswordInput.type = 'password';
+    }
+    if (confirmPasswordInput) {
+        confirmPasswordInput.type = 'password';
+    }
+    if (newPasswordIcon) {
+        newPasswordIcon.className = 'fas fa-eye';
+    }
+    if (confirmPasswordIcon) {
+        confirmPasswordIcon.className = 'fas fa-eye';
+    }
+}
+
+function togglePasswordVisibility(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+
+    if (!input || !icon) {
+        return;
+    }
+
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+    icon.className = isPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
 }
 
 async function handleChangePassword(event) {
@@ -344,6 +346,14 @@ async function handleChangePassword(event) {
     submitBtn.textContent = 'Changing...';
     
     try {
+        const token = getSessionToken();
+        if (!token) {
+            alert('Session token not found. Please log in again.');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Change Password';
+            return;
+        }
+        
         const response = await fetch('/api/account/change-password', {
             method: 'POST',
             headers: {
@@ -356,18 +366,14 @@ async function handleChangePassword(event) {
                 confirmPassword
             })
         });
-        let data = null;
-        try {
-            data = await response.json();
-        } catch (jsonError) {
-            data = null;
-        }
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        if (data?.success) {
+        const data = await response.json();
+        
+        if (data.success) {
             messageDiv.textContent = 'Password changed successfully!';
             messageDiv.style.background = '#e8f5e9';
             messageDiv.style.color = '#28a745';
@@ -375,13 +381,8 @@ async function handleChangePassword(event) {
             
             // Reset form
             document.getElementById('change-password-form').reset();
-            
-            // Close modal after 2 seconds
-            setTimeout(() => {
-                closeChangePasswordModal();
-            }, 2000);
         } else {
-            messageDiv.textContent = data?.error || 'Failed to change password';
+            messageDiv.textContent = data.error || 'Failed to change password';
             messageDiv.style.background = '#ffe6e6';
             messageDiv.style.color = '#dc3545';
             messageDiv.style.display = 'block';
@@ -436,11 +437,12 @@ async function resendVerificationEmail() {
             },
             body: JSON.stringify({ email: accountData.email })
         });
-        const data = await response.json();
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        const data = await response.json();
         
         if (data.success) {
             // Show success message
@@ -610,6 +612,40 @@ async function loadCurrentPlan() {
     }
 }
 
+function getSessionToken() {
+    // CSRF implementation moves token from URL to cookie, so check cookie first
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        const trimmed = cookie.trim();
+        const equalIndex = trimmed.indexOf('=');
+        if (equalIndex === -1) continue;
+        
+        const name = trimmed.substring(0, equalIndex).trim();
+        const value = trimmed.substring(equalIndex + 1).trim();
+        
+        if (name === 'sessionToken') {
+            return decodeURIComponent(value);
+        }
+    }
+    
+    // Fallback to URL (in case CSRF hasn't run yet)
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlToken = urlParams.get('token');
+    if (urlToken) {
+        return urlToken;
+    }
+    
+    // Try sessionManager if available
+    if (window.sessionManager && typeof window.sessionManager.getToken === 'function') {
+        const token = window.sessionManager.getToken();
+        if (token) {
+            return token;
+        }
+    }
+    
+    return null;
+}
+
 function toggleEmailVerificationDetails() {
     const detailsSection = document.getElementById('email-verification-details');
     const chevron = document.getElementById('email-verification-chevron');
@@ -677,11 +713,12 @@ async function verifyEmailByCode() {
                 userId: accountData.userId
             })
         });
-        const data = await response.json();
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        const data = await response.json();
         
         if (data.success) {
             // Show success message
