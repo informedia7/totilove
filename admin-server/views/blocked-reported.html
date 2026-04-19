@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blocked & Reported Users - Totilove Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-box {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stat-box h4 {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        .stat-box .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none;">← Back to Dashboard</a>
+                <form method="POST" action="/logout" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+            <h1>🚫 Blocked & Reported Users</h1>
+            <p>Manage blocked users, reported users, and view related messages</p>
+        </div>
+        
+        <div class="content">
+            <!-- Statistics Overview -->
+            <div class="stats-overview" id="statsOverview">
+                <div class="stat-box">
+                    <h4>Total Blocks</h4>
+                    <div class="value" id="totalBlocks">-</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Total Reports</h4>
+                    <div class="value" id="totalReports">-</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Pending Reports</h4>
+                    <div class="value" id="pendingReports">-</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Blocks (7 days)</h4>
+                    <div class="value" id="blocks7Days">-</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Reports (7 days)</h4>
+                    <div class="value" id="reports7Days">-</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('blocked', event)">Blocked Users</button>
+                <button class="tab-btn" onclick="switchTab('reported', event)">Reported Users</button>
+            </div>
+
+            <!-- Filters Panel -->
+            <div class="filters-panel">
+                <div class="filters-header">
+                    <h2>Filters</h2>
+                </div>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>Search</label>
+                        <input type="text" id="searchInput" placeholder="Search by username, email, or ID...">
+                    </div>
+                    <div class="filter-group">
+                        <label>Sort By</label>
+                        <select id="sortBy">
+                            <option value="created_at">Date</option>
+                            <option value="report_date">Date (Reports)</option>
+                            <option value="blocker_username">Blocker/Reporter Username</option>
+                            <option value="blocked_username">Blocked/Reported Username</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Sort Order</label>
+                        <select id="sortOrder">
+                            <option value="DESC">Newest First</option>
+                            <option value="ASC">Oldest First</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+            </div>
+
+            <!-- Blocked Users Tab -->
+            <div class="tab-content active" id="blockedTab">
+                <div class="table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Blocker</th>
+                                <th>Blocked User</th>
+                                <th>Reason</th>
+                                <th>Blocked At</th>
+                                <th>Total Blocks Received</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="blockedUsersTableBody">
+                            <tr>
+                                <td colspan="7" class="loading">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="blockedPagination"></div>
+            </div>
+
+            <!-- Reported Users Tab -->
+            <div class="tab-content" id="reportedTab">
+                <div class="table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Reporter</th>
+                                <th>Reported User</th>
+                                <th>Reason</th>
+                                <th>Reported At</th>
+                                <th>Status</th>
+                                <th>Total Reports Received</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportedUsersTableBody">
+                            <tr>
+                                <td colspan="8" class="loading">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="reportedPagination"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages Modal -->
+    <div id="messagesModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeMessagesModal()">&times;</span>
+            <h2>Messages Between Users</h2>
+            <div class="modal-messages" id="messagesList"></div>
+        </div>
+    </div>
+
+    <script src="/js/notifications.js"></script>
+    <script src="/js/admin-blocked-reported.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
