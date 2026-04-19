@@ -113,7 +113,7 @@ class ConfigService {
             'email_smtp_port': { value: 587, type: 'number', description: 'SMTP port' },
             'email_smtp_user': { value: '', type: 'string', description: 'SMTP username' },
             'email_smtp_password': { value: '', type: 'string', description: 'SMTP password (encrypted)' },
-            'email_from_address': { value: 'noreply@totilove1.com', type: 'string', description: 'Default from email address' },
+            'email_from_address': { value: 'noreply@totilove.com', type: 'string', description: 'Default from email address' },
             'email_notifications_enabled': { value: true, type: 'boolean', description: 'Enable email notifications' },
 
             // Security Settings

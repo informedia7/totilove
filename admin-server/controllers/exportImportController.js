@@ -1,6 +1,5 @@
 const exportImportService = require('../services/exportImportService');
 const logger = require('../utils/logger');
-const archiver = require('archiver');
 
 class ExportImportController {
     /**
@@ -99,40 +98,6 @@ class ExportImportController {
             res.status(500).json({
                 success: false,
                 error: 'Failed to export payments'
-            });
-        }
-    }
-
-    /**
-     * Export uploads/images folder as ZIP
-     */
-    async exportImages(req, res) {
-        try {
-            const { uploadsRoot, filename } = await exportImportService.getUploadsExportInfo();
-
-            res.setHeader('Content-Type', 'application/zip');
-            res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-
-            const archive = archiver('zip', { zlib: { level: 9 } });
-
-            archive.on('error', (error) => {
-                logger.error('Error while creating images export archive:', error);
-                if (!res.headersSent) {
-                    res.status(500).json({
-                        success: false,
-                        error: 'Failed to create images export archive'
-                    });
-                }
-            });
-
-            archive.pipe(res);
-            archive.directory(uploadsRoot, 'uploads');
-            await archive.finalize();
-        } catch (error) {
-            logger.error('Error in exportImages controller:', error);
-            res.status(500).json({
-                success: false,
-                error: error.message || 'Failed to export images folder'
             });
         }
     }

@@ -13,7 +13,6 @@ router.use(auditLog);
 router.get('/users', exportImportController.exportUsers.bind(exportImportController));
 router.post('/users', exportImportController.importUsers.bind(exportImportController));
 router.get('/payments', exportImportController.exportPayments.bind(exportImportController));
-router.get('/images', exportImportController.exportImages.bind(exportImportController));
 
 module.exports = router;
 

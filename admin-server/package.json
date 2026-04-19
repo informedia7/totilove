@@ -1,5 +1,5 @@
 {
-  "name": "totilove1-admin-server",
+  "name": "totilove-admin-server",
   "version": "1.0.0",
   "description": "Standalone admin server for Totilove user management",
   "main": "server.js",
@@ -9,18 +9,16 @@
     "test": "jest",
     "setup-db": "node database/setup-admin-database.js",
     "verify-tables": "node database/verify-shared-tables.js",
-    "migrate-mssql": "node database/migrate-mssql-to-postgres.js",
-    "add-users-profile-columns": "node database/add-users-profile-columns.js"
+    "migrate-mssql": "node database/migrate-mssql-to-postgres.js"
   },
   "keywords": [
     "admin",
     "user-management",
-    "totilove1"
+    "totilove"
   ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "archiver": "^6.0.2",
     "express": "^4.18.2",
     "pg": "^8.11.0",
     "redis": "^4.6.0",
