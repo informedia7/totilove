@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Control - Totilove Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none;">← Back to Dashboard</a>
+                <form method="POST" action="/logout" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+            <h1>🔒 Subscription Control Settings</h1>
+            <p>Configure subscription system and restrictions</p>
+        </div>
+        
+        <div class="content">
+            <div class="settings-container">
+                <form id="subscriptionSettingsForm">
+                    <!-- Master Control -->
+                    <div class="settings-section master-control-section">
+                        <h2>🎛️ Master Control</h2>
+                        <p class="section-description">Global mode control for the subscription system</p>
+                        
+                        <div class="setting-item master-mode-item">
+                            <label class="setting-label">System Mode:</label>
+                            <div class="mode-selector">
+                                <label class="mode-option">
+                                    <input type="radio" name="subscription_master_mode" value="free" id="masterModeFree">
+                                    <span class="mode-label">
+                                        <strong>Free Mode</strong>
+                                        <span class="mode-description">All users can use all features without restrictions</span>
+                                    </span>
+                                </label>
+                                <label class="mode-option">
+                                    <input type="radio" name="subscription_master_mode" value="subscription" id="masterModeSubscription">
+                                    <span class="mode-label">
+                                        <strong>Subscription Mode</strong>
+                                        <span class="mode-description">Subscription system enabled with configured restrictions</span>
+                                    </span>
+                                </label>
+                            </div>
+                            <p class="setting-description">
+                                <strong>Free Mode:</strong> Completely disables all subscription requirements. All users can join, contact, message, and like without any restrictions.<br>
+                                <strong>Subscription Mode:</strong> Enables the subscription system below. Users must meet subscription requirements based on the settings configured.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Subscription Mode Settings (only visible when subscription mode is active) -->
+                    <div class="settings-section subscription-settings" id="subscriptionSettingsSection">
+                        <div class="section-header">
+                            <h2>⚙️ Subscription Mode Settings</h2>
+                            <p class="section-description">These settings only apply when Subscription Mode is active</p>
+                        </div>
+                        
+                        <!-- Free Join Settings -->
+                        <div class="settings-subsection">
+                        <h3>Free Join Settings</h3>
+                        <p class="subsection-description">Control who can join the platform for free</p>
+                        
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <input type="checkbox" id="freeJoinAll" name="subscription_free_join_all">
+                                <span>Allow all new users to join for free</span>
+                            </label>
+                            <p class="setting-description">When enabled, all new users can join without subscription</p>
+                        </div>
+
+                        <div class="setting-item">
+                            <label class="setting-label">Allow specific gender to join for free:</label>
+                            <select id="freeJoinGender" name="subscription_free_join_gender">
+                                <option value="">None (all require subscription)</option>
+                                <option value="female">Female</option>
+                                <option value="male">Male</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <p class="setting-description">Select a gender that can join for free (e.g., women)</p>
+                        </div>
+
+                        <div class="setting-item">
+                            <label class="setting-label">New users free period (days):</label>
+                            <input type="number" id="newUsersFreePeriod" name="subscription_new_users_free_period_days" min="0" value="0">
+                            <p class="setting-description">Number of days new users can use the platform for free (0 = no free period)</p>
+                        </div>
+                    </div>
+
+                    <!-- Contact Restrictions -->
+                    <div class="settings-subsection">
+                        <h3>Contact Restrictions</h3>
+                        <p class="section-description">Control who needs subscription to contact other users</p>
+                        
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <input type="checkbox" id="requireSubToContact" name="subscription_require_subscription_to_contact">
+                                <span>Require subscription to contact users</span>
+                            </label>
+                            <p class="setting-description">When enabled, users must have active subscription to contact others</p>
+                        </div>
+
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <input type="checkbox" id="freeUsersCanContact" name="subscription_free_users_can_contact">
+                                <span>Free users can contact others</span>
+                            </label>
+                            <p class="setting-description">Allow users in free category to contact others</p>
+                        </div>
+
+                        <div class="setting-item">
+                            <label class="setting-label">Free users daily contact limit:</label>
+                            <input type="number" id="freeContactsPerDay" name="subscription_allowed_free_contacts_per_day" min="0" value="0">
+                            <p class="setting-description">Maximum contacts per day for free users (0 = unlimited)</p>
+                        </div>
+                    </div>
+
+                    <!-- Message Restrictions -->
+                    <div class="settings-subsection">
+                        <h3>Message Restrictions</h3>
+                        <p class="section-description">Control who needs subscription to send messages</p>
+                        
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <input type="checkbox" id="requireSubToMessage" name="subscription_require_subscription_to_message">
+                                <span>Require subscription to send messages</span>
+                            </label>
+                            <p class="setting-description">When enabled, users must have active subscription to send messages</p>
+                        </div>
+
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <input type="checkbox" id="freeUsersCanMessage" name="subscription_free_users_can_message">
+                                <span>Free users can send messages</span>
+                            </label>
+                            <p class="setting-description">Allow users in free category to send messages</p>
+                        </div>
+
+                        <div class="setting-item">
+                            <label class="setting-label">Free users daily message limit:</label>
+                            <input type="number" id="freeMessagesPerDay" name="subscription_allowed_free_messages_per_day" min="0" value="0">
+                            <p class="setting-description">Maximum messages per day for free users (0 = unlimited)</p>
+                        </div>
+                    </div>
+
+                    <!-- Like Restrictions -->
+                    <div class="settings-section">
+                        <h2>Like Restrictions</h2>
+                        <p class="section-description">Control who needs subscription to like profiles</p>
+                        
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <input type="checkbox" id="requireSubToLike" name="subscription_require_subscription_to_like">
+                                <span>Require subscription to like profiles</span>
+                            </label>
+                            <p class="setting-description">When enabled, users must have active subscription to like profiles</p>
+                        </div>
+
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <input type="checkbox" id="freeUsersCanLike" name="subscription_free_users_can_like">
+                                <span>Free users can like profiles</span>
+                            </label>
+                            <p class="setting-description">Allow users in free category to like profiles</p>
+                        </div>
+
+                        <div class="setting-item">
+                            <label class="setting-label">Free users daily like limit:</label>
+                            <input type="number" id="freeLikesPerDay" name="subscription_allowed_free_likes_per_day" min="0" value="0">
+                            <p class="setting-description">Maximum likes per day for free users (0 = unlimited)</p>
+                        </div>
+                    </div>
+
+                    <!-- Other Restrictions -->
+                    <div class="settings-subsection">
+                        <h3>Other Restrictions</h3>
+                        
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <input type="checkbox" id="requireSubToViewProfile" name="subscription_require_subscription_to_view_profile">
+                                <span>Require subscription to view full profiles</span>
+                            </label>
+                            <p class="setting-description">When enabled, users must have active subscription to view full profile details</p>
+                        </div>
+                    </div>
+
+
+                        </div>
+                    </div>
+
+                    <!-- Save Button -->
+                    <div class="settings-actions">
+                        <button type="submit" class="btn btn-primary">Save Settings</button>
+                        <button type="button" class="btn btn-secondary" onclick="loadSettings()">Reset to Defaults</button>
+                    </div>
+                </form>
+
+                <!-- Status Message -->
+                <div id="statusMessage" style="display: none; margin-top: 20px; padding: 12px; border-radius: 6px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/admin-subscription-control.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
