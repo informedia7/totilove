@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Approval - Totilove Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none;">← Back to Dashboard</a>
+                <form method="POST" action="/logout" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+            <h1>🖼️ Image Approval</h1>
+            <p>Review and approve/reject user uploaded images</p>
+        </div>
+        
+        <div class="content">
+            <!-- Statistics Overview -->
+            <div class="stats-overview" id="statsOverview">
+                <div class="stat-box">
+                    <h4>Total Images</h4>
+                    <div class="value" id="totalImages">-</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Pending</h4>
+                    <div class="value" id="pendingImages">-</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Approved</h4>
+                    <div class="value" id="approvedImages">-</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Rejected</h4>
+                    <div class="value" id="rejectedImages">-</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Last 7 Days</h4>
+                    <div class="value" id="images7Days">-</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="pending">Pending</button>
+                <button class="tab-btn" data-tab="all">All Images</button>
+            </div>
+
+            <!-- Filters Panel -->
+            <div class="filters-panel">
+                <div class="filters-header">
+                    <h2>Filters</h2>
+                </div>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>Search</label>
+                        <input type="text" id="searchInput" placeholder="Search by username, email, filename...">
+                    </div>
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select id="statusFilter">
+                            <option value="">All</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Sort By</label>
+                        <select id="sortBy">
+                            <option value="uploaded_at">Upload Date</option>
+                            <option value="user_id">User ID</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Sort Order</label>
+                        <select id="sortOrder">
+                            <option value="DESC">Newest First</option>
+                            <option value="ASC">Oldest First</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="applyFiltersBtn">Apply Filters</button>
+            </div>
+
+            <!-- Pending Images Tab -->
+            <div class="tab-content active" id="pendingTab">
+                <div class="image-grid" id="pendingImagesGrid">
+                    <div class="loading">Loading...</div>
+                </div>
+                <div class="pagination" id="pendingPagination"></div>
+            </div>
+
+            <!-- All Images Tab -->
+            <div class="tab-content" id="allTab">
+                <div class="image-grid" id="allImagesGrid">
+                    <div class="loading">Loading...</div>
+                </div>
+                <div class="pagination" id="allPagination"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="imagePreviewModal" class="modal">
+        <div class="modal-content image-preview-modal">
+            <span class="close" id="closeImagePreviewBtn">&times;</span>
+            <h2>Image Preview</h2>
+            <div id="imagePreviewContent"></div>
+            <div id="imagePreviewActions" style="margin-top: 16px;"></div>
+        </div>
+    </div>
+
+    <!-- Rejection Reason Modal -->
+    <div id="rejectionModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeRejectionModal">&times;</span>
+            <h2>Reject Image</h2>
+            <p>Please provide a reason for rejection (optional):</p>
+            <textarea id="rejectionReason" rows="4" style="width: 100%; margin: 16px 0;" placeholder="Reason for rejection..."></textarea>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn btn-danger" id="confirmRejectBtn">Reject</button>
+                <button class="btn btn-secondary" id="cancelRejectBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/notifications.js"></script>
+    <script src="/js/admin-image-approval.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
