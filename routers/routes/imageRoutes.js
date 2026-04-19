@@ -532,6 +532,17 @@ function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
             color: #5c4b3c;
             font-size: 14px;
         }
+        .tree {
+            margin: 0 0 24px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: #fbf7f0;
+            border: 1px solid rgba(79, 58, 41, 0.12);
+            color: #4b3d33;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
         .button {
             display: inline-block;
             padding: 14px 20px;
@@ -549,10 +560,16 @@ function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
 </head>
 <body>
     <main class="panel">
-        <h1>Download Uploaded Files</h1>
-        <p>This temporary page creates a zip archive of the Railway uploads folder and downloads it through your browser.</p>
-        <div class="meta">Source folder: app/uploads</div>
-        <a class="button" href="/api/profile/uploads-export/download">Download uploads.zip</a>
+        <h1>Download Full Uploads Folder</h1>
+        <p>This page downloads the full <strong>app/uploads</strong> folder from Railway as one zip file through your browser.</p>
+        <div class="meta">Export source: app/uploads</div>
+        <div class="tree">Included in the zip:
+uploads/
+  profile_images/
+  chat_images/images/
+  chat_images/thumbnails/
+  chat_images/temp/</div>
+        <a class="button" href="/api/profile/uploads-export/download">Download Full app/uploads Folder</a>
     </main>
 </body>
 </html>`;
