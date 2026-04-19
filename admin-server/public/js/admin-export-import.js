@@ -2,6 +2,7 @@
 
 let selectedFile = null;
 let fileData = null;
+const folderCollapsedState = {};
 
 // ── Init ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -98,6 +99,48 @@ async function scanUploads() {
 function renderUploadsTree(data) {
     const panel = document.getElementById('uploadsPanel');
 
+    function makeSafeNodeId(path) {
+        return 'folder-node-' + String(path || 'root').replace(/[^a-zA-Z0-9_-]/g, '_');
+    }
+
+    function renderFolderNode(folder, level, rootTotalSize, parentPath) {
+        const safeName = escapeHtml(folder.name || 'unknown');
+        const fullPath = parentPath ? `${parentPath}/${folder.name}` : folder.name;
+        const encodedPath = encodeURIComponent(fullPath);
+        const nodeId = makeSafeNodeId(fullPath);
+        const hasChildren = Array.isArray(folder.subfolders) && folder.subfolders.length > 0;
+        const isCollapsed = folderCollapsedState[fullPath] === undefined ? level > 0 : folderCollapsedState[fullPath];
+        const percent = rootTotalSize > 0 ? ((folder.totalSize / rootTotalSize) * 100).toFixed(1) : '0.0';
+        const indent = Math.min(level * 20, 80);
+
+        let nodeHtml = `
+            <div class="subfolder-row" style="padding-left:${indent + 8}px;">
+                <div class="subfolder-row-left">
+                    ${hasChildren
+                        ? `<button type="button" class="folder-toggle" data-node-path="${encodedPath}" onclick="toggleFolderNode(this)" aria-label="Toggle ${safeName}">${isCollapsed ? '+' : '-'}</button>`
+                        : '<span class="folder-toggle-placeholder"></span>'}
+                    📂 <strong>${safeName}/</strong>
+                    <span class="badge badge-gray">${folder.fileCount.toLocaleString()} files</span>
+                    <span class="badge badge-green">${fmtBytes(folder.totalSize)}</span>
+                    <span style="font-size:11px;color:#aaa;">${percent}%</span>
+                </div>
+                <div class="subfolder-row-right">
+                    <span class="time-chip">🕒 ${fmtDate(folder.lastModified)}</span>
+                </div>
+            </div>`;
+
+        if (hasChildren) {
+            const sortedChildren = [...folder.subfolders].sort((a, b) => b.totalSize - a.totalSize);
+            nodeHtml += `<div class="folder-children ${isCollapsed ? 'collapsed' : ''}" id="${nodeId}">`;
+            for (const child of sortedChildren) {
+                nodeHtml += renderFolderNode(child, level + 1, rootTotalSize, fullPath);
+            }
+            nodeHtml += '</div>';
+        }
+
+        return nodeHtml;
+    }
+
     // Summary stats
     const subCount = (data.subfolders || []).length;
     let html = `
@@ -142,36 +185,7 @@ function renderUploadsTree(data) {
         const sorted = [...data.subfolders].sort((a, b) => b.totalSize - a.totalSize);
 
         for (const sf of sorted) {
-            const pct = data.totalSize > 0 ? ((sf.totalSize / data.totalSize) * 100).toFixed(1) : 0;
-            html += `
-            <div class="subfolder-row">
-                <div class="subfolder-row-left">
-                    📂 <strong>${escapeHtml(sf.name)}/</strong>
-                    <span class="badge badge-gray">${sf.fileCount.toLocaleString()} files</span>
-                    <span class="badge badge-green">${fmtBytes(sf.totalSize)}</span>
-                    <span style="font-size:11px;color:#aaa;">${pct}%</span>
-                </div>
-                <div class="subfolder-row-right">
-                    <span class="time-chip">🕒 ${fmtDate(sf.lastModified)}</span>
-                </div>
-            </div>`;
-
-            // nested subfolders (one level deep)
-            if (sf.subfolders && sf.subfolders.length > 0) {
-                for (const sub2 of sf.subfolders) {
-                    html += `
-                    <div class="subfolder-row" style="padding-left:30px;">
-                        <div class="subfolder-row-left">
-                            └ 📂 <strong>${escapeHtml(sub2.name)}/</strong>
-                            <span class="badge badge-gray">${sub2.fileCount.toLocaleString()} files</span>
-                            <span class="badge badge-green">${fmtBytes(sub2.totalSize)}</span>
-                        </div>
-                        <div class="subfolder-row-right">
-                            <span class="time-chip">🕒 ${fmtDate(sub2.lastModified)}</span>
-                        </div>
-                    </div>`;
-                }
-            }
+            html += renderFolderNode(sf, 0, data.totalSize, '');
         }
         html += `</div>`; // subfolder-list
     } else {
@@ -184,6 +198,18 @@ function renderUploadsTree(data) {
     html += `<p style="font-size:12px; color:#999; margin-top:8px;">Server path: <code>${escapeHtml(data.path)}</code></p>`;
 
     panel.innerHTML = html;
+}
+
+function toggleFolderNode(btnEl) {
+    const encodedPath = btnEl.getAttribute('data-node-path');
+    const decodedPath = decodeURIComponent(encodedPath);
+    folderCollapsedState[decodedPath] = !folderCollapsedState[decodedPath];
+    const nodeId = 'folder-node-' + String(decodedPath || 'root').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const node = document.getElementById(nodeId);
+    if (node) {
+        node.classList.toggle('collapsed', folderCollapsedState[decodedPath]);
+    }
+    btnEl.textContent = folderCollapsedState[decodedPath] ? '+' : '-';
 }
 
 // ── Uploads Folder: Download ──────────────────────────────────────────────────
