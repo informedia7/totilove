@@ -169,14 +169,37 @@ async function exportData() {
         const status = document.getElementById('exportStatus').value;
 
         if (exportType === 'images') {
+            const response = await fetch('/api/export-import/images', {
+                method: 'GET'
+            });
+
+            if (!response.ok) {
+                let errorMessage = 'Failed to export uploads ZIP';
+                try {
+                    const errorBody = await response.json();
+                    errorMessage = errorBody.error || errorMessage;
+                } catch (e) {
+                    // Ignore JSON parse errors and keep default message.
+                }
+                showStatus(errorMessage, 'error');
+                return;
+            }
+
+            const blob = await response.blob();
+            const disposition = response.headers.get('content-disposition') || '';
+            const match = disposition.match(/filename="?([^";]+)"?/i);
+            const filename = (match && match[1]) ? match[1] : 'uploads_export.zip';
+
+            const blobUrl = URL.createObjectURL(blob);
             const link = document.createElement('a');
-            link.href = '/api/export-import/images';
-            link.download = '';
+            link.href = blobUrl;
+            link.download = filename;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            URL.revokeObjectURL(blobUrl);
 
-            showStatus('Image export started. ZIP file will download shortly.', 'success');
+            showStatus('Uploads ZIP downloaded successfully.', 'success');
             return;
         }
 

@@ -2,18 +2,40 @@ const { query } = require('../config/database');
 const logger = require('../utils/logger');
 const path = require('path');
 const fs = require('fs');
+const archiver = require('archiver');
 
 class ExportImportService {
+    /**
+     * Export uploads is intentionally Railway-only.
+     */
+    isRailwayEnvironment() {
+        return Boolean(
+            process.env.RAILWAY_ENVIRONMENT ||
+            process.env.RAILWAY_PROJECT_ID ||
+            process.env.RAILWAY_STATIC_URL
+        );
+    }
+
     /**
      * Resolve and validate uploads root for image export.
      */
     async getUploadsExportInfo() {
+        if (!this.isRailwayEnvironment()) {
+            throw new Error('Uploads export is only available in Railway environment');
+        }
+
+        if (!process.env.UPLOADS_PATH) {
+            throw new Error('UPLOADS_PATH is required in Railway to export uploads folder');
+        }
+
         try {
-            const uploadsRoot = process.env.UPLOADS_PATH
-                ? path.resolve(process.env.UPLOADS_PATH)
-                : path.resolve(__dirname, '..', '..', 'app', 'uploads');
+            const uploadsRoot = path.resolve(process.env.UPLOADS_PATH);
 
             await fs.promises.access(uploadsRoot, fs.constants.R_OK);
+            const stats = await fs.promises.stat(uploadsRoot);
+            if (!stats.isDirectory()) {
+                throw new Error('UPLOADS_PATH does not point to a directory');
+            }
 
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
             const filename = `uploads_export_${timestamp}.zip`;
@@ -23,6 +45,20 @@ class ExportImportService {
             logger.error('Error resolving uploads export path:', error);
             throw new Error('Uploads folder is not accessible for export');
         }
+    }
+
+    /**
+     * Create ZIP stream for uploads folder.
+     */
+    async createUploadsArchiveStream() {
+        const { uploadsRoot, filename } = await this.getUploadsExportInfo();
+
+        const archive = archiver('zip', {
+            zlib: { level: 9 }
+        });
+
+        archive.directory(uploadsRoot, 'uploads');
+        return { archive, filename };
     }
 
     /**
