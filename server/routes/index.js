@@ -52,6 +52,47 @@ function setupRoutes(app, dependencies) {
     });
     
     // Add CSRF validation middleware (must be before routes that need protection)
+    // Secure uploads-export endpoint — registered BEFORE CSRF middleware so no session/token needed.
+    // Protected by shared EXPORT_SECRET instead.
+    app.get('/uploads-export', (req, res) => {
+        const archiver = require('archiver');
+        const path = require('path');
+        const fs = require('fs');
+
+        const secret = process.env.EXPORT_SECRET;
+        if (!secret) {
+            return res.status(503).json({ error: 'EXPORT_SECRET not configured on this service' });
+        }
+
+        const provided = req.query.secret || req.headers['x-export-secret'];
+        if (!provided || provided !== secret) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
+
+        const uploadsRoot = process.env.UPLOADS_PATH
+            ? path.resolve(process.env.UPLOADS_PATH)
+            : path.join(__dirname, '..', '..', 'app', 'uploads');
+
+        if (!fs.existsSync(uploadsRoot)) {
+            return res.status(404).json({ error: `Uploads path does not exist: ${uploadsRoot}` });
+        }
+
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = `uploads_export_${timestamp}.zip`;
+
+        res.setHeader('Content-Type', 'application/zip');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+        const archive = archiver('zip', { zlib: { level: 6 } });
+        archive.on('error', (err) => {
+            console.error('[uploads-export] Archive error:', err);
+            if (!res.headersSent) res.status(500).end();
+        });
+        archive.pipe(res);
+        archive.directory(uploadsRoot, 'uploads');
+        archive.finalize();
+    });
+
     app.use(csrfMiddleware.validate());
 
     // Attach optional auth early so downstream middleware can read req.user when a session exists
@@ -119,44 +160,6 @@ function setupRoutes(app, dependencies) {
     setupStateRoutes(app, { stateService, authMiddleware });
     setupPresenceRoutes(app, { presenceService, authMiddleware, monitoringUtils });
     setupImageRoutes(app);
-
-    // Secure uploads-export endpoint (for admin-server to proxy-download)
-    app.get('/uploads-export', (req, res) => {
-        const archiver = require('archiver');
-        const secret = process.env.EXPORT_SECRET;
-
-        if (!secret) {
-            return res.status(503).json({ error: 'EXPORT_SECRET not configured on this service' });
-        }
-
-        const provided = req.query.secret || req.headers['x-export-secret'];
-        if (!provided || provided !== secret) {
-            return res.status(403).json({ error: 'Forbidden' });
-        }
-
-        const uploadsRoot = process.env.UPLOADS_PATH
-            ? require('path').resolve(process.env.UPLOADS_PATH)
-            : require('path').join(__dirname, '..', '..', 'app', 'uploads');
-
-        if (!require('fs').existsSync(uploadsRoot)) {
-            return res.status(404).json({ error: `Uploads path does not exist: ${uploadsRoot}` });
-        }
-
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const filename = `uploads_export_${timestamp}.zip`;
-
-        res.setHeader('Content-Type', 'application/zip');
-        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-
-        const archive = archiver('zip', { zlib: { level: 6 } });
-        archive.on('error', (err) => {
-            console.error('[uploads-export] Archive error:', err);
-            if (!res.headersSent) res.status(500).end();
-        });
-        archive.pipe(res);
-        archive.directory(uploadsRoot, 'uploads');
-        archive.finalize();
-    });
 
     // Template routes
     app.use('/', templateRoutes.getRouter());
