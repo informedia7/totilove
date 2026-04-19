@@ -1,8 +1,8 @@
 require('dotenv').config();
 
 module.exports = {
-    port: parseInt(process.env.ADMIN_PORT) || 3003,
-    host: process.env.ADMIN_HOST || 'localhost',
+    port: parseInt(process.env.PORT || process.env.ADMIN_PORT) || 3003,
+    host: process.env.ADMIN_HOST || '0.0.0.0',
     environment: process.env.NODE_ENV || 'development',
     
     session: {
