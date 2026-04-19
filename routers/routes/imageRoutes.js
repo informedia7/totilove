@@ -484,7 +484,7 @@ function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
     // Create multer instance
     const profileImageUpload = createProfileImageUpload(baseDir);
 
-    router.get('/profile/uploads-export', async (req, res) => {
+    router.get('/uploads-export', async (req, res) => {
         if (!isUploadExportEnabled()) {
             return res.status(404).send('Not found');
         }
