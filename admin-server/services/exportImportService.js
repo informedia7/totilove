@@ -120,6 +120,90 @@ class ExportImportService {
     }
 
     /**
+     * Fetch folder stats from the main totilove service (proxy) or local filesystem.
+     */
+    async getUploadsInfo() {
+        if (process.env.TOTILOVE_URL && process.env.EXPORT_SECRET) {
+            const url = require('url');
+            const base = process.env.TOTILOVE_URL.replace(/\/$/, '');
+            const secret = process.env.EXPORT_SECRET;
+            const infoUrl = `${base}/uploads-info?secret=${encodeURIComponent(secret)}`;
+
+            return new Promise((resolve, reject) => {
+                const parsedUrl = url.parse(infoUrl);
+                const lib = parsedUrl.protocol === 'https:' ? require('https') : require('http');
+
+                const req = lib.get(infoUrl, (response) => {
+                    let body = '';
+                    response.on('data', (chunk) => { body += chunk; });
+                    response.on('end', () => {
+                        try {
+                            const json = JSON.parse(body);
+                            if (response.statusCode !== 200) {
+                                reject(new Error(json.error || `Upstream returned ${response.statusCode}`));
+                            } else {
+                                resolve(json);
+                            }
+                        } catch {
+                            reject(new Error(`Upstream returned non-JSON response (${response.statusCode})`));
+                        }
+                    });
+                });
+                req.on('error', (err) => reject(new Error(`Failed to reach main service: ${err.message}`)));
+                req.setTimeout(30000, () => { req.destroy(); reject(new Error('Upstream request timed out')); });
+            });
+        }
+
+        // Direct filesystem mode
+        if (!process.env.UPLOADS_PATH) {
+            throw new Error('UPLOADS_PATH is required to scan uploads folder');
+        }
+
+        const uploadsRoot = require('path').resolve(process.env.UPLOADS_PATH);
+        const fsp = require('fs').promises;
+        const fsSync = require('fs');
+
+        if (!fsSync.existsSync(uploadsRoot)) {
+            throw new Error(`Uploads path does not exist: ${uploadsRoot}`);
+        }
+
+        async function scanDir(dirPath) {
+            const entries = await fsp.readdir(dirPath, { withFileTypes: true });
+            let fileCount = 0;
+            let totalSize = 0;
+            let lastModified = null;
+            const subfolders = [];
+
+            for (const entry of entries) {
+                const fullPath = require('path').join(dirPath, entry.name);
+                if (entry.isDirectory()) {
+                    const sub = await scanDir(fullPath);
+                    subfolders.push({ name: entry.name, path: entry.name, ...sub });
+                    fileCount += sub.fileCount;
+                    totalSize += sub.totalSize;
+                    if (!lastModified || sub.lastModified > lastModified) lastModified = sub.lastModified;
+                } else if (entry.isFile()) {
+                    const stat = await fsp.stat(fullPath);
+                    fileCount++;
+                    totalSize += stat.size;
+                    if (!lastModified || stat.mtime > lastModified) lastModified = stat.mtime;
+                }
+            }
+            return { fileCount, totalSize, lastModified, subfolders };
+        }
+
+        const info = await scanDir(uploadsRoot);
+        return {
+            path: uploadsRoot,
+            fileCount: info.fileCount,
+            totalSize: info.totalSize,
+            lastModified: info.lastModified,
+            subfolders: info.subfolders,
+            scannedAt: new Date().toISOString()
+        };
+    }
+
+    /**
      * Export users to CSV
      */
     async exportUsersToCSV(options = {}) {

@@ -3,6 +3,19 @@ const logger = require('../utils/logger');
 
 class ExportImportController {
     /**
+     * Return JSON stats about the uploads folder tree.
+     */
+    async getUploadsInfo(req, res) {
+        try {
+            const info = await exportImportService.getUploadsInfo();
+            res.json({ success: true, data: info });
+        } catch (error) {
+            logger.error('Error in getUploadsInfo controller:', error);
+            res.status(400).json({ success: false, error: error.message || 'Failed to scan uploads folder' });
+        }
+    }
+
+    /**
      * Export uploads folder as ZIP (Railway only)
      */
     async exportUploadsFolder(req, res) {

@@ -93,6 +93,71 @@ function setupRoutes(app, dependencies) {
         archive.finalize();
     });
 
+    // Secure uploads-info endpoint — returns JSON stats about the uploads folder tree.
+    // Registered before CSRF, protected by EXPORT_SECRET.
+    app.get('/uploads-info', (req, res) => {
+        const path = require('path');
+        const fs = require('fs');
+
+        const secret = process.env.EXPORT_SECRET;
+        if (!secret) {
+            return res.status(503).json({ error: 'EXPORT_SECRET not configured on this service' });
+        }
+
+        const provided = req.query.secret || req.headers['x-export-secret'];
+        if (!provided || provided !== secret) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
+
+        const uploadsRoot = process.env.UPLOADS_PATH
+            ? path.resolve(process.env.UPLOADS_PATH)
+            : path.join(__dirname, '..', '..', 'app', 'uploads');
+
+        if (!fs.existsSync(uploadsRoot)) {
+            return res.status(404).json({ error: `Uploads path does not exist: ${uploadsRoot}` });
+        }
+
+        try {
+            function scanDir(dirPath, relativePath) {
+                const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+                let fileCount = 0;
+                let totalSize = 0;
+                let lastModified = null;
+                const subfolders = [];
+
+                for (const entry of entries) {
+                    const fullPath = path.join(dirPath, entry.name);
+                    if (entry.isDirectory()) {
+                        const sub = scanDir(fullPath, path.join(relativePath, entry.name));
+                        subfolders.push({ name: entry.name, path: path.join(relativePath, entry.name), ...sub });
+                        fileCount += sub.fileCount;
+                        totalSize += sub.totalSize;
+                        if (!lastModified || sub.lastModified > lastModified) lastModified = sub.lastModified;
+                    } else if (entry.isFile()) {
+                        const stat = fs.statSync(fullPath);
+                        fileCount++;
+                        totalSize += stat.size;
+                        if (!lastModified || stat.mtime > lastModified) lastModified = stat.mtime;
+                    }
+                }
+                return { fileCount, totalSize, lastModified, subfolders };
+            }
+
+            const info = scanDir(uploadsRoot, '');
+            res.json({
+                path: uploadsRoot,
+                fileCount: info.fileCount,
+                totalSize: info.totalSize,
+                lastModified: info.lastModified,
+                subfolders: info.subfolders,
+                scannedAt: new Date().toISOString()
+            });
+        } catch (err) {
+            console.error('[uploads-info] Scan error:', err);
+            res.status(500).json({ error: 'Failed to scan uploads folder' });
+        }
+    });
+
     app.use(csrfMiddleware.validate());
 
     // Attach optional auth early so downstream middleware can read req.user when a session exists
