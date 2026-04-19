@@ -20,7 +20,6 @@
 
 const express = require('express');
 const router = express.Router();
-const archiver = require('archiver');
 const multer = require('multer');
 const sharp = require('sharp');
 const path = require('path');
@@ -72,11 +71,11 @@ class ApiResponse {
         this.meta = meta;
         this.timestamp = new Date().toISOString();
     }
-    
+
     static success(data, meta = null) {
         return new ApiResponse(true, data, meta);
     }
-    
+
     static error(message, code = null) {
         return new ApiResponse(false, null, { message, code });
     }
@@ -175,7 +174,7 @@ function trackImageUpload(userId, success, fileSize, processingTime) {
     } else {
         imageMetrics.failedUploads++;
     }
-    
+
     // Log to console (can be extended to send to monitoring system)
     console.log({
         event: 'image_upload',
@@ -216,16 +215,16 @@ async function extractImageMetadata(filePath) {
 async function moderateImage(imagePath) {
     try {
         const metadata = await sharp(imagePath).metadata();
-        
+
         const checks = {
             hasReasonableDimensions: metadata.width >= 100 && metadata.height >= 100,
             aspectRatioValid: metadata.width / metadata.height > 0.1 && metadata.width / metadata.height < 10,
             notTooSmall: metadata.width >= 50 && metadata.height >= 50,
             notTooLarge: metadata.width <= 10000 && metadata.height <= 10000
         };
-        
+
         const passed = Object.values(checks).every(check => check === true);
-        
+
         return {
             passed,
             checks,
@@ -247,19 +246,19 @@ async function moderateImage(imagePath) {
 async function optimizeImage(inputPath, outputPath, userId) {
     try {
         const metadata = await sharp(inputPath).metadata();
-        
+
         // Determine optimal settings based on image characteristics
         let quality = IMAGE_CONFIG.QUALITY;
         let progressive = true;
-        
+
         // Lower quality for large images
         if (metadata.width > 2000 || metadata.height > 2000) {
             quality = Math.max(quality - 20, 50);
         }
-        
+
         // Different settings for PNG vs JPEG
         const pipeline = sharp(inputPath).rotate();
-        
+
         if (metadata.format === 'png' && metadata.hasAlpha) {
             // For PNG with transparency
             await pipeline
@@ -267,7 +266,7 @@ async function optimizeImage(inputPath, outputPath, userId) {
                     fit: 'inside',
                     withoutEnlargement: true
                 })
-                .png({ 
+                .png({
                     quality: quality,
                     progressive: true,
                     compressionLevel: 9
@@ -280,7 +279,7 @@ async function optimizeImage(inputPath, outputPath, userId) {
                     fit: 'inside',
                     withoutEnlargement: true
                 })
-                .jpeg({ 
+                .jpeg({
                     quality: quality,
                     progressive: progressive,
                     mozjpeg: true,
@@ -292,7 +291,7 @@ async function optimizeImage(inputPath, outputPath, userId) {
                 })
                 .toFile(outputPath);
         }
-        
+
         return outputPath;
     } catch (error) {
         console.error('[ImageRoutes] Image optimization failed:', error);
@@ -308,28 +307,28 @@ async function generateThumbnails(imagePath, userId, filename) {
         const baseName = path.basename(filename, path.extname(filename));
         const dirName = path.dirname(imagePath);
         const thumbnails = {};
-        
+
         // Small thumbnail (150x150)
         const smallThumb = path.join(dirName, `${baseName}_thumb_small.jpg`);
         await sharp(imagePath)
-            .resize(IMAGE_CONFIG.THUMBNAIL_SIZES.small.width, IMAGE_CONFIG.THUMBNAIL_SIZES.small.height, { 
-                fit: 'cover' 
+            .resize(IMAGE_CONFIG.THUMBNAIL_SIZES.small.width, IMAGE_CONFIG.THUMBNAIL_SIZES.small.height, {
+                fit: 'cover'
             })
             .jpeg({ quality: IMAGE_CONFIG.THUMBNAIL_SIZES.small.quality })
             .toFile(smallThumb);
         thumbnails.small = path.basename(smallThumb);
-        
+
         // Medium thumbnail (400x400)
         const mediumThumb = path.join(dirName, `${baseName}_thumb_medium.jpg`);
         await sharp(imagePath)
-            .resize(IMAGE_CONFIG.THUMBNAIL_SIZES.medium.width, IMAGE_CONFIG.THUMBNAIL_SIZES.medium.height, { 
-                fit: 'inside', 
-                withoutEnlargement: true 
+            .resize(IMAGE_CONFIG.THUMBNAIL_SIZES.medium.width, IMAGE_CONFIG.THUMBNAIL_SIZES.medium.height, {
+                fit: 'inside',
+                withoutEnlargement: true
             })
             .jpeg({ quality: IMAGE_CONFIG.THUMBNAIL_SIZES.medium.quality })
             .toFile(mediumThumb);
         thumbnails.medium = path.basename(mediumThumb);
-        
+
         return thumbnails;
     } catch (error) {
         console.error('[ImageRoutes] Thumbnail generation failed:', error);
@@ -405,40 +404,36 @@ function createProfileImageUpload(baseDir) {
     });
 }
 
-function isUploadExportEnabled() {
-    return process.env.ENABLE_UPLOAD_EXPORT_UI === 'true';
-}
-
 // ============================================================================
 // 12. CLEANUP SERVICE
 // ============================================================================
 function startCleanupService(db, baseDir) {
     const cleanupInterval = 24 * 60 * 60 * 1000; // 24 hours
-    
+
     const cleanupOrphanedFiles = async () => {
         try {
             const uploadDir = path.join(baseDir, 'app', 'uploads', 'profile_images');
             if (!fs.existsSync(uploadDir)) {
                 return;
             }
-            
+
             const files = await fs.promises.readdir(uploadDir);
-            
+
             for (const file of files) {
                 const filePath = path.join(uploadDir, file);
-                
+
                 try {
                     // Check if file exists in database
                     const result = await db.query(
                         'SELECT id FROM user_images WHERE file_name = $1',
                         [file]
                     );
-                    
+
                     if (result.rows.length === 0) {
                         // File not in database, check age
                         const stat = await fs.promises.stat(filePath);
                         const ageInDays = (Date.now() - stat.mtimeMs) / (1000 * 60 * 60 * 24);
-                        
+
                         if (ageInDays > 1) { // Keep files for 1 day
                             await fs.promises.unlink(filePath);
                             console.log(`[ImageRoutes] Cleaned up orphaned file: ${file}`);
@@ -453,11 +448,11 @@ function startCleanupService(db, baseDir) {
             console.error('[ImageRoutes] Cleanup service error:', error);
         }
     };
-    
+
     // Run cleanup immediately, then on interval
     cleanupOrphanedFiles();
     setInterval(cleanupOrphanedFiles, cleanupInterval);
-    
+
     console.log('[ImageRoutes] Cleanup service started (runs every 24 hours)');
 }
 
@@ -484,145 +479,10 @@ function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
     // Create multer instance
     const profileImageUpload = createProfileImageUpload(baseDir);
 
-    router.get('/uploads-export', async (req, res) => {
-        if (!isUploadExportEnabled()) {
-            return res.status(404).send('Not found');
-        }
-
-        const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uploads Export</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: Georgia, "Times New Roman", serif;
-            background: linear-gradient(135deg, #f4efe7 0%, #e4dccf 100%);
-            color: #1f1b18;
-            min-height: 100vh;
-            display: grid;
-            place-items: center;
-        }
-        .panel {
-            width: min(560px, calc(100vw - 32px));
-            padding: 32px;
-            background: rgba(255, 252, 247, 0.96);
-            border: 1px solid rgba(79, 58, 41, 0.16);
-            border-radius: 20px;
-            box-shadow: 0 24px 60px rgba(79, 58, 41, 0.14);
-        }
-        h1 {
-            margin: 0 0 12px;
-            font-size: 32px;
-            line-height: 1.1;
-        }
-        p {
-            margin: 0 0 20px;
-            font-size: 16px;
-            line-height: 1.6;
-            color: #4b3d33;
-        }
-        .meta {
-            margin: 0 0 24px;
-            padding: 14px 16px;
-            border-radius: 14px;
-            background: #f0e6d8;
-            color: #5c4b3c;
-            font-size: 14px;
-        }
-        .tree {
-            margin: 0 0 24px;
-            padding: 14px 16px;
-            border-radius: 14px;
-            background: #fbf7f0;
-            border: 1px solid rgba(79, 58, 41, 0.12);
-            color: #4b3d33;
-            font-size: 14px;
-            line-height: 1.6;
-            white-space: pre-line;
-        }
-        .button {
-            display: inline-block;
-            padding: 14px 20px;
-            border-radius: 999px;
-            background: #1f6f5f;
-            color: #fffaf2;
-            text-decoration: none;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-        }
-        .button:hover {
-            background: #18594d;
-        }
-    </style>
-</head>
-<body>
-    <main class="panel">
-        <h1>Download Full Uploads Folder</h1>
-        <p>This page downloads the full <strong>app/uploads</strong> folder from Railway as one zip file through your browser.</p>
-        <div class="meta">Export source: app/uploads</div>
-        <div class="tree">Included in the zip:
-uploads/
-  profile_images/
-  chat_images/images/
-  chat_images/thumbnails/
-  chat_images/temp/</div>
-        <a class="button" href="/api/profile/uploads-export/download">Download Full app/uploads Folder</a>
-    </main>
-</body>
-</html>`;
-
-        return res.status(200).type('html').send(html);
-    });
-
-    router.get('/api/profile/uploads-export/download', async (req, res) => {
-        if (!isUploadExportEnabled()) {
-            return res.status(404).json({
-                success: false,
-                error: 'Not found'
-            });
-        }
-
-        const uploadsRoot = path.join(baseDir, 'app', 'uploads');
-
-        try {
-            await fs.promises.access(uploadsRoot, fs.constants.R_OK);
-        } catch (error) {
-            return res.status(404).json({
-                success: false,
-                error: 'Uploads folder not found'
-            });
-        }
-
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        res.setHeader('Content-Type', 'application/zip');
-        res.setHeader('Content-Disposition', `attachment; filename="uploads-${timestamp}.zip"`);
-
-        const archive = archiver('zip', { zlib: { level: 9 } });
-
-        archive.on('error', (error) => {
-            console.error('[ImageRoutes] Upload export failed:', error);
-            if (!res.headersSent) {
-                res.status(500).json({
-                    success: false,
-                    error: 'Failed to export uploads folder'
-                });
-            } else {
-                res.destroy(error);
-            }
-        });
-
-        archive.pipe(res);
-        archive.directory(uploadsRoot, 'uploads');
-        await archive.finalize();
-    });
-
     /**
      * POST /api/profile/upload-images - Upload images
      */
-    router.post('/api/profile/upload-images', 
+    router.post('/api/profile/upload-images',
         profileImageUpload.array('images', IMAGE_CONFIG.MAX_FILES),
         validateImageUpload,
         async (req, res) => {
@@ -697,21 +557,21 @@ uploads/
                     const fileStartTime = Date.now();
                     try {
                         const imagePath = file.path;
-                        
+
                         // Image moderation
                         const moderationResult = await moderateImage(imagePath);
                         if (!moderationResult.passed) {
                             throw new Error(moderationResult.reason || 'Image validation failed');
                         }
-                        
+
                         // Optimize image
                         const tempPath = imagePath + '.tmp';
                         await optimizeImage(imagePath, tempPath, userId);
-                        
+
                         // Replace original with optimized version
                         await fs.promises.unlink(imagePath);
                         await fs.promises.rename(tempPath, imagePath);
-                        
+
                         // Rename to include userId in filename
                         const timestamp = Date.now();
                         const randomStr = Math.random().toString(36).substring(2, 15);
@@ -721,16 +581,16 @@ uploads/
                         await fs.promises.rename(oldPath, newPath);
                         file.filename = newFileName;
                         file.path = newPath;
-                        
+
                         // Generate thumbnails
                         const thumbnails = await generateThumbnails(newPath, userId, newFileName);
-                        
+
                         // Extract metadata
                         const metadata = await extractImageMetadata(newPath);
-                        
+
                         // Build thumbnail path (relative path like chat images)
                         const thumbnailPath = thumbnails ? `/uploads/profile_images/${thumbnails.medium || thumbnails.small}` : null;
-                        
+
                         // Insert into database with explicit column set
                         const insertResult = await db.query(`
                             INSERT INTO user_images (
@@ -746,10 +606,10 @@ uploads/
 
                         const imageRow = insertResult.rows[0];
                         const processingTime = Date.now() - fileStartTime;
-                        
+
                         // Track metrics
                         trackImageUpload(userId, true, file.size, processingTime);
-                        
+
                         uploadedImages.push({
                             id: imageRow.id,
                             file_name: imageRow.file_name,
@@ -763,7 +623,7 @@ uploads/
                     } catch (error) {
                         const processingTime = Date.now() - fileStartTime;
                         trackImageUpload(userId, false, file.size || 0, processingTime);
-                        
+
                         console.error('[ImageRoutes] Error processing image:', error.message);
                         // Delete file if processing failed
                         try {
@@ -773,15 +633,15 @@ uploads/
                         } catch (unlinkError) {
                             // Ignore cleanup errors
                         }
-                        errors.push({ 
-                            filename: file.originalname, 
-                            error: error.message || ERROR_MESSAGES.PROCESSING_FAILED 
+                        errors.push({
+                            filename: file.originalname,
+                            error: error.message || ERROR_MESSAGES.PROCESSING_FAILED
                         });
                     }
                 }
 
                 const totalProcessingTime = Date.now() - startTime;
-                
+
                 res.json(ApiResponse.success({
                     uploaded: uploadedImages,
                     count: uploadedImages.length,
@@ -832,7 +692,7 @@ uploads/
             }
 
             const imageUserId = imageResult.rows[0].user_id;
-            
+
             if (imageUserId !== authenticatedUserId) {
                 return res.status(403).json({
                     success: false,
@@ -847,13 +707,13 @@ uploads/
             const filePath = path.join(baseDir, 'app', 'uploads', 'profile_images', fileName);
             const baseName = path.basename(fileName, path.extname(fileName));
             const dirName = path.dirname(filePath);
-            
+
             const filesToDelete = [
                 filePath,
                 path.join(dirName, `${baseName}_thumb_small.jpg`),
                 path.join(dirName, `${baseName}_thumb_medium.jpg`)
             ];
-            
+
             for (const fileToDelete of filesToDelete) {
                 try {
                     if (fs.existsSync(fileToDelete)) {
@@ -979,7 +839,7 @@ uploads/
                     [authenticatedUserId, imageId]
                 );
             }
-            
+
             // Update featured status (convert boolean to integer for smallint column)
             const featuredValue = featured ? 1 : 0;
             await db.query(
@@ -1007,7 +867,7 @@ uploads/
             res.json(ApiResponse.success({
                 metrics: {
                     ...imageMetrics,
-                    averageProcessingTime: imageMetrics.totalUploads > 0 
+                    averageProcessingTime: imageMetrics.totalUploads > 0
                         ? Math.round(imageMetrics.totalProcessingTime / imageMetrics.totalUploads)
                         : 0,
                     averageFileSize: imageMetrics.successfulUploads > 0
