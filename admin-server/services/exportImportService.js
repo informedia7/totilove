@@ -28,22 +28,36 @@ class ExportImportService {
             throw new Error('UPLOADS_PATH is required in Railway to export uploads folder');
         }
 
-        try {
-            const uploadsRoot = path.resolve(process.env.UPLOADS_PATH);
+        const uploadsRoot = path.resolve(process.env.UPLOADS_PATH);
 
-            await fs.promises.access(uploadsRoot, fs.constants.R_OK);
+        try {
             const stats = await fs.promises.stat(uploadsRoot);
             if (!stats.isDirectory()) {
-                throw new Error('UPLOADS_PATH does not point to a directory');
+                throw new Error(`UPLOADS_PATH is not a directory: ${uploadsRoot}`);
             }
+
+            await fs.promises.access(uploadsRoot, fs.constants.R_OK | fs.constants.X_OK);
 
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
             const filename = `uploads_export_${timestamp}.zip`;
 
             return { uploadsRoot, filename };
         } catch (error) {
-            logger.error('Error resolving uploads export path:', error);
-            throw new Error('Uploads folder is not accessible for export');
+            logger.error('Error resolving uploads export path:', {
+                uploadsRoot,
+                message: error.message,
+                code: error.code
+            });
+
+            if (error.code === 'ENOENT') {
+                throw new Error(`Uploads path does not exist: ${uploadsRoot}`);
+            }
+
+            if (error.code === 'EACCES' || error.code === 'EPERM') {
+                throw new Error(`Uploads path is not readable: ${uploadsRoot}`);
+            }
+
+            throw new Error(`Uploads folder is not accessible: ${uploadsRoot}`);
         }
     }
 
