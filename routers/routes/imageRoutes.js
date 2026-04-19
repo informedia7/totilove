@@ -20,6 +20,7 @@
 
 const express = require('express');
 const router = express.Router();
+const archiver = require('archiver');
 const multer = require('multer');
 const sharp = require('sharp');
 const path = require('path');
@@ -404,6 +405,10 @@ function createProfileImageUpload(baseDir) {
     });
 }
 
+function isUploadExportEnabled() {
+    return process.env.ENABLE_UPLOAD_EXPORT_UI === 'true';
+}
+
 // ============================================================================
 // 12. CLEANUP SERVICE
 // ============================================================================
@@ -478,6 +483,124 @@ function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
 
     // Create multer instance
     const profileImageUpload = createProfileImageUpload(baseDir);
+
+    router.get('/profile/uploads-export', async (req, res) => {
+        if (!isUploadExportEnabled()) {
+            return res.status(404).send('Not found');
+        }
+
+        const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uploads Export</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            background: linear-gradient(135deg, #f4efe7 0%, #e4dccf 100%);
+            color: #1f1b18;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+        }
+        .panel {
+            width: min(560px, calc(100vw - 32px));
+            padding: 32px;
+            background: rgba(255, 252, 247, 0.96);
+            border: 1px solid rgba(79, 58, 41, 0.16);
+            border-radius: 20px;
+            box-shadow: 0 24px 60px rgba(79, 58, 41, 0.14);
+        }
+        h1 {
+            margin: 0 0 12px;
+            font-size: 32px;
+            line-height: 1.1;
+        }
+        p {
+            margin: 0 0 20px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #4b3d33;
+        }
+        .meta {
+            margin: 0 0 24px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: #f0e6d8;
+            color: #5c4b3c;
+            font-size: 14px;
+        }
+        .button {
+            display: inline-block;
+            padding: 14px 20px;
+            border-radius: 999px;
+            background: #1f6f5f;
+            color: #fffaf2;
+            text-decoration: none;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+        .button:hover {
+            background: #18594d;
+        }
+    </style>
+</head>
+<body>
+    <main class="panel">
+        <h1>Download Uploaded Files</h1>
+        <p>This temporary page creates a zip archive of the Railway uploads folder and downloads it through your browser.</p>
+        <div class="meta">Source folder: app/uploads</div>
+        <a class="button" href="/api/profile/uploads-export/download">Download uploads.zip</a>
+    </main>
+</body>
+</html>`;
+
+        return res.status(200).type('html').send(html);
+    });
+
+    router.get('/api/profile/uploads-export/download', async (req, res) => {
+        if (!isUploadExportEnabled()) {
+            return res.status(404).json({
+                success: false,
+                error: 'Not found'
+            });
+        }
+
+        const uploadsRoot = path.join(baseDir, 'app', 'uploads');
+
+        try {
+            await fs.promises.access(uploadsRoot, fs.constants.R_OK);
+        } catch (error) {
+            return res.status(404).json({
+                success: false,
+                error: 'Uploads folder not found'
+            });
+        }
+
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        res.setHeader('Content-Type', 'application/zip');
+        res.setHeader('Content-Disposition', `attachment; filename="uploads-${timestamp}.zip"`);
+
+        const archive = archiver('zip', { zlib: { level: 9 } });
+
+        archive.on('error', (error) => {
+            console.error('[ImageRoutes] Upload export failed:', error);
+            if (!res.headersSent) {
+                res.status(500).json({
+                    success: false,
+                    error: 'Failed to export uploads folder'
+                });
+            } else {
+                res.destroy(error);
+            }
+        });
+
+        archive.pipe(res);
+        archive.directory(uploadsRoot, 'uploads');
+        await archive.finalize();
+    });
 
     /**
      * POST /api/profile/upload-images - Upload images
