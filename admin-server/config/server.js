@@ -1,9 +1,14 @@
 require('dotenv').config();
 
+const environment = process.env.NODE_ENV || 'development';
+const host = environment === 'production'
+    ? '0.0.0.0'
+    : (process.env.ADMIN_HOST || '0.0.0.0');
+
 module.exports = {
     port: parseInt(process.env.PORT || process.env.ADMIN_PORT) || 3003,
-    host: process.env.ADMIN_HOST || '0.0.0.0',
-    environment: process.env.NODE_ENV || 'development',
+    host,
+    environment,
     
     session: {
         secret: process.env.ADMIN_SESSION_SECRET || 'change_this_secret',
