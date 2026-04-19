@@ -63,16 +63,60 @@ class ExportImportService {
 
     /**
      * Create ZIP stream for uploads folder.
+     * If TOTILOVE_URL + EXPORT_SECRET are set, proxy from main service (recommended).
+     * Otherwise fall back to direct filesystem read via UPLOADS_PATH.
      */
     async createUploadsArchiveStream() {
+        if (process.env.TOTILOVE_URL && process.env.EXPORT_SECRET) {
+            return this.createProxiedArchiveStream();
+        }
         const { uploadsRoot, filename } = await this.getUploadsExportInfo();
-
-        const archive = archiver('zip', {
-            zlib: { level: 9 }
-        });
-
+        const archive = archiver('zip', { zlib: { level: 9 } });
         archive.directory(uploadsRoot, 'uploads');
         return { archive, filename };
+    }
+
+    /**
+     * Proxy-stream the uploads ZIP from the main totilove service.
+     */
+    async createProxiedArchiveStream() {
+        const http = require('https');
+        const url = require('url');
+
+        const base = process.env.TOTILOVE_URL.replace(/\/$/, '');
+        const secret = process.env.EXPORT_SECRET;
+        const exportUrl = `${base}/uploads-export?secret=${encodeURIComponent(secret)}`;
+
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = `uploads_export_${timestamp}.zip`;
+
+        return new Promise((resolve, reject) => {
+            const parsedUrl = url.parse(exportUrl);
+            const lib = parsedUrl.protocol === 'https:' ? require('https') : require('http');
+
+            const req = lib.get(exportUrl, (response) => {
+                if (response.statusCode !== 200) {
+                    let body = '';
+                    response.on('data', (chunk) => { body += chunk; });
+                    response.on('end', () => {
+                        try {
+                            const json = JSON.parse(body);
+                            reject(new Error(json.error || `Upstream returned ${response.statusCode}`));
+                        } catch {
+                            reject(new Error(`Upstream returned ${response.statusCode}`));
+                        }
+                    });
+                    return;
+                }
+                resolve({ stream: response, filename });
+            });
+
+            req.on('error', (err) => reject(new Error(`Failed to reach main service: ${err.message}`)));
+            req.setTimeout(60000, () => {
+                req.destroy();
+                reject(new Error('Upstream request timed out'));
+            });
+        });
     }
 
     /**

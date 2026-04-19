@@ -7,23 +7,32 @@ class ExportImportController {
      */
     async exportUploadsFolder(req, res) {
         try {
-            const { archive, filename } = await exportImportService.createUploadsArchiveStream();
+            const result = await exportImportService.createUploadsArchiveStream();
 
             res.setHeader('Content-Type', 'application/zip');
-            res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+            res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
 
-            archive.on('error', (error) => {
+            // Proxy mode: result.stream is an http.IncomingMessage
+            if (result.stream) {
+                result.stream.pipe(res);
+                result.stream.on('error', (error) => {
+                    logger.error('Proxy stream error:', error);
+                    if (!res.headersSent) {
+                        res.status(502).json({ success: false, error: 'Upstream stream error' });
+                    }
+                });
+                return;
+            }
+
+            // Direct mode: result.archive is an archiver instance
+            result.archive.on('error', (error) => {
                 logger.error('Archive streaming error:', error);
                 if (!res.headersSent) {
-                    res.status(500).json({
-                        success: false,
-                        error: 'Failed to stream uploads archive'
-                    });
+                    res.status(500).json({ success: false, error: 'Failed to stream uploads archive' });
                 }
             });
-
-            archive.pipe(res);
-            archive.finalize();
+            result.archive.pipe(res);
+            result.archive.finalize();
         } catch (error) {
             logger.error('Error in exportUploadsFolder controller:', error);
             res.status(400).json({
