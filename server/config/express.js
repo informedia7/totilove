@@ -7,7 +7,6 @@ const express = require('express');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const path = require('path');
-const fs = require('fs');
 const {
     createPerRequestCorsMiddleware,
     warnProductionWithoutExplicitOrigins,
@@ -64,26 +63,14 @@ function configureExpress(app) {
         parameterLimit: 1000
     }));
     
-    const uploadsRoot =
-        typeof process.env.UPLOADS_PATH === 'string' && process.env.UPLOADS_PATH.trim()
-            ? process.env.UPLOADS_PATH.trim()
-            : path.join(__dirname, '../../app', 'uploads');
-    if (!fs.existsSync(uploadsRoot)) {
-        try {
-            fs.mkdirSync(uploadsRoot, { recursive: true });
-        } catch {
-            // ignore
-        }
-    }
-
     // Static file serving - specific paths first
     app.use('/assets', express.static(path.join(__dirname, '../../app', 'assets')));
-    app.use('/uploads', express.static(uploadsRoot));
+    app.use('/uploads', express.static(path.join(__dirname, '../../app', 'uploads')));
     app.use('/js', express.static(path.join(__dirname, '../../app', 'js')));
     app.use('/components', express.static(path.join(__dirname, '../../app', 'components')));
     
     // Ensure chat images are served from the correct path
-    app.use('/uploads/chat_images', express.static(path.join(uploadsRoot, 'chat_images')));
+    app.use('/uploads/chat_images', express.static(path.join(__dirname, '../../app', 'uploads', 'chat_images')));
     
     // Catch-all static file serving - MUST be before routes
     app.use('/', express.static(path.join(__dirname, '../../app')));
