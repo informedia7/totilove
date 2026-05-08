@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>My Account | Security & Profile Hub</title>
+    <!-- Google Fonts + Font Awesome 6 -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f1f5f9 0%, #e8eef5 100%);
+            font-family: 'Inter', sans-serif;
+            padding: 2rem 1.5rem;
+            color: #0a2b3e;
+        }
+
+        .dashboard-container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* header */
+        .header-section {
+            margin-bottom: 2rem;
+        }
+
+        .header-section h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e3c72, #2b4c7c);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .subhead {
+            color: #4a627a;
+            margin-top: 6px;
+            font-size: 0.9rem;
+        }
+
+        /* main 2-column layout */
+        .account-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 1.8rem;
+        }
+
+        /* card style */
+        .card {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(2px);
+            border-radius: 28px;
+            box-shadow: 0 10px 25px -12px rgba(0, 0, 0, 0.08);
+            padding: 1.5rem 1.6rem;
+            transition: all 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #eef2f8;
+        }
+
+        .card-header i {
+            font-size: 1.5rem;
+            color: #1f6392;
+            background: #eef4fc;
+            padding: 10px;
+            border-radius: 18px;
+        }
+
+        .card-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #193e58;
+        }
+
+        /* verified badge row */
+        .verified-banner {
+            background: #e6f7ec;
+            border-left: 5px solid #2b8c4a;
+            padding: 0.9rem 1rem;
+            border-radius: 20px;
+            margin-bottom: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .verified-banner i {
+            font-size: 1.8rem;
+            color: #2b8c4a;
+        }
+
+        .verified-text {
+            font-weight: 700;
+            color: #1b6b3c;
+        }
+
+        .verified-email {
+            font-family: monospace;
+            font-weight: 500;
+            background: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+        }
+
+        /* password row */
+        .password-row {
+            background: #f8fafd;
+            border-radius: 20px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .info-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .btn-sm {
+            background: #eef2f9;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-sm-primary {
+            background: #1f6392;
+            color: white;
+        }
+
+        .btn-sm-primary:hover {
+            background: #0e4b72;
+        }
+
+        .btn-sm-outline {
+            border: 1px solid #cbdde9;
+            background: white;
+        }
+
+        .btn-sm-outline:hover {
+            background: #f1f7fd;
+        }
+
+        /* quick actions row */
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 1.2rem 0;
+        }
+
+        .action-chip {
+            background: #f4f8fe;
+            border-radius: 60px;
+            padding: 8px 18px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #e2ebf3;
+        }
+
+        .action-chip:hover {
+            background: #e6f0fa;
+            transform: scale(0.97);
+        }
+
+        .danger-chip {
+            background: #fff5f3;
+            color: #bc4e3a;
+            border-color: #fadbd4;
+        }
+
+        .danger-chip:hover {
+            background: #ffe8e3;
+        }
+
+        /* subscription pill */
+        .plan-badge {
+            display: inline-block;
+            background: #eef4fc;
+            padding: 5px 14px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            margin: 8px 0;
+        }
+
+        .price-tag {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #1e4a76;
+        }
+
+        hr {
+            margin: 1rem 0;
+            border: none;
+            border-top: 1px solid #e7edf4;
+        }
+
+        .support-link {
+            background: #f8fafd;
+            padding: 0.8rem;
+            border-radius: 20px;
+            text-align: center;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .support-link:hover {
+            background: #eef3fc;
+        }
+
+        /* delete alert */
+        .delete-warning {
+            background: #fff8f0;
+            border-radius: 20px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid #ffe1c6;
+            font-size: 0.8rem;
+        }
+
+        /* modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+        }
+
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-container {
+            background: white;
+            width: 90%;
+            max-width: 450px;
+            border-radius: 32px;
+            padding: 1.8rem;
+            box-shadow: 0 30px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-container h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-container input,
+        .modal-container select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 60px;
+            border: 1px solid #cbdde9;
+            margin: 12px 0;
+            font-family: inherit;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 1.5rem;
+        }
+
+        .toast-msg {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1f2f3c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 60px;
+            font-size: 0.85rem;
+            z-index: 1100;
+            opacity: 0;
+            transition: 0.2s;
+            pointer-events: none;
+        }
+
+        .toast-msg.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 780px) {
+            body {
+                padding: 1rem;
+            }
+
+            .account-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <div class="header-section">
+            <h1><i class="fas fa-user-shield"></i> Account Hub</h1>
+            <div class="subhead">Manage your identity, security, and subscription</div>
+        </div>
+
+        <div class="account-grid">
+            <!-- LEFT COLUMN: EMAIL VERIFIED + PASSWORD SECURITY + QUICK ACTIONS + PROFILE MGMT -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-envelope-circle-check"></i>
+                    <h2>Email & Security</h2>
+                </div>
+                <!-- Email Verified block -->
+                <div class="verified-banner">
+                    <i class="fas fa-badge-check"></i>
+                    <div>
+                        <div class="verified-text">Email Verified</div>
+                        <div>Your email address has been successfully verified!</div>
+                    </div>
+                </div>
+                <div
+                    style="background:#F4F9FE; border-radius: 60px; padding: 0.5rem 1rem; margin-bottom: 1rem; display: inline-block;">
+                    <i class="fas fa-at"></i> <strong id="displayUserEmail">barker@icq.com</strong>
+                </div>
+
+                <!-- Password Security -->
+                <div class="password-row">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <i class="fas fa-lock" style="color:#1f6392;"></i>
+                        <strong>Password Security</strong>
+                    </div>
+                    <div style="font-size: 0.85rem; color: #456e8b;">Keep your account secure by regularly updating your
+                        password.</div>
+                    <div class="info-line">
+                        <span><i class="fas fa-history"></i> Password <span id="lastChangedText">Last changed:
+                                Unknown</span></span>
+                        <button class="btn-sm btn-sm-primary" id="changePasswordBtn"><i class="fas fa-key"></i> Change
+                            Password</button>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card-header" style="margin-top: 0.5rem;">
+                    <i class="fas fa-bolt"></i>
+                    <h2>Quick Actions</h2>
+                </div>
+                <div class="quick-actions">
+                    <div class="action-chip" id="editProfileBtn"><i class="fas fa-user-pen"></i> Edit Profile</div>
+                    <div class="action-chip" id="pauseAccountBtn"><i class="fas fa-pause-circle"></i> Pause Account
+                    </div>
+                    <div class="action-chip" id="supportCenterBtn"><i class="fas fa-headset"></i> Support Center</div>
+                </div>
+
+                <!-- Support Center explicit area (Open Support Center) -->
+                <div class="support-link" id="openSupportFullBtn">
+                    <i class="fas fa-life-ring"></i> Open Support Center <span style="font-size:0.7rem;">→</span>
+                    <div style="font-size:0.7rem; margin-top:4px;">Contact support, report account issues, flag user
+                        problems, or send a feature request.</div>
+                </div>
+
+                <!-- Profile Management block -->
+                <div class="card-header" style="margin-top: 0.8rem;">
+                    <i class="fas fa-images"></i>
+                    <h2>Profile Management</h2>
+                </div>
+                <div class="quick-actions">
+                    <div class="action-chip" id="managePhotosBtn"><i class="fas fa-camera"></i> Manage Photos</div>
+                    <div class="action-chip" id="viewFullProfileBtn"><i class="fas fa-id-card"></i> View Full Profile
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Subscription Plan + Delete Profile -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-tag"></i>
+                    <h2>Subscription Plan</h2>
+                </div>
+                <div>
+                    <span class="plan-badge"><i class="fas fa-star"></i> Current Plan</span>
+                    <div style="font-size: 1.7rem; font-weight: 700; margin: 8px 0 0 0;">Free Plan</div>
+                    <div class="price-tag">FREE</div>
+                    <div style="margin: 8px 0 16px 0;">✓ Basic features included</div>
+                    <button class="btn-sm btn-sm-primary" id="manageBillingBtn"><i class="fas fa-credit-card"></i>
+                        Manage Billing & Subscription</button>
+                </div>
+
+                <hr>
+
+                <!-- DELETE PROFILE SECTION (exactly as required) -->
+                <div class="card-header">
+                    <i class="fas fa-trash-alt" style="color:#bc4e3a;"></i>
+                    <h2 style="color:#bc4e3a;">Delete Profile</h2>
+                </div>
+                <div style="font-size: 0.9rem; margin-bottom: 0.5rem;">
+                    Permanently remove your profile and all associated data.
+                </div>
+                <div class="delete-warning">
+                    <i class="fas fa-exclamation-triangle" style="color:#dc7a2c;"></i>
+                    <strong>⚠️ Permanently delete your account - This cannot be undone</strong>
+                </div>
+                <button class="action-chip danger-chip" id="deleteAccountFinalBtn"
+                    style="margin-top: 1rem; width: 100%; justify-content: center;">
+                    <i class="fas fa-trash-can"></i> Delete Account
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toastMsg" class="toast-msg">Action simulated</div>
+
+    <!-- MODAL: generic for mock interactions -->
+    <div id="genericModal" class="modal-overlay">
+        <div class="modal-container">
+            <h3 id="modalTitle">Modal Title</h3>
+            <div id="modalBody">
+                <p>Mock action content</p>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-sm btn-sm-outline" id="modalCloseBtn">Cancel</button>
+                <button class="btn-sm btn-sm-primary" id="modalConfirmBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const toast = document.getElementById('toastMsg');
+        const modal = document.getElementById('genericModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const modalClose = document.getElementById('modalCloseBtn');
+        const modalConfirm = document.getElementById('modalConfirmBtn');
+
+        let currentModalCallback = null;
+
+        function showToast(msg, duration = 2000) {
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), duration);
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            currentModalCallback = null;
+        }
+
+        function openModal(title, bodyHtml, onConfirm = null) {
+            modalTitle.innerText = title;
+            modalBody.innerHTML = bodyHtml;
+            modal.classList.add('active');
+            currentModalCallback = onConfirm;
+        }
+
+        modalClose.addEventListener('click', closeModal);
+        modalConfirm.addEventListener('click', () => {
+            if (currentModalCallback) currentModalCallback();
+            closeModal();
+        });
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        // Helper to update "last changed" display after password change
+        function updateLastChanged() {
+            const now = new Date();
+            const formatted = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            document.getElementById('lastChangedText').innerText = `Last changed: ${formatted}`;
+        }
+
+        // Email verified display (static uses barker@icq.com)
+        document.getElementById('displayUserEmail').innerText = 'barker@icq.com';
+
+        // 1. Change Password flow
+        document.getElementById('changePasswordBtn').addEventListener('click', () => {
+            openModal('Change Password', `
+      <p style="margin-bottom: 12px;">Enter new password (mock demo)</p>
+      <input type="password" id="mockNewPass" placeholder="New password" style="width:100%; padding:10px; border-radius:60px; border:1px solid #ccc;">
+      <input type="password" id="mockConfirmPass" placeholder="Confirm password" style="width:100%; margin-top:10px; padding:10px; border-radius:60px; border:1px solid #ccc;">
+    `, () => {
+                const newPass = document.getElementById('mockNewPass')?.value;
+                const confirm = document.getElementById('mockConfirmPass')?.value;
+                if (!newPass || newPass.length < 3) {
+                    showToast('Please enter a valid password (min 3 chars)');
+                    return;
+                }
+                if (newPass !== confirm) {
+                    showToast('Passwords do not match');
+                    return;
+                }
+                updateLastChanged();
+                showToast('Password updated successfully! (mock)');
+            });
+        });
+
+        // 2. Edit Profile (Quick Action)
+        document.getElementById('editProfileBtn').addEventListener('click', () => {
+            openModal('Edit Profile', `
+      <label>Full Name</label>
+      <input type="text" id="editName" placeholder="Alex Barker" value="Alex Barker">
+      <label style="margin-top:12px;">Bio</label>
+      <textarea rows="2" id="editBio" placeholder="Short bio" style="border-radius:16px; padding:10px; width:100%; border:1px solid #ccc;">Music lover & creator</textarea>
+    `, () => {
+                const newName = document.getElementById('editName')?.value || 'Alex Barker';
+                showToast(`Profile updated: ${newName} (mock saved)`);
+            });
+        });
+
+        // 3. Pause Account
+        document.getElementById('pauseAccountBtn').addEventListener('click', () => {
+            openModal('Pause Account', `
+      <p>Your account will be temporarily paused. You can reactivate anytime.</p>
+      <div style="background:#fff0db; padding:12px; border-radius:20px; margin-top:12px;">
+        <i class="fas fa-info-circle"></i> While paused, you won't receive notifications.
+      </div>
+    `, () => {
+                showToast('Account paused (mock). Reactivate from settings.');
+            });
+        });
+
+        // 4. Support Center (full open)
+        document.getElementById('supportCenterBtn').addEventListener('click', () => {
+            openModal('Support Center', `
+      <div><i class="fas fa-envelope"></i> <strong>Contact support</strong><br>support@mockaccount.com</div>
+      <div style="margin-top:12px;"><i class="fas fa-flag"></i> <strong>Report issue / flag user</strong><br>Submit a ticket with details.</div>
+      <div style="margin-top:12px;"><i class="fas fa-lightbulb"></i> <strong>Feature request</strong><br>We love feedback.</div>
+    `, () => {
+                showToast('Support request sent (demo simulation)');
+            });
+        });
+        document.getElementById('openSupportFullBtn').addEventListener('click', () => {
+            openModal('Support Center - Full', `
+      <i class="fas fa-headset"></i> <strong>24/7 Mock Support</strong><br><br>
+      • <strong>Report account issues</strong> – Describe the problem<br>
+      • <strong>Flag user problems</strong> – Provide user ID<br>
+      • <strong>Feature request</strong> – Suggest improvements<br><br>
+      <div style="background:#eef4fc; border-radius:20px; padding:10px;">📧 Email: help@mockaccounthub.com</div>
+    `, () => {
+                showToast('Ticket opened (mock)');
+            });
+        });
+
+        // 5. Manage Photos
+        document.getElementById('managePhotosBtn').addEventListener('click', () => {
+            openModal('Manage Photos', `
+      <p>📸 Your photo gallery (simulated)</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin:12px 0;">
+        <div style="background:#eef2f8; border-radius:20px; padding:10px; text-align:center; width:70px;"><i class="fas fa-image fa-2x"></i><br>pic1</div>
+        <div style="background:#eef2f8; border-radius:20px; padding:10px; text-align:center; width:70px;"><i class="fas fa-image fa-2x"></i><br>pic2</div>
+      </div>
+      <button id="mockUploadBtn" class="btn-sm btn-sm-primary" style="margin-top:5px;">Upload New Photo</button>
+    `, () => {
+                const uploadBtn = document.getElementById('mockUploadBtn');
+                if (uploadBtn) uploadBtn.onclick = () => showToast('Mock upload started (demo)');
+                else showToast('Photo management updated');
+            });
+            // small hack to attach event if modal already open? we attach inside callback but also we can re-trigger.
+            setTimeout(() => {
+                const upBtn = document.getElementById('mockUploadBtn');
+                if (upBtn) upBtn.onclick = () => showToast('Upload photo (demo)');
+            }, 50);
+        });
+
+        // 6. View Full Profile
+        document.getElementById('viewFullProfileBtn').addEventListener('click', () => {
+            openModal('Complete Profile', `
+      <p><strong>Name:</strong> Alex Barker</p>
+      <p><strong>Email:</strong> barker@icq.com <span style="background:#e1f7ec; padding:2px 8px; border-radius:20px;">verified</span></p>
+      <p><strong>Member since:</strong> Jan 2024</p>
+      <p><strong>Location:</strong> New York, USA</p>
+      <hr>
+      <p><i class="fas fa-shield-alt"></i> 2FA Disabled (mock)</p>
+    `, () => showToast('Full profile viewed'));
+        });
+
+        // 7. Manage Billing & Subscription
+        document.getElementById('manageBillingBtn').addEventListener('click', () => {
+            openModal('Billing & Subscription', `
+      <div><strong>Current Plan:</strong> Free Plan</div>
+      <div style="margin:12px 0;"><strong>Upgrade options:</strong> Premium $9.99/mo • Pro $19.99/mo</div>
+      <div class="action-chip" id="upgradeMockBtn" style="background:#1f6392; color:white; text-align:center;">Upgrade to Premium</div>
+    `, () => {
+                showToast('Subscription updated (mock upgrade)');
+            });
+            setTimeout(() => {
+                const upgrade = document.getElementById('upgradeMockBtn');
+                if (upgrade) upgrade.onclick = () => showToast('Premium plan activated (demo)');
+            }, 50);
+        });
+
+        // 8. DELETE ACCOUNT final button (with warning)
+        document.getElementById('deleteAccountFinalBtn').addEventListener('click', () => {
+            openModal('Delete Account - Permanent', `
+      <div style="background:#fff0f0; padding:15px; border-radius:24px; margin-bottom:15px;">
+        <i class="fas fa-skull-crosswalk" style="color:#bc4e3a;"></i> 
+        <strong>⚠️ This action is irreversible.</strong><br>
+        All your data, photos, and profile will be wiped.
+      </div>
+      <label>Type <strong>DELETE</strong> to confirm:</label>
+      <input type="text" id="confirmDeleteInput" placeholder="DELETE" style="margin-top:8px;">
+    `, () => {
+                const confirmation = document.getElementById('confirmDeleteInput')?.value;
+                if (confirmation === 'DELETE') {
+                    showToast('Account permanently deleted (demo simulation). Redirecting...');
+                    setTimeout(() => {
+                        alert('[MOCK] Your account would have been deleted. This is a demo environment.');
+                    }, 300);
+                } else {
+                    showToast('Confirmation failed. Please type DELETE exactly.');
+                }
+            });
+        });
+
+        // Additional requirement: "Password Last changed: Unknown" initially but after change updates
+        // We also need to simulate unknown as default.
+        // Also "Change Password" functionality triggers updateLastChanged effectively.
+
+        // Quick email display ensures barker@icq.com
+        // Emulate the "Email Verified" block already present in UI.
+
+        // Optional: Pause modal extra actions
+        // For consistency, all modals are mock but they cover exactly the required features:
+        // - Email Verified ✔
+        // - barker@icq.com ✔
+        // - Password Security section with Last changed and Change Password ✔
+        // - Quick Actions (Edit Profile, Pause Account, Support Center) ✔
+        // - Support Center open with full detail ✔
+        // - Profile Management: Manage Photos / View Full Profile ✔
+        // - Subscription Plan: Free Plan + Manage Billing ✔
+        // - Delete Profile with permanent warning ✔
+        // - "⚠️ Permanently delete your account - This cannot be undone" ✔
+
+        // Also support center quick link text includes "Contact support, report account issues, flag user problems, or send a feature request"
+        // already inside support-link div.
+
+        // Add some extra easter egg: make "Last changed: Unknown" stay until password change works.
+        // finished.
+        console.log('Account management page ready');
+    </script>
+</body>
+
+</html>

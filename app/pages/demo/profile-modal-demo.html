@@ -1,0 +1,442 @@
+<!-- USER PROFILE MODAL – FULLY UPDATED ALL-IN-ONE -->
+<link rel="stylesheet" href="/assets/css/vendor/font-awesome.min.css">
+
+<div id="userProfileModal" class="profile-modal" style="display:block">
+  <div class="profile-modal-content">
+
+    <!-- Controls -->
+    <button class="dark-toggle" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+    <button class="close-profile-modal" onclick="closeProfileModal()">&times;</button>
+
+    <!-- Skeleton -->
+    <div id="modal-loading" class="loading">
+      <i class="fas fa-spinner fa-spin fa-2x"></i>
+      <p>Loading profile…</p>
+    </div>
+
+    <!-- CONTENT -->
+    <div id="modal-profile-content">
+
+      <!-- HEADER -->
+      <div class="profile-header">
+        <img class="profile-avatar" src="https://picsum.photos/200">
+        <div>
+          <h2 id="modal-profile-real_name">
+            Sophie, 27
+            <span class="badge">💎 Premium</span>
+          </h2>
+
+          <div class="profile-meta">
+            <span><i class="fas fa-map-marker-alt"></i> Sydney • 3km</span>
+            <span><i class="fas fa-birthday-cake"></i> 27</span>
+          </div>
+
+          <div class="status">
+            <span class="dot"></span> Active now
+          </div>
+        </div>
+      </div>
+
+      <!-- GRID -->
+      <div class="profile-grid">
+
+        <!-- BASIC -->
+        <div class="card">
+          <h3><i class="fas fa-user"></i> Basic Info</h3>
+          <p>Joined: Jan 2024</p>
+        </div>
+
+        <!-- ABOUT -->
+        <div class="card">
+          <h3><i class="fas fa-briefcase"></i> About</h3>
+          <p>Love travel, coffee dates and deep conversations ☕✈️</p>
+        </div>
+
+        <!-- INTERESTS -->
+        <div class="card">
+          <h3><i class="fas fa-star"></i> Interests</h3>
+          <div class="tags">
+            <span>Travel</span>
+            <span>Music</span>
+            <span>Fitness</span>
+          </div>
+        </div>
+
+        <!-- PHOTOS -->
+        <div class="card">
+          <h3><i class="fas fa-images"></i> Photos</h3>
+          <div class="photos">
+            <img src="https://picsum.photos/300?1">
+            <img src="https://picsum.photos/300?2">
+            <img src="https://picsum.photos/300?3">
+          </div>
+        </div>
+
+        <!-- VIDEO -->
+        <div class="card">
+          <h3><i class="fas fa-video"></i> Video Intro</h3>
+          <video controls width="100%" style="border-radius:12px">
+            <source src="https://www.w3schools.com/html/mov_bbb.mp4">
+          </video>
+        </div>
+
+        <!-- AI MATCH -->
+        <div class="card">
+          <h3><i class="fas fa-brain"></i> Compatibility</h3>
+          <p>🧠 Match Score: <b>89%</b></p>
+          <ul>
+            <li>❤️ Shared interests</li>
+            <li>📍 Close distance</li>
+            <li>💬 Communication style</li>
+          </ul>
+        </div>
+
+        <!-- MAP -->
+        <div class="card">
+          <h3><i class="fas fa-map"></i> Location</h3>
+          <div class="map-box">📍 Within 5 km</div>
+        </div>
+
+        <!-- ANALYTICS -->
+        <div class="card">
+          <h3><i class="fas fa-eye"></i> Profile Views</h3>
+          <p>Viewed <b id="views">12</b> times today</p>
+        </div>
+
+        <!-- PRIVACY -->
+        <div class="card">
+          <h3><i class="fas fa-user-shield"></i> Privacy</h3>
+          <label>
+            <input type="checkbox" onchange="toggleGhost(this)">
+            Ghost mode
+          </label>
+        </div>
+
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="actions">
+        <button class="btn like" onclick="likeProfile()"><i class="fas fa-heart"></i> Like</button>
+        <button class="btn fav" onclick="superLike()"><i class="fas fa-star"></i> Super Like</button>
+        <button class="btn msg"><i class="fas fa-paper-plane"></i> Message</button>
+        <button class="btn block" onclick="blockUser()">Block</button>
+        <button class="btn report" onclick="reportUser()">Report</button>
+      </div>
+
+      <!-- BOOST -->
+      <button class="boost-btn" onclick="boost()">⚡ Boost Profile</button>
+
+    </div>
+  </div>
+</div>
+
+<style>
+/* --- styles trimmed for clarity, identical to previous response --- */
+.badge{background:gold;padding:.2rem .6rem;border-radius:10px;font-size:.7rem}
+.map-box{background:#eef2ff;padding:.6rem;border-radius:10px}
+.boost-btn{margin:1rem auto;display:block;background:linear-gradient(90deg,#a855f7,#ec4899);color:#fff;padding:.6rem 1.2rem;border:none;border-radius:30px}
+</style>
+
+<script>
+let likes = 5;
+
+function likeProfile(){
+  if(likes<=0){alert("Upgrade to Premium 💎");return;}
+  likes--; notify("🔥 It's a match!");
+}
+function superLike(){notify("⭐ Super Like sent");}
+function boost(){alert("🚀 Boost active for 30 minutes");}
+function toggleGhost(el){alert(el.checked?"👻 Invisible":"🟢 Visible");}
+function reportUser(){alert("🚨 Reported");}
+function blockUser(){alert("⛔ Blocked");}
+function notify(msg){
+  if(Notification.permission==="granted") new Notification(msg);
+  else Notification.requestPermission();
+}
+function toggleDarkMode(){
+  document.getElementById("userProfileModal").classList.toggle("dark");
+}
+function closeProfileModal(){
+  document.getElementById("userProfileModal").style.display="none";
+}
+</script>
+<style>
+    :root {
+        --primary: #667eea;
+        --secondary: #764ba2;
+        --danger-color: #e74c3c;
+        --success-color: #00b894;
+    }
+    
+    /* ===== MODAL ===== */
+    .profile-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.75);
+        display: none;
+        padding: 1.5rem;
+        z-index: 10000;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    
+    .profile-modal.dark {
+        background: rgba(0,0,0,.9);
+    }
+    
+    .profile-modal-content {
+        max-width: 1100px;
+        margin: auto;
+        background: #fff;
+        border-radius: 22px;
+        padding: 2rem;
+        position: relative;
+        box-sizing: border-box;
+    }
+    
+    .profile-modal.dark .profile-modal-content {
+        background: #121212;
+        color: #eee;
+    }
+    
+    /* ===== HEADER ===== */
+    .close-profile-modal {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 2rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #999;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s;
+    }
+    
+    .close-profile-modal:hover {
+        background: #f0f0f0;
+        color: #333;
+    }
+    
+    .profile-modal.dark .close-profile-modal {
+        color: #aaa;
+    }
+    
+    .profile-modal.dark .close-profile-modal:hover {
+        background: #2a2a2a;
+        color: #fff;
+    }
+    
+    .dark-toggle {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background: none;
+        border: none;
+        font-size: 1.4rem;
+        cursor: pointer;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s;
+        color: #666;
+    }
+    
+    .dark-toggle:hover {
+        background: #f0f0f0;
+    }
+    
+    .profile-modal.dark .dark-toggle {
+        color: #aaa;
+    }
+    
+    .profile-modal.dark .dark-toggle:hover {
+        background: #2a2a2a;
+    }
+    
+    .profile-header {
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .profile-modal.dark .profile-header {
+        border-bottom-color: #333;
+    }
+    
+    .profile-avatar {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 8px 20px rgba(0,0,0,.2);
+        flex-shrink: 0;
+    }
+    
+    .profile-meta {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        font-size: .9rem;
+        color: #777;
+        margin-top: 0.5rem;
+    }
+    
+    .profile-modal.dark .profile-meta {
+        color: #aaa;
+    }
+    
+    .status {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        margin-top: .4rem;
+        font-size: .75rem;
+    }
+    
+    .dot {
+        width: 8px;
+        height: 8px;
+        background: #00b894;
+        border-radius: 50%;
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(0,184,148,.6); }
+        70% { box-shadow: 0 0 0 8px rgba(0,184,148,0); }
+        100% { box-shadow: 0 0 0 0 rgba(0,184,148,0); }
+    }
+    
+    /* ===== GRID ===== */
+    .profile-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .card {
+        background: #f9fafb;
+        border-radius: 16px;
+        padding: 1.3rem;
+    }
+    
+    .profile-modal.dark .card {
+        background: #1c1c1c;
+    }
+    
+    .card h3 {
+        margin-bottom: .8rem;
+        font-size: 1rem;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* ===== TAGS ===== */
+    .tags {
+        display: flex;
+        gap: .4rem;
+        flex-wrap: wrap;
+    }
+    
+    .tags span {
+        background: linear-gradient(90deg,var(--primary),#764ba2);
+        color: #fff;
+        padding: .3rem .8rem;
+        border-radius: 20px;
+        font-size: .75rem;
+    }
+    
+    /* ===== PHOTOS ===== */
+    .photos {
+        display: grid;
+        grid-template-columns: repeat(auto-fill,minmax(130px,1fr));
+        gap: .8rem;
+    }
+    
+    .photos img {
+        width: 100%;
+        height: 140px;
+        object-fit: cover;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: transform 0.3s;
+    }
+    
+    .photos img:hover {
+        transform: scale(1.05);
+    }
+    
+    /* ===== ACTIONS ===== */
+    .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .6rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .btn {
+        padding: .6rem 1.4rem;
+        border-radius: 30px;
+        border: none;
+        font-size: .8rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    
+    .like { background: linear-gradient(90deg,#e74c3c,#c44569); color:#fff; }
+    .fav { background: linear-gradient(90deg,#f39c12,#e67e22); color:#fff; }
+    .msg { background: linear-gradient(90deg,#667eea,#5a6fd8); color:#fff; }
+    .block { background: #f5f6fa; color: #d63031; border: 2px solid #d63031; }
+    .report { background: #f5f6fa; color: #e74c3c; border: 2px solid #e74c3c; }
+    
+    .profile-modal.dark .block,
+    .profile-modal.dark .report {
+        background: #2a2a2a;
+    }
+    
+    .badge{background:gold;padding:.2rem .6rem;border-radius:10px;font-size:.7rem}
+    .map-box{background:#eef2ff;padding:.6rem;border-radius:10px}
+    .boost-btn{margin:1rem auto;display:block;background:linear-gradient(90deg,#a855f7,#ec4899);color:#fff;padding:.6rem 1.2rem;border:none;border-radius:30px}
+    
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+        .profile-modal { padding: 1rem; }
+        .profile-modal-content { padding: 1.5rem; }
+        .profile-header { flex-direction: column; text-align: center; }
+        .profile-grid { grid-template-columns: 1fr; }
+        .actions { flex-direction: column; }
+        .btn { width: 100%; justify-content: center; }
+    }
+    
+    @media (max-width: 480px) {
+        .profile-modal { padding: 0.5rem; }
+        .profile-modal-content { padding: 1rem; border-radius: 16px; }
+        .dark-toggle, .close-profile-modal { width: 32px; height: 32px; font-size: 1.5rem; }
+    }
+    </style>
+    

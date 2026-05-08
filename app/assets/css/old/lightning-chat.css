@@ -1,0 +1,133 @@
+/* Lightning-Fast Message Status Styles */
+.message-item {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.message-item.sending {
+    opacity: 0.7;
+    background-color: #f8f9fa;
+}
+
+.message-item.sending::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background: linear-gradient(45deg, #ffc107, #fd7e14);
+    animation: pulse 1s ease-in-out infinite;
+}
+
+.message-item.error {
+    background-color: #fff5f5;
+    border-left: 3px solid #dc3545;
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.sender {
+    font-weight: bold;
+    color: #495057;
+}
+
+.timestamp {
+    font-size: 0.85em;
+    color: #6c757d;
+}
+
+.status {
+    font-size: 0.75em;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.status.sending {
+    background-color: #fff3cd;
+    color: #856404;
+    animation: blink 1s ease-in-out infinite;
+}
+
+.status.sent {
+    background-color: #d1edff;
+    color: #0c5460;
+}
+
+.status.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.message-content {
+    color: #212529;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+/* Animations for instant feedback */
+@keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+/* Lightning fast transition for new messages */
+.message-item {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Performance indicator */
+.performance-stats {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 0.8em;
+    z-index: 1000;
+}
+
+.lightning-indicator {
+    position: relative;
+}
+
+.lightning-indicator::after {
+    content: '⚡';
+    position: absolute;
+    top: -5px;
+    right: -15px;
+    font-size: 12px;
+    animation: lightning 0.5s ease-in-out;
+}
+
+@keyframes lightning {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.8; }
+}
