@@ -312,6 +312,9 @@ if (cluster.isMaster && process.env.NODE_ENV === 'production') {
     server.init().then(() => {
         server.start();
     }).catch(error => {
+        // Ensure the full stack is visible in Railway logs even if structured meta is truncated.
+        console.error('Failed to initialize server (raw error follows)');
+        console.error(error);
         logger.error('Failed to initialize server', { err: error.message, stack: error.stack });
         process.exit(1);
     });
