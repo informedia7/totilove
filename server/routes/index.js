@@ -91,15 +91,8 @@ function setupRoutes(app, dependencies) {
     const templateRoutes = new TemplateRoutes(controllers.templateController, authMiddleware);
     const matchesRoutes = new MatchesRoutes(controllers.matchesController, authMiddleware);
 
-    // Admin routes (optional). Some deployments don't include the old admin app path.
-    // Don't fail boot if admin routes aren't present.
-    let adminRoutes = null;
-    try {
-        adminRoutes = require('../../admin/routes/adminRoutes');
-    } catch (e) {
-        // ignore missing optional admin routes
-        adminRoutes = null;
-    }
+    // Admin routes
+    const adminRoutes = require('../../admin/routes/adminRoutes');
 
     // Mount routes - ORDER MATTERS!
     // Mount message routes BEFORE authRoutes to ensure messageCountLimiter is applied first
@@ -111,9 +104,7 @@ function setupRoutes(app, dependencies) {
     // Mount other routes
     app.use('/api/matches', matchesRoutes.getRouter());
     app.use('/api/stats', matchesRoutes.setupStatsRoutes());
-    if (adminRoutes) {
-        app.use('/admin', adminRoutes);
-    }
+    app.use('/admin', adminRoutes);
     setupSearchRoutes(app, controllers.searchController);
     setupMonitoringRoutes(app, monitoringUtils, { db, redis });
     setupStateRoutes(app, { stateService, authMiddleware });
