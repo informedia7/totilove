@@ -70,7 +70,19 @@ function createPageRoutes(templateController, authMiddleware) {
             if (fs.existsSync(loginPath)) {
                 res.sendFile(loginPath);
             } else {
-                res.redirect('/login');
+                // Avoid redirect loops if the file isn't present in this deployment.
+                res.status(200).type('html').send(
+                    [
+                        '<!doctype html>',
+                        '<html><head><meta charset="utf-8"><title>Login</title></head>',
+                        '<body style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 24px;">',
+                        '<h1>Login</h1>',
+                        '<p>The static login page is missing in this deployment.</p>',
+                        '<p>API is online. Use <code>/api/auth/check-session</code> or deploy the frontend pages.</p>',
+                        '<p><a href="/register">Go to register</a></p>',
+                        '</body></html>'
+                    ].join('')
+                );
             }
         } catch (error) {
             res.status(500).send('<h1>Login page not available</h1>');
@@ -86,7 +98,19 @@ function createPageRoutes(templateController, authMiddleware) {
             if (fs.existsSync(registerPath)) {
                 res.sendFile(registerPath);
             } else {
-                res.redirect('/register');
+                // Avoid redirect loops if the file isn't present in this deployment.
+                res.status(200).type('html').send(
+                    [
+                        '<!doctype html>',
+                        '<html><head><meta charset="utf-8"><title>Register</title></head>',
+                        '<body style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 24px;">',
+                        '<h1>Register</h1>',
+                        '<p>The static register page is missing in this deployment.</p>',
+                        '<p>API is online. Use <code>POST /register</code> to create an account.</p>',
+                        '<p><a href="/login">Go to login</a></p>',
+                        '</body></html>'
+                    ].join('')
+                );
             }
         } catch (error) {
             res.status(500).send('<h1>Register page not available</h1>');
