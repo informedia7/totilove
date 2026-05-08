@@ -409,7 +409,7 @@ function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
 
     // Require authentication for all image routes
     if (authMiddleware) {
-        router.use(requireAuth(authMiddleware));
+        router.use('/api', requireAuth(authMiddleware));
     }
 
     // Create multer instance

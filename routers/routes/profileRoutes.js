@@ -31,7 +31,7 @@ function createProfileRoutes(authController, authMiddleware, io = null, redis = 
 
     // Require authentication
     if (authMiddleware) {
-        router.use(requireAuth(authMiddleware));
+        router.use('/api', requireAuth(authMiddleware));
     }
 
     /**

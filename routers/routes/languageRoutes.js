@@ -29,7 +29,7 @@ function createLanguageRoutes(db, authMiddleware) {
 
     // Require authentication for all language routes
     if (authMiddleware) {
-        router.use(requireAuth(authMiddleware));
+        router.use('/api', requireAuth(authMiddleware));
     }
 
     /**

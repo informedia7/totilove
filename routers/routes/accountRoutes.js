@@ -139,7 +139,7 @@ function createAccountRoutes(authController, authMiddleware) {
 
     // Require authentication for all account routes
     if (authMiddleware) {
-        router.use(requireAuth(authMiddleware));
+        router.use('/api', requireAuth(authMiddleware));
     }
 
     /**
