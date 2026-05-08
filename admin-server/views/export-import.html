@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Export/Import - Totilove Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        /* ── Tab nav ── */
+        .tab-nav { display: flex; gap: 4px; border-bottom: 2px solid #e0e0e0; margin-bottom: 28px; }
+        .tab-btn {
+            padding: 10px 22px; border: none; background: none; cursor: pointer;
+            font-size: 14px; font-weight: 500; color: #666; border-bottom: 3px solid transparent;
+            margin-bottom: -2px; transition: color .15s, border-color .15s;
+        }
+        .tab-btn.active { color: #667eea; border-bottom-color: #667eea; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ── Folder tree ── */
+        .folder-card {
+            background: #fff; border: 1px solid #e0e0e0; border-radius: 10px;
+            padding: 20px; margin-bottom: 16px; transition: box-shadow .15s;
+        }
+        .folder-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+        .folder-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+        .folder-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .folder-meta { display: flex; gap: 16px; font-size: 13px; color: #666; flex-wrap: wrap; }
+        .folder-meta span { display: flex; align-items: center; gap: 4px; }
+        .badge {
+            display: inline-block; padding: 2px 8px; border-radius: 12px;
+            font-size: 11px; font-weight: 600;
+        }
+        .badge-blue { background: #e8f0fe; color: #3c67d6; }
+        .badge-green { background: #e8f5e9; color: #2e7d32; }
+        .badge-gray { background: #f0f0f0; color: #555; }
+
+        /* subfolder rows */
+        .subfolder-list { margin-top: 14px; border-top: 1px solid #f0f0f0; padding-top: 10px; }
+        .subfolder-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 10px; border-radius: 6px; flex-wrap: wrap; gap: 8px;
+        }
+        .subfolder-row:hover { background: #f8f9ff; }
+        .subfolder-row-left { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+        .subfolder-row-right { display: flex; align-items: center; gap: 10px; font-size: 12px; color: #666; }
+        .folder-toggle {
+            width: 20px; height: 20px; border: 1px solid #aeb9e3; border-radius: 4px;
+            background: #fff; color: #3c67d6; font-size: 13px; font-weight: 700;
+            line-height: 18px; cursor: pointer; padding: 0;
+        }
+        .folder-toggle:hover { background: #eef3ff; }
+        .folder-toggle-placeholder {
+            display: inline-block; width: 20px; height: 20px;
+        }
+        .folder-children.collapsed { display: none; }
+
+        /* scan state */
+        .scan-placeholder {
+            text-align: center; padding: 40px 20px; color: #888;
+            border: 2px dashed #d0d0d0; border-radius: 10px;
+        }
+        .spinner {
+            display: inline-block; width: 20px; height: 20px;
+            border: 3px solid #d0d0d0; border-top-color: #667eea;
+            border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* download progress */
+        .dl-progress {
+            display: none; background: #e8f0fe; border: 1px solid #c5d5f8;
+            border-radius: 8px; padding: 12px 16px; margin-top: 12px;
+            font-size: 13px; color: #3c67d6; align-items: center; gap: 10px;
+        }
+        .dl-progress.show { display: flex; }
+
+        /* status msg */
+        .status-message.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .status-message.warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+
+        /* summary stats row */
+        .stats-row {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px; margin-bottom: 20px;
+        }
+        .stat-box {
+            background: #f8f9ff; border: 1px solid #e0e8ff; border-radius: 8px;
+            padding: 14px 16px; text-align: center;
+        }
+        .stat-box .stat-val { font-size: 22px; font-weight: 700; color: #3c67d6; }
+        .stat-box .stat-lbl { font-size: 12px; color: #666; margin-top: 2px; }
+
+        .btn-sm { padding: 5px 12px; font-size: 12px; }
+        .btn-outline {
+            background: none; border: 1px solid #667eea; color: #667eea;
+            border-radius: 5px; cursor: pointer; font-size: 12px; padding: 5px 12px;
+            transition: background .15s, color .15s;
+        }
+        .btn-outline:hover { background: #667eea; color: #fff; }
+
+        /* last-modified chip */
+        .time-chip { font-size: 11px; color: #888; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none;">← Back to Dashboard</a>
+                <form method="POST" action="/logout" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+            <h1>📦 Export / Import</h1>
+            <p>Export user data, media uploads, or import users in bulk</p>
+        </div>
+
+        <div class="content">
+            <!-- Tab navigation -->
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="switchTab('uploads')">🖼️ Uploads Folder</button>
+                <button class="tab-btn" onclick="switchTab('data')">📊 Data Export</button>
+                <button class="tab-btn" onclick="switchTab('import')">📥 Import Users</button>
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════
+                 TAB 1 — Uploads Folder
+            ══════════════════════════════════════════════════════ -->
+            <div class="tab-panel active" id="tab-uploads">
+
+                <!-- Top action bar -->
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+                    <div>
+                        <h2 style="margin:0;">🖼️ Uploads Folder</h2>
+                        <p style="margin:4px 0 0; font-size:13px; color:#666;">Scan to inspect contents, then download a full or partial ZIP.</p>
+                    </div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <button class="btn btn-secondary btn-sm" id="scanBtn" onclick="scanUploads()">🔍 Scan Folder</button>
+                        <button class="btn btn-primary btn-sm" id="dlAllBtn" onclick="downloadUploads(null)" disabled>⬇ Download All ZIP</button>
+                    </div>
+                </div>
+
+                <!-- Download progress bar -->
+                <div class="dl-progress" id="dlProgress">
+                    <span class="spinner"></span>
+                    <span id="dlProgressText">Preparing ZIP — this may take a while for large folders…</span>
+                </div>
+
+                <!-- Scan result area -->
+                <div id="uploadsPanel">
+                    <div class="scan-placeholder" id="scanPlaceholder">
+                        Click <strong>Scan Folder</strong> to inspect the uploads directory on the server.
+                    </div>
+                </div>
+
+                <div class="status-message" id="uploadsStatus" style="margin-top:14px;"></div>
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════
+                 TAB 2 — Data Export
+            ══════════════════════════════════════════════════════ -->
+            <div class="tab-panel" id="tab-data">
+                <h2>📤 Export Data</h2>
+
+                <div class="filters-panel" style="margin-bottom: 20px;">
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label>Export Type</label>
+                            <select id="exportType">
+                                <option value="users">Users</option>
+                                <option value="payments">Payments</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Format</label>
+                            <select id="exportFormat">
+                                <option value="csv">CSV</option>
+                                <option value="json">JSON</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Search</label>
+                            <input type="text" id="exportSearch" placeholder="Search by username or email...">
+                        </div>
+                        <div class="filter-group">
+                            <label>Status</label>
+                            <select id="exportStatus">
+                                <option value="">All</option>
+                                <option value="active">Active</option>
+                                <option value="suspended">Suspended</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="export-options">
+                    <div class="export-option">
+                        <input type="radio" name="exportScope" id="exportAll" value="all" checked>
+                        <label for="exportAll">Export All</label>
+                        <p style="font-size: 12px; color: #666; margin-top: 4px;">Export all matching records</p>
+                    </div>
+                    <div class="export-option">
+                        <input type="radio" name="exportScope" id="exportFiltered" value="filtered">
+                        <label for="exportFiltered">Export Filtered</label>
+                        <p style="font-size: 12px; color: #666; margin-top: 4px;">Export based on current filters</p>
+                    </div>
+                    <div class="export-option">
+                        <input type="radio" name="exportScope" id="exportSelected" value="selected">
+                        <label for="exportSelected">Export Selected</label>
+                        <p style="font-size: 12px; color: #666; margin-top: 4px;">Export selected user IDs (comma-separated)</p>
+                    </div>
+                </div>
+
+                <div class="filter-group" id="selectedIdsGroup" style="display: none; margin-top: 16px;">
+                    <label>User IDs (comma-separated)</label>
+                    <input type="text" id="selectedUserIds" placeholder="e.g., 1,2,3,4,5">
+                </div>
+
+                <button class="btn btn-primary" onclick="exportData()" style="margin-top: 20px;">Export Data</button>
+                <div class="status-message" id="exportStatus2" style="margin-top:14px;"></div>
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════
+                 TAB 3 — Import Users
+            ══════════════════════════════════════════════════════ -->
+            <div class="tab-panel" id="tab-import">
+                <h2>📥 Import Users</h2>
+
+                <div class="filter-group" style="margin-bottom: 16px;">
+                    <label>Import Format</label>
+                    <select id="importFormat">
+                        <option value="json">JSON</option>
+                        <option value="csv">CSV</option>
+                    </select>
+                </div>
+
+                <div class="file-upload-area" id="fileUploadArea" onclick="document.getElementById('fileInput').click()">
+                    <input type="file" id="fileInput" accept=".json,.csv" onchange="handleFileSelect(event)">
+                    <p>📁 Click to select file or drag and drop</p>
+                    <p style="font-size: 12px; color: #666; margin-top: 8px;">Supports JSON and CSV files</p>
+                </div>
+
+                <div class="file-info" id="fileInfo"></div>
+                <div class="import-preview" id="importPreview" style="display: none;"></div>
+                <div class="status-message" id="importStatus"></div>
+                <button class="btn btn-primary" onclick="importData()" id="importButton" style="margin-top: 20px; display: none;">Import Users</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/notifications.js"></script>
+    <script src="/js/admin-export-import.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

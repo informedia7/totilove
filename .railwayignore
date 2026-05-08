@@ -1,0 +1,12 @@
+# Exclude oversized assets and local-only tooling from Railway uploads
+19_01_2026.sql
+backups/
+database-backups/
+migration-backups/
+migration-tool/
+downloads/
+admin/
+admin-server/
+docs/
+scripts/
+testing/

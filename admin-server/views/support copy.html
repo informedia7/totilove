@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Inbox - Totilove Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .help-page {
+            font-family: "Inter", sans-serif;
+            padding: 0.25rem;
+            color: #d8e4f5;
+            --help-border: rgba(158, 178, 208, 0.2);
+            --help-text-main: #d8e4f5;
+            --help-text-muted: #8da2bf;
+            --help-success: #3ebd7a;
+            --help-danger: #ff6b6b;
+        }
+
+        .help-page * {
+            box-sizing: border-box;
+        }
+
+        .help-page .support-container {
+            width: 100%;
+            min-height: 82vh;
+            background: linear-gradient(165deg, rgba(14, 23, 37, 0.97) 0%, rgba(10, 16, 29, 0.98) 100%);
+            border-radius: 2rem;
+            box-shadow: 0 30px 50px -16px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(124, 152, 194, 0.18);
+            display: flex;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        .help-page .support-sidebar {
+            width: 300px;
+            background: linear-gradient(180deg, #101b2d 0%, #0e1727 100%);
+            border-right: 1px solid var(--help-border);
+            padding: 22px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .help-page .brand h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #c5d8f3, #8fb4dc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin: 0;
+        }
+
+        .help-page .status-card {
+            background: #152238;
+            border-radius: 1rem;
+            padding: 14px;
+            border: 1px solid var(--help-border);
+        }
+
+        .help-page .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(62, 189, 122, 0.2);
+            color: #98e5ba;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .help-page .status-card p {
+            margin: 10px 0 0;
+            font-size: 0.8rem;
+            color: var(--help-text-muted);
+        }
+
+        .help-page .quick-stats {
+            background: #131f33;
+            border-radius: 1rem;
+            padding: 14px;
+            border: 1px solid var(--help-border);
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .help-page .quick-stats h4 {
+            margin: 0;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            color: #9bb1cd;
+        }
+
+        .help-page .insights-summary {
+            display: flex;
+            gap: 8px;
+            margin: 12px 0;
+        }
+
+        .help-page .insight-chip {
+            flex: 1;
+            background: #0e1727;
+            border: 1px solid var(--help-border);
+            border-radius: 10px;
+            padding: 8px 6px;
+            text-align: center;
+        }
+
+        .help-page .insight-chip .ic-val {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #c9def7;
+            line-height: 1;
+        }
+
+        .help-page .insight-chip .ic-lbl {
+            font-size: 0.66rem;
+            color: var(--help-text-muted);
+            margin-top: 3px;
+        }
+
+        .help-page .thread-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-right: 2px;
+        }
+
+        .help-page .thread-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .help-page .thread-list::-webkit-scrollbar-thumb {
+            background: rgba(158, 178, 208, 0.25);
+            border-radius: 4px;
+        }
+
+        .help-page .thread-entry {
+            background: #0e1727;
+            border: 1px solid rgba(158, 178, 208, 0.14);
+            border-radius: 10px;
+            padding: 9px 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            width: 100%;
+            text-align: left;
+            color: inherit;
+        }
+
+        .help-page .thread-entry:hover,
+        .help-page .thread-entry.is-active {
+            border-color: #3c7db0;
+            background: #122035;
+        }
+
+        .help-page .thread-entry-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+        }
+
+        .help-page .thread-type {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #b8d4f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .help-page .thread-status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .help-page .thread-status-dot.responded { background: #3ebd7a; }
+        .help-page .thread-status-dot.in_review { background: #f5a623; }
+        .help-page .thread-status-dot.new { background: #5a7393; }
+
+        .help-page .thread-entry-meta {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .help-page .thread-badge {
+            font-size: 0.66rem;
+            padding: 2px 7px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.35px;
+            background: rgba(80, 140, 200, 0.18);
+            color: #7fb3dc;
+        }
+
+        .help-page .thread-date {
+            font-size: 0.66rem;
+            color: var(--help-text-muted);
+            margin-left: auto;
+        }
+
+        .help-page .thread-divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 0 6px;
+        }
+
+        .help-page .thread-divider-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(158, 178, 208, 0.15);
+        }
+
+        .help-page .thread-divider-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #5a7393;
+        }
+
+        .help-page .support-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #0e1727;
+            min-width: 0;
+            min-height: 0;
+        }
+
+        .help-page .chat-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--help-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #121d31;
+            gap: 10px;
+        }
+
+        .help-page .chat-header h3 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--help-text-main);
+        }
+
+        .help-page .support-agent {
+            background: #1a2941;
+            border: 1px solid var(--help-border);
+            border-radius: 999px;
+            color: #c8dbf4;
+            padding: 6px 12px;
+            font-size: 0.82rem;
+        }
+
+        .help-page .message-history {
+            flex: 1;
+            overflow-y: auto;
+            padding: 22px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            background: linear-gradient(180deg, #0f192b 0%, #0c1423 100%);
+        }
+
+        .help-page .message-item {
+            display: flex;
+            max-width: 78%;
+        }
+
+        .help-page .message-bubble {
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 0.94rem;
+            line-height: 1.45;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        .help-page .message-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 0.7rem;
+            margin-top: 6px;
+            color: #93a8c3;
+        }
+
+        .help-page .message-received {
+            justify-content: flex-start;
+        }
+
+        .help-page .message-received .message-bubble {
+            background: #1a2538;
+            color: #d8e4f5;
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--help-border);
+        }
+
+        .help-page .message-sent {
+            justify-content: flex-end;
+            align-self: flex-end;
+        }
+
+        .help-page .message-sent .message-bubble {
+            color: #dcecff;
+            border-bottom-right-radius: 4px;
+            background: linear-gradient(135deg, #244e73, #1f4567);
+            border: 1px solid rgba(139, 177, 218, 0.36);
+        }
+
+        .help-page .compose-area {
+            background: #121d31;
+            border-top: 1px solid rgba(158, 178, 208, 0.18);
+            padding: 14px 18px 18px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .help-page .compose-input-wrapper {
+            flex: 1;
+            background: #1a2a42;
+            border: 1px solid rgba(158, 178, 208, 0.22);
+            border-radius: 14px;
+            padding: 10px 12px;
+            display: flex;
+        }
+
+        .help-page .compose-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #e0eaf7;
+            font-size: 0.94rem;
+            resize: none;
+            line-height: 1.45;
+            max-height: 140px;
+            overflow-y: auto;
+            font-family: inherit;
+        }
+
+        .help-page .compose-input::placeholder {
+            color: #5a7393;
+        }
+
+        .help-page .compose-send-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #3c7db0, #2c5e88);
+            color: #ffffff;
+            font-size: 0.86rem;
+            cursor: pointer;
+        }
+
+        .help-page .compose-send-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .help-page .status-line {
+            padding: 6px 24px 0;
+            min-height: 22px;
+            font-size: 0.8rem;
+        }
+
+        .help-page .status-line.success {
+            color: var(--help-success);
+        }
+
+        .help-page .status-line.error {
+            color: var(--help-danger);
+        }
+
+        .help-page .empty-history,
+        .help-page .alert-card {
+            text-align: center;
+            color: #8ea6c2;
+            border: 1px dashed rgba(158, 178, 208, 0.2);
+            border-radius: 12px;
+            padding: 24px;
+            background: rgba(12, 20, 35, 0.75);
+        }
+
+        .help-page .alert-card {
+            color: #ff9e9e;
+            border-style: solid;
+            background: rgba(102, 21, 21, 0.28);
+        }
+
+        .help-page .secure-note {
+            margin-top: auto;
+            font-size: 0.75rem;
+            color: #8ea6c2;
+        }
+
+        @media (max-width: 880px) {
+            .help-page .support-container {
+                flex-direction: column;
+            }
+
+            .help-page .support-sidebar {
+                width: 100%;
+            }
+
+            .help-page .chat-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .help-page .message-item {
+                max-width: 92%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none;">← Back to Dashboard</a>
+                <div class="user-info">
+                    Logged in as: <strong><%= admin.username %></strong> (<%= admin.role %>)
+                </div>
+                <form method="POST" action="/logout" class="logout-form">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+            <h1>Support Inbox</h1>
+            <p>User support requests submitted from footer help/contact flow</p>
+        </div>
+
+        <div class="content">
+            <section class="account-section help-page">
+                <div class="support-container">
+                    <aside class="support-sidebar">
+                        <div class="brand">
+                            <h2>Support</h2>
+                        </div>
+
+                        <div class="status-card">
+                            <div class="status-badge">Online · Admin</div>
+                            <p>Real-time support timeline</p>
+                        </div>
+
+                        <div class="quick-stats">
+                            <h4>Conversation insights</h4>
+                            <div class="insights-summary">
+                                <div class="insight-chip">
+                                    <div class="ic-val" id="insightTotal">0</div>
+                                    <div class="ic-lbl">Messages</div>
+                                </div>
+                                <div class="insight-chip">
+                                    <div class="ic-val" id="insightNew">0</div>
+                                    <div class="ic-lbl">New</div>
+                                </div>
+                                <div class="insight-chip">
+                                    <div class="ic-val" id="insightUsers">0</div>
+                                    <div class="ic-lbl">Users</div>
+                                </div>
+                            </div>
+
+                            <div class="thread-list" id="threadList"></div>
+                        </div>
+
+                        <div class="secure-note">Encrypted admin actions</div>
+                    </aside>
+
+                    <main class="support-main">
+                        <div class="chat-header">
+                            <h3 id="chatTitle">Support conversation</h3>
+                            <div class="support-agent" id="chatAgent">Select a user thread</div>
+                        </div>
+
+                        <div id="supportStatus" class="status-line" aria-live="polite"></div>
+
+                        <div id="messageHistory" class="message-history" role="log" aria-live="polite">
+                            <% if (supportError) { %>
+                                <div class="alert-card">Failed to load support messages: <%= supportError %></div>
+                            <% } %>
+                            <% if (!supportMessages.length) { %>
+                                <div class="empty-history">No support messages found.</div>
+                            <% } %>
+                        </div>
+
+                        <div class="compose-area" id="composeArea">
+                            <div class="compose-input-wrapper">
+                                <textarea id="replyMessage" class="compose-input" placeholder="Write admin reply visible to user..." rows="1" maxlength="5000" aria-label="Admin reply"></textarea>
+                            </div>
+                            <button type="button" id="sendReplyBtn" class="compose-send-btn" aria-label="Send reply">Send</button>
+                        </div>
+                    </main>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        (function initSupportThreads() {
+            const rawMessages = <%- JSON.stringify(supportMessages || []) %>;
+            const threadList = document.getElementById('threadList');
+            const messageHistory = document.getElementById('messageHistory');
+            const chatTitle = document.getElementById('chatTitle');
+            const chatAgent = document.getElementById('chatAgent');
+            const sendReplyBtn = document.getElementById('sendReplyBtn');
+            const replyMessage = document.getElementById('replyMessage');
+            const statusLine = document.getElementById('supportStatus');
+            const insightTotal = document.getElementById('insightTotal');
+            const insightNew = document.getElementById('insightNew');
+            const insightUsers = document.getElementById('insightUsers');
+
+            if (!threadList || !messageHistory || !sendReplyBtn || !replyMessage) {
+                return;
+            }
+
+            const escapeHtml = (value) => String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+
+            const threadsByKey = {};
+            rawMessages.forEach(function (item) {
+                const key = String(item.email || item.name || ('user-' + item.id)).toLowerCase();
+                if (!threadsByKey[key]) {
+                    threadsByKey[key] = {
+                        key: key,
+                        name: item.name || 'Unknown User',
+                        email: item.email || '',
+                        messages: []
+                    };
+                }
+                threadsByKey[key].messages.push(item);
+            });
+
+            const threads = Object.keys(threadsByKey).map(function (key) {
+                const t = threadsByKey[key];
+                t.messages.sort(function (a, b) {
+                    return Number(a.id) - Number(b.id);
+                });
+                t.newCount = t.messages.filter(function (m) { return !m.is_read; }).length;
+                t.lastMessage = t.messages[t.messages.length - 1] || null;
+                return t;
+            }).sort(function (a, b) {
+                const aId = a.lastMessage ? Number(a.lastMessage.id) : 0;
+                const bId = b.lastMessage ? Number(b.lastMessage.id) : 0;
+                return bId - aId;
+            });
+
+            let activeThreadKey = threads.length ? threads[0].key : null;
+
+            function setStatus(message, tone) {
+                statusLine.textContent = message || '';
+                statusLine.classList.remove('success', 'error');
+                if (tone === 'success') {
+                    statusLine.classList.add('success');
+                }
+                if (tone === 'error') {
+                    statusLine.classList.add('error');
+                }
+            }
+
+            function getActiveThread() {
+                return threads.find(function (t) { return t.key === activeThreadKey; }) || null;
+            }
+
+            function renderSidebar() {
+                const newThreads = threads.filter(function (t) { return t.newCount > 0; });
+                const reviewedThreads = threads.filter(function (t) { return t.newCount === 0; });
+
+                const renderThreadButton = function (thread, dotClass, badgeText) {
+                    const isActive = thread.key === activeThreadKey ? 'is-active' : '';
+                    const countSuffix = thread.messages.length > 1 ? ' · ' + thread.messages.length : '';
+                    const date = thread.lastMessage ? (thread.lastMessage.submitted_at_ts || '') : '';
+                    return '' +
+                        '<button type="button" class="thread-entry ' + isActive + '" data-thread-key="' + escapeHtml(thread.key) + '">' +
+                            '<div class="thread-entry-top">' +
+                                '<span class="thread-type">' + escapeHtml(thread.name) + '</span>' +
+                                '<span class="thread-status-dot ' + dotClass + '"></span>' +
+                            '</div>' +
+                            '<div class="thread-entry-meta">' +
+                                '<span class="thread-badge">' + badgeText + countSuffix + '</span>' +
+                                '<span class="thread-date">' + escapeHtml(date) + '</span>' +
+                            '</div>' +
+                        '</button>';
+                };
+
+                const newHtml = newThreads.length
+                    ? newThreads.map(function (thread) { return renderThreadButton(thread, 'new', 'new'); }).join('')
+                    : '<div class="thread-entry" disabled><div class="thread-type">No new threads</div></div>';
+
+                const reviewedHtml = reviewedThreads.length
+                    ? reviewedThreads.map(function (thread) { return renderThreadButton(thread, 'responded', 'read'); }).join('')
+                    : '<div class="thread-entry" disabled><div class="thread-type">No reviewed threads</div></div>';
+
+                threadList.innerHTML = '' +
+                    '<div class="thread-divider"><span class="thread-divider-line"></span><span class="thread-divider-label">New</span><span class="thread-divider-line"></span></div>' +
+                    newHtml +
+                    '<div class="thread-divider"><span class="thread-divider-line"></span><span class="thread-divider-label">Reviewed</span><span class="thread-divider-line"></span></div>' +
+                    reviewedHtml;
+
+                threadList.querySelectorAll('.thread-entry[data-thread-key]').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        activeThreadKey = btn.getAttribute('data-thread-key');
+                        renderSidebar();
+                        renderMessages();
+                    });
+                });
+            }
+
+            function renderMessages() {
+                const thread = getActiveThread();
+                if (!thread) {
+                    messageHistory.innerHTML = '<div class="empty-history">No thread selected.</div>';
+                    chatTitle.textContent = 'Support conversation';
+                    chatAgent.textContent = 'Select a user thread';
+                    sendReplyBtn.disabled = true;
+                    return;
+                }
+
+                chatTitle.textContent = 'Conversation with ' + thread.name;
+                chatAgent.textContent = thread.email || 'No email';
+                sendReplyBtn.disabled = false;
+
+                const parts = [];
+                thread.messages.forEach(function (msg) {
+                    parts.push('' +
+                        '<div class="message-item message-received">' +
+                            '<div>' +
+                                '<div class="message-bubble">' + escapeHtml(msg.message || '') + '</div>' +
+                                '<div class="message-meta">' +
+                                    '<span>ID #' + escapeHtml(msg.id) + '</span>' +
+                                    '<span>' + escapeHtml(msg.subject || 'General') + '</span>' +
+                                    '<span>' + escapeHtml(msg.submitted_at_ts || '') + '</span>' +
+                                    '<span>' + (msg.is_read ? 'Read' : 'New') + '</span>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>'
+                    );
+
+                    if (msg.admin_reply) {
+                        parts.push('' +
+                            '<div class="message-item message-sent">' +
+                                '<div>' +
+                                    '<div class="message-bubble">' + escapeHtml(msg.admin_reply) + '</div>' +
+                                    '<div class="message-meta">' +
+                                        '<span>Admin reply</span>' +
+                                        '<span>' + escapeHtml(msg.admin_replied_at_ts || '') + '</span>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>'
+                        );
+                    }
+                });
+
+                messageHistory.innerHTML = parts.join('') || '<div class="empty-history">No messages in this thread.</div>';
+                messageHistory.scrollTop = messageHistory.scrollHeight;
+            }
+
+            function refreshInsights() {
+                insightTotal.textContent = String(rawMessages.length);
+                insightNew.textContent = String(rawMessages.filter(function (m) { return !m.is_read; }).length);
+                insightUsers.textContent = String(threads.length);
+            }
+
+            function getReplyTargetMessage(thread) {
+                const reversed = thread.messages.slice().sort(function (a, b) {
+                    return Number(b.id) - Number(a.id);
+                });
+                const unread = reversed.find(function (m) { return !m.is_read; });
+                return unread || reversed[0] || null;
+            }
+
+            async function postJson(url, body) {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body || {})
+                });
+
+                const payload = await response.json();
+                if (!response.ok || !payload.success) {
+                    throw new Error(payload.error || 'Operation failed');
+                }
+                return payload;
+            }
+
+            sendReplyBtn.addEventListener('click', async function () {
+                const thread = getActiveThread();
+                if (!thread) {
+                    setStatus('Please select a thread first.', 'error');
+                    return;
+                }
+
+                const reply = replyMessage.value.trim();
+                if (!reply) {
+                    setStatus('Reply cannot be empty.', 'error');
+                    return;
+                }
+
+                const targetMessage = getReplyTargetMessage(thread);
+                if (!targetMessage) {
+                    setStatus('No message found to reply to.', 'error');
+                    return;
+                }
+
+                sendReplyBtn.disabled = true;
+                const originalText = sendReplyBtn.textContent;
+                sendReplyBtn.textContent = '...';
+
+                try {
+                    const payload = await postJson('/api/support/' + targetMessage.id + '/reply', { reply: reply });
+
+                    targetMessage.admin_reply = reply;
+                    targetMessage.is_read = true;
+                    targetMessage.admin_replied_at_ts = payload.reply && payload.reply.admin_replied_at
+                        ? payload.reply.admin_replied_at
+                        : new Date().toISOString();
+
+                    threads.forEach(function (t) {
+                        t.newCount = t.messages.filter(function (m) { return !m.is_read; }).length;
+                        t.lastMessage = t.messages[t.messages.length - 1] || null;
+                    });
+
+                    setStatus('Reply saved and marked as read.', 'success');
+                    replyMessage.value = '';
+                    renderSidebar();
+                    renderMessages();
+                    refreshInsights();
+                } catch (error) {
+                    setStatus(error.message || 'Failed to save reply.', 'error');
+                } finally {
+                    sendReplyBtn.disabled = false;
+                    sendReplyBtn.textContent = originalText;
+                }
+            });
+
+            replyMessage.addEventListener('keydown', function (event) {
+                if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+                    sendReplyBtn.click();
+                }
+            });
+
+            refreshInsights();
+            renderSidebar();
+            renderMessages();
+        })();
+    </script>
+</body>
+</html>

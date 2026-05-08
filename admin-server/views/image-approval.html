@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Approval - Totilove Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none;">← Back to Dashboard</a>
+                <form method="POST" action="/logout" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+            <h1>🖼️ Image Approval</h1>
+            <p>Review and approve or delete profile images. Open a preview for account actions in severity order: suspend, delete account, Delete+Blacklist.</p>
+        </div>
+        
+        <div class="content">
+            <!-- Statistics Overview -->
+            <div class="stats-overview" id="statsOverview">
+                <div class="stat-box">
+                    <h4>Total Images</h4>
+                    <div class="value" id="totalImages">-</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Pending</h4>
+                    <div class="value" id="pendingImages">-</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Approved</h4>
+                    <div class="value" id="approvedImages">-</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Rejected</h4>
+                    <div class="value" id="rejectedImages">-</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Last 7 Days</h4>
+                    <div class="value" id="images7Days">-</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="all">All Images</button>
+            </div>
+
+            <!-- Filters Panel -->
+            <div class="filters-panel">
+                <div class="filters-header">
+                    <h2>Filters</h2>
+                </div>
+                <div class="status-chip-row" id="statusChipRow" aria-label="Quick status filters">
+                    <button type="button" class="status-chip active" data-status="">All</button>
+                    <button type="button" class="status-chip" data-status="approved">Approved</button>
+                    <button type="button" class="status-chip" data-status="not_approved">Not Approved</button>
+                    <button type="button" class="status-chip" data-status="pending">Pending</button>
+                    <button type="button" class="status-chip" data-status="rejected">Rejected</button>
+                </div>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>Search</label>
+                        <input type="text" id="searchInput" placeholder="Search by username, email, filename...">
+                    </div>
+                    <div class="filter-group">
+                        <label>Approval Status</label>
+                        <select id="statusFilter">
+                            <option value="">All</option>
+                            <option value="approved">Approved</option>
+                            <option value="not_approved">Not Approved</option>
+                            <option value="pending">Pending</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Sort By</label>
+                        <select id="sortBy">
+                            <option value="uploaded_at">Upload Date</option>
+                            <option value="user_id">User ID</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Sort Order</label>
+                        <select id="sortOrder">
+                            <option value="DESC">Newest First</option>
+                            <option value="ASC">Oldest First</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="applyFiltersBtn">Apply Filters</button>
+            </div>
+
+            <!-- All Images Tab -->
+            <div class="tab-content active" id="allTab">
+                <div class="image-grid" id="allImagesGrid">
+                    <div class="loading">Loading...</div>
+                </div>
+                <div class="pagination" id="allPagination"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="imagePreviewModal" class="modal">
+        <div class="modal-content image-preview-modal">
+            <span class="close" id="closeImagePreviewBtn">&times;</span>
+            <h2>Image Preview</h2>
+            <div id="imagePreviewContent"></div>
+            <div id="imagePreviewActions" style="margin-top: 16px;"></div>
+        </div>
+    </div>
+
+    <script src="/js/notifications.js"></script>
+    <script src="/js/admin-image-approval.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

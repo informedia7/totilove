@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Management - Totilove Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none;">← Back to Dashboard</a>
+                <form method="POST" action="/logout" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+            <h1>🗄️ Database Management</h1>
+            <p>Manage database integrity, check for corruption, and view table statistics</p>
+        </div>
+        
+        <div class="content">
+            <!-- Tabs (same pattern as Payments page) -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('orphanCleanup', this)">Orphaned Data Cleanup</button>
+                <button class="tab-btn" onclick="showTab('integrityChecker', this)">Database Integrity Checker</button>
+                <button class="tab-btn" onclick="showTab('tableOverview', this)">Database Tables Overview</button>
+            </div>
+
+            <!-- Orphaned Data Cleanup Tab -->
+            <div id="orphanCleanupTab" class="tab-content active">
+                <div class="welcome-card" id="orphan-cleanup-card" style="margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 12px;">
+                    <div style="flex: 1 1 320px;">
+                        <h2 style="margin-bottom: 8px;">🧹 Orphaned Data Cleanup</h2>
+                        <p style="color: #666; margin: 0;">
+                            Use dedicated tabs for orphaned profile image files and orphaned database table rows.
+                        </p>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
+                    <button id="orphan-tab-images"
+                            style="padding: 8px 14px; border: 1px solid #667eea; background: #667eea; color: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">
+                        Orphaned Images
+                    </button>
+                    <button id="orphan-tab-db"
+                            style="padding: 8px 14px; border: 1px solid #d4d8e2; background: #fff; color: #3f4a5a; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">
+                        Database Table Orphans
+                    </button>
+                </div>
+
+                <div id="orphan-panel-images" style="display: block; border: 1px solid #eef1f6; border-radius: 8px; padding: 14px; background: #fafbff;">
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+                        <button id="scan-orphan-images-btn"
+                                style="padding: 10px 24px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                            Scan Orphaned Images
+                        </button>
+                    </div>
+                    <div id="orphan-image-scan-loading" style="display: none; margin-top: 16px; padding: 16px; text-align: center; color: #666;">
+                        <div style="margin-bottom: 10px; display: inline-block; width: 42px; height: 42px; border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <p style="margin: 0;">Scanning orphaned profile images...</p>
+                    </div>
+                    <div id="orphan-image-scan-results" style="display: none; margin-top: 16px;">
+                        <div id="orphan-image-scan-summary" style="margin-bottom: 16px;"></div>
+                        <div id="orphan-image-scan-table"></div>
+                    </div>
+                </div>
+
+                <div id="orphan-panel-db" style="display: none; border: 1px solid #eef1f6; border-radius: 8px; padding: 14px; background: #fffdf9; margin-top: 12px;">
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
+                        <button id="cleanup-orphans-btn"
+                                style="padding: 10px 24px; background: #e67e22; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                            Run DB Cleanup
+                        </button>
+                    </div>
+                    <div id="orphan-cleanup-loading" style="display: none; margin-top: 16px; padding: 16px; text-align: center; color: #666;">
+                        <div style="margin-bottom: 10px; display: inline-block; width: 48px; height: 48px; border: 4px solid #f3f3f3; border-top: 4px solid #e67e22; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <p style="margin: 0;">Cleaning orphaned database rows...</p>
+                    </div>
+                    <div id="orphan-cleanup-results" style="display: none; margin-top: 16px;">
+                        <div id="orphan-cleanup-summary" style="margin-bottom: 16px;"></div>
+                        <div id="orphan-cleanup-table-results" style="margin-bottom: 16px;"></div>
+                        <div id="orphan-cleanup-file-results" style="margin-bottom: 16px;"></div>
+                        <div id="orphan-cleanup-warnings" style="display: none; padding: 12px; border-left: 4px solid #ffc107; background: #fff8e1; border-radius: 6px;"></div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- Database Integrity Checker Tab -->
+            <div id="integrityCheckerTab" class="tab-content">
+            <div class="welcome-card" id="database-tools" style="margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <div>
+                        <h2 style="margin-bottom: 8px;">🔍 Database Integrity Checker</h2>
+                        <p style="color: #666; margin: 0;">Check and fix database corruption issues</p>
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button id="check-corruption-btn" 
+                                style="padding: 10px 24px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                            Check Corruption
+                        </button>
+                        <button id="fix-corruption-btn" 
+                                style="padding: 10px 24px; background: #e74c3c; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; display: none;">
+                            Fix Issues
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="corruption-status" style="display: none; margin-top: 20px;">
+                    <div id="corruption-summary" style="padding: 16px; border-radius: 8px; margin-bottom: 16px;"></div>
+                    <div id="corruption-details" style="max-height: 400px; overflow-y: auto;"></div>
+                </div>
+                
+                <div id="corruption-loading" style="display: none; text-align: center; padding: 20px; color: #667eea;">
+                    <p>Checking database integrity...</p>
+                </div>
+            </div>
+            </div>
+
+            <!-- Database Tables Overview Tab -->
+            <div id="tableOverviewTab" class="tab-content">
+            <div class="welcome-card" style="margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <div>
+                        <h2 style="margin-bottom: 8px;">📊 Database Tables Overview</h2>
+                        <p style="color: #666; margin: 0;">View statistics for all database tables</p>
+                    </div>
+                    <button id="refresh-tables-btn" 
+                            style="padding: 10px 24px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                        Refresh Statistics
+                    </button>
+                </div>
+                
+                <div id="tables-loading" style="display: none; text-align: center; padding: 20px; color: #667eea;">
+                    <p>Loading table statistics...</p>
+                </div>
+                
+                <div id="tables-overview" style="display: none;">
+                    <div id="tables-stats" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; margin-top: 16px;"></div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/notifications.js"></script>
+    <script src="/js/admin-database-management.js"></script>
+</body>
+</html>
+
+

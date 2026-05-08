@@ -1,0 +1,1192 @@
+/* ========================================
+   COMPONENTS
+   All styles scoped to #app-root
+   ======================================== */
+
+/* ===== MODALS ===== */
+/* REMOVED: Profile modal - return to original layout */
+/* Profile modal uses existing CSS from user-profile-modal.html */
+
+/* Message modal */
+#app-root .message-modal.show,
+#app-root .message-modal[style*="display: block"] {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 10000;
+}
+
+#app-root .message-modal .modal-content {
+  width: 92%;
+  max-width: 100%;
+  background: var(--card);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  padding: var(--md);
+  max-height: 92vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+
+/* Block/Unblock Confirmation Modal - Common styles used across multiple pages */
+#app-root .block-confirm-modal,
+#app-root .unblock-confirm-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#app-root .block-confirm-overlay,
+#app-root .unblock-confirm-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+#app-root .block-confirm-content,
+#app-root .unblock-confirm-content {
+  position: relative;
+  background: white;
+  border-radius: 16px;
+  padding: var(--lg);
+  max-width: 450px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+  text-align: center;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+#app-root .block-confirm-icon,
+#app-root .unblock-confirm-icon {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto var(--md);
+  background: linear-gradient(135deg, #d63031, #e74c3c);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: white;
+}
+
+#app-root .unblock-confirm-icon {
+  background: linear-gradient(135deg, #00b894, #00d2a0);
+}
+
+#app-root .block-confirm-title,
+#app-root .unblock-confirm-title {
+  font-size: var(--f-xl);
+  color: var(--dark);
+  margin-bottom: var(--md);
+  font-weight: 700;
+}
+
+#app-root .block-confirm-message,
+#app-root .unblock-confirm-message {
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: var(--lg);
+  font-size: var(--f-md);
+}
+
+#app-root .block-confirm-message strong,
+#app-root .unblock-confirm-message strong {
+  color: var(--dark);
+  font-weight: 600;
+}
+
+#app-root .block-confirm-actions,
+#app-root .unblock-confirm-actions {
+  display: flex;
+  gap: var(--md);
+  justify-content: center;
+}
+
+#app-root .block-confirm-cancel,
+#app-root .block-confirm-yes,
+#app-root .unblock-confirm-cancel,
+#app-root .unblock-confirm-yes {
+  padding: var(--md) var(--lg);
+  border-radius: var(--r-md);
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-size: var(--f-md);
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: var(--sm);
+  min-height: var(--touch);
+}
+
+#app-root .block-confirm-cancel,
+#app-root .unblock-confirm-cancel {
+  background: #dfe6e9;
+  color: var(--dark);
+}
+
+#app-root .block-confirm-cancel:hover,
+#app-root .unblock-confirm-cancel:hover {
+  background: #b2bec3;
+}
+
+#app-root .block-confirm-yes {
+  background: linear-gradient(135deg, #d63031, #e74c3c);
+  color: white;
+}
+
+#app-root .block-confirm-yes:hover {
+  background: linear-gradient(135deg, #c0392b, #d63031);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(214, 48, 49, 0.3);
+}
+
+#app-root .unblock-confirm-yes {
+  background: linear-gradient(135deg, #00b894, #00d2a0);
+  color: white;
+}
+
+#app-root .unblock-confirm-yes:hover {
+  background: linear-gradient(135deg, #00a885, #00b894);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 184, 148, 0.3);
+}
+
+/* ===== BUTTONS ===== */
+/* Essential button fixes - only target specific classes to avoid conflicts */
+#app-root .action-btn,
+#app-root .like-btn,
+#app-root .message-btn,
+#app-root .report-btn {
+  min-height: var(--touch);
+  height: auto;
+  padding: var(--sm) var(--md);
+  border-radius: var(--r-md);
+  font-size: var(--f-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sm);
+  cursor: pointer;
+  transition: var(--transition);
+  box-sizing: border-box;
+}
+
+/* Login/Register buttons */
+#app-root .btn-login,
+#app-root .login-btn,
+#app-root .btn-register,
+#app-root .register-btn {
+  min-height: var(--touch);
+  padding: var(--md) var(--lg);
+  border-radius: var(--r-md);
+  font-size: var(--f-md);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+/* Global navigation buttons */
+#app-root .global-btn-outline,
+#app-root .global-btn-solid {
+  min-height: var(--touch);
+  padding: var(--sm) var(--md);
+  border-radius: var(--r-md);
+  font-size: var(--f-md);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+/* Back button */
+#app-root .back-btn {
+  min-height: var(--touch);
+  min-width: var(--touch);
+  padding: var(--sm);
+  border-radius: var(--r-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+/* Form submit buttons */
+#app-root .submit button,
+#app-root form button[type="submit"] {
+  min-height: var(--touch);
+  padding: var(--md) var(--lg);
+  border-radius: var(--r-md);
+  font-size: var(--f-md);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+/* ===== FORM INPUTS ===== */
+/* Only target generic form inputs, NOT search-specific classes */
+/* Don't touch: .search-input, .filter-group, .search-wrapper, .search-container, .search-header, .search-stats */
+
+/* Generic form inputs (only when not in search context) */
+#app-root .form-group input:not(.search-input),
+#app-root .form-group textarea,
+#app-root .form-group select {
+  min-height: var(--touch);
+  padding: var(--sm) var(--md);
+  border-radius: var(--r-md);
+  font-size: var(--f-md);
+  border: 1px solid #e0e0e0;
+  transition: var(--transition);
+}
+
+#app-root .form-group input:not(.search-input):focus,
+#app-root .form-group textarea:focus,
+#app-root .form-group select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+/* Field component (floating labels) - exclude search inputs */
+#app-root .field input:not(.search-input),
+#app-root .field select {
+  min-height: var(--touch);
+  padding: var(--sm) var(--md);
+  border-radius: var(--r-md);
+  font-size: var(--f-md);
+  transition: var(--transition);
+}
+
+/* ===== UTILITY ===== */
+/* Generic button fallback - ensure all buttons have minimum touch target */
+#app-root button:not(.action-btn):not(.like-btn):not(.message-btn):not(.report-btn):not(.page-btn):not(.tab-btn):not(.btn-login):not(.login-btn):not(.btn-register):not(.register-btn):not(.global-btn-outline):not(.global-btn-solid):not(.back-btn):not(.chat-action-btn):not(.input-action-btn):not(.send-btn):not(.filter-reset-btn):not(.bulk-btn):not(.load-more-btn):not(.icon-btn) {
+  min-height: var(--touch);
+  min-width: var(--touch);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+#app-root button,
+#app-root a,
+#app-root [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+#app-root {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
+}
+
+/* ===== CARDS ===== */
+/* REMOVED: .card rule - search.html and other pages have their own card styling */
+/* Only apply to specific card types that need fixes, not generic .card */
+
+/* ===== TABS ===== */
+#app-root .tab-btn,
+#app-root .tab-button {
+  min-height: var(--touch);
+  height: auto;
+  padding: var(--sm) var(--md);
+  border-radius: var(--r-md);
+  font-size: var(--f-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  box-sizing: border-box;
+}
+
+/* ===== BADGES ===== */
+#app-root .badge,
+#app-root .tag,
+#app-root .age-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--xs) var(--sm);
+  border-radius: var(--r-full);
+  font-size: var(--f-xs);
+  white-space: nowrap;
+}
+
+/* ===== NAVIGATION ===== */
+#app-root .navbar,
+#app-root nav.navbar,
+#app-root .global-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+#app-root .nav-link,
+#app-root .navbar-link,
+#app-root .global-nav-link {
+  min-height: var(--touch);
+  height: auto;
+  padding: var(--sm) var(--md);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--xs);
+  border-radius: var(--r-md);
+  transition: var(--transition);
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+/* ===== FILTER CONTROLS ===== */
+/* REMOVED: filter-tab, filter-input - search.html has its own styling */
+
+/* ===== SORT/VIEW CONTROLS ===== */
+#app-root .sort-controls,
+#app-root .view-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sm);
+  align-items: stretch;
+}
+
+#app-root .sort-controls select,
+#app-root .view-controls select {
+  min-height: var(--touch);
+  padding: var(--sm) var(--md);
+  border-radius: var(--r-md);
+  font-size: var(--f-md);
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+/* ===== RESULTS HEADER ===== */
+#app-root .results-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--md);
+  padding: var(--md);
+  margin-bottom: var(--md);
+}
+
+/* ===== PAGINATION ===== */
+#app-root .pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--sm);
+  padding: var(--md);
+  flex-wrap: wrap;
+}
+
+#app-root .page-btn {
+  min-height: var(--touch);
+  min-width: var(--touch);
+  height: auto;
+  padding: var(--sm) var(--md);
+  border-radius: var(--r-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  box-sizing: border-box;
+}
+
+/* ===== MORE BUTTON TYPES ===== */
+#app-root .chat-action-btn,
+#app-root .input-action-btn,
+#app-root .send-btn {
+  min-width: var(--touch);
+  min-height: var(--touch);
+  padding: var(--sm);
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+#app-root .filter-reset-btn,
+#app-root .bulk-btn,
+#app-root .load-more-btn {
+  min-height: var(--touch);
+  padding: var(--sm) var(--md);
+  border-radius: var(--r-md);
+  font-size: var(--f-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+/* ===== ICON BUTTONS ===== */
+#app-root .icon-btn,
+#app-root button[class*="icon"],
+#app-root .icon-action {
+  min-width: var(--touch);
+  min-height: var(--touch);
+  padding: var(--sm);
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+/* ===== LINKS ===== */
+#app-root .nav-link,
+#app-root .back-to-search {
+  min-height: var(--touch);
+  height: auto;
+  padding: var(--sm) var(--md);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--xs);
+  border-radius: var(--r-md);
+  box-sizing: border-box;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+/* ===== MOBILE MENU ===== */
+#app-root .mobile-menu-toggle,
+#app-root .navbar-toggle,
+#app-root .global-mobile-toggle {
+  min-width: var(--touch);
+  min-height: var(--touch);
+  padding: var(--sm);
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  transition: var(--transition);
+}
+
+#app-root .mobile-menu-container,
+#app-root .navbar-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--card);
+  box-shadow: var(--shadow-lg);
+  border-radius: 0 0 var(--r-md) var(--r-md);
+  padding: var(--md);
+  z-index: 999;
+}
+
+#app-root .mobile-menu-item,
+#app-root .navbar-menu li {
+  min-height: var(--touch);
+  padding: var(--sm) var(--md);
+  display: flex;
+  align-items: center;
+  gap: var(--sm);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+/* ===== EMPTY STATES ===== */
+#app-root .empty-state,
+#app-root .no-results,
+#app-root .empty-state-wrapper {
+  text-align: center;
+  padding: var(--xl);
+  color: var(--text-muted);
+}
+
+/* ===== DROPDOWNS ===== */
+#app-root .dropdown-toggle,
+#app-root .dropdown-btn {
+  min-height: var(--touch);
+  padding: var(--sm) var(--md);
+  border-radius: var(--r-md);
+  font-size: var(--f-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sm);
+  cursor: pointer;
+  transition: var(--transition);
+  border: 1px solid #e0e0e0;
+  background: var(--card);
+}
+
+#app-root .dropdown-item,
+#app-root .dropdown-content a {
+  min-height: var(--touch);
+  padding: var(--sm) var(--md);
+  display: flex;
+  align-items: center;
+  gap: var(--sm);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  color: var(--text);
+}
+
+/* ===== NOTIFICATIONS ===== */
+#app-root .notification,
+#app-root .alert,
+#app-root .toast {
+  padding: var(--md);
+  border-radius: var(--r-md);
+  margin-bottom: var(--sm);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sm);
+  box-shadow: var(--shadow-md);
+  min-height: var(--touch);
+}
+
+#app-root .notification-close,
+#app-root .alert-close {
+  min-width: var(--touch);
+  min-height: var(--touch);
+  padding: var(--xs);
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  margin-left: auto;
+  transition: var(--transition);
+}
+
+/* ===== REPORT MODAL ===== */
+#app-root .report-modal.show,
+#app-root .report-modal[style*="display: block"] {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 10000;
+}
+
+#app-root .report-modal-content {
+  width: 92%;
+  max-width: 600px;
+  background: var(--card);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  padding: var(--md);
+  max-height: 92vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+
+/* ===== MODAL CLOSE BUTTON ===== */
+#app-root .modal-close {
+  position: absolute;
+  top: var(--md);
+  right: var(--md);
+  background: transparent;
+  border: none;
+  font-size: var(--f-xl);
+  color: var(--text);
+  cursor: pointer;
+  width: var(--touch);
+  height: var(--touch);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-full);
+  transition: var(--transition);
+}
+
+/* ===== PROFILE MODAL ACTIONS ===== */
+/* REMOVED: Profile modal actions - return to original layout */
+
+/* ===== MODAL ACTION BUTTONS ===== */
+#app-root .modal-like-btn,
+#app-root .modal-message-btn,
+#app-root .modal-report-btn {
+  min-height: var(--touch);
+  padding: var(--sm) var(--md);
+  border-radius: var(--r-md);
+  font-size: var(--f-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sm);
+}
+
+/* ===== USER ACTIONS ===== */
+/* REMOVED: Don't touch user-actions - results.html has its own specific styling */
+/* The results page handles user-actions styling internally */
+
+/* ===== INTEREST TAGS ===== */
+#app-root .user-interests span,
+#app-root .interest-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--xs) var(--sm);
+  border-radius: var(--r-full);
+  font-size: var(--f-xs);
+  white-space: nowrap;
+  margin: var(--xs);
+}
+
+/* ===== STAT CARDS ===== */
+/* REMOVED: Don't touch stat-item or stat-card - they have existing backgrounds */
+/* The existing CSS in layout.html handles stat-item backgrounds */
+
+/* ===== LOADING STATES ===== */
+#app-root .spinner.show,
+#app-root .spinner[style*="display: block"],
+#app-root .loader.show,
+#app-root .loader[style*="display: block"] {
+  min-width: var(--touch);
+  min-height: var(--touch);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#app-root .spinner,
+#app-root .loader {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e0e0e0;
+  border-top-color: var(--primary);
+  border-radius: var(--r-full);
+  animation: spin 1s linear infinite;
+}
+
+/* ===== TEXTAREA ===== */
+#app-root textarea {
+  min-height: calc(var(--touch) * 2);
+  padding: var(--sm) var(--md);
+  border-radius: var(--r-md);
+  font-size: var(--f-md);
+  border: 1px solid #e0e0e0;
+  transition: var(--transition);
+  resize: vertical;
+  font-family: inherit;
+}
+
+#app-root textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+/* ===== CHECKBOXES & RADIO BUTTONS ===== */
+/* REMOVED: Don't touch checkboxes/radios - existing CSS in matches.html handles sizing */
+/* Existing rules: .filter-group input[type="checkbox"] (18px) and .match-card-checkbox input (20px) */
+
+/* ===== USER CARDS ===== */
+/* REMOVED: Don't touch .online-user-card - results.html has its own specific styling */
+/* Only apply to generic user-card/profile-card, NOT results grid cards */
+#app-root .user-card:not(.online-user-card),
+#app-root .profile-card:not(.online-user-card) {
+  padding: var(--md);
+  border-radius: var(--r-md);
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+#app-root .user-card:not(.online-user-card):hover,
+#app-root .profile-card:not(.online-user-card):hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* ===== IMAGE CONTAINERS ===== */
+/* Don't interfere with list view - matches.html has its own styling */
+#app-root .image-container:not(.user-image-container),
+#app-root .photo-container:not(.user-image-container) {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r-md);
+}
+
+/* ===== MATCHES GRID STABILITY ===== */
+/* Prevent layout jumps when filtering with match score slider */
+/* Only apply containment to grid view, not list view */
+#app-root .online-users-grid:not(.list-view),
+#app-root .matches-grid:not(.list-view) {
+  contain: layout;
+  grid-auto-rows: min-content;
+}
+
+/* Prevent individual cards from causing layout shifts */
+/* Exclude list view cards - they need flex layout to work */
+#app-root .online-users-grid:not(.list-view) .online-user-card,
+#app-root .matches-grid:not(.list-view) .online-user-card {
+  contain: layout style paint;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* List view - completely exclude from our CSS */
+/* matches.html handles all list view styling with its own CSS */
+/* Don't apply any rules to list view cards, images, or containers */
+
+/* Images - but don't interfere with list view */
+/* List view images have inline styles in matches.html */
+#app-root img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ===== SCROLLABLE CONTAINERS ===== */
+#app-root .scrollable,
+#app-root .scroll-container {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* ===== TOOLTIPS ===== */
+#app-root [data-tooltip],
+#app-root .tooltip {
+  position: relative;
+  cursor: help;
+}
+
+/* ===== LABELS ===== */
+#app-root label {
+  display: block;
+  font-size: var(--f-sm);
+  font-weight: 500;
+  margin-bottom: var(--xs);
+  color: var(--text);
+}
+
+/* ===== FORM GROUPS ===== */
+#app-root .form-group {
+  margin-bottom: var(--md);
+}
+
+#app-root .form-group:last-child {
+  margin-bottom: 0;
+}
+
+/* ===== FOCUS VISIBLE (KEYBOARD NAVIGATION) ===== */
+#app-root button:focus-visible,
+#app-root a:focus-visible,
+#app-root input:focus-visible,
+#app-root select:focus-visible,
+#app-root textarea:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ===== SEARCH BARS ===== */
+/* REMOVED: All search-related CSS - search.html has its own complete styling */
+/* Don't touch: .search-wrapper, .search-container, .search-header, .search-stats, .search-bar, .search-input */
+
+/* ===== ACTION BUTTON GROUPS ===== */
+#app-root .action-group,
+#app-root .button-group {
+  display: flex;
+  gap: var(--sm);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ===== DISABLED STATES ===== */
+#app-root button:disabled,
+#app-root input:disabled,
+#app-root select:disabled,
+#app-root textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ===== ACTIVE STATES ===== */
+#app-root .active,
+#app-root [aria-selected="true"],
+#app-root [aria-current="page"] {
+  font-weight: 600;
+}
+
+/* ===== VISUALLY HIDDEN (ACCESSIBILITY) ===== */
+#app-root .sr-only,
+#app-root .visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ===== SLIDERS & RANGE INPUTS ===== */
+#app-root input[type="range"] {
+  width: 100%;
+  height: 8px;
+  border-radius: var(--r-md);
+  background: #e0e0e0;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+#app-root input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--r-full);
+  background: var(--primary);
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: var(--transition);
+}
+
+#app-root input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--r-full);
+  background: var(--primary);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: var(--transition);
+}
+
+/* ===== FILTER GROUPS ===== */
+/* REMOVED: filter-group - search.html has its own styling */
+
+/* ===== BULK ACTIONS ===== */
+#app-root .bulk-actions {
+  display: flex;
+  gap: var(--sm);
+  align-items: center;
+  flex-wrap: wrap;
+  padding: var(--md);
+  background: var(--light);
+  border-radius: var(--r-md);
+  margin-bottom: var(--md);
+}
+
+#app-root .bulk-btn {
+  min-height: var(--touch);
+  padding: var(--sm) var(--md);
+  border-radius: var(--r-md);
+  font-size: var(--f-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+/* ===== VIEW TOGGLE BUTTONS ===== */
+#app-root .view-toggle {
+  display: flex;
+  gap: var(--xs);
+  align-items: center;
+  border-radius: var(--r-md);
+  background: var(--light);
+  padding: var(--xs);
+}
+
+#app-root .view-btn {
+  min-height: var(--touch);
+  padding: var(--sm) var(--md);
+  border-radius: var(--r-sm);
+  font-size: var(--f-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+  background: transparent;
+}
+
+#app-root .view-btn.active {
+  background: var(--primary);
+  color: white;
+}
+
+/* ===== MATCHES INFO ===== */
+#app-root .matches-info {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* ===== MATCHES FILTERS ===== */
+#app-root .matches-filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--md);
+  padding: var(--md);
+  margin-bottom: var(--md);
+  background: var(--card);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ===== EMPTY STATE BUTTONS ===== */
+#app-root .empty-btn-primary,
+#app-root .empty-btn-secondary {
+  min-height: var(--touch);
+  padding: var(--md) var(--lg);
+  border-radius: var(--r-md);
+  font-size: var(--f-md);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+}
+
+#app-root .empty-btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+#app-root .empty-btn-secondary {
+  background: transparent;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+}
+
+/* ===== HERO SECTIONS ===== */
+#app-root .hero-section {
+  padding: var(--xl) var(--md);
+  text-align: center;
+}
+
+#app-root .hero-title {
+  font-size: var(--f-2xl);
+  font-weight: 700;
+  margin-bottom: var(--md);
+  line-height: 1.2;
+}
+
+#app-root .hero-subtitle {
+  font-size: var(--f-lg);
+  color: var(--text-muted);
+  margin-bottom: var(--lg);
+}
+
+#app-root .hero-actions {
+  display: flex;
+  gap: var(--md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ===== FEATURE CARDS ===== */
+#app-root .feature-card {
+  padding: var(--lg);
+  border-radius: var(--r-md);
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+#app-root .feature-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+#app-root .feature-icon {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-md);
+  background: var(--light);
+  margin-bottom: var(--md);
+  font-size: var(--f-2xl);
+  color: var(--primary);
+}
+
+/* ===== SECTION TITLES ===== */
+#app-root .section-title {
+  font-size: var(--f-xl);
+  font-weight: 700;
+  margin-bottom: var(--lg);
+  text-align: center;
+}
+
+/* ===== CONTAINERS ===== */
+/* Only add minimal spacing fixes, don't override existing container styles */
+#app-root .container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--md);
+}
+
+/* ===== GRIDS ===== */
+#app-root .features-grid,
+#app-root .showcase-grid {
+  display: grid;
+  gap: var(--lg);
+  grid-template-columns: 1fr;
+}
+
+/* ===== SEARCH PARAMETER BADGES ===== */
+/* Style for search parameter labels/badges */
+/* REMOVED: These are inline styles in results.html - don't override them */
+
+/* ===== CARD HEADERS ===== */
+/* REMOVED: card-header, card-title - results.html has its own styling with inline styles */
+
+/* ===== USER SEEKING INFO ===== */
+/* User seeking information in cards */
+#app-root .user-seeking {
+  color: var(--text-muted);
+  margin-bottom: var(--sm);
+  text-align: center;
+  font-size: var(--f-sm);
+}
+
+/* ===== ONLINE INDICATOR ===== */
+/* Online status dot in user cards */
+#app-root .online-indicator,
+#app-root [style*="position: absolute"][style*="background: #00b894"] {
+  position: absolute;
+  top: var(--xs);
+  right: var(--xs);
+  width: 16px;
+  height: 16px;
+  background: var(--success);
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+/* ===== ERROR STATES ===== */
+/* Search error display */
+#app-root .search-error {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-muted);
+  padding: var(--xl) var(--lg);
+}
+
+#app-root .search-error-icon {
+  font-size: var(--f-3xl);
+  margin-bottom: var(--md);
+  color: var(--danger);
+}
+
+#app-root .search-error-title {
+  font-size: var(--f-xl);
+  margin-bottom: var(--md);
+  color: var(--dark);
+}
+
+#app-root .search-error-message {
+  color: var(--text-muted);
+  margin-bottom: var(--md);
+}
+
+/* ===== VIEW CONTROLS ===== */
+/* Cards per row and view controls */
+#app-root .view-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--sm);
+}
+
+#app-root .view-controls label {
+  font-size: var(--f-sm);
+  color: var(--dark);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+#app-root .view-controls select {
+  padding: var(--sm) var(--md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--r-md);
+  background: white;
+  font-size: var(--f-sm);
+  cursor: pointer;
+  transition: border-color var(--transition);
+  min-height: var(--touch);
+}
+
+#app-root .view-controls select:hover {
+  border-color: var(--primary);
+}
+
+#app-root .view-controls select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+/* ===== MATCH SCORE SLIDER ===== */
+#app-root #match-score-slider {
+  flex: 1;
+  min-width: 0;
+}
+
+#app-root #match-score-slider-label {
+  margin-right: var(--sm);
+  font-size: var(--f-sm);
+  color: var(--text);
+  white-space: nowrap;
+}
+
+/* Keyframes */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

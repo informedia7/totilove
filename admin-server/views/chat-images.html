@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Images Monitor - Totilove Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .chat-images-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .chat-images-stat-card {
+            background: linear-gradient(180deg, #fff 0%, #f8fbff 100%);
+            border: 1px solid #d8e3f1;
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+        .chat-images-stat-card .num {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .chat-images-stat-card .lbl {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-top: 4px;
+        }
+
+        .chat-images-grid-wrap {
+            margin-top: 20px;
+        }
+        .chat-images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+            gap: 16px;
+        }
+        .chat-image-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+        .chat-image-card:hover {
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.12);
+            border-color: #c7d2fe;
+        }
+        .chat-image-card:focus-visible {
+            outline: 2px solid #6366f1;
+            outline-offset: 2px;
+        }
+        .chat-image-card .card-thumb-wrap {
+            position: relative;
+            background: #f1f5f9;
+            aspect-ratio: 1;
+        }
+        .chat-image-card .card-thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .chat-image-card .card-foot {
+            padding: 10px 12px 12px;
+            font-size: 12px;
+            color: #475569;
+            line-height: 1.35;
+        }
+        .chat-image-card .card-msg-id {
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .chat-image-card .card-users-line {
+            font-size: 12px;
+            color: #334155;
+            margin-top: 6px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+        .chat-image-card .card-hint {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+        .sender-badge {
+            display: inline-block;
+            font-size: 10px;
+            padding: 2px 7px;
+            border-radius: 999px;
+            background: #e2e8f0;
+            color: #334155;
+            vertical-align: middle;
+        }
+        .sender-badge.suspended {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Detail modal: large image + controls */
+        .chat-image-detail-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10060;
+            background: rgba(15, 23, 42, 0.72);
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            overflow-y: auto;
+        }
+        .chat-image-detail-modal.open {
+            display: flex;
+        }
+        .chat-image-detail-dialog {
+            background: #fff;
+            border-radius: 14px;
+            max-width: 1100px;
+            width: 100%;
+            max-height: min(96vh, 900px);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.25);
+            position: relative;
+        }
+        .chat-image-detail-close {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            z-index: 2;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            font-size: 26px;
+            line-height: 1;
+            cursor: pointer;
+            color: #334155;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+        }
+        .chat-image-detail-close:hover {
+            background: #f1f5f9;
+        }
+        .chat-image-detail-body {
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+            gap: 0;
+            flex: 1;
+            min-height: 0;
+        }
+        @media (max-width: 768px) {
+            .chat-image-detail-body {
+                grid-template-columns: 1fr;
+                max-height: none;
+            }
+        }
+        .chat-image-detail-visual {
+            background: #0f172a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-height: 200px;
+            max-height: min(70vh, 640px);
+            padding: 12px;
+        }
+        .chat-image-detail-visual-label {
+            align-self: flex-start;
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .chat-image-detail-visual img {
+            max-width: 100%;
+            max-height: min(68vh, 620px);
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+        .chat-image-detail-side {
+            padding: 20px 20px 24px;
+            overflow-y: auto;
+            max-height: min(90vh, 900px);
+            border-left: 1px solid #e2e8f0;
+        }
+        @media (max-width: 768px) {
+            .chat-image-detail-side {
+                border-left: none;
+                border-top: 1px solid #e2e8f0;
+                max-height: none;
+            }
+        }
+        .chat-image-detail-meta {
+            font-size: 14px;
+            color: #334155;
+            line-height: 1.55;
+            margin-bottom: 20px;
+        }
+        .chat-image-detail-meta dt {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #64748b;
+            margin-top: 12px;
+            margin-bottom: 4px;
+        }
+        .chat-image-detail-meta dt:first-child {
+            margin-top: 0;
+        }
+        .chat-image-detail-meta dd {
+            margin: 0;
+            word-break: break-word;
+        }
+        .chat-image-detail-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .chat-image-detail-actions .btn {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none;">← Back to Dashboard</a>
+                <form method="POST" action="/logout" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+            <h1>🖼️ Chat Images Monitor</h1>
+            <p>Click an image to view it full size and use Remove, then account actions in order of severity: Suspend, Delete account, Delete+Blacklist.</p>
+        </div>
+
+        <div class="content">
+            <div class="chat-images-stats">
+                <div class="chat-images-stat-card">
+                    <div class="num" id="statTotal">–</div>
+                    <div class="lbl">Total images</div>
+                </div>
+                <div class="chat-images-stat-card">
+                    <div class="num" id="stat24h">–</div>
+                    <div class="lbl">Last 24 hours</div>
+                </div>
+                <div class="chat-images-stat-card">
+                    <div class="num" id="stat7d">–</div>
+                    <div class="lbl">Last 7 days</div>
+                </div>
+            </div>
+
+            <div class="filters-panel">
+                <h2>Filters</h2>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>Search</label>
+                        <input type="text" id="searchInput" placeholder="Sender/receiver name, user ID, filename">
+                    </div>
+                    <div class="filter-group">
+                        <label>Message ID</label>
+                        <input type="number" id="messageIdFilter" placeholder="Message ID">
+                    </div>
+                    <div class="filter-group">
+                        <label>Sender user ID</label>
+                        <input type="number" id="senderFilter" placeholder="Sender ID">
+                    </div>
+                    <div class="filter-group">
+                        <label>Receiver user ID</label>
+                        <input type="number" id="receiverFilter" placeholder="Receiver ID">
+                    </div>
+                    <div class="filter-group">
+                        <label>Per page</label>
+                        <select id="limitSelect">
+                            <option value="20">20</option>
+                            <option value="30" selected>30</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 12px;">
+                    <button type="button" id="applyFilters" class="btn btn-primary">Search</button>
+                    <button type="button" id="clearFilters" class="btn btn-secondary">Clear</button>
+                </div>
+            </div>
+
+            <div class="chat-images-grid-wrap">
+                <div id="chatImagesGrid" class="chat-images-grid" role="list">
+                    <div class="loading" style="grid-column: 1 / -1; text-align: center; padding: 40px;">Loading…</div>
+                </div>
+            </div>
+
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <div id="chatImageDetailModal" class="chat-image-detail-modal" aria-hidden="true">
+        <div class="chat-image-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="chatImageDetailHeading" onclick="event.stopPropagation()">
+            <button type="button" class="chat-image-detail-close" id="chatImageDetailClose" title="Close">&times;</button>
+            <h2 id="chatImageDetailHeading" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Chat image details</h2>
+            <div class="chat-image-detail-body">
+                <div class="chat-image-detail-visual">
+                    <span class="chat-image-detail-visual-label">Preview</span>
+                    <img id="chatImageDetailImg" src="" alt="Chat attachment preview">
+                </div>
+                <div class="chat-image-detail-side">
+                    <div id="chatImageDetailMeta" class="chat-image-detail-meta"></div>
+                    <div id="chatImageDetailActions" class="chat-image-detail-actions"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/notifications.js"></script>
+    <script src="/js/admin-chat-images.js"></script>
+</body>
+</html>

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - Totilove Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .users-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .users-metric-card {
+            position: relative;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+            padding: 7px 8px;
+            border-radius: 8px;
+            border: 1px solid #d8e3f1;
+            box-shadow: 0 2px 8px rgba(17, 24, 39, 0.06);
+            overflow: hidden;
+        }
+
+        .users-metric-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #0ea5e9 0%, #1d4ed8 100%);
+        }
+
+        .users-metric-card h4 {
+            margin: 0 0 4px;
+            font-size: 10px;
+            color: #52627a;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+        }
+
+        .users-metric-value {
+            margin: 0;
+            font-size: 18px;
+            line-height: 1;
+            font-weight: 400;
+            color: #0f172a;
+        }
+
+        .users-metric-total::before {
+            background: linear-gradient(90deg, #0369a1 0%, #1d4ed8 100%);
+        }
+
+        .users-metric-active::before {
+            background: linear-gradient(90deg, #16a34a 0%, #15803d 100%);
+        }
+
+        .users-metric-not-active::before {
+            background: linear-gradient(90deg, #64748b 0%, #475569 100%);
+        }
+
+        .users-metric-suspended::before {
+            background: linear-gradient(90deg, #ef4444 0%, #b91c1c 100%);
+        }
+
+        .users-metric-blacklisted::before {
+            background: linear-gradient(90deg, #c2410c 0%, #7c2d12 100%);
+        }
+
+        .users-metric-email-verified::before {
+            background: linear-gradient(90deg, #0891b2 0%, #0e7490 100%);
+        }
+
+        .users-metric-email-unverified::before {
+            background: linear-gradient(90deg, #f59e0b 0%, #b45309 100%);
+        }
+
+        .users-metric-profile-verified::before {
+            background: linear-gradient(90deg, #7c3aed 0%, #5b21b6 100%);
+        }
+
+        @media (max-width: 640px) {
+            .users-metrics {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .users-metric-value {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none;">← Back to Dashboard</a>
+                <form method="POST" action="/logout" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+            <h1>👥 User Management</h1>
+        </div>
+        
+        <div class="content">
+            <!-- Filters Section -->
+            <div class="filters-panel">
+                <div class="filters-header">
+                    <h2>Filters</h2>
+                    <button id="clearFilters" class="btn btn-link">Clear All</button>
+                </div>
+                <div class="tabs" id="quickFilterTabs" role="tablist" aria-label="User filter tabs">
+                    <button type="button" class="tab-btn active" role="tab" aria-selected="true" data-tab="custom">Custom</button>
+                    <button type="button" class="tab-btn" role="tab" aria-selected="false" data-tab="all">All Users (<span id="allUsersTabCount">0</span>)</button>
+                    <button type="button" class="tab-btn" role="tab" aria-selected="false" data-tab="active">Active</button>
+                    <button type="button" class="tab-btn" role="tab" aria-selected="false" data-tab="suspended">Suspended</button>
+                    <button type="button" class="tab-btn" role="tab" aria-selected="false" data-tab="blacklisted">Blacklisted (<span id="blacklistedTabCount">0</span>)</button>
+                    <button type="button" class="tab-btn" role="tab" aria-selected="false" data-tab="email_verified">Email Verified</button>
+                    <button type="button" class="tab-btn" role="tab" aria-selected="false" data-tab="email_unverified">Email Unverified</button>
+                    <button type="button" class="tab-btn" role="tab" aria-selected="false" data-tab="profile_verified">Profile Verified</button>
+                </div>
+                <div id="usersBreakdownPanel" class="users-metrics" aria-label="Users breakdown summary">
+                    <div class="users-metric-card users-metric-total">
+                        <h4>Total</h4>
+                        <p class="users-metric-value" id="summaryTotalUsers">0</p>
+                    </div>
+                    <div class="users-metric-card">
+                        <h4>Have Photo</h4>
+                        <p class="users-metric-value" id="summaryWithPhotosUsers">0</p>
+                    </div>
+                    <div class="users-metric-card">
+                        <h4>No Photo</h4>
+                        <p class="users-metric-value" id="summaryNoPhotosUsers">0</p>
+                    </div>
+                    <div class="users-metric-card">
+                        <h4>Male</h4>
+                        <p class="users-metric-value" id="summaryMaleUsers">0</p>
+                    </div>
+                    <div class="users-metric-card">
+                        <h4>Female</h4>
+                        <p class="users-metric-value" id="summaryFemaleUsers">0</p>
+                    </div>
+                    <div class="users-metric-card users-metric-active">
+                        <h4>Active</h4>
+                        <p class="users-metric-value" id="summaryActiveUsers">0</p>
+                    </div>
+                    <div class="users-metric-card users-metric-not-active">
+                        <h4>Not Active</h4>
+                        <p class="users-metric-value" id="summaryNotActiveUsers">0</p>
+                    </div>
+                    <div class="users-metric-card users-metric-suspended">
+                        <h4>Suspended</h4>
+                        <p class="users-metric-value" id="summarySuspendedUsers">0</p>
+                    </div>
+                    <div class="users-metric-card users-metric-blacklisted">
+                        <h4>Blacklisted</h4>
+                        <p class="users-metric-value" id="summaryBlacklistedUsers">0</p>
+                    </div>
+                    <div class="users-metric-card users-metric-email-verified">
+                        <h4>Email Verified</h4>
+                        <p class="users-metric-value" id="summaryEmailVerifiedUsers">0</p>
+                    </div>
+                    <div class="users-metric-card users-metric-email-unverified">
+                        <h4>Email Unverified</h4>
+                        <p class="users-metric-value" id="summaryEmailUnverifiedUsers">0</p>
+                    </div>
+                    <div class="users-metric-card users-metric-profile-verified">
+                        <h4>Profile Verified</h4>
+                        <p class="users-metric-value" id="summaryProfileVerifiedUsers">0</p>
+                    </div>
+                </div>
+                <div class="filters-grid" id="advancedFiltersPanel">
+                    <div class="filter-group search-filter-group">
+                        <label>Search</label>
+                        <input type="text" id="searchInput" placeholder="Username, email, ID, or location">
+                    </div>
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select id="statusFilter">
+                            <option value="">All</option>
+                            <option value="active">Active</option>
+                            <option value="suspended">Suspended</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Gender</label>
+                        <select id="genderFilter">
+                            <option value="">All</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Age Min</label>
+                        <input type="number" id="ageMin" min="18" max="100">
+                    </div>
+                    <div class="filter-group">
+                        <label>Age Max</label>
+                        <input type="number" id="ageMax" min="18" max="100">
+                    </div>
+                    <div class="filter-group">
+                        <label>Email Verified</label>
+                        <select id="emailVerifiedFilter">
+                            <option value="">All</option>
+                            <option value="true">Verified</option>
+                            <option value="false">Not Verified</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Profile Verified</label>
+                        <select id="profileVerifiedFilter">
+                            <option value="">All</option>
+                            <option value="true">Verified</option>
+                            <option value="false">Not Verified</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Has Images</label>
+                        <select id="hasImagesFilter">
+                            <option value="">All</option>
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Sort By</label>
+                        <select id="sortBy">
+                            <option value="date_joined">Date Joined</option>
+                            <option value="last_login">Last Login</option>
+                            <option value="real_name">Real Name</option>
+                            <option value="username">Real Name</option>
+                            <option value="id">ID</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Order</label>
+                        <select id="sortOrder">
+                            <option value="DESC">Descending</option>
+                            <option value="ASC">Ascending</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Show per page</label>
+                        <select id="itemsPerPage">
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="1000">1000</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="applyFilters" class="btn btn-primary" data-advanced-filter-control="true">Apply Filters</button>
+            </div>
+
+            <div style="margin: 0 0 12px;">
+                <button type="button" id="addBlacklistEntryBtn" class="btn btn-primary" style="display: none;">
+                    Add blacklist entry
+                </button>
+            </div>
+
+            <!-- Bulk Actions -->
+            <div class="bulk-actions" id="bulkActions" style="display: none;">
+                <span id="selectedCount">0</span> users selected
+                <select id="bulkOperation">
+                    <option value="">Select action...</option>
+                    <option value="suspend">Suspend Selected</option>
+                    <option value="unsuspend">Unsuspend Selected</option>
+                    <option value="verify_email">Verify Email</option>
+                    <option value="unverify_email">Unverify Email</option>
+                    <option value="verify_profile">Verify Profile</option>
+                    <option value="unverify_profile">Unverify Profile</option>
+                    <option value="delete">Delete Account</option>
+                    <option value="blacklist">Delete+Blacklist</option>
+                </select>
+                <button id="executeBulk" class="btn btn-primary">Execute</button>
+                <button id="clearSelection" class="btn btn-secondary">Clear Selection</button>
+            </div>
+
+            <!-- Users Table -->
+            <div class="users-totalbar" aria-label="Current result count">
+                <span class="badge badge--info" id="usersTotalTop">Total: 0</span>
+            </div>
+            <div class="table-container">
+                <table class="users-table">
+                    <thead id="usersTableHead">
+                        <tr>
+                            <th><input type="checkbox" id="selectAll"></th>
+                            <th class="sortable" data-sort="id">ID <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="real_name">Real Name <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="email">Email <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="age">Age <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="gender">Gender <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="location">Location <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="status">Status <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="image_count">Images <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="messages">Messages <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="likes">Likes <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="last_login">Last Login <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-sort="date_joined">Date Joined <span class="sort-arrow"></span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr>
+                            <td colspan="12" class="loading">Loading users...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <!-- User Detail Modal -->
+    <div id="userModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="userModalBody">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Edit blacklist entry (Blacklisted tab) -->
+    <div id="editBlacklistModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 520px;">
+            <span class="close" id="editBlacklistModalClose" aria-label="Close">&times;</span>
+            <h3 id="editBlacklistModalTitle" style="margin-top:0;">Edit blacklist entry</h3>
+            <div id="editBlacklistModalBody"></div>
+            <div id="editBlacklistModalError" class="delete-error" style="display: none; margin-top: 10px;"></div>
+            <div class="bl-entry-form__actions" style="margin-top: 16px; display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary" id="editBlacklistModalCancel">Cancel</button>
+                <button type="button" class="btn btn-primary" id="editBlacklistModalSave">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete User Confirmation Modal -->
+    <div id="adminDeleteUserModal" class="modal" style="display: none;">
+        <div class="modal-content delete-user-modal">
+            <span class="close delete-modal-close" data-action="close-delete-modal" aria-label="Close">&times;</span>
+
+            <!-- Step 1 -->
+            <div id="admin-delete-step1" class="delete-step">
+                <h3>Delete Account</h3>
+                <p>You're about to permanently delete <strong id="adminDeleteUserName">this user</strong>.</p>
+                <p class="delete-subtext">Email: <span id="adminDeleteUserEmail">Not provided</span></p>
+                <div class="delete-warning">
+                    <p>⚠️ This action is permanent and cannot be undone. Deleting an account will:</p>
+                    <ul>
+                        <li>Remove all messages, images, likes, matches, and profile data</li>
+                        <li>Hide this user everywhere and show receivers "Account Deactivated"</li>
+                        <li>Log the deletion in the audit trail with your admin account</li>
+                    </ul>
+                </div>
+                <div id="adminDeleteServerError" class="delete-error" style="display: none;"></div>
+                <div class="delete-actions">
+                    <button type="button" class="btn btn-secondary" data-action="close-delete-modal">Cancel</button>
+                    <button type="button" class="btn btn-account-delete" id="adminDeleteConfirmBtn">Delete Account</button>
+                </div>
+            </div>
+
+            <!-- Step 2: processing / result -->
+            <div id="admin-delete-step2" class="delete-step" style="display: none;">
+                <div id="adminDeleteSpinner" class="delete-spinner"></div>
+                <h3 id="adminDeleteProcessingTitle">Deleting Account...</h3>
+                <p id="adminDeleteProcessingText">Please wait while we permanently remove this account.</p>
+                <div id="adminDeleteResultMessage" class="delete-result-message"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/notifications.js"></script>
+    <script src="/js/admin-users.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

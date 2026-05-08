@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Backup & Restore - Totilove Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .backup-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(31,38,135,0.08);
+        }
+        
+        .backup-section h2 {
+            margin: 0 0 1rem 0;
+            color: var(--dark-color);
+            font-size: 1.5rem;
+        }
+        
+        .backup-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        
+        .backup-input-group {
+            display: flex;
+            gap: 0.5rem;
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .backup-input-group input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .backup-list {
+            margin-top: 1.5rem;
+        }
+        
+        .backup-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .backup-item-info {
+            flex: 1;
+        }
+        
+        .backup-item-name {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.25rem;
+        }
+        
+        .backup-item-details {
+            font-size: 0.85rem;
+            color: var(--muted-color);
+        }
+        
+        .backup-item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .status-message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: #856404;
+        }
+        
+        .warning-box strong {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <a href="/dashboard" class="btn btn-secondary" style="text-decoration: none;">← Back to Dashboard</a>
+                <form method="POST" action="/logout" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+            <h1>💾 Database Backup & Restore</h1>
+            <p>Create backups and restore your database. Useful for testing user deletion and other operations.</p>
+        </div>
+        
+        <div class="content">
+            <!-- Status Messages -->
+            <div id="statusMessage" class="status-message"></div>
+            
+            <!-- PostgreSQL Tools Check -->
+            <div id="toolsCheck" class="backup-section" style="display: none;">
+                <h2>⚠️ PostgreSQL Tools Status</h2>
+                <div id="toolsStatus"></div>
+            </div>
+            
+            <!-- Create Backup Section -->
+            <div class="backup-section">
+                <h2>📦 Create Backup</h2>
+                <p style="color: var(--muted-color); margin-bottom: 1.5rem;">Create a timestamped backup of your database. Use descriptive names like "before-user-deletion-test".</p>
+                
+                <div class="backup-input-group">
+                    <input type="text" id="backupName" placeholder="Enter backup name (optional)" style="flex: 1;">
+                    <button id="createBackupBtn" class="btn btn-primary" onclick="createBackup()">
+                        <i class="fas fa-download"></i> Create Backup
+                    </button>
+                </div>
+                
+                <div id="backupProgress" style="display: none; margin-top: 1rem;">
+                    <div class="loading"></div>
+                    <span>Creating backup...</span>
+                </div>
+            </div>
+            
+            <!-- Restore Backup Section -->
+            <div class="backup-section">
+                <h2>🔄 Restore Backup</h2>
+                <div class="warning-box">
+                    <strong>⚠️ Warning:</strong>
+                    Restoring will REPLACE your current database. All current data will be lost. Make sure you have a recent backup before restoring.
+                </div>
+                
+                <div class="backup-input-group">
+                    <select id="restoreBackupSelect" style="flex: 1; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem;">
+                        <option value="">Select a backup to restore...</option>
+                    </select>
+                    <button id="restoreBackupBtn" class="btn btn-danger" onclick="restoreBackup()" disabled>
+                        <i class="fas fa-undo"></i> Restore Backup
+                    </button>
+                </div>
+                
+                <div id="restoreProgress" style="display: none; margin-top: 1rem;">
+                    <div class="loading"></div>
+                    <span>Restoring backup...</span>
+                </div>
+            </div>
+            
+            <!-- Backup List Section -->
+            <div class="backup-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 style="margin: 0;">📋 Available Backups</h2>
+                    <button class="btn btn-secondary" onclick="loadBackups()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+                
+                <div id="backupList" class="backup-list">
+                    <div style="text-align: center; padding: 2rem; color: var(--muted-color);">
+                        <div class="loading"></div>
+                        Loading backups...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 12px; padding: 2rem; max-width: 500px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <h3 style="margin: 0 0 1rem 0; color: var(--dark-color);">Confirm Restore</h3>
+            <p id="confirmMessage" style="margin: 0 0 1.5rem 0; color: var(--muted-color);"></p>
+            <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; color: #856404;">
+                <strong>⚠️ This will REPLACE your current database!</strong><br>
+                Type <strong>"RESTORE"</strong> to confirm:
+            </div>
+            <input type="text" id="confirmInput" placeholder="Type RESTORE here" style="width: 100%; padding: 0.75rem; border: 2px solid #dee2e6; border-radius: 8px; font-size: 1rem; margin-bottom: 1.5rem; text-align: center; text-transform: uppercase;">
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="closeConfirmModal()">Cancel</button>
+                <button id="confirmRestoreBtn" class="btn btn-danger" onclick="confirmRestore()" disabled>Restore</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/notifications.js"></script>
+    <script src="/js/admin-backup-restore.js"></script>
+</body>
+</html>
+
+
