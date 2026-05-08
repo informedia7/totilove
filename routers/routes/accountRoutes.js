@@ -133,8 +133,8 @@ function createAccountRoutes(authController, authMiddleware) {
         throw new Error('AuthController is required for account routes');
     }
 
-    // Apply rate limiting and logging to all routes
-    router.use(accountLimiter || apiLimiter);
+    // Apply rate limiting and logging to API routes only
+    router.use('/api', accountLimiter || apiLimiter);
     router.use(requestLogger);
 
     // Require authentication for all account routes

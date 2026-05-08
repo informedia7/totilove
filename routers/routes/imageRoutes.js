@@ -403,8 +403,8 @@ function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
     // Start cleanup service
     startCleanupService(db, baseDir);
 
-    // Apply rate limiting and logging to all routes
-    router.use(imageUploadLimiter);
+    // Apply rate limiting and logging to API routes only
+    router.use('/api', imageUploadLimiter);
     router.use(requestLogger);
 
     // Require authentication for all image routes

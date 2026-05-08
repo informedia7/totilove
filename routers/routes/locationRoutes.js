@@ -24,8 +24,8 @@ function createLocationRoutes(db) {
         throw new Error('Database connection is required for location routes');
     }
 
-    // Apply lenient rate limiting for read-only lookup endpoints
-    router.use(lookupLimiter);
+    // Apply lenient rate limiting for read-only lookup endpoints (API only)
+    router.use('/api', lookupLimiter);
     router.use(requestLogger);
 
     /**

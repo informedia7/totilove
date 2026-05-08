@@ -29,8 +29,8 @@ function createUserRoutes(authController, templateController = null, authMiddlew
         throw new Error('AuthController is required for user routes');
     }
 
-    // Apply rate limiting and logging to all routes
-    router.use(accountLimiter || apiLimiter);
+    // Apply rate limiting and logging to API routes only
+    router.use('/api', accountLimiter || apiLimiter);
     router.use(requestLogger);
 
     // Apply optional auth (some endpoints may need it)
