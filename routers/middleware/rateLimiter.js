@@ -55,6 +55,10 @@ let standaloneRateLimiterClient = null;
 let usingSharedRedisClient = false;
 let presetsInitialized = false;
 
+function noopLimiter(_req, _res, next) {
+    return next();
+}
+
 function normalizeIp(ip = '') {
     if (!ip) {
         return 'unknown';
@@ -458,18 +462,20 @@ module.exports = {
     normalizeIp,
     hasRateLimit: !!rateLimit,
     globalApiLimiter: null,
-    profileUpdateLimiter: null,
-    imageUploadLimiter: null,
-    authLimiter: null,
-    apiLimiter: null,
-    strictLimiter: null,
-    validationLimiter: null,
-    activityLimiter: null,
-    messageCountLimiter: null,
-    lookupLimiter: null,
-    accountLimiter: null,
-    statusReadLimiter: null,
-    statusWriteLimiter: null,
-    presenceHeartbeatLimiter: null,
-    userStatusBurstLimiter: null
+    // Default to no-op middleware so route modules can safely destructure presets
+    // before initFromRedis() runs (Server.init calls it before routes are registered).
+    profileUpdateLimiter: noopLimiter,
+    imageUploadLimiter: noopLimiter,
+    authLimiter: noopLimiter,
+    apiLimiter: noopLimiter,
+    strictLimiter: noopLimiter,
+    validationLimiter: noopLimiter,
+    activityLimiter: noopLimiter,
+    messageCountLimiter: noopLimiter,
+    lookupLimiter: noopLimiter,
+    accountLimiter: noopLimiter,
+    statusReadLimiter: noopLimiter,
+    statusWriteLimiter: noopLimiter,
+    presenceHeartbeatLimiter: noopLimiter,
+    userStatusBurstLimiter: noopLimiter
 };
