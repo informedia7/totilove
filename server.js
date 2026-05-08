@@ -291,8 +291,10 @@ class Server {
     }
 }
 
-// Cluster support for production
-if (cluster.isMaster && process.env.NODE_ENV === 'production') {
+// Cluster support for production (opt-in).
+// Sessions are stored in-memory; multi-worker without a shared session store will cause "session expired"
+// when requests land on different workers. Enable only when you have a shared session store + sticky routing.
+if (cluster.isMaster && process.env.NODE_ENV === 'production' && process.env.ENABLE_CLUSTER === 'true') {
     const numCPUs = os.cpus().length;
     const numWorkers = Math.min(numCPUs, 4);
     
