@@ -27,16 +27,20 @@ function buildSslOption() {
     const pgSslRequired = pgSslMode === 'require' || pgSslMode === 'verify-ca' || pgSslMode === 'verify-full';
     const railwayLikely = !!process.env.RAILWAY_ENVIRONMENT || !!process.env.RAILWAY_PROJECT_ID;
     const prod = process.env.NODE_ENV === 'production';
+    const databaseUrl = resolveDatabaseUrl();
 
     // Railway's Postgres typically requires SSL. Auto-enable in prod/railway when DATABASE_URL is present,
     // but still allow opting out explicitly (DB_SSL=false).
     const dbSslOptOut = process.env.DB_SSL === 'false';
-    const shouldEnable = (dbSslExplicit || pgSslRequired || ((railwayLikely || prod) && !!resolveDatabaseUrl())) && !dbSslOptOut;
+    const shouldEnable = (dbSslExplicit || pgSslRequired || ((railwayLikely || prod) && !!databaseUrl)) && !dbSslOptOut;
 
     if (!shouldEnable) {
         return undefined;
     }
-    const rejectUnauthorized = process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false';
+
+    // Managed Postgres providers (Railway, etc.) often present cert chains that fail strict verification
+    // unless you provide the CA bundle. Default to permissive verify=false unless explicitly opted into strict mode.
+    const rejectUnauthorized = process.env.DB_SSL_REJECT_UNAUTHORIZED === 'true';
     const ca = process.env.DB_SSL_CA;
     const ssl = { rejectUnauthorized };
     if (ca && String(ca).trim()) {

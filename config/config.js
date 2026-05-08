@@ -33,7 +33,7 @@ module.exports = {
             process.env.DB_SSL === 'true' ||
             String(process.env.PGSSLMODE || '').toLowerCase() === 'require'
                 ? {
-                      rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false',
+                      rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED === 'true',
                       ...(process.env.DB_SSL_CA && String(process.env.DB_SSL_CA).trim()
                           ? { ca: String(process.env.DB_SSL_CA).replace(/\\n/g, '\n') }
                           : {})
