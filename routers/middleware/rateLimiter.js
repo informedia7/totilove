@@ -33,7 +33,9 @@ try {
     console.warn('[RateLimiter] redis client not available.');
 }
 
-const healthPathList = (process.env.RATE_LIMIT_HEALTH_PATHS || '/health,/live,/status,/healthz')
+// Default skip paths include health + high-frequency presence/search polling endpoints
+// so the UI doesn't DOS itself in production.
+const healthPathList = (process.env.RATE_LIMIT_HEALTH_PATHS || '/health,/live,/status,/healthz,/api/search,/api/search/filters,/api/presence,/api/users-online-status,/presence/subscribe')
     .split(',')
     .map((path) => path.trim())
     .filter(Boolean);
