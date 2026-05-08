@@ -14,19 +14,24 @@ module.exports = {
 
     // Database Configuration (primary Pool is built in server/config/database.js — keep this aligned)
     database: {
-        host: process.env.DB_HOST || 'localhost',
-        port: process.env.DB_PORT || 5432,
-        database: process.env.DB_NAME || 'totilove',
-        user: process.env.DB_USER || 'postgres',
-        password:
-            process.env.DB_PASSWORD ||
-            process.env.PGPASSWORD ||
-            (process.env.NODE_ENV === 'production' ? '' : 'password'),
+        ...(process.env.DATABASE_URL
+            ? { connectionString: process.env.DATABASE_URL }
+            : {
+                  host: process.env.DB_HOST || 'localhost',
+                  port: process.env.DB_PORT || 5432,
+                  database: process.env.DB_NAME || 'totilove',
+                  user: process.env.DB_USER || 'postgres',
+                  password:
+                      process.env.DB_PASSWORD ||
+                      process.env.PGPASSWORD ||
+                      (process.env.NODE_ENV === 'production' ? '' : 'password')
+              }),
         max: 20,
         idleTimeoutMillis: 30010,
         connectionTimeoutMillis: 2000,
         ssl:
-            process.env.DB_SSL === 'true'
+            process.env.DB_SSL === 'true' ||
+            String(process.env.PGSSLMODE || '').toLowerCase() === 'require'
                 ? {
                       rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false',
                       ...(process.env.DB_SSL_CA && String(process.env.DB_SSL_CA).trim()

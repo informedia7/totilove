@@ -167,13 +167,21 @@ function assertProductionDatabaseCredentials() {
     if (process.env.NODE_ENV !== 'production') {
         return;
     }
+    const url = String(process.env.DATABASE_URL || '').trim();
     const pwd = String(process.env.PGPASSWORD || process.env.DB_PASSWORD || '').trim();
-    if (!pwd) {
+
+    if (!pwd && !url) {
         console.error(
-            '[productionEnv] Set DB_PASSWORD or PGPASSWORD in production (empty passwords are not allowed).'
+            '[productionEnv] Set DATABASE_URL (preferred on Railway) or DB_PASSWORD/PGPASSWORD in production.'
         );
         process.exit(1);
     }
+
+    // If using DATABASE_URL, pg parses credentials from the URL.
+    if (!pwd && url) {
+        return;
+    }
+
     const lower = pwd.toLowerCase();
     if (lower === 'password' || lower === 'postgres' || lower === 'admin') {
         console.error(
