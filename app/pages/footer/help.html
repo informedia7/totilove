@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="description" content="Totilove Help Center — find answers to your questions.">
+    <title>Help Center — Totilove</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#764ba2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/assets/css/vendor/font-awesome.min.css">
+    <link rel="stylesheet" href="/assets/css/new/02-components/_navigation.css">
+    <link rel="stylesheet" href="/assets/css/new/05-pages/_footer-pages.css">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <script src="/assets/js/new/pwa-init.js"></script>
+</head>
+
+<body>
+    <div class="fp-page">
+        <!-- Hero -->
+        <div class="fp-hero">
+            <div class="fp-hero-inner">
+                <h1><i class="fas fa-life-ring"></i> Help Center</h1>
+                <p>Find answers to common questions and get the most out of Totilove.</p>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <main class="fp-main">
+            <div class="fp-card">
+                <a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> Back to Home</a>
+                <h2><i class="fas fa-user-plus"></i> Getting Started</h2>
+                <p>Creating an account on Totilove is free. Visit the <a href="/pages/register.html">Register page</a>
+                    and fill in your details. Once registered, complete your profile to increase your match visibility.
+                </p>
+
+                <hr class="fp-divider">
+
+                <h2><i class="fas fa-search-heart"></i> Finding Matches</h2>
+                <p>Use the <strong>Search</strong> feature to filter by age, location, language, and interests. Our
+                    smart matching engine also suggests compatible profiles automatically based on your preferences.</p>
+
+                <hr class="fp-divider">
+
+                <h2><i class="fas fa-comments"></i> Messaging</h2>
+                <p>You can send a message to any profile you match with. Go to <strong>Messages</strong> in the
+                    navigation bar to view all conversations. All messages are encrypted and private.</p>
+
+                <hr class="fp-divider">
+
+                <h2><i class="fas fa-cog"></i> Account Settings</h2>
+                <p>Manage your notification preferences, privacy settings, and language in <strong>Settings</strong>.
+                    You can deactivate or delete your account at any time from the Account section.</p>
+
+                <hr class="fp-divider">
+
+                <h2><i class="fas fa-credit-card"></i> Billing &amp; Subscriptions</h2>
+                <p>Totilove offers a free tier as well as premium plans. View and manage your subscription under
+                    <strong>Billing</strong> in your account menu. Cancel anytime — no hidden fees.</p>
+
+                <hr class="fp-divider">
+
+                <h2><i class="fas fa-envelope"></i> Still Need Help?</h2>
+                <p>Can't find your answer here? <a href="/pages/footer/contact.html">Contact our support team</a> and
+                    we'll get back to you within 24 hours.</p>
+            </div>
+        </main>
+
+        <footer class="fp-footer">
+            &copy; <span id="fp-year"></span> Totilove &mdash;
+            <a href="/pages/footer/privacy.html">Privacy</a> &bull;
+            <a href="/pages/footer/terms.html">Terms</a> &bull;
+            <a href="/pages/footer/contact.html">Contact</a>
+        </footer>
+    </div>
+
+    <script src="/assets/i18n/simple-i18n.js"></script>
+    <script>document.getElementById('fp-year').textContent = new Date().getFullYear();</script>
+</body>
+
+</html>

@@ -1,0 +1,302 @@
+<!-- Include User Profile Modal -->
+{{include:modals/user-profile-modal}}
+
+<!-- Include User Report Modal -->
+{{include:modals/user-report-modal}}
+
+    <!-- Presence engine + refresh are loaded globally via layout scripts -->
+
+<!-- Include Universal Message Modal -->
+{{include:modals/universal-message-modal}}
+
+<!-- Include Block Confirmation Modal -->
+{{include:modals/block-confirm-modal}}
+
+<!-- Universal component styles (includes user-card) -->
+<link rel="stylesheet" href="/assets/css/new/02-components/components.css">
+
+<!-- Extracted CSS from results.html - Phase 1 CSS Extraction -->
+<link rel="stylesheet" href="/assets/css/new/05-pages/_results.css">
+<script src="/components/user-card/user-card.js"></script>
+
+<style>
+.results-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: nowrap;
+}
+
+@media (min-width: 769px) {
+    .search-wrapper {
+        padding-top: 0;
+    }
+
+    .search-container {
+        padding-top: 0;
+    }
+}
+
+.results-top-row .back-to-search {
+    margin-bottom: 0;
+}
+
+#app-root .results-top-row .results-count,
+#app-root .results-top-row #resultsCount {
+    white-space: nowrap;
+    color: #111827;
+}
+
+body.dark-mode #app-root .results-top-row .results-count,
+body.dark-mode #app-root .results-top-row #resultsCount,
+html.theme-dark #app-root .results-top-row .results-count,
+html.theme-dark #app-root .results-top-row #resultsCount,
+html[data-theme="dark"] #app-root .results-top-row .results-count,
+html[data-theme="dark"] #app-root .results-top-row #resultsCount {
+    color: #b3b3b3 !important;
+    font-weight: 700;
+}
+
+.card-header-flex {
+    margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+    .results-top-row .results-count,
+    .results-top-row #resultsCount {
+        font-size: 0.88rem;
+    }
+
+    body.dark-mode .results-top-row .results-count,
+    body.dark-mode .results-top-row #resultsCount,
+    html.theme-dark .results-top-row .results-count,
+    html.theme-dark .results-top-row #resultsCount,
+    html[data-theme="dark"] .results-top-row .results-count,
+    html[data-theme="dark"] .results-top-row #resultsCount {
+        color: #f2f5ff;
+        font-weight: 700;
+    }
+
+    .card-title.card-title-large {
+        font-size: 0.76rem !important;
+    }
+
+    .search-parameters-container {
+        font-size: 0.68rem;
+    }
+
+    #searchParameters span {
+        font-size: 0.68rem !important;
+    }
+
+    #searchParameters span i {
+        font-size: 0.68rem !important;
+    }
+
+    .results-header-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.88rem;
+        flex-wrap: wrap;
+    }
+
+    .sort-controls,
+    .view-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.44rem;
+    }
+
+    .sort-controls label,
+    .view-controls label {
+        font-size: 0.79rem !important;
+    }
+
+    .sort-controls select,
+    .view-controls select {
+        font-size: 0.79rem;
+        min-height: 33px;
+        padding: 0.44rem 0.66rem;
+    }
+
+    .view-toggle {
+        width: auto;
+        justify-content: center;
+        margin: 0 auto;
+    }
+
+    .view-btn {
+        flex: 0 0 auto;
+        padding: 0.44rem 0.88rem;
+        min-width: 35px;
+        min-height: 35px;
+    }
+
+    .results-top-row {
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) and (orientation: portrait) {
+    .pagination {
+        display: flex;
+        flex-wrap: nowrap !important;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 0.12rem;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .pagination::-webkit-scrollbar {
+        display: none;
+    }
+
+    .pagination > * {
+        flex: 0 0 auto;
+    }
+
+    .page-numbers {
+        display: flex;
+        flex-wrap: nowrap !important;
+        gap: 0.1rem;
+        white-space: nowrap;
+        flex: 0 0 auto;
+    }
+
+    .page-numbers > * {
+        flex: 0 0 auto;
+    }
+
+    .page-btn {
+        padding: 0.3rem 0.3rem;
+        min-width: 22px;
+        font-size: 0.54rem;
+        line-height: 1;
+        flex: 0 0 auto;
+    }
+
+    .prev-next-btn {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.52rem;
+        white-space: nowrap;
+        flex: 0 0 auto;
+    }
+
+    #prevPage,
+    #nextPage {
+        font-size: 0 !important;
+        gap: 0;
+        min-width: 34px;
+    }
+
+    #prevPage i,
+    #nextPage i {
+        font-size: 0.56rem !important;
+        margin: 0;
+    }
+
+    .page-ellipsis {
+        font-size: 0.54rem;
+        padding: 0;
+    }
+}
+</style>
+
+    <!-- Email Verification Check Utility -->
+    <script src="/assets/js/new/shared/email-verification-check.js"></script>
+
+<div class="search-wrapper">
+        <div class="search-container">
+            <div class="results-top-row">
+                <a href="/search" class="back-to-search">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Search
+                </a>
+                <div class="results-count">
+                    <span id="resultsCount">0 matches found</span>
+                </div>
+            </div>
+
+            <div class="card-header card-header-flex">
+                <div class="card-header-inner">
+                    <div class="card-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <span class="card-title card-title-large">Search results for:</span>
+                </div>
+                <div id="searchParameters" class="search-parameters-container">
+                    <!-- Search parameters will be displayed here -->
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingContainer" class="loading-container">
+                <div class="spinner"></div>
+                <p>Searching for your perfect matches...</p>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" style="display: none;">
+                <div class="results-header">
+                    <div class="results-header-controls">
+                        <div class="sort-controls">
+                            <label for="sortBy">Sort by:</label>
+                            <select id="sortBy" name="sortBy">
+                                <option value="relevance">Relevance</option>
+                                <option value="distance">Distance</option>
+                                <option value="age">Age</option>
+                                <option value="last_active">Last Active</option>
+                            </select>
+                        </div>
+                        <div class="view-controls">
+                            <label for="cardsPerRow">Cards per row:</label>
+                            <select id="cardsPerRow" name="cardsPerRow">
+                                <option value="3">3</option>
+                                <option value="4" selected>4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                            </select>
+                        </div>
+                        <div class="view-toggle">
+                            <button class="view-btn active" data-view="grid" title="Grid View">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button class="view-btn" data-view="list" title="List View">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                        <div class="photo-filter-control">
+                            <label class="photo-filter-checkbox" for="results-with-photos">
+                                <input type="checkbox" id="results-with-photos" name="resultsWithPhotos">
+                                <span>Has profile photos</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-grid" id="resultsGrid">
+                    <!-- Results will be populated here -->
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="paginationContainer" style="display: none;">
+                    <button id="prevPage" class="page-btn prev-next-btn">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <div id="pageNumbers" class="page-numbers"></div>
+                    <button id="nextPage" class="page-btn prev-next-btn">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/js/new/pages/results/results-page.js" defer></script>
+
+    <!-- Session Manager -->

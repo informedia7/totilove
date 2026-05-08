@@ -1,0 +1,1899 @@
+<!-- User Profile Modal - Updated: Advanced UI with Dark Mode -->
+<div id="userProfileModal" class="profile-modal" role="dialog" aria-modal="true"
+    aria-labelledby="modal-profile-real_name" aria-describedby="modal-profile-content" tabindex="-1">
+    <div class="profile-modal-content">
+        <button class="close-profile-modal" id="closeProfileModalBtn" aria-label="Close modal">&times;</button>
+
+        <div id="modal-loading" class="loading" style="text-align: center; padding: 3rem;">
+            <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i>
+            <p style="margin-top: 1rem; color: #888;">Loading profile...</p>
+        </div>
+
+        <div id="modal-error" class="error"
+            style="display: none; text-align: center; padding: 2rem; color: var(--danger-color);">
+            <i class="fas fa-exclamation-triangle fa-2x"></i>
+            <p>Error loading profile</p>
+        </div>
+
+        <div id="modal-profile-content" style="display: none;">
+            <!-- HEADER -->
+            <div class="profile-header">
+                <img id="modal-profile-avatar" class="profile-avatar" src="/assets/images/default_profile_male.svg"
+                    alt="">
+                <div>
+                    <h2 id="modal-profile-real_name" class="profile-real_name"
+                        style="margin-bottom: 0; padding-bottom: 0; line-height: 1.2;">
+                        Loading...
+                    </h2>
+
+                    <div id="modal-profile-location-header"
+                        style="margin-top: 0.1rem !important; margin-bottom: 0; font-size: 1.14rem; color: #87CEEB; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; word-wrap: break-word; overflow-wrap: break-word;">
+                        <i class="fas fa-map-marker-alt"
+                            style="color: #87CEEB; font-size: 1.08rem; flex-shrink: 0;"></i>
+                        <span id="modal-profile-location-text"
+                            style="word-wrap: break-word; overflow-wrap: break-word;">Loading...</span>
+                    </div>
+
+                    <div id="modal-profile-meta" class="profile-meta" style="margin-top: 0.18rem;">
+                        <span><i class="fas fa-birthday-cake"></i> <span id="modal-profile-age">Loading...</span></span>
+                    </div>
+
+                    <div id="modal-profile-status" class="status" style="margin-top: 0.135rem;">
+                        <span id="modal-status-text"
+                            style="word-wrap: break-word; overflow-wrap: break-word;">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRID -->
+            <div class="profile-grid">
+                <!-- Photos Card -->
+                <div class="card photo-gallery-card">
+                    <h3><i class="fas fa-images"></i> Photos</h3>
+                    <div id="modal-profile-photos" class="photos">
+                        <img src="/assets/images/default_profile_male.svg" alt="Loading...">
+                    </div>
+                </div>
+
+                <!-- About + The person I am seeking for (combined card) -->
+                <div class="card combined-about-seeking-card">
+                    <h3><i class="fas fa-user"></i> About Me:</h3>
+                    <div id="modal-profile-about">
+                        <p>Loading...</p>
+                    </div>
+
+                    <h3 class="combined-section-title"><i class="fas fa-heart"></i> <span
+                            style="white-space: nowrap;">The person I am seeking for:</span> <span
+                            id="modal-looking-for-badges"
+                            style="display: flex; align-items: center; gap: 0.2rem; font-size: 0.9rem; font-weight: normal; flex-wrap: wrap;"></span>
+                    </h3>
+                    <div id="modal-profile-looking-for">
+                        <p>Loading...</p>
+                    </div>
+                </div>
+
+                <!-- Basic Information Card -->
+                <div class="card">
+                    <h3><i class="fas fa-briefcase"></i> Career & Education:</h3>
+                    <div
+                        style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 0.5rem; align-content: flex-start;">
+                        <span class="interest-text-item" id="modal-info-occupation"><i class="fas fa-briefcase"></i>
+                            <span>Loading...</span></span>
+                        <span class="interest-text-item" id="modal-info-education"><i class="fas fa-graduation-cap"></i>
+                            <span>Loading...</span></span>
+                        <span class="interest-text-item" id="modal-info-income"><i class="fas fa-dollar-sign"></i>
+                            <span>Loading...</span></span>
+                    </div>
+                </div>
+
+                <!-- Interests Card -->
+                <div class="card">
+                    <h3><i class="fas fa-star"></i> Interests and <span class="modal-hobbies-accent">Hobbies:</span>
+                    </h3>
+                    <div id="modal-profile-interests"
+                        style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 0.5rem; align-content: flex-start;">
+                        <span>Loading...</span>
+                    </div>
+                </div>
+
+                <!-- Basic Info Card -->
+                <div class="card">
+                    <h3><i class="fas fa-id-card"></i> Basic Info:</h3>
+                    <div id="modal-profile-basic-info"
+                        style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 0.5rem; align-content: flex-start;">
+                        <span class="interest-text-item" id="modal-info-height"><i class="fas fa-ruler-vertical"></i>
+                            <span>Loading...</span></span>
+                        <span class="interest-text-item" id="modal-info-weight"><i class="fas fa-weight-scale"></i>
+                            <span>Loading...</span></span>
+                        <span class="interest-text-item" id="modal-info-body-type"><i class="fas fa-person"></i>
+                            <span>Loading...</span></span>
+                        <span class="interest-text-item" id="modal-info-eye-color"><i class="fas fa-eye"></i>
+                            <span>Loading...</span></span>
+                        <span class="interest-text-item" id="modal-info-ethnicity"><i class="fas fa-earth-asia"></i>
+                            <span>Loading...</span></span>
+                        <span class="interest-text-item" id="modal-info-religion"><i class="fas fa-pray"></i>
+                            <span>Loading...</span></span>
+                        <span class="interest-text-item" id="modal-info-marital-status"><i class="fas fa-ring"></i>
+                            <span>Loading...</span></span>
+                        <span class="interest-text-item" id="modal-info-lifestyle"><i class="fas fa-seedling"></i>
+                            <span>Loading...</span></span>
+                        <span class="interest-text-item" id="modal-info-living-situation"><i
+                                class="fas fa-house-user"></i>
+                            <span>Loading...</span></span>
+                        <span class="interest-text-item" id="modal-info-body-art"><i class="fas fa-palette"></i>
+                            <span>Loading...</span></span>
+                        <span class="interest-text-item" id="modal-info-english-ability"><i class="fas fa-language"></i>
+                            <span>Loading...</span></span>
+                        <span class="interest-text-item" id="modal-info-relocation"><i class="fas fa-truck"></i>
+                            <span>Loading...</span></span>
+                        <span class="interest-text-item" id="modal-info-smoking"><i class="fas fa-smoking"></i>
+                            <span>Loading...</span></span>
+                        <span class="interest-text-item" id="modal-info-drinking"><i class="fas fa-wine-glass"></i>
+                            <span>Loading...</span></span>
+                        <span class="interest-text-item" id="modal-info-exercise"><i class="fas fa-dumbbell"></i>
+                            <span>Loading...</span></span>
+                        <span class="interest-text-item" id="modal-info-have-children"><i class="fas fa-baby"></i>
+                            <span>Loading...</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="actions">
+                <button class="btn like modal-like-btn" id="modal-like-btn" data-action="like">
+                    <i class="fas fa-thumbs-up"></i> <span class="like-btn-text">Like</span>
+                </button>
+                <button class="btn fav modal-favourite-btn" id="modal-favourite-btn" data-action="favourite">
+                    <i class="fas fa-star"></i> <span class="favourite-btn-text">Add to Favourites</span>
+                </button>
+                <button class="btn msg modal-message-btn" id="modal-message-btn" data-action="message"
+                    aria-label="Send message" title="Send message">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+                <button class="btn block modal-block-btn" id="modal-block-btn" data-action="block"
+                    style="display: none;">
+                    <i class="fas fa-ban"></i> Block
+                </button>
+                <button class="btn report modal-report-btn" id="modal-report-btn" data-action="report"
+                    style="display: none;">
+                    <i class="fas fa-flag"></i> Report
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('userProfileModal')?.addEventListener('click', e => { if (e.target.id === 'userProfileModal' && typeof window.closeProfileModal === 'function') window.closeProfileModal(); });
+        document.getElementById('closeProfileModalBtn')?.addEventListener('click', () => { if (typeof window.closeProfileModal === 'function') window.closeProfileModal(); });
+    });
+</script>
+
+<style>
+    :root {
+        --primary: #667eea;
+        --secondary: #764ba2;
+        --danger-color: #e74c3c;
+        --success-color: #00b894;
+    }
+
+    /* ===== MODAL ===== */
+    .profile-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .75);
+        display: none;
+        padding: 1.2rem;
+        z-index: 10000;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .profile-modal.dark,
+    html[data-theme="dark"] .profile-modal,
+    body.dark-mode .profile-modal {
+        background: rgba(0, 0, 0, .9);
+    }
+
+    .profile-modal-content {
+        max-width: 1100px;
+        margin: auto;
+        background: #fff;
+        border-radius: 22px;
+        padding: 1.5rem;
+        position: relative;
+        box-sizing: border-box;
+    }
+
+    .profile-modal.dark .profile-modal-content,
+    html[data-theme="dark"] .profile-modal .profile-modal-content,
+    body.dark-mode .profile-modal .profile-modal-content {
+        background: #121212;
+        color: #eee;
+    }
+
+    /* ===== HEADER ===== */
+    .profile-modal .close-profile-modal {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 2.2rem;
+        background: rgba(255, 255, 255, 0.95);
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        color: #333;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        z-index: 10;
+    }
+
+    .profile-modal .close-profile-modal:hover {
+        background: #fff;
+        color: #e74c3c;
+        border-color: #e74c3c;
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        transform: scale(1.1);
+    }
+
+    .profile-modal.dark .close-profile-modal,
+    html[data-theme="dark"] .profile-modal .close-profile-modal,
+    body.dark-mode .profile-modal .close-profile-modal {
+        background: rgba(30, 30, 30, 0.95);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .profile-modal.dark .close-profile-modal:hover,
+    html[data-theme="dark"] .profile-modal .close-profile-modal:hover,
+    body.dark-mode .profile-modal .close-profile-modal:hover {
+        background: #2a2a2a;
+        color: #e74c3c;
+        border-color: #e74c3c;
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+    }
+
+
+    .profile-modal .profile-header {
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+        border-bottom: none;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        color: white;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .profile-modal .profile-header>div {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .profile-modal.dark .profile-header,
+    html[data-theme="dark"] .profile-modal .profile-header,
+    body.dark-mode .profile-modal .profile-header {
+        background: linear-gradient(135deg, #0b1220 0%, #111a2e 100%);
+        color: white;
+    }
+
+    .profile-modal.dark .profile-header *,
+    html[data-theme="dark"] .profile-modal .profile-header *,
+    body.dark-mode .profile-modal .profile-header * {
+        color: inherit;
+    }
+
+    .profile-modal .profile-avatar {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, .2);
+        flex-shrink: 0;
+    }
+
+    /* Letter avatar when user has no profile photo (aligned with Talk list/header) */
+    .profile-modal .profile-avatar-initial {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 2.25rem;
+        color: #fff;
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, .2);
+        user-select: none;
+    }
+
+    .profile-modal .profile-real_name {
+        margin: 0;
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2ecc71;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        min-width: 0;
+        flex-wrap: wrap;
+        line-height: 1.2;
+    }
+
+    .profile-modal.dark .profile-real_name,
+    html[data-theme="dark"] .profile-modal .profile-real_name,
+    body.dark-mode .profile-modal .profile-real_name {
+        color: #2ecc71;
+        text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .profile-modal .profile-meta {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        font-size: .9rem;
+        color: #ffffff;
+        margin-top: 0.18rem !important;
+        margin-bottom: 0;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .profile-modal.dark .profile-meta,
+    html[data-theme="dark"] .profile-modal .profile-meta,
+    body.dark-mode .profile-modal .profile-meta {
+        color: #ffffff;
+    }
+
+    .profile-modal.dark #modal-profile-location-header,
+    html[data-theme="dark"] .profile-modal #modal-profile-location-header,
+    body.dark-mode .profile-modal #modal-profile-location-header {
+        color: #87CEEB;
+    }
+
+    .profile-modal.dark #modal-profile-location-text,
+    html[data-theme="dark"] .profile-modal #modal-profile-location-text,
+    body.dark-mode .profile-modal #modal-profile-location-text {
+        color: #87CEEB;
+    }
+
+    .profile-modal.dark .status,
+    html[data-theme="dark"] .profile-modal .status,
+    body.dark-mode .profile-modal .status {
+        color: #ffffff;
+    }
+
+    .profile-modal.dark #modal-status-text,
+    html[data-theme="dark"] .profile-modal #modal-status-text,
+    body.dark-mode .profile-modal #modal-status-text {
+        color: #ffffff;
+    }
+
+    .profile-modal .verified {
+        color: #1da1f2;
+        margin-left: .4rem;
+    }
+
+    .profile-modal .status {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        margin-top: 0.135rem !important;
+        margin-bottom: 0;
+        font-size: .9rem;
+        color: #ffffff;
+        flex-wrap: wrap;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
+    }
+
+    /* ===== GRID ===== */
+    .profile-modal .profile-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        margin-top: 1.2rem;
+    }
+
+    .profile-modal .card {
+        background: #f9fafb;
+        border-radius: 16px;
+        padding: 1.1rem;
+    }
+
+    .profile-modal .photo-gallery-card {
+        align-self: start;
+    }
+
+    .profile-modal .combined-about-seeking-card {
+        grid-column: span 2;
+    }
+
+    .profile-modal .combined-section-title {
+        margin-top: 1.4rem !important;
+        padding-top: 1.4rem !important;
+        border-top: 1px solid rgba(102, 126, 234, 0.22);
+    }
+
+    /* Carousel bleeds edge-to-edge inside the card — margin cancels card padding */
+    .profile-modal .carousel-fullbleed {
+        margin: -1.1rem -1.1rem 0 -1.1rem;
+    }
+
+    .profile-modal.dark .card,
+    html[data-theme="dark"] .profile-modal .card,
+    body.dark-mode .profile-modal .card {
+        background: #1c1c1c;
+    }
+
+    .profile-modal.dark .combined-section-title,
+    html[data-theme="dark"] .profile-modal .combined-section-title,
+    body.dark-mode .profile-modal .combined-section-title {
+        border-top-color: rgba(102, 126, 234, 0.35);
+    }
+
+    .profile-modal .card h3 {
+        margin-top: 0;
+        margin-bottom: .8rem;
+        font-size: 1rem;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .profile-modal .info-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .profile-modal .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 0;
+        margin-bottom: -0.2rem;
+        border: none;
+        border-bottom: none !important;
+    }
+
+    .profile-modal .info-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .profile-modal .info-item:last-child {
+        padding-bottom: 0;
+    }
+
+    .profile-modal .info-label {
+        font-weight: 500;
+        color: #888;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .profile-modal .info-label i {
+        color: #000;
+        font-size: 0.9rem;
+    }
+
+    .profile-modal.dark .info-label,
+    html[data-theme="dark"] .profile-modal .info-label,
+    body.dark-mode .profile-modal .info-label {
+        color: #aaa;
+    }
+
+    .profile-modal .info-value {
+        font-weight: 600;
+        color: #333;
+        text-align: right;
+    }
+
+    .profile-modal.dark .info-value,
+    html[data-theme="dark"] .profile-modal .info-value,
+    body.dark-mode .profile-modal .info-value {
+        color: #eee;
+    }
+
+    /* ===== TAGS ===== */
+    .profile-modal .tags {
+        display: flex;
+        gap: .4rem;
+        flex-wrap: wrap;
+    }
+
+    .profile-modal .tags span {
+        background: linear-gradient(90deg, var(--primary), #764ba2);
+        color: #fff;
+        padding: .3rem .8rem;
+        border-radius: 20px;
+        font-size: .75rem;
+    }
+
+    .profile-modal .interest-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.8rem;
+        background: #f8f9fa;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        color: #333;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .profile-modal.dark .interest-item,
+    html[data-theme="dark"] .profile-modal .interest-item,
+    body.dark-mode .profile-modal .interest-item {
+        background: #2a2a2a;
+        color: #eee;
+    }
+
+    /* ===== BADGES (interest-text-item) - Modern Redesign ===== */
+
+    .profile-modal .modal-hobbies-accent {
+        color: #b86426;
+    }
+
+    .profile-modal.dark .modal-hobbies-accent,
+    html[data-theme="dark"] .profile-modal .modal-hobbies-accent,
+    body.dark-mode .profile-modal .modal-hobbies-accent {
+        color: #e6a15c;
+    }
+
+    /* Base - Modern Glass Morphism Style */
+    .profile-modal .interest-text-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.34rem;
+        font-size: 0.54rem;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        color: #1e293b;
+        background: linear-gradient(135deg, #e9efff 0%, #dde7ff 100%);
+        backdrop-filter: blur(8px);
+        padding: 0.27rem 0.68rem;
+        border-radius: 8px;
+        border: 1px solid #b8c7ff;
+        white-space: nowrap;
+    }
+
+    /* Basic Info card - badges 10% larger than base 0.54rem */
+    .profile-modal #modal-profile-basic-info .interest-text-item {
+        font-size: 0.594rem;
+    }
+
+    /* Dark mode - Elevated Dark Theme */
+    .profile-modal.dark .interest-text-item,
+    html[data-theme="dark"] .profile-modal .interest-text-item,
+    body.dark-mode .profile-modal .interest-text-item {
+        background: linear-gradient(135deg, #263152 0%, #2f3d66 100%);
+        backdrop-filter: blur(8px);
+        color: #e2e8f0;
+        border-color: #4b5f99;
+    }
+
+    /* Icon (Light) - Distinctive & Vivid */
+    .profile-modal .interest-text-item i {
+        color: #4f46e5;
+        font-size: 1.12rem;
+        flex-shrink: 0;
+        filter: drop-shadow(0 1px 2px rgba(79, 70, 229, 0.3));
+    }
+
+    /* Hobby items get a warm orange icon */
+    .profile-modal .interest-text-item.hobby-item i {
+        color: #c26a33;
+        font-size: 1.12rem;
+        filter: drop-shadow(0 1px 2px rgba(194, 106, 51, 0.35));
+    }
+
+    /* Icon (Dark) - Brighter with Glow */
+    .profile-modal.dark .interest-text-item i,
+    html[data-theme="dark"] .profile-modal .interest-text-item i,
+    body.dark-mode .profile-modal .interest-text-item i {
+        color: #818cf8;
+        filter: drop-shadow(0 0 4px rgba(129, 140, 248, 0.6));
+    }
+
+    .profile-modal.dark .interest-text-item.hobby-item i,
+    html[data-theme="dark"] .profile-modal .interest-text-item.hobby-item i,
+    body.dark-mode .profile-modal .interest-text-item.hobby-item i {
+        color: #e6a15c;
+        filter: drop-shadow(0 0 4px rgba(230, 161, 92, 0.6));
+    }
+
+    /* Inner text span - Enhanced Typography */
+    .profile-modal .interest-text-item span {
+        display: inline;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        font-size: 130%;
+    }
+
+    /* Variant: Pill Shape (Alternative style) */
+    .profile-modal .interest-text-item.pill {
+        border-radius: 999px;
+        padding: 0.4rem 1.2rem;
+    }
+
+    /* Variant: Minimal Outline */
+    .profile-modal .interest-text-item.outline {
+        background: transparent;
+        backdrop-filter: none;
+        border: 1.5px solid rgba(102, 126, 234, 0.3);
+    }
+
+    /* Empty State - Subtle & Modern */
+    .profile-modal .interest-text-empty {
+        color: #94a3b8 !important;
+        font-style: italic;
+        font-size: 0.85rem;
+        letter-spacing: -0.01em;
+    }
+
+    .profile-modal .interest-text-empty i {
+        color: #94a3b8 !important;
+        opacity: 0.7;
+    }
+
+    .profile-modal.dark .interest-text-empty,
+    html[data-theme="dark"] .profile-modal .interest-text-empty,
+    body.dark-mode .profile-modal .interest-text-empty {
+        color: #64748b !important;
+    }
+
+    .profile-modal.dark .interest-text-empty i,
+    html[data-theme="dark"] .profile-modal .interest-text-empty i,
+    body.dark-mode .profile-modal .interest-text-empty i {
+        color: #64748b !important;
+    }
+
+    /* Optional: Color Variants */
+    .profile-modal .interest-text-item[data-color="purple"] {
+        background: linear-gradient(135deg, #ede6ff 0%, #e3d6ff 100%);
+        border-color: #cbb4ff;
+    }
+
+    .profile-modal .interest-text-item[data-color="purple"] i {
+        color: #8b5cf6;
+    }
+
+    .profile-modal .interest-text-item[data-color="green"] {
+        background: linear-gradient(135deg, #e5f9ee 0%, #d6f3e5 100%);
+        border-color: #a7e3c0;
+    }
+
+    .profile-modal .interest-text-item[data-color="green"] i {
+        color: #22c55e;
+    }
+
+    .profile-modal .interest-text-item[data-color="orange"] {
+        background: linear-gradient(135deg, #fff0e4 0%, #ffe4d0 100%);
+        border-color: #ffc89d;
+    }
+
+    .profile-modal .interest-text-item[data-color="orange"] i {
+        color: #f97316;
+    }
+
+    .profile-modal .interest-text-item.hobby-item {
+        color: #7a4621;
+        background: linear-gradient(135deg, #fbeadf 0%, #f6dcc9 100%);
+        border-color: #e0ae88;
+    }
+
+    .profile-modal .interest-text-item.hobby-item i {
+        color: #c26a33;
+    }
+
+    .profile-modal.dark .interest-text-item.hobby-item,
+    html[data-theme="dark"] .profile-modal .interest-text-item.hobby-item,
+    body.dark-mode .profile-modal .interest-text-item.hobby-item {
+        color: #f2c6a0;
+        background: linear-gradient(135deg, #4c2f1d 0%, #5b3924 100%);
+        border-color: #b57a4f;
+    }
+
+    .profile-modal.dark .interest-text-item.hobby-item i,
+    html[data-theme="dark"] .profile-modal .interest-text-item.hobby-item i,
+    body.dark-mode .profile-modal .interest-text-item.hobby-item i {
+        color: #e6a15c;
+        filter: drop-shadow(0 0 2px rgba(230, 161, 92, 0.28));
+    }
+
+    /* Relationship Type Badge - Dark Mode Support */
+    .profile-modal .dark p span[style*="background: linear-gradient(135deg, rgba(102, 126, 234"],
+    html[data-theme="dark"] .profile-modal p span[style*="background: linear-gradient(135deg, rgba(102, 126, 234"],
+    body.dark-mode .profile-modal p span[style*="background: linear-gradient(135deg, rgba(102, 126, 234"] {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.12) 0%, rgba(142, 166, 255, 0.18) 100%) !important;
+        color: #e2e8f0 !important;
+        border-color: rgba(142, 166, 255, 0.25) !important;
+    }
+
+    .profile-modal.dark p span[style*="background: linear-gradient(135deg, rgba(102, 126, 234"] i,
+    html[data-theme="dark"] .profile-modal p span[style*="background: linear-gradient(135deg, rgba(102, 126, 234"] i,
+    body.dark-mode .profile-modal p span[style*="background: linear-gradient(135deg, rgba(102, 126, 234"] i {
+        filter: drop-shadow(0 0 2px rgba(142, 166, 255, 0.3));
+    }
+
+    /* Custom tooltips for badge line - always appear above */
+    #modal-looking-for-badges [data-tooltip],
+    #modal-info-occupation[data-tooltip],
+    #modal-info-education[data-tooltip],
+    #modal-info-income[data-tooltip],
+    #modal-profile-interests .interest-text-item[data-tooltip],
+    #modal-profile-basic-info .interest-text-item[data-tooltip] {
+        position: relative;
+    }
+
+
+
+    /* Age badge in seeking section */
+    #modal-looking-for-badges .interest-text-item {
+        font-size: 0.75rem !important;
+    }
+
+    /* Gender icon in seeking section: desktop +15% */
+    .profile-modal .seeking-gender-icon {
+        font-size: 1.265em !important;
+    }
+
+    /* Seeking age badge */
+    .profile-modal .seeking-age-item {
+        font-size: 0.75rem !important;
+    }
+
+    #modal-looking-for-badges [data-tooltip]::after,
+    #modal-info-occupation[data-tooltip]::after,
+    #modal-info-education[data-tooltip]::after,
+    #modal-info-income[data-tooltip]::after,
+    #modal-profile-interests .interest-text-item[data-tooltip]::after,
+    #modal-profile-basic-info .interest-text-item[data-tooltip]::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: calc(100% + 6px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #e9efff 0%, #dde7ff 100%);
+        color: #1e293b;
+        backdrop-filter: blur(8px);
+        border: 1px solid #b8c7ff;
+        padding: 0.35rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.78rem;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-style: normal;
+        text-transform: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.15s;
+        z-index: 99999;
+        line-height: 1.4;
+    }
+
+    #modal-looking-for-badges [data-tooltip]:hover::after,
+    #modal-info-occupation[data-tooltip]:hover::after,
+    #modal-info-education[data-tooltip]:hover::after,
+    #modal-info-income[data-tooltip]:hover::after,
+    #modal-profile-interests .interest-text-item[data-tooltip]:hover::after,
+    #modal-profile-basic-info .interest-text-item[data-tooltip]:hover::after {
+        opacity: 1;
+    }
+
+    .profile-modal.dark #modal-looking-for-badges [data-tooltip]::after,
+    .profile-modal.dark #modal-info-occupation[data-tooltip]::after,
+    .profile-modal.dark #modal-info-education[data-tooltip]::after,
+    .profile-modal.dark #modal-info-income[data-tooltip]::after,
+    .profile-modal.dark #modal-profile-interests .interest-text-item[data-tooltip]::after,
+    .profile-modal.dark #modal-profile-basic-info .interest-text-item[data-tooltip]::after,
+    html[data-theme="dark"] .profile-modal #modal-looking-for-badges [data-tooltip]::after,
+    html[data-theme="dark"] .profile-modal #modal-info-occupation[data-tooltip]::after,
+    html[data-theme="dark"] .profile-modal #modal-info-education[data-tooltip]::after,
+    html[data-theme="dark"] .profile-modal #modal-info-income[data-tooltip]::after,
+    html[data-theme="dark"] .profile-modal #modal-profile-interests .interest-text-item[data-tooltip]::after,
+    html[data-theme="dark"] .profile-modal #modal-profile-basic-info .interest-text-item[data-tooltip]::after,
+    body.dark-mode #modal-looking-for-badges [data-tooltip]::after,
+    body.dark-mode #modal-info-occupation[data-tooltip]::after,
+    body.dark-mode #modal-info-education[data-tooltip]::after,
+    body.dark-mode #modal-info-income[data-tooltip]::after,
+    body.dark-mode #modal-profile-interests .interest-text-item[data-tooltip]::after,
+    body.dark-mode #modal-profile-basic-info .interest-text-item[data-tooltip]::after {
+        background: linear-gradient(135deg, #263152 0%, #2f3d66 100%);
+        color: #e2e8f0;
+        border-color: #4b5f99;
+    }
+
+    /* Career/Education/Salary tooltip bubble - browser-style flat dark */
+    #modal-info-occupation[data-tooltip]::after,
+    #modal-info-education[data-tooltip]::after,
+    #modal-info-income[data-tooltip]::after,
+    #modal-profile-interests .interest-text-item[data-tooltip]::after,
+    #modal-profile-basic-info .interest-text-item[data-tooltip]::after {
+        border-radius: 3px !important;
+        background: rgba(30, 30, 30, 0.92) !important;
+        color: #ffffff !important;
+        border: none !important;
+        padding: 0.25rem 0.5rem !important;
+        font-size: 0.75rem !important;
+        font-weight: 400 !important;
+        letter-spacing: 0 !important;
+        backdrop-filter: none !important;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25) !important;
+    }
+
+    /* About + Looking For text sizing (prevents mobile portrait inflation) */
+    .profile-modal #modal-profile-about,
+    .profile-modal #modal-profile-looking-for {
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+    }
+
+    .profile-modal .modal-profile-text-block {
+        white-space: pre-wrap;
+        word-break: break-word;
+        margin: 4px 0 12px 0;
+        font-size: 0.99rem;
+        line-height: 1.45;
+        color: #333;
+    }
+
+    .profile-modal .modal-profile-empty {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 0.6rem 0;
+        font-size: 1.4rem;
+        color: #ccc;
+        gap: 0.35rem;
+        cursor: default;
+    }
+
+    .profile-modal .modal-profile-empty .empty-dots {
+        font-size: 0.85rem;
+        color: #bbb;
+        letter-spacing: 0.05em;
+    }
+
+    .profile-modal .modal-profile-empty .empty-hover-text {
+        display: none;
+        font-size: 0.78rem;
+        color: #aaa;
+        font-style: italic;
+    }
+
+    .profile-modal .modal-profile-empty:hover .empty-dots {
+        display: none;
+    }
+
+    .profile-modal .modal-profile-empty:hover .empty-hover-text {
+        display: inline;
+    }
+
+    .profile-modal.dark .modal-profile-empty,
+    html[data-theme="dark"] .profile-modal .modal-profile-empty,
+    body.dark-mode .profile-modal .modal-profile-empty {
+        color: #444;
+    }
+
+    .profile-modal #modal-profile-about p,
+    .profile-modal #modal-profile-looking-for p,
+    .profile-modal #modal-profile-about .modal-profile-text-block,
+    .profile-modal #modal-profile-looking-for .modal-profile-text-block {
+        font-size: 0.99rem;
+        line-height: 1.45;
+        margin: 0 0 0.5rem 0;
+        color: #333;
+    }
+
+    .profile-modal #modal-profile-about p:last-child,
+    .profile-modal #modal-profile-looking-for p:last-child,
+    .profile-modal #modal-profile-about .modal-profile-text-block:last-child,
+    .profile-modal #modal-profile-looking-for .modal-profile-text-block:last-child {
+        margin-bottom: 0;
+    }
+
+    .profile-modal.dark #modal-profile-about p,
+    html[data-theme="dark"] .profile-modal #modal-profile-about p,
+    body.dark-mode .profile-modal #modal-profile-about p,
+    .profile-modal.dark #modal-profile-looking-for p,
+    html[data-theme="dark"] .profile-modal #modal-profile-looking-for p,
+    body.dark-mode .profile-modal #modal-profile-looking-for p,
+    .profile-modal.dark #modal-profile-about .modal-profile-text-block,
+    html[data-theme="dark"] .profile-modal #modal-profile-about .modal-profile-text-block,
+    body.dark-mode .profile-modal #modal-profile-about .modal-profile-text-block,
+    .profile-modal.dark #modal-profile-looking-for .modal-profile-text-block,
+    html[data-theme="dark"] .profile-modal #modal-profile-looking-for .modal-profile-text-block,
+    body.dark-mode .profile-modal #modal-profile-looking-for .modal-profile-text-block {
+        color: #eee;
+    }
+
+    /* ===== PHOTOS ===== */
+    .profile-modal .photos {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 0.8rem;
+    }
+
+    .profile-modal .photos img {
+        width: 100%;
+        height: 154px;
+        object-fit: cover;
+        border-radius: 12px;
+        cursor: pointer;
+        display: block;
+        user-select: none;
+        -webkit-user-drag: none;
+    }
+
+    .profile-modal .profile-modal-photo-not-provided {
+        grid-column: 1 / -1;
+        min-height: 80px;
+        padding: 1.25rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 1rem;
+        color: #6c757d;
+        background: rgba(0, 0, 0, 0.04);
+        border: 1px dashed rgba(0, 0, 0, 0.12);
+        border-radius: 12px;
+    }
+
+    .profile-modal.dark .profile-modal-photo-not-provided,
+    html[data-theme="dark"] .profile-modal .profile-modal-photo-not-provided,
+    body.dark-mode .profile-modal .profile-modal-photo-not-provided {
+        color: #adb5bd;
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    /* ===== ACTIONS ===== */
+    .profile-modal .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .6rem;
+        justify-content: center;
+        margin-top: 1.2rem;
+    }
+
+    .profile-modal .btn {
+        padding: .66rem 1.54rem;
+        border-radius: 30px;
+        border: none;
+        font-size: .88rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        transition: all 0.3s ease;
+    }
+
+    .profile-modal .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .profile-modal .like {
+        background: linear-gradient(135deg, #3c7db0, #2c5e88);
+        color: #fff;
+    }
+
+    .profile-modal .like:hover {
+        background: linear-gradient(135deg, #4b8fc5, #336c99);
+    }
+
+    .profile-modal .fav {
+        background: linear-gradient(135deg, #356f9f, #29557b);
+        color: #fff;
+    }
+
+    .profile-modal .fav:hover {
+        background: linear-gradient(135deg, #4283b8, #31648f);
+    }
+
+    .profile-modal .msg {
+        background: linear-gradient(135deg, #3c7db0, #2c5e88);
+        color: #fff;
+    }
+
+    .profile-modal .msg:hover {
+        background: linear-gradient(135deg, #4b8fc5, #336c99);
+        transform: none;
+        box-shadow: none;
+    }
+
+    .profile-modal .msg:active {
+        transform: scale(0.93);
+        transition: transform 0.1s ease;
+    }
+
+    .profile-modal .modal-message-btn {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        padding: 0;
+        border-radius: 50%;
+        flex: 0 0 44px;
+        justify-content: center;
+        gap: 0;
+    }
+
+    .profile-modal .modal-message-btn i {
+        font-size: 1rem !important;
+        margin-right: 0 !important;
+    }
+
+    .profile-modal .block {
+        background: #f5f6fa;
+        color: #d63031;
+        border: 2px solid #d63031;
+    }
+
+    .profile-modal .report {
+        background: #f5f6fa;
+        color: #e74c3c;
+        border: 2px solid #e74c3c;
+    }
+
+    .profile-modal.dark .block,
+    .profile-modal.dark .report,
+    html[data-theme="dark"] .profile-modal .block,
+    html[data-theme="dark"] .profile-modal .report,
+    body.dark-mode .profile-modal .block,
+    body.dark-mode .profile-modal .report {
+        background: #2a2a2a;
+    }
+
+    .profile-modal .loading,
+    .profile-modal .error {
+        text-align: center;
+        padding: 3rem;
+    }
+
+    .profile-modal .loading p,
+    .profile-modal .error p {
+        margin-top: 1rem;
+        color: #888;
+    }
+
+    .profile-modal.dark .loading p,
+    .profile-modal.dark .error p,
+    html[data-theme="dark"] .profile-modal .loading p,
+    html[data-theme="dark"] .profile-modal .error p,
+    body.dark-mode .profile-modal .loading p,
+    body.dark-mode .profile-modal .error p {
+        color: #aaa;
+    }
+
+    /* ===== LIGHTBOX ===== */
+    .lightbox {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 20000;
+        cursor: pointer;
+    }
+
+    .lightbox img {
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: 12px;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+        .profile-modal {
+            padding: 0.5rem;
+        }
+
+        .profile-modal-content {
+            padding: 1rem;
+            border-radius: 16px;
+        }
+
+        .close-profile-modal {
+            width: 36px;
+            height: 36px;
+            font-size: 1.5rem;
+            top: 0.75rem;
+            right: 0.75rem;
+        }
+
+        .profile-modal .profile-header {
+            flex-direction: column;
+            text-align: center;
+            padding: 1.5rem 1rem;
+            gap: 1rem;
+            margin-top: 2.5rem;
+        }
+
+        .profile-modal .profile-avatar {
+            width: 80px;
+            height: 80px;
+        }
+
+        .profile-modal .profile-real_name {
+            font-size: 1.5rem;
+            justify-content: center;
+        }
+
+        .profile-modal .profile-meta {
+            justify-content: center;
+            font-size: 0.85rem;
+        }
+
+        .profile-modal .status {
+            justify-content: center;
+            font-size: 0.85rem;
+        }
+
+        #modal-profile-location-header {
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .profile-modal .profile-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .profile-modal .combined-about-seeking-card {
+            grid-column: auto;
+        }
+
+        .profile-modal .card {
+            padding: 1rem;
+        }
+
+        .profile-modal .card h3 {
+            font-size: 0.95rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .profile-modal .info-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.25rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .profile-modal.dark .info-item,
+        html[data-theme="dark"] .profile-modal .info-item,
+        body.dark-mode .profile-modal .info-item {
+            border-bottom-color: #333;
+        }
+
+        .profile-modal .info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .profile-modal .info-label {
+            font-size: 0.85rem;
+        }
+
+        .profile-modal .info-value {
+            text-align: left;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        .profile-modal #modal-profile-about p,
+        .profile-modal #modal-profile-looking-for p,
+        .profile-modal #modal-profile-about .modal-profile-text-block,
+        .profile-modal #modal-profile-looking-for .modal-profile-text-block {
+            font-size: 13.54px !important;
+        }
+
+        .profile-modal .photos {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .profile-modal .photos img {
+            height: 120px;
+        }
+
+        .profile-modal .actions {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 1.2rem;
+            width: 100%;
+        }
+
+        .profile-modal .btn {
+            flex: 1;
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            justify-content: center;
+            padding: 0.58rem 0.4rem;
+            font-size: 0.68rem !important;
+            border-radius: 30px;
+            gap: 0.25rem;
+        }
+
+        .profile-modal .btn span {
+            font-size: 0.68rem !important;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .profile-modal .btn i {
+            font-size: 0.68rem !important;
+            margin-right: 0.12rem;
+        }
+
+        .profile-modal .modal-like-btn {
+            flex: 0.78;
+        }
+
+        .profile-modal .modal-favourite-btn {
+            flex: 1.28;
+        }
+
+        .profile-modal .modal-message-btn {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            flex: 0 0 44px;
+            padding: 0;
+            border-radius: 50%;
+            gap: 0;
+        }
+
+        .profile-modal .modal-message-btn i {
+            font-size: 0.95rem !important;
+            margin-right: 0 !important;
+        }
+
+        .profile-modal .btn:hover {
+            transform: none;
+        }
+
+        .profile-modal .btn:active {
+            transform: scale(0.97);
+            transition: transform 0.05s;
+        }
+
+        .profile-modal .interest-text-item {
+            font-size: 0.65rem;
+            padding: 0.21rem 0.51rem;
+            gap: 0.29rem;
+            border-radius: 8px;
+        }
+
+        .profile-modal .interest-text-item i {
+            font-size: 1.4rem;
+        }
+
+        .profile-modal .interest-text-empty {
+            font-size: 0.65rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .profile-modal {
+            padding: 0;
+        }
+
+        .profile-modal-content {
+            padding: 0.75rem;
+            border-radius: 12px;
+            margin: 0;
+            min-height: 100vh;
+            border-radius: 0;
+        }
+
+        .close-profile-modal {
+            width: 32px;
+            height: 32px;
+            font-size: 1.3rem;
+            top: 0.5rem;
+            right: 0.5rem;
+        }
+
+        .profile-modal .profile-header {
+            padding: 1.25rem 0.75rem;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+            border-radius: 12px;
+        }
+
+        .profile-modal .profile-avatar {
+            width: 70px;
+            height: 70px;
+        }
+
+        .profile-modal .profile-real_name {
+            font-size: 1.3rem;
+        }
+
+        .profile-modal .profile-meta {
+            font-size: 0.8rem;
+            gap: 0.75rem;
+        }
+
+        .profile-modal .status {
+            font-size: 0.8rem;
+        }
+
+        #modal-profile-location-header {
+            font-size: 0.9rem;
+        }
+
+        .profile-modal .profile-grid {
+            gap: 0.75rem;
+        }
+
+        .profile-modal .card {
+            padding: 0.875rem;
+            border-radius: 12px;
+        }
+
+        .profile-modal .carousel-fullbleed {
+            margin: -0.875rem -0.875rem 0 -0.875rem;
+        }
+
+        .profile-modal .card h3 {
+            font-size: 0.9rem;
+            margin-bottom: 0.625rem;
+        }
+
+        .profile-modal .info-item {
+            margin-bottom: 0.625rem;
+            padding-bottom: 0.625rem;
+        }
+
+        .profile-modal .info-label {
+            font-size: 0.8rem;
+        }
+
+        .profile-modal .info-value {
+            font-size: 0.85rem;
+        }
+
+        .profile-modal #modal-profile-about p,
+        .profile-modal #modal-profile-looking-for p,
+        .profile-modal #modal-profile-about .modal-profile-text-block,
+        .profile-modal #modal-profile-looking-for .modal-profile-text-block {
+            font-size: 12.78px !important;
+        }
+
+        .profile-modal .photos {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .profile-modal .photos img {
+            height: 100px;
+            border-radius: 8px;
+        }
+
+        .profile-modal .actions {
+            gap: 0.4rem;
+            margin-top: 1rem;
+        }
+
+        .profile-modal .btn {
+            padding: 0.5rem 0.22rem;
+            font-size: 0.62rem !important;
+            border-radius: 30px;
+            gap: 0.2rem;
+        }
+
+        .profile-modal .btn span {
+            font-size: 0.62rem !important;
+        }
+
+        .profile-modal .btn i {
+            font-size: 0.62rem !important;
+            margin-right: 0.08rem;
+        }
+
+        .profile-modal .modal-like-btn {
+            flex: 0.72;
+        }
+
+        .profile-modal .modal-favourite-btn {
+            flex: 1.34;
+        }
+
+        .profile-modal .modal-message-btn {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            flex: 0 0 40px;
+            padding: 0;
+            border-radius: 50%;
+            gap: 0;
+        }
+
+        .profile-modal .modal-message-btn i {
+            font-size: 0.9rem !important;
+            margin-right: 0 !important;
+        }
+
+        .profile-modal .interest-text-item {
+            font-size: 0.65rem;
+            padding: 0.21rem 0.51rem;
+            gap: 0.29rem;
+            border-radius: 8px;
+        }
+
+        .profile-modal .interest-text-item i {
+            font-size: 1.4rem;
+        }
+
+        .profile-modal .interest-text-empty {
+            font-size: 0.65rem;
+        }
+
+        .profile-modal .loading,
+        .profile-modal .error {
+            padding: 2rem 1rem;
+        }
+    }
+
+    /* ===== Mobile Portrait: compact header layout ===== */
+    @media (max-width: 480px) and (orientation: portrait) {
+
+        /* Wider cards: reduce horizontal padding ~5% of screen width */
+        .profile-modal-content {
+            padding-left: 0.25rem;
+            padding-right: 0.25rem;
+        }
+
+        .profile-modal .carousel-fullbleed {
+            margin: -0.875rem -0.875rem 0 -0.875rem;
+        }
+
+
+        /* Avatar left, info right — flex row like desktop but compact */
+        .profile-modal .profile-header {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: flex-start !important;
+            gap: 0 !important;
+        }
+
+        .profile-modal .profile-avatar {
+            flex-shrink: 0 !important;
+            align-self: flex-start !important;
+            margin-right: 0 !important;
+        }
+
+        /* Vertical divider between avatar and info */
+        .profile-modal .profile-header>div {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            border-left: 2px solid rgba(255, 255, 255, 0.35);
+            padding-left: 0.75rem !important;
+            margin-left: 0.75rem !important;
+            align-self: stretch;
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* Name: 50% smaller (desktop 1.3rem → 0.65rem in 480px) */
+        .profile-modal .profile-real_name {
+            font-size: 0.65rem !important;
+        }
+
+        /* Gender icon: 50% smaller */
+        .profile-modal .profile-real_name i {
+            font-size: 0.9rem !important;
+        }
+
+        /* Geo: 30% smaller */
+        .profile-modal #modal-profile-location-header {
+            font-size: 0.63rem !important;
+        }
+
+        .profile-modal #modal-profile-location-header i {
+            font-size: 0.63rem !important;
+        }
+
+        /* Age meta */
+        .profile-modal #modal-profile-meta {
+            font-size: 0.63rem;
+        }
+
+        /* Last active: 30% smaller */
+        .profile-modal #modal-profile-status,
+        .profile-modal #modal-status-text {
+            font-size: 0.56rem !important;
+        }
+
+        /* Interest & hobby badges: 40% smaller than desktop */
+        .profile-modal .interest-text-item {
+            font-size: 0.42rem !important;
+            padding: 0.14rem 0.33rem !important;
+            gap: 0.18rem !important;
+            border-radius: 6px !important;
+        }
+
+        .profile-modal .interest-text-item i {
+            font-size: 0.9rem !important;
+        }
+
+        /* Age badge in seeking section: keep at pre-portrait size (not shrunk) */
+        #modal-looking-for-badges .interest-text-item {
+            font-size: 0.65rem !important;
+        }
+
+        /* Gender icon: restore original size in portrait */
+        .profile-modal .seeking-gender-icon {
+            font-size: 1.1em !important;
+        }
+    }
+</style>
+
+<script>
+    (function () {
+        const modal = document.getElementById('userProfileModal');
+        const modalWindow = modal?.querySelector('.profile-modal-content');
+        const closeBtn = modal?.querySelector('.close-profile-modal');
+        const focusableSelector = 'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+        let previousFocus = null;
+        let previousOverflow = null;
+        let isActive = false;
+
+        if (!modal || !modalWindow) return;
+
+        function trapFocus(e) {
+            if (e.key !== 'Tab') return;
+            const focusable = Array.from(modal.querySelectorAll(focusableSelector)).filter(el => el.offsetParent !== null);
+            if (focusable.length === 0) {
+                e.preventDefault();
+                modalWindow.focus();
+                return;
+            }
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
+        }
+
+        function handleKeydown(e) {
+            if (e.key === 'Escape') {
+                e.stopPropagation();
+                if (typeof window.closeProfileModal === 'function') {
+                    window.closeProfileModal();
+                } else {
+                    hideModal();
+                }
+                return;
+            }
+            trapFocus(e);
+        }
+
+        function hideModal() {
+            modal.style.display = 'none';
+        }
+
+        function onOpen() {
+            if (isActive) return;
+            isActive = true;
+            previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+            previousOverflow = document.body.style.overflow;
+            document.body.style.overflow = 'hidden';
+            modal.addEventListener('keydown', handleKeydown, true);
+            setTimeout(() => {
+                (closeBtn || modalWindow).focus();
+            }, 0);
+        }
+
+        function onClose() {
+            if (!isActive) return;
+            isActive = false;
+            modal.removeEventListener('keydown', handleKeydown, true);
+            document.body.style.overflow = previousOverflow;
+            if (previousFocus && typeof previousFocus.focus === 'function') {
+                previousFocus.focus();
+            }
+        }
+
+        const observer = new MutationObserver(() => {
+            const isVisible = getComputedStyle(modal).display !== 'none';
+            if (isVisible) {
+                onOpen();
+            } else {
+                onClose();
+            }
+        });
+
+        observer.observe(modal, { attributes: true, attributeFilter: ['style'] });
+
+        window.addEventListener('pagehide', () => observer.disconnect());
+
+        // Photo lightbox
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('#modal-profile-photos img')) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const img = e.target.closest('img');
+            if (!img || img.src.includes('default_profile_')) return;
+
+            const photosContainer = document.getElementById('modal-profile-photos');
+            const photoThumbs = Array.from(photosContainer.querySelectorAll('img'))
+                .filter(i => !i.src.includes('default_profile_'));
+            const srcs = photoThumbs
+                .map(i => i.dataset.lightboxSrc || i.src)
+                .filter(Boolean);
+            if (!srcs.length) return;
+
+            let idx = photoThumbs.indexOf(img);
+            if (idx === -1) idx = srcs.indexOf(img.dataset.lightboxSrc || img.src);
+            if (idx < 0 || idx >= srcs.length) idx = 0;
+
+            // ---- DOM ----
+            const box = document.createElement('div');
+            box.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;z-index:20000;';
+
+            // X close button — always visible top-right
+            const closeBtn = document.createElement('button');
+            closeBtn.type = 'button';
+            closeBtn.innerHTML = '&times;';
+            closeBtn.style.cssText = 'position:absolute;top:12px;right:12px;width:36px;height:36px;border:none;border-radius:50%;background:rgba(255,255,255,0.15);color:#fff;font-size:1.5rem;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:3;touch-action:manipulation;';
+            closeBtn.addEventListener('pointerdown', (ev) => {
+                ev.stopPropagation();
+                document.removeEventListener('keydown', onKey);
+                box.remove();
+            });
+            box.appendChild(closeBtn);
+
+            const wrap = document.createElement('div');
+            wrap.style.cssText = 'position:relative;display:flex;align-items:center;justify-content:center;width:100%;max-width:1200px;max-height:90vh;overflow:hidden;';
+
+            const photo = document.createElement('img');
+            photo.alt = 'Profile photo';
+            photo.style.cssText = 'max-width:100%;max-height:90vh;width:auto;height:auto;object-fit:contain;border-radius:12px;display:block;pointer-events:none;user-select:none;';
+            photo.src = srcs[idx];
+            wrap.appendChild(photo);
+            box.appendChild(wrap);
+
+            // ---- navigation ----
+            const show = (newIdx) => {
+                idx = (newIdx + srcs.length) % srcs.length;
+                photo.src = srcs[idx];
+            };
+
+            // ---- arrows (pointerdown only — no click, avoids touch double-fire) ----
+            if (srcs.length > 1) {
+                [['prev', 'left:8px'], ['next', 'right:8px']].forEach(([dir, side]) => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.innerHTML = dir === 'prev' ? '<i class="fas fa-chevron-left"></i>' : '<i class="fas fa-chevron-right"></i>';
+                    btn.style.cssText = `position:absolute;top:50%;${side};transform:translateY(-50%);width:44px;height:44px;border:none;border-radius:50%;background:rgba(0,0,0,0.55);color:#fff;font-size:1.2rem;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;touch-action:manipulation;`;
+                    btn.addEventListener('pointerdown', (ev) => {
+                        ev.stopPropagation();
+                        show(dir === 'prev' ? idx - 1 : idx + 1);
+                    });
+                    wrap.appendChild(btn);
+                });
+
+                // ---- swipe ----
+                let tx = 0;
+                wrap.addEventListener('touchstart', ev => { tx = ev.touches[0].clientX; }, { passive: true });
+                wrap.addEventListener('touchend', ev => {
+                    const dx = ev.changedTouches[0].clientX - tx;
+                    if (Math.abs(dx) > 40) show(dx < 0 ? idx + 1 : idx - 1);
+                }, { passive: true });
+            }
+
+            // ---- close on backdrop tap/click ----
+            box.addEventListener('pointerdown', (ev) => {
+                if (ev.target === box) { document.removeEventListener('keydown', onKey); box.remove(); }
+            });
+
+            // ---- keyboard ----
+            const onKey = (ev) => {
+                if (ev.key === 'Escape') { box.remove(); document.removeEventListener('keydown', onKey); }
+                if (ev.key === 'ArrowRight' && srcs.length > 1) show(idx + 1);
+                if (ev.key === 'ArrowLeft' && srcs.length > 1) show(idx - 1);
+            };
+            document.addEventListener('keydown', onKey);
+
+            document.body.appendChild(box);
+        });
+    })();
+
+    // Function to render interests and hobbies with icons in the modal
+    (function () {
+        // Icon mapping for interests and hobbies
+        function getInterestIcon(interest) {
+            if (interest.icon) {
+                let iconClass = interest.icon;
+                if (iconClass.includes('fa-')) {
+                    if (!iconClass.includes('fas ') && !iconClass.includes('far ') && !iconClass.includes('fab ')) {
+                        iconClass = 'fas ' + iconClass;
+                    }
+                } else {
+                    iconClass = 'fas fa-' + iconClass;
+                }
+                return iconClass;
+            }
+            // Icons match INTEREST_ICONS in UserCard.js (same as profile-edit display)
+            const iconMap = {
+                // Core interests (from UserCard.js INTEREST_ICONS)
+                'travel': 'fa-plane', 'travelling': 'fa-plane', 'traveling': 'fa-plane', 'tourism': 'fa-plane',
+                'music': 'fa-music', 'musician': 'fa-music',
+                'yoga': 'fa-child',
+                'photography': 'fa-camera', 'photographer': 'fa-camera',
+                'art': 'fa-palette', 'arts': 'fa-palette', 'painting': 'fa-palette', 'drawing': 'fa-palette', 'creativity': 'fa-palette',
+                'reading': 'fa-book', 'book': 'fa-book',
+                'books': 'fa-book',
+                'dancing': 'fa-music', 'dance': 'fa-music',
+                'sports': 'fa-running', 'sport': 'fa-running', 'football': 'fa-futbol', 'soccer': 'fa-futbol',
+                'gaming': 'fa-gamepad', 'games': 'fa-gamepad', 'video games': 'fa-gamepad',
+                'movies': 'fa-film', 'film': 'fa-film', 'cinema': 'fa-film',
+                'nature': 'fa-tree', 'plants': 'fa-tree', 'environment': 'fa-tree', 'nature & environment': 'fa-tree', 'nature and environment': 'fa-tree',
+                'fitness': 'fa-running', 'gym': 'fa-dumbbell', 'workout': 'fa-dumbbell', 'exercise': 'fa-dumbbell',
+                'cooking': 'fa-utensils', 'culinary': 'fa-utensils', 'food & cooking': 'fa-utensils', 'food and cooking': 'fa-utensils',
+                'hiking': 'fa-hiking',
+                'technology': 'fa-laptop', 'tech': 'fa-laptop',
+                'cycling': 'fa-bicycle', 'biking': 'fa-bicycle', 'bike': 'fa-bicycle',
+                'skiing': 'fa-skiing', 'snowboarding': 'fa-skiing',
+                'coffee': 'fa-coffee', 'tea': 'fa-coffee',
+                'food': 'fa-hamburger', 'baking': 'fa-cookie-bite',
+                // Additional hobbies (matching faIconToEmoji in MultiSelectManager.js)
+                'running': 'fa-running', 'jogging': 'fa-running',
+                'swimming': 'fa-swimmer',
+                'basketball': 'fa-basketball-ball', 'tennis': 'fa-table-tennis', 'volleyball': 'fa-volleyball-ball',
+                'outdoors': 'fa-tree', 'camping': 'fa-campground',
+                'gardening': 'fa-seedling',
+                'singing': 'fa-microphone',
+                'writing': 'fa-pen', 'blogging': 'fa-pen',
+                'meditation': 'emoji:&#x1F9D8;',
+                'surfing': 'fa-water',
+                'cars': 'fa-car', 'driving': 'fa-car', 'automotive': 'fa-car',
+                'tv': 'fa-tv', 'television': 'fa-tv',
+                'social': 'fa-comments', 'community': 'fa-handshake', 'socializing': 'fa-comments',
+                'social & community': 'fa-handshake', 'social and community': 'fa-handshake',
+                'health': 'fa-heartbeat', 'wellness': 'fa-spa',
+                'health & wellness': 'fa-spa', 'health and wellness': 'fa-spa',
+                'programming': 'fa-code', 'coding': 'fa-code',
+                'networking': 'fa-network-wired',
+                'business': 'fa-briefcase', 'career': 'fa-briefcase', 'entrepreneur': 'fa-briefcase', 'entrepreneurship': 'fa-briefcase',
+                'adventure': 'fa-mountain', 'exploring': 'fa-compass',
+                'literature': 'fa-book',
+                'sports & fitness': 'fa-running', 'sports and fitness': 'fa-running',
+                'interests and hobbies': 'fa-lightbulb', 'interests': 'fa-lightbulb', 'hobbies': 'fa-paint-brush',
+                'fashion': 'fa-tshirt', 'style': 'fa-tshirt', 'fashion & style': 'fa-tshirt', 'fashion and style': 'fa-tshirt',
+                'fishing': 'fa-fish', 'fish': 'fa-fish',
+                'collecting': 'fa-boxes', 'collections': 'fa-boxes', 'antiques': 'fa-boxes'
+            };
+            const name = (interest.name || '').toLowerCase().trim();
+            // Try exact match first
+            let iconClass = iconMap[name];
+            // If not found, try matching any part of the name
+            if (!iconClass) {
+                for (const key in iconMap) {
+                    if (name.includes(key) || key.includes(name)) {
+                        iconClass = iconMap[key];
+                        break;
+                    }
+                }
+            }
+            // If still not found, try to infer from common words
+            if (!iconClass) {
+                if (name.includes('sport') || name.includes('fitness')) iconClass = 'fa-futbol';
+                else if (name.includes('music') || name.includes('dance')) iconClass = 'fa-music';
+                else if (name.includes('art') || name.includes('creativity')) iconClass = 'fa-palette';
+                else if (name.includes('read') || name.includes('book')) iconClass = 'fa-book';
+                else if (name.includes('travel') || name.includes('adventure')) iconClass = 'fa-plane';
+                else if (name.includes('food') || name.includes('cook')) iconClass = 'fa-utensils';
+                else if (name.includes('tech') || name.includes('code')) iconClass = 'fa-laptop';
+                else if (name.includes('social') || name.includes('community')) iconClass = 'fa-users';
+                else if (name.includes('health') || name.includes('wellness')) iconClass = 'fa-spa';
+                else if (name.includes('natur') || name.includes('outdoor')) iconClass = 'fa-leaf';
+                else if (name.includes('photo') || name.includes('camera')) iconClass = 'fa-camera';
+                else if (name.includes('game') || name.includes('gaming')) iconClass = 'fa-gamepad';
+                else if (name.includes('movie') || name.includes('film')) iconClass = 'fa-film';
+                else if (name.includes('hike') || name.includes('hiking')) iconClass = 'fa-hiking';
+                else iconClass = 'fa-tag'; // Default fallback
+            }
+            // Return svg: and emoji: prefixes as-is (no fas prefix)
+            if (iconClass.startsWith('svg:') || iconClass.startsWith('emoji:')) return iconClass;
+            return 'fas ' + iconClass;
+        }
+
+        // Escape HTML helper
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Function to render interests with icons (plain text, no button styling)
+        window.renderModalInterests = function (interests) {
+            const interestsElement = document.getElementById('modal-profile-interests');
+            if (!interestsElement) return;
+
+            if (interests && Array.isArray(interests) && interests.length > 0) {
+                interestsElement.innerHTML = interests.map(interest => {
+                    const iconClass = getInterestIcon(interest);
+                    const isEmoji = iconClass.startsWith('emoji:');
+                    const iconHtml = isEmoji
+                        ? '<span style="font-size:1.82em;line-height:1;vertical-align:middle;font-family:\'Segoe UI Emoji\',\'Apple Color Emoji\',\'Noto Color Emoji\',Arial,sans-serif;">' + iconClass.slice(6) + '</span>'
+                        : '<i class="' + iconClass + '"></i>';
+                    const interestName = escapeHtml(interest.name || 'Interest');
+                    const itemClass = interest.type === 'hobby' ? 'interest-text-item hobby-item' : 'interest-text-item';
+                    const itemLabel = interest.type === 'hobby' ? 'Hobbies' : 'Interests';
+                    return '<span class="' + itemClass + '" data-tooltip="' + interestName + '" aria-label="' + itemLabel + ': ' + interestName + '">' +
+                        iconHtml +
+                        '</span>';
+                }).join('');
+            } else {
+                interestsElement.innerHTML = '<span class="interest-text-item interest-text-empty">' +
+                    '<i class="fas fa-info-circle"></i>' +
+                    '<span>No interests or hobbies listed</span>' +
+                    '</span>';
+            }
+        };
+    })();
+
+    // Load external modal JavaScript
+    (function () {
+        const script = document.createElement('script');
+        script.src = '/components/modals/user-profile-modal.js?v=20260502-photos-empty-text';
+        script.async = true;
+        document.head.appendChild(script);
+    })();
+</script>

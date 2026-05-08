@@ -1,0 +1,1668 @@
+<link rel="stylesheet" href="/assets/css/new/05-pages/_account.css">
+
+<div class="account-section help-page">
+    <style>
+        .help-page {
+            font-family: "Inter", sans-serif;
+            padding: 0.25rem;
+            color: #d8e4f5;
+            --help-bg-0: #0b1220;
+            --help-bg-1: #111a2b;
+            --help-bg-2: #151f33;
+            --help-bg-3: #1b2940;
+            --help-border: rgba(158, 178, 208, 0.2);
+            --help-text-main: #d8e4f5;
+            --help-text-muted: #8da2bf;
+            --help-accent: #2e6b99;
+            --help-accent-strong: #1f4f77;
+            --help-success: #3ebd7a;
+            --help-danger: #ff6b6b;
+        }
+
+        .help-page * {
+            box-sizing: border-box;
+        }
+
+        .help-page .support-container {
+            max-width: 1400px;
+            width: 100%;
+            height: 84vh;
+            background: linear-gradient(165deg, rgba(14, 23, 37, 0.97) 0%, rgba(10, 16, 29, 0.98) 100%);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 30px 50px -16px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(124, 152, 194, 0.18);
+            display: flex;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        .help-page .support-sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #101b2d 0%, #0e1727 100%);
+            backdrop-filter: blur(4px);
+            border-right: 1px solid var(--help-border);
+            padding: 28px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .help-page .brand h2 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #c5d8f3, #8fb4dc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+        }
+
+        .help-page .brand i {
+            color: #78a9d1;
+            font-size: 1.8rem;
+        }
+
+        .help-page .status-card {
+            background: #152238;
+            border-radius: 1.5rem;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid var(--help-border);
+        }
+
+        .help-page .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(62, 189, 122, 0.2);
+            color: #98e5ba;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .help-page .status-card p {
+            margin-top: 12px;
+            font-size: 0.8rem;
+            color: var(--help-text-muted);
+        }
+
+        .help-page .quick-stats {
+            background: #131f33;
+            border-radius: 1.2rem;
+            padding: 16px;
+            box-shadow: none;
+            border: 1px solid var(--help-border);
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .help-page .quick-stats h4 {
+            margin: 0 0 10px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            color: #9bb1cd;
+            flex-shrink: 0;
+        }
+
+        .help-page .insights-summary {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+
+        .help-page .insight-chip {
+            flex: 1;
+            background: #0e1727;
+            border: 1px solid var(--help-border);
+            border-radius: 10px;
+            padding: 8px 6px;
+            text-align: center;
+        }
+
+        .help-page .insight-chip .ic-val {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #c9def7;
+            line-height: 1;
+        }
+
+        .help-page .insight-chip .ic-lbl {
+            font-size: 0.68rem;
+            color: var(--help-text-muted);
+            margin-top: 3px;
+        }
+
+        .help-page .thread-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-right: 2px;
+        }
+
+        .help-page .thread-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .help-page .thread-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .help-page .thread-list::-webkit-scrollbar-thumb {
+            background: rgba(158,178,208,0.25);
+            border-radius: 4px;
+        }
+
+        .help-page .thread-entry {
+            background: #0e1727;
+            border: 1px solid rgba(158,178,208,0.14);
+            border-radius: 10px;
+            padding: 9px 10px;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .help-page .thread-entry:hover,
+        .help-page .thread-entry.is-active {
+            border-color: #3c7db0;
+            background: #122035;
+        }
+
+        .help-page .thread-entry-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+        }
+
+        .help-page .thread-type {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #b8d4f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .help-page .thread-status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .help-page .thread-status-dot.responded { background: #3ebd7a; }
+        .help-page .thread-status-dot.in_review  { background: #f5a623; }
+        .help-page .thread-status-dot.new        { background: #5a7393; }
+
+        .help-page .thread-entry-meta {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .help-page .thread-badge {
+            font-size: 0.67rem;
+            padding: 2px 7px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .help-page .thread-badge.priority-high   { background: rgba(255,90,90,0.18);  color: #ff8080; }
+        .help-page .thread-badge.priority-urgent { background: rgba(255,60,60,0.22);  color: #ff6060; }
+        .help-page .thread-badge.priority-normal { background: rgba(80,140,200,0.18); color: #7fb3dc; }
+        .help-page .thread-badge.priority-low    { background: rgba(80,180,130,0.18); color: #72c99d; }
+
+        .help-page .thread-date {
+            font-size: 0.67rem;
+            color: var(--help-text-muted);
+            margin-left: auto;
+        }
+
+        .help-page .thread-count {
+            font-size: 0.66rem;
+            color: #8da2bf;
+            white-space: nowrap;
+        }
+
+        .help-page .thread-divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 18px 0 6px;
+            flex-shrink: 0;
+        }
+
+        .help-page .thread-divider-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(158,178,208,0.15);
+        }
+
+        .help-page .thread-divider-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #5a7393;
+            white-space: nowrap;
+        }
+
+        .help-page .support-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #0e1727;
+            min-width: 0;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .help-page .chat-header {
+            padding: 20px 28px;
+            border-bottom: 1px solid var(--help-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #121d31;
+            z-index: 2;
+            gap: 12px;
+        }
+
+        .help-page .chat-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+
+        .help-page .chat-header h3 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.3rem;
+            color: var(--help-text-main);
+        }
+
+        .help-page .support-agent {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #1a2941;
+            padding: 6px 16px;
+            border-radius: 60px;
+            color: #c8dbf4;
+            border: 1px solid var(--help-border);
+        }
+
+        .help-page .agent-avatar {
+            width: 36px;
+            height: 36px;
+            background: #2b5f8b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .help-page .message-history {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: linear-gradient(180deg, #0f192b 0%, #0c1423 100%);
+        }
+
+        .help-page .message-item {
+            display: flex;
+            max-width: 75%;
+            animation: fadeSlideUp 0.2s ease;
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .help-page .message-bubble {
+            padding: 12px 18px;
+            border-radius: 24px;
+            font-size: 0.95rem;
+            line-height: 1.45;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.03);
+            word-break: break-word;
+        }
+
+        .help-page .message-meta {
+            display: flex;
+            flex-wrap: wrap;
+            font-size: 0.7rem;
+            margin-top: 6px;
+            gap: 8px;
+            color: #93a8c3;
+            letter-spacing: 0.2px;
+        }
+
+        .help-page .message-sent {
+            justify-content: flex-end;
+            align-self: flex-end;
+        }
+
+        .help-page .message-sent .message-bubble {
+            color: #dcecff;
+            border-bottom-right-radius: 4px;
+            background: linear-gradient(135deg, #244e73, #1f4567);
+            border: 1px solid rgba(139, 177, 218, 0.36);
+        }
+
+        .help-page .message-sent .message-meta {
+            justify-content: flex-end;
+        }
+
+        .help-page .message-received {
+            justify-content: flex-start;
+        }
+
+        .help-page .message-received .message-bubble {
+            background: #1a2538;
+            color: #d8e4f5;
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--help-border);
+        }
+
+        .help-page .message-received .message-meta {
+            justify-content: flex-start;
+        }
+
+        .help-page .timestamp {
+            font-family: monospace;
+            font-size: 0.7rem;
+        }
+
+        .help-page .empty-history,
+        .help-page .loading-history {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #8ea6c2;
+            gap: 12px;
+            padding: 40px;
+        }
+
+        .help-page .compose-area {
+            background: #121d31;
+            border-top: 1px solid rgba(158,178,208,0.18);
+            padding: 16px 24px 20px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            flex-shrink: 0;
+        }
+
+        .help-page .compose-input-wrapper {
+            flex: 1;
+            background: #1a2a42;
+            border: 1px solid rgba(158,178,208,0.22);
+            border-radius: 14px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .help-page .compose-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #e0eaf7;
+            font-size: 0.95rem;
+            resize: none;
+            line-height: 1.5;
+            max-height: 120px;
+            overflow-y: auto;
+            font-family: inherit;
+        }
+
+        .help-page .compose-input::placeholder {
+            color: #5a7393;
+        }
+
+        .help-page .compose-send-btn {
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #3c7db0, #2c5e88);
+            color: #ffffff;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease, transform 0.1s ease;
+        }
+
+        .help-page .compose-send-btn:hover {
+            background: linear-gradient(135deg, #4b8fc5, #336c99);
+        }
+
+        .help-page .compose-send-btn:active {
+            transform: scale(0.93);
+        }
+
+        .help-page .compose-send-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .help-page .open-request-btn {
+            border: none;
+            background: linear-gradient(135deg, #3c7db0, #2c5e88);
+            color: white;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: auto;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .help-page .open-request-btn:hover {
+            background: linear-gradient(135deg, #4b8fc5, #336c99);
+        }
+
+        .help-page .message-history::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .help-page .message-history::-webkit-scrollbar-track {
+            background: #111c2f;
+        }
+
+        .help-page .message-history::-webkit-scrollbar-thumb {
+            background: #3a5678;
+            border-radius: 20px;
+        }
+
+        .help-page .request-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: rgba(4, 9, 17, 0.8);
+            z-index: 1200;
+        }
+
+        .help-page .request-modal.is-open {
+            display: flex;
+        }
+
+        .help-page .request-modal-panel {
+            width: min(720px, 100%);
+            max-height: calc(100vh - 32px);
+            overflow: auto;
+            background: #111b2d;
+            border-radius: 18px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.55);
+            padding: 20px;
+            position: relative;
+            border: 1px solid var(--help-border);
+        }
+
+        .help-page .request-modal-close {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            width: 34px;
+            height: 34px;
+            border: none;
+            border-radius: 50%;
+            background: #1b2b43;
+            color: #d8e4f5;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border: 1px solid var(--help-border);
+        }
+
+        .help-page .request-modal-title {
+            margin: 0 0 14px;
+            color: #d8e4f5;
+            font-size: 1.35rem;
+        }
+
+        .help-page .request-form {
+            display: grid;
+            gap: 12px;
+        }
+
+        .help-page .request-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .help-page .request-field {
+            display: grid;
+            gap: 6px;
+        }
+
+        .help-page .request-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .help-page .request-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #b6cae6;
+        }
+
+        .help-page .request-input,
+        .help-page .request-select,
+        .help-page .request-textarea {
+            width: 100%;
+            border: 1px solid var(--help-border);
+            background: #16243a;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font: inherit;
+            color: #d8e4f5;
+        }
+
+        .help-page .request-select option {
+            background: #16243a;
+            color: #d8e4f5;
+        }
+
+        .help-page .request-textarea {
+            min-height: 170px;
+            resize: vertical;
+        }
+
+        .help-page .request-input:focus,
+        .help-page .request-select:focus,
+        .help-page .request-textarea:focus {
+            outline: none;
+            border-color: #6ca3d2;
+            box-shadow: 0 0 0 3px rgba(108, 163, 210, 0.23);
+            background: #1c2d46;
+        }
+
+        .help-page .request-meta {
+            display: flex;
+            justify-content: flex-end;
+            font-size: 0.8rem;
+            color: #92a9c3;
+        }
+
+        .help-page .request-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .help-page .request-status {
+            min-height: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #9ab0cb;
+        }
+
+        .help-page .request-status.is-success {
+            color: #62cc92;
+        }
+
+        .help-page .request-status.is-error {
+            color: #ff7f7f;
+        }
+
+        .help-page .request-submit {
+            border: none;
+            background: linear-gradient(135deg, #3c7db0, #2c5e88);
+            color: white;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .help-page .request-submit:disabled {
+            opacity: 0.65;
+            cursor: wait;
+        }
+
+        .help-page .stats-note {
+            font-size: 0.75rem;
+            color: #8ea6c2;
+        }
+
+        .help-page .stats-divider {
+            margin: 12px 0;
+            border-color: rgba(158, 178, 208, 0.2);
+        }
+
+        .help-page .secure-note {
+            margin-top: auto;
+            font-size: 0.75rem;
+            color: #8ea6c2;
+        }
+
+        .help-page.is-light-mode {
+            color: #1f2a3e;
+        }
+
+        .help-page.is-light-mode .support-container {
+            background: linear-gradient(165deg, rgba(255, 255, 255, 0.98) 0%, rgba(247, 251, 255, 0.98) 100%);
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.22), 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .help-page.is-light-mode .support-sidebar {
+            background: #ffffffdd;
+            border-right: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .help-page.is-light-mode .brand h2 {
+            background: linear-gradient(135deg, #1a2c3e, #2c4c6e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .help-page.is-light-mode .brand i {
+            color: #2c6e9e;
+        }
+
+        .help-page.is-light-mode .status-card {
+            background: #f0f4f9;
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        .help-page.is-light-mode .status-badge {
+            background: #e2f0e8;
+            color: #1f7840;
+        }
+
+        .help-page.is-light-mode .status-card p {
+            color: #2c3e50;
+        }
+
+        .help-page.is-light-mode .quick-stats {
+            background: #ffffff;
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        .help-page.is-light-mode .quick-stats h4 {
+            color: #5c6f87;
+        }
+
+        .help-page.is-light-mode .stat-value {
+            color: #1e4663;
+        }
+
+        .help-page.is-light-mode .stats-note,
+        .help-page.is-light-mode .secure-note {
+            color: #6b809b;
+        }
+
+        .help-page.is-light-mode .support-main,
+        .help-page.is-light-mode .chat-header {
+            background: #ffffff;
+        }
+
+        .help-page.is-light-mode .chat-header {
+            border-bottom: 1px solid #eef2f6;
+        }
+
+        .help-page.is-light-mode .chat-header h3 {
+            color: #1f2a3e;
+        }
+
+        .help-page.is-light-mode .support-agent {
+            background: #f8fafd;
+            color: #26445f;
+            border-color: rgba(44, 110, 158, 0.15);
+        }
+
+        .help-page.is-light-mode .agent-avatar {
+            background: #1e4663;
+            color: #ffffff;
+        }
+
+        .help-page.is-light-mode .message-history {
+            background: #fbfdff;
+        }
+
+        .help-page.is-light-mode .message-sent .message-bubble {
+            color: #0a2b44;
+            background: linear-gradient(135deg, #d9e9ff, #eef5ff);
+            border: 1px solid #cddff0;
+        }
+
+        .help-page.is-light-mode .message-received .message-bubble {
+            background: #f1f3f7;
+            color: #1f2a40;
+            border: 1px solid #e9edf2;
+        }
+
+        .help-page.is-light-mode .message-meta {
+            color: #6c7a8e;
+        }
+
+        .help-page.is-light-mode .empty-history,
+        .help-page.is-light-mode .loading-history {
+            color: #8aa0bc;
+        }
+
+        .help-page.is-light-mode .message-history::-webkit-scrollbar-track {
+            background: #edf2f7;
+        }
+
+        .help-page.is-light-mode .message-history::-webkit-scrollbar-thumb {
+            background: #b9ccdf;
+        }
+
+        .help-page.is-light-mode .open-request-btn,
+        .help-page.is-light-mode .request-submit {
+            background: linear-gradient(135deg, #2e6b99, #1f4f77);
+        }
+
+        .help-page.is-light-mode .open-request-btn:hover,
+        .help-page.is-light-mode .request-submit:hover {
+            background: linear-gradient(135deg, #3a7caf, #27608d);
+        }
+
+        .help-page.is-light-mode .request-modal {
+            background: rgba(10, 18, 32, 0.62);
+        }
+
+        .help-page.is-light-mode .request-modal-panel {
+            background: #ffffff;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        .help-page.is-light-mode .request-modal-close {
+            background: #edf2f8;
+            color: #1f2a3e;
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        .help-page.is-light-mode .request-modal-title {
+            color: #1f2a3e;
+        }
+
+        .help-page.is-light-mode .request-label {
+            color: #2f4358;
+        }
+
+        .help-page.is-light-mode .request-input,
+        .help-page.is-light-mode .request-select,
+        .help-page.is-light-mode .request-textarea {
+            border: 1px solid #d8e2ee;
+            background: #f8fbff;
+            color: #223042;
+        }
+
+        .help-page.is-light-mode .request-select option {
+            background: #ffffff;
+            color: #223042;
+        }
+
+        .help-page.is-light-mode .request-input:focus,
+        .help-page.is-light-mode .request-select:focus,
+        .help-page.is-light-mode .request-textarea:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            background: #fff;
+        }
+
+        .help-page.is-light-mode .request-meta {
+            color: #6c7a8e;
+        }
+
+        .help-page.is-light-mode .request-status {
+            color: #51667d;
+        }
+
+        .help-page.is-light-mode .request-status.is-success {
+            color: #1f7840;
+        }
+
+        .help-page.is-light-mode .request-status.is-error {
+            color: #c23939;
+        }
+
+        .help-page.is-light-mode .compose-area {
+            background: #ffffff;
+            border-top: 1px solid #e2eaf4;
+        }
+
+        .help-page.is-light-mode .compose-input-wrapper {
+            background: #f4f8fd;
+            border-color: #cddcee;
+        }
+
+        .help-page.is-light-mode .compose-input {
+            color: #1f2a3e;
+        }
+
+        .help-page.is-light-mode .compose-input::placeholder {
+            color: #8faabf;
+        }
+
+        .help-page.is-light-mode .compose-send-btn {
+            background: linear-gradient(135deg, #2e6b99, #1f4f77);
+        }
+
+        .help-page.is-light-mode .compose-send-btn:hover {
+            background: linear-gradient(135deg, #3a7caf, #27608d);
+        }
+
+
+        body.help-modal-open {
+            overflow: hidden;
+        }
+
+        @media (max-width: 780px) {
+            .help-page .support-container {
+                flex-direction: column;
+                min-height: 90vh;
+            }
+
+            .help-page .support-sidebar {
+                width: 100%;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 16px;
+                padding: 16px;
+            }
+
+            .help-page .message-item {
+                max-width: 90%;
+            }
+
+            .help-page .compose-area {
+                padding: 14px 20px;
+            }
+
+            .help-page .chat-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .help-page .chat-header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .help-page .request-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <div class="support-container">
+        <aside class="support-sidebar">
+            <div class="brand">
+                <h2><i class="fas fa-headset"></i> Support</h2>
+            </div>
+            <div class="status-card">
+                <div class="status-badge">
+                    <i class="fas fa-circle" style="font-size:0.55rem; color:#2bae66"></i> Online · 24/7
+                </div>
+                <p><i class="far fa-clock"></i> Real-time support timeline</p>
+            </div>
+            <div class="quick-stats">
+                <h4><i class="fas fa-chart-line"></i> Conversation insights</h4>
+                <div class="insights-summary">
+                    <div class="insight-chip">
+                        <div class="ic-val" id="insightTotalCount">0</div>
+                        <div class="ic-lbl">Total</div>
+                    </div>
+                    <div class="insight-chip">
+                        <div class="ic-val" id="insightNewCount">0</div>
+                        <div class="ic-lbl">New</div>
+                    </div>
+                    <div class="insight-chip">
+                        <div class="ic-val" id="insightUpdatedCount">0</div>
+                        <div class="ic-lbl">Updated</div>
+                    </div>
+                </div>
+                <div class="thread-list" id="sidebarThreadList"></div>
+            </div>
+            <div class="secure-note">
+                <i class="fas fa-lock"></i> Encrypted · Secure support
+            </div>
+        </aside>
+
+        <main class="support-main">
+            <div class="chat-header">
+                <h3><i class="fas fa-comment-dots" style="margin-right:8px;"></i> Support conversation</h3>
+                <div class="chat-header-actions">
+                    <button type="button" class="open-request-btn" id="helpOpenModalBtn">
+                        <i class="fas fa-paper-plane"></i> Open Request Card
+                    </button>
+                </div>
+            </div>
+
+            <div id="messageHistory" class="message-history" role="log" aria-live="polite">
+                <div class="loading-history">
+                    <i class="fas fa-circle-notch fa-spin" style="font-size:2rem;"></i>
+                    <p>Loading support timeline...</p>
+                </div>
+            </div>
+
+            <div id="helpReplyStatus" style="display:none;padding:6px 24px 0;font-size:0.82rem;" aria-live="polite"></div>
+            <div class="compose-area" id="helpComposeArea">
+                <div class="compose-input-wrapper">
+                    <textarea id="helpReplyMessage" class="compose-input" placeholder="Type your message" rows="1" maxlength="5000" aria-label="Follow-up message"></textarea>
+                </div>
+                <button type="button" id="helpSendReplyBtn" class="compose-send-btn" aria-label="Send reply">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="helpRequestModal" class="request-modal" hidden aria-hidden="true">
+        <section class="request-modal-panel" role="dialog" aria-modal="true" aria-labelledby="requestModalTitle">
+            <button type="button" id="helpCloseModalBtn" class="request-modal-close" aria-label="Close request form">&times;</button>
+            <h2 id="requestModalTitle" class="request-modal-title">Send a support request</h2>
+
+            <form id="helpForm" class="request-form" novalidate>
+                <div class="request-grid">
+                    <div class="request-field">
+                        <label class="request-label" for="helpIssueType">Issue type</label>
+                        <select id="helpIssueType" name="issueType" class="request-select" required>
+                            <option value="">Select one</option>
+                            <option value="technical_problem">Technical Problem</option>
+                            <option value="billing_question">Billing Question</option>
+                            <option value="account_access">Account Access</option>
+                            <option value="report_user">Report a User</option>
+                            <option value="feature_request">Feature Request</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="request-field">
+                        <label class="request-label" for="helpPriority">Priority</label>
+                        <select id="helpPriority" name="priority" class="request-select" required>
+                            <option value="normal" selected>Normal</option>
+                            <option value="low">Low</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+
+                    <div class="request-field full">
+                        <label class="request-label" for="helpMessage">What happened?</label>
+                        <textarea id="helpMessage" name="message" class="request-textarea" maxlength="5000" required
+                            placeholder="Describe the issue clearly. Include what you were trying to do, what happened instead, and any user ID or screen details that matter."></textarea>
+                        <div class="request-meta">
+                            <span id="helpCharCount">0 / 5000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="request-actions">
+                    <div id="helpStatus" class="request-status" aria-live="polite"></div>
+                    <button id="helpSubmit" class="request-submit" type="submit">
+                        <i class="fas fa-paper-plane" aria-hidden="true"></i> Send
+                    </button>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <script>
+        (function initHelpPage() {
+            const helpPageNode = document.querySelector('.help-page');
+            const root = document.documentElement;
+            const messageHistory = document.getElementById('messageHistory');
+
+            const modal = document.getElementById('helpRequestModal');
+            const openModalBtn = document.getElementById('helpOpenModalBtn');
+            const closeModalBtn = document.getElementById('helpCloseModalBtn');
+
+            const form = document.getElementById('helpForm');
+            const issueTypeField = document.getElementById('helpIssueType');
+            const priorityField = document.getElementById('helpPriority');
+            const messageField = document.getElementById('helpMessage');
+            const charCount = document.getElementById('helpCharCount');
+            const statusNode = document.getElementById('helpStatus');
+            const submitBtn = document.getElementById('helpSubmit');
+
+            if (!messageHistory || !form || !modal || !messageField) {
+                return;
+            }
+
+            const isLightThemeActive = () => {
+                if (root.dataset.theme === 'light') {
+                    return true;
+                }
+                if (root.dataset.theme === 'dark') {
+                    return false;
+                }
+                if (root.classList.contains('theme-light')) {
+                    return true;
+                }
+                if (root.classList.contains('theme-dark')) {
+                    return false;
+                }
+                if (document.body.classList.contains('light-mode')) {
+                    return true;
+                }
+                if (document.body.classList.contains('dark-mode')) {
+                    return false;
+                }
+                // Fail-safe default: if app theme signal is missing, keep Help page in white mode.
+                return true;
+            };
+
+            const syncHelpThemeClass = () => {
+                if (!helpPageNode) {
+                    return;
+                }
+                helpPageNode.classList.toggle('is-light-mode', isLightThemeActive());
+            };
+
+            syncHelpThemeClass();
+
+            window.addEventListener('storage', syncHelpThemeClass);
+
+            window.addEventListener('totilove:theme-change', syncHelpThemeClass);
+
+            const rootObserver = new MutationObserver(syncHelpThemeClass);
+            rootObserver.observe(root, {
+                attributes: true,
+                attributeFilter: ['data-theme', 'class']
+            });
+
+            const bodyObserver = new MutationObserver(syncHelpThemeClass);
+            bodyObserver.observe(document.body, {
+                attributes: true,
+                attributeFilter: ['class']
+            });
+
+            let lastFocusedElement = null;
+
+            const escapeHtml = (value) => String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+
+            const formatDate = (value) => {
+                if (!value) {
+                    return 'Unknown date';
+                }
+                const parsed = new Date(value);
+                if (Number.isNaN(parsed.getTime())) {
+                    return String(value);
+                }
+                return new Intl.DateTimeFormat(undefined, {
+                    dateStyle: 'medium',
+                    timeStyle: 'short'
+                }).format(parsed);
+            };
+
+            const prettyStatus = (status) => {
+                switch (status) {
+                    case 'responded':
+                        return 'Responded';
+                    case 'in_review':
+                        return 'In Review';
+                    default:
+                        return 'New';
+                }
+            };
+
+            const prettyIssueType = (issueType) => String(issueType || 'General')
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, (char) => char.toUpperCase());
+
+            const openModal = () => {
+                lastFocusedElement = document.activeElement;
+                modal.hidden = false;
+                modal.classList.add('is-open');
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('help-modal-open');
+                issueTypeField.focus();
+            };
+
+            const closeModal = () => {
+                modal.classList.remove('is-open');
+                modal.setAttribute('aria-hidden', 'true');
+                modal.hidden = true;
+                document.body.classList.remove('help-modal-open');
+                if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+                    lastFocusedElement.focus();
+                }
+            };
+
+            const setStatus = (message, tone) => {
+                statusNode.textContent = message || '';
+                statusNode.classList.remove('is-success', 'is-error');
+                if (tone === 'success') {
+                    statusNode.classList.add('is-success');
+                }
+                if (tone === 'error') {
+                    statusNode.classList.add('is-error');
+                }
+            };
+
+            const updateCharCount = () => {
+                charCount.textContent = `${messageField.value.length} / 5000`;
+            };
+
+            const sidebarThreadList = document.getElementById('sidebarThreadList');
+            const insightTotalCount = document.getElementById('insightTotalCount');
+            const insightNewCount = document.getElementById('insightNewCount');
+            const insightUpdatedCount = document.getElementById('insightUpdatedCount');
+            const ALLOWED_PRIORITIES = new Set(['low', 'normal', 'high', 'urgent']);
+            const ISSUE_TYPE_LABEL_TO_KEY = {
+                'Technical Problem': 'technical_problem',
+                'Billing Question': 'billing_question',
+                'Account Access': 'account_access',
+                'Report a User': 'report_user',
+                'Feature Request': 'feature_request',
+                'Other': 'other',
+                'Follow-up': 'follow_up'
+            };
+            const SHORT_DATE_FORMATTER = new Intl.DateTimeFormat(undefined, {
+                month: 'short',
+                day: 'numeric'
+            });
+
+            const normalizePriority = (value) => {
+                const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
+                return ALLOWED_PRIORITIES.has(normalized) ? normalized : 'normal';
+            };
+
+            const deriveIssueTypeKey = (item) => {
+                const key = typeof item?.issueTypeKey === 'string' ? item.issueTypeKey.trim() : '';
+                if (key) {
+                    return key;
+                }
+                const label = typeof item?.issueType === 'string' ? item.issueType.trim() : '';
+                return ISSUE_TYPE_LABEL_TO_KEY[label] || '';
+            };
+
+            const buildConversationThreads = (items) => {
+                if (!Array.isArray(items) || items.length === 0) {
+                    return [];
+                }
+
+                const sortedByOldest = [...items].sort((a, b) => {
+                    const aTime = new Date(a?.createdAt || 0).getTime();
+                    const bTime = new Date(b?.createdAt || 0).getTime();
+                    return aTime - bTime;
+                });
+
+                const threadsByKey = new Map();
+                let lastNonFollowupContext = null;
+
+                sortedByOldest.forEach((item) => {
+                    const rawIssueTypeKey = deriveIssueTypeKey(item) || 'follow_up';
+                    const rawIssueTypeLabel = typeof item?.issueType === 'string' && item.issueType.trim()
+                        ? item.issueType.trim()
+                        : prettyIssueType(rawIssueTypeKey);
+                    const rawPriority = normalizePriority(item?.priority);
+                    const isFollowUp = rawIssueTypeKey === 'follow_up' || rawIssueTypeLabel === 'Follow-up';
+
+                    if (!isFollowUp) {
+                        lastNonFollowupContext = {
+                            issueTypeKey: rawIssueTypeKey,
+                            issueTypeLabel: rawIssueTypeLabel,
+                            priority: rawPriority
+                        };
+                    }
+
+                    const resolvedIssueTypeKey = isFollowUp && lastNonFollowupContext
+                        ? lastNonFollowupContext.issueTypeKey
+                        : rawIssueTypeKey;
+                    const resolvedIssueTypeLabel = isFollowUp && lastNonFollowupContext
+                        ? lastNonFollowupContext.issueTypeLabel
+                        : rawIssueTypeLabel;
+                    const resolvedPriority = isFollowUp && lastNonFollowupContext
+                        ? lastNonFollowupContext.priority
+                        : rawPriority;
+
+                    const threadKey = `${resolvedIssueTypeKey}|${resolvedPriority}`;
+                    if (!threadsByKey.has(threadKey)) {
+                        threadsByKey.set(threadKey, {
+                            key: threadKey,
+                            issueTypeKey: resolvedIssueTypeKey,
+                            issueTypeLabel: resolvedIssueTypeLabel,
+                            priority: resolvedPriority,
+                            items: [],
+                            firstActivity: Number.MAX_SAFE_INTEGER,
+                            lastActivity: 0,
+                            totalMessages: 0,
+                            hasResponse: false,
+                            hasInReview: false
+                        });
+                    }
+
+                    const thread = threadsByKey.get(threadKey);
+                    const createdAt = new Date(item?.createdAt || 0).getTime();
+                    thread.items.push(item);
+                    thread.firstActivity = Math.min(thread.firstActivity, createdAt);
+                    thread.lastActivity = Math.max(thread.lastActivity, createdAt);
+                    thread.totalMessages += 1 + (item?.supportReply ? 1 : 0);
+                    thread.hasResponse = thread.hasResponse || item?.status === 'responded' || Boolean(item?.supportReply);
+                    thread.hasInReview = thread.hasInReview || item?.status === 'in_review';
+                });
+
+                return Array.from(threadsByKey.values()).map((thread) => {
+                    thread.items.sort((a, b) => new Date(a?.createdAt || 0) - new Date(b?.createdAt || 0));
+                    return thread;
+                });
+            };
+
+            let threadsByRecency = [];
+            let activeThreadKey = '';
+
+            const getActiveThread = () => threadsByRecency.find((thread) => thread.key === activeThreadKey) || null;
+
+            const syncActiveThreadEntry = () => {
+                if (!sidebarThreadList) {
+                    return;
+                }
+                sidebarThreadList.querySelectorAll('.thread-entry').forEach((entry) => {
+                    entry.classList.toggle('is-active', entry.dataset.threadKey === activeThreadKey);
+                });
+            };
+
+            const renderActiveThreadWindow = () => {
+                const thread = getActiveThread();
+                if (!thread) {
+                    renderEmptyState('No thread selected.');
+                    return;
+                }
+
+                const priorityClass = `priority-${thread.priority || 'normal'}`;
+                const divider = `
+                    <div class="thread-divider" data-thread-key="${thread.key}">
+                        <div class="thread-divider-line"></div>
+                        <span class="thread-divider-label">
+                            <span class="thread-badge ${priorityClass}" style="font-size:0.7rem;">${escapeHtml((thread.priority || 'normal').toUpperCase())}</span>
+                            &nbsp;${escapeHtml(prettyIssueType(thread.issueTypeLabel || thread.issueTypeKey))}
+                            &nbsp;<span class="thread-count">(${escapeHtml(String(thread.totalMessages))} messages)</span>
+                        </span>
+                        <div class="thread-divider-line"></div>
+                    </div>
+                `;
+
+                const threadMessages = thread.items.flatMap((item) => {
+                    const threadIssueType = thread.issueTypeLabel || thread.issueTypeKey || item.issueType;
+                    const threadPriority = thread.priority || normalizePriority(item.priority);
+
+                    const userMessage = `
+                        <div class="message-item message-sent">
+                            <div>
+                                <div class="message-bubble">${escapeHtml(item.message)}</div>
+                                <div class="message-meta">
+                                    <span><i class="fas fa-user"></i> You</span>
+                                    <span>${escapeHtml(prettyIssueType(threadIssueType))}</span>
+                                    <span>${escapeHtml(String(threadPriority).toUpperCase())}</span>
+                                    <span>${escapeHtml(prettyStatus(item.status))}</span>
+                                    <span class="timestamp"><i class="far fa-clock"></i> ${escapeHtml(formatDate(item.createdAt))}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    if (!item.supportReply) {
+                        return [
+                            userMessage,
+                            `
+                                <div class="message-item message-received">
+                                    <div>
+                                        <div class="message-bubble">No admin reply yet. Your request is still waiting in the support queue.</div>
+                                        <div class="message-meta">
+                                            <span><i class="fas fa-hourglass-half"></i> Waiting for support</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `
+                        ];
+                    }
+
+                    return [
+                        userMessage,
+                        `
+                            <div class="message-item message-received">
+                                <div>
+                                    <div class="message-bubble">${escapeHtml(item.supportReply.message)}</div>
+                                    <div class="message-meta">
+                                        <span><i class="fas fa-headset"></i> ${escapeHtml(item.supportReply.author || 'Support Team')}</span>
+                                        <span class="timestamp"><i class="far fa-clock"></i> ${escapeHtml(formatDate(item.supportReply.repliedAt || item.createdAt))}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `
+                    ];
+                });
+
+                messageHistory.innerHTML = [divider, ...threadMessages].join('');
+                messageHistory.scrollTop = messageHistory.scrollHeight;
+            };
+
+            const updateStats = (threads) => {
+                const totalCount = Array.isArray(threads) ? threads.length : 0;
+                const updatedCount = Array.isArray(threads)
+                    ? threads.filter((thread) => thread.hasResponse || thread.hasInReview).length
+                    : 0;
+                const newCount = Math.max(0, totalCount - updatedCount);
+
+                if (insightTotalCount) insightTotalCount.textContent = String(totalCount);
+                if (insightNewCount) insightNewCount.textContent = String(newCount);
+                if (insightUpdatedCount) insightUpdatedCount.textContent = String(updatedCount);
+
+                if (!sidebarThreadList) return;
+
+                if (threads.length === 0) {
+                    sidebarThreadList.innerHTML = '<div style="font-size:0.78rem;color:#5a7393;text-align:center;padding:12px 0;">No threads yet</div>';
+                    return;
+                }
+
+                const sortedThreads = [...threads].sort((a, b) => b.lastActivity - a.lastActivity);
+
+                sidebarThreadList.innerHTML = sortedThreads.map((thread) => {
+                    const statusClass = thread.hasResponse ? 'responded' : (thread.hasInReview ? 'in_review' : 'new');
+                    const priorityClass = `priority-${thread.priority}`;
+                    const shortDate = thread.lastActivity
+                        ? SHORT_DATE_FORMATTER.format(new Date(thread.lastActivity))
+                        : '';
+                    const countLabel = `${thread.totalMessages} message${thread.totalMessages === 1 ? '' : 's'}`;
+                    const typeLabel = escapeHtml(prettyIssueType(thread.issueTypeLabel || thread.issueTypeKey));
+                    const priorityLabel = escapeHtml((thread.priority || 'normal').toUpperCase());
+                    return `
+                        <div class="thread-entry" data-thread-key="${thread.key}" role="button" tabindex="0" aria-label="Thread: ${typeLabel}">
+                            <div class="thread-entry-top">
+                                <span class="thread-type">${typeLabel}</span>
+                                <span class="thread-status-dot ${statusClass}" title="${escapeHtml(prettyStatus(statusClass))}"></span>
+                            </div>
+                            <div class="thread-entry-meta">
+                                <span class="thread-badge ${priorityClass}">${priorityLabel}</span>
+                                <span class="thread-count">${escapeHtml(countLabel)}</span>
+                                <span class="thread-date">${escapeHtml(shortDate)}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                sidebarThreadList.querySelectorAll('.thread-entry').forEach((el) => {
+                    const activate = () => {
+                        activeThreadKey = el.dataset.threadKey || '';
+                        syncActiveThreadEntry();
+                        updateReplyContext(threadsByRecency);
+                        renderActiveThreadWindow();
+                    };
+                    el.addEventListener('click', activate);
+                    el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); } });
+                });
+
+                syncActiveThreadEntry();
+            };
+
+            let replyIssueType = 'follow_up';
+            let replyPriority = 'normal';
+
+            const updateReplyContext = (threads) => {
+                if (!Array.isArray(threads) || threads.length === 0) {
+                    replyIssueType = 'follow_up';
+                    replyPriority = 'normal';
+                    return;
+                }
+
+                const active = threads.find((thread) => thread.key === activeThreadKey);
+                const anchor = active || threads.find((thread) => thread.hasResponse) || threads[0];
+
+                const anchorIssueTypeKey = typeof anchor?.issueTypeKey === 'string' ? anchor.issueTypeKey.trim() : '';
+                const anchorPriority = normalizePriority(anchor?.priority);
+
+                replyIssueType = anchorIssueTypeKey || 'follow_up';
+                replyPriority = ALLOWED_PRIORITIES.has(anchorPriority) ? anchorPriority : 'normal';
+            };
+
+            const renderEmptyState = (message) => {
+                messageHistory.innerHTML = `
+                    <div class="empty-history">
+                        <i class="fas fa-inbox" style="font-size:3rem; opacity:0.6"></i>
+                        <p>${escapeHtml(message)}</p>
+                    </div>
+                `;
+            };
+
+            const renderHistory = (items) => {
+                if (!Array.isArray(items) || items.length === 0) {
+                    renderEmptyState('No messages yet. Start a conversation and support replies will appear here.');
+                    updateStats([]);
+                    return;
+                }
+
+                const threads = buildConversationThreads(items);
+                threadsByRecency = [...threads].sort((a, b) => b.lastActivity - a.lastActivity);
+
+                if (!activeThreadKey || !threadsByRecency.some((thread) => thread.key === activeThreadKey)) {
+                    activeThreadKey = threadsByRecency[0]?.key || '';
+                }
+
+                updateStats(threadsByRecency);
+                updateReplyContext(threadsByRecency);
+                renderActiveThreadWindow();
+            };
+
+            const loadHistory = async () => {
+                messageHistory.innerHTML = `
+                    <div class="loading-history">
+                        <i class="fas fa-circle-notch fa-spin" style="font-size:2rem;"></i>
+                        <p>Loading support timeline...</p>
+                    </div>
+                `;
+
+                try {
+                    const response = await fetch('/api/help/support-history');
+                    const payload = await response.json().catch(() => ({}));
+
+                    if (!response.ok || !payload.success) {
+                        throw new Error(payload.error || 'Failed to load support timeline');
+                    }
+
+                    const items = Array.isArray(payload.items) ? payload.items : [];
+                    renderHistory(items);
+                } catch (error) {
+                    threadsByRecency = [];
+                    activeThreadKey = '';
+                    updateReplyContext([]);
+                    renderEmptyState(error.message || 'Failed to load support timeline');
+                }
+            };
+
+            openModalBtn.addEventListener('click', openModal);
+            closeModalBtn.addEventListener('click', closeModal);
+
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && modal.classList.contains('is-open')) {
+                    closeModal();
+                }
+            });
+
+            messageField.addEventListener('input', updateCharCount);
+            updateCharCount();
+            loadHistory();
+
+            // Compose area — auto-resize and send
+            const replyTextarea = document.getElementById('helpReplyMessage');
+            const sendReplyBtn = document.getElementById('helpSendReplyBtn');
+            const replyStatusEl = document.getElementById('helpReplyStatus');
+
+            const setReplyStatus = (msg, tone) => {
+                if (!replyStatusEl) return;
+                replyStatusEl.textContent = msg || '';
+                replyStatusEl.style.display = msg ? 'block' : 'none';
+                replyStatusEl.style.color = tone === 'error' ? 'var(--help-danger, #ff6b6b)' : 'var(--help-success, #3ebd7a)';
+            };
+
+            if (replyTextarea) {
+                replyTextarea.addEventListener('input', () => {
+                    replyTextarea.style.height = 'auto';
+                    replyTextarea.style.height = Math.min(replyTextarea.scrollHeight, 120) + 'px';
+                    if (replyStatusEl && replyStatusEl.style.display !== 'none') {
+                        setReplyStatus('', null);
+                    }
+                });
+
+                replyTextarea.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (sendReplyBtn) sendReplyBtn.click();
+                    }
+                });
+            }
+
+            if (sendReplyBtn) {
+                sendReplyBtn.addEventListener('click', async () => {
+                    const message = replyTextarea ? replyTextarea.value.trim() : '';
+                    if (!message) {
+                        setReplyStatus('Type a message before sending.', 'error');
+                        if (replyTextarea) replyTextarea.focus();
+                        return;
+                    }
+
+                    sendReplyBtn.disabled = true;
+                    setReplyStatus('', null);
+
+                    try {
+                        const response = await fetch('/api/help/support', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                issueType: replyIssueType,
+                                priority: replyPriority,
+                                message,
+                                pageUrl: window.location.href
+                            })
+                        });
+
+                        const payload = await response.json().catch(() => ({}));
+
+                        if (!response.ok || !payload.success) {
+                            throw new Error(payload.error || 'Failed to send message');
+                        }
+
+                        if (replyTextarea) {
+                            replyTextarea.value = '';
+                            replyTextarea.style.height = 'auto';
+                        }
+                        setReplyStatus('Message sent.', 'success');
+                        setTimeout(() => setReplyStatus('', null), 3000);
+                        await loadHistory();
+                    } catch (err) {
+                        console.error('[help] send reply error:', err.message);
+                        setReplyStatus(err.message || 'Failed to send message.', 'error');
+                    } finally {
+                        sendReplyBtn.disabled = false;
+                        if (replyTextarea) replyTextarea.focus();
+                    }
+                });
+            }
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const issueType = issueTypeField.value.trim();
+                const priority = priorityField.value.trim();
+                const message = messageField.value.trim();
+
+                if (!issueType) {
+                    setStatus('Choose an issue type before sending.', 'error');
+                    issueTypeField.focus();
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                setStatus('Sending your request...');
+
+                try {
+                    const response = await fetch('/api/help/support', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            issueType,
+                            priority,
+                            message,
+                            pageUrl: window.location.href
+                        })
+                    });
+
+                    const payload = await response.json().catch(() => ({}));
+
+                    if (!response.ok || !payload.success) {
+                        throw new Error(payload.error || 'Failed to submit help request');
+                    }
+
+                    form.reset();
+                    priorityField.value = 'normal';
+                    updateCharCount();
+                    setStatus('Your request was sent to support.', 'success');
+                    await loadHistory();
+                    closeModal();
+                } catch (error) {
+                    setStatus(error.message || 'Failed to submit help request', 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            });
+        })();
+    </script>
+</div>

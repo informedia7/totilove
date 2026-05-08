@@ -1,0 +1,544 @@
+﻿/* =====================================================
+   Footer Pages - Shared Styles
+   Covers: Help, Safety, Contact, Privacy, Terms,
+           Cookies, Accessibility, Sitemap, Preferences
+   ===================================================== */
+
+/* -- Reset / Base -- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #667eea;
+    --secondary: #764ba2;
+    --accent: #c084fc;
+    --page-max: 860px;
+    --radius: 14px;
+    --shadow: 0 4px 24px rgba(102, 126, 234, 0.15);
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: #f8f9fa;
+    color: #2d2d3a;
+    min-height: 100vh;
+}
+
+/* -- Page wrapper -- */
+.fp-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.fp-page::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
+        radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.1) 2px, transparent 2px);
+    background-size: 50px 50px;
+    animation: fp-float 20s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.fp-page>* {
+    position: relative;
+    z-index: 1;
+}
+
+/* -- Hero banner -- */
+.fp-hero {
+    background: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    padding: 2.5rem 1rem 2.5rem;
+    text-align: center;
+    border-bottom: 2px solid #c084fc;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.fp-hero-inner {
+    max-width: var(--page-max);
+    margin: 0 auto;
+    width: 100%;
+}
+
+@keyframes fp-float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+.fp-hero-icon {
+    font-size: 2.8rem;
+    margin-bottom: 0.75rem;
+    opacity: 0.95;
+}
+
+.fp-hero h1 {
+    margin: 0 0 0.5rem;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.fp-hero h1 i {
+    font-size: 1.5rem;
+    margin-right: 0.45rem;
+    vertical-align: middle;
+    opacity: 0.95;
+}
+
+.fp-hero p {
+    margin: 0 auto;
+    max-width: 520px;
+    font-size: 1rem;
+    opacity: 0.88;
+    line-height: 1.5;
+}
+
+/* -- Main content -- */
+.fp-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 1rem;
+    max-width: var(--page-max);
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* -- Card -- */
+.fp-card {
+    flex: 1;
+    background: #2d2d3a;
+    border-radius: 0 0 var(--radius) var(--radius);
+    box-shadow: var(--shadow);
+    padding: 2rem 2.25rem;
+    margin-bottom: 0;
+}
+
+.fp-card h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #b0b0b0;
+    margin: 0 0 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.fp-card h2 i {
+    color: var(--accent);
+    font-size: 1rem;
+}
+
+.fp-section-header {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #b0b0b0;
+    margin: 1.5rem 0 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.fp-section-header:first-child {
+    margin-top: 0;
+}
+
+.fp-section-header i {
+    font-size: 1rem;
+    color: var(--accent);
+}
+
+.fp-card p,
+.fp-card li {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: #a0a0a0;
+    margin: 0 0 0.6rem;
+}
+
+.fp-card ul,
+.fp-card ol {
+    padding-left: 1.3rem;
+    margin: 0 0 0.75rem;
+}
+
+.fp-card a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.fp-card a:hover {
+    text-decoration: underline;
+}
+
+.fp-divider {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 1.75rem 0;
+}
+
+.fp-intro {
+    font-size: 0.92rem;
+    color: #888;
+    font-style: italic;
+    margin: 0 0 0;
+}
+
+/* â”€â”€ Info chips (used on Safety, Accessibility etc.) â”€â”€ */
+.fp-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+}
+
+.fp-chip {
+    background: #f3f0ff;
+    border: 1px solid #d8b4fe;
+    color: var(--secondary);
+    border-radius: 999px;
+    padding: 0.3rem 0.9rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+/* â”€â”€ Contact form â”€â”€ */
+.fp-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.fp-form label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #a0a0a0;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.fp-form input,
+.fp-form select,
+.fp-form textarea {
+    width: 100%;
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.95rem;
+    background: #1e1e2a;
+    color: #d0d0d0;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: vertical;
+}
+
+.fp-form input:focus,
+.fp-form select:focus,
+.fp-form textarea:focus {
+    border-color: var(--primary);
+}
+
+.fp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.75rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+}
+
+.fp-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* â”€â”€ Toggle switch (Cookie Preferences) â”€â”€ */
+.fp-pref-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid #f0ecff;
+}
+
+.fp-pref-row:last-child {
+    border-bottom: none;
+}
+
+.fp-pref-info h3 {
+    margin: 0 0 0.2rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #2d2d3a;
+}
+
+.fp-pref-info p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #777;
+}
+
+.fp-switch {
+    position: relative;
+    flex-shrink: 0;
+    width: 46px;
+    height: 26px;
+}
+
+.fp-switch input {
+    display: none;
+}
+
+.fp-switch-track {
+    position: absolute;
+    inset: 0;
+    background: #d0c8f0;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.25s;
+}
+
+.fp-switch input:checked~.fp-switch-track {
+    background: var(--primary);
+}
+
+.fp-switch-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    pointer-events: none;
+    transition: transform 0.25s;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.fp-switch input:checked~.fp-switch-track~.fp-switch-thumb,
+.fp-switch input:checked+.fp-switch-track+.fp-switch-thumb {
+    transform: translateX(20px);
+}
+
+.fp-switch-disabled .fp-switch-track {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* â”€â”€ Sitemap grid â”€â”€ */
+.fp-sitemap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.25rem;
+}
+
+.fp-sitemap-section h3 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--secondary);
+    margin: 0 0 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.fp-sitemap-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.fp-sitemap-section li {
+    margin-bottom: 0.35rem;
+}
+
+.fp-sitemap-section a {
+    font-size: 0.88rem;
+    color: var(--primary);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.fp-sitemap-section a:hover {
+    text-decoration: underline;
+}
+
+.fp-sitemap-section a i {
+    font-size: 0.75rem;
+    opacity: 0.6;
+}
+
+/* â”€â”€ Back link â”€â”€ */
+.fp-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--primary);
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 1.25rem;
+}
+
+.fp-back:hover {
+    text-decoration: underline;
+}
+
+/* â”€â”€ Footer strip â”€â”€ */
+.fp-footer {
+    text-align: center;
+    padding: 1.25rem 1rem;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.6);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    background: transparent;
+}
+
+.fp-footer a {
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+}
+
+/* -- Mobile portrait -- */
+@media (max-width: 480px) and (orientation: portrait) {
+    .fp-hero {
+        padding: 1.25rem 1rem;
+    }
+
+    .fp-hero h1 {
+        font-size: 1rem;
+    }
+
+    .fp-hero-icon {
+        font-size: 1.4rem;
+    }
+
+    .fp-hero p {
+        font-size: 0.58rem;
+    }
+
+    .fp-main {
+        padding: 0 2px;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .fp-card {
+        padding: 1rem 0.75rem;
+        border-radius: 0;
+        margin-bottom: 0;
+    }
+
+    .fp-card h2 {
+        font-size: 0.58rem;
+    }
+
+    .fp-section-header {
+        font-size: 0.53rem;
+    }
+
+    .fp-card p,
+    .fp-card li {
+        font-size: 0.57rem;
+    }
+
+    .fp-card ul,
+    .fp-card ol {
+        padding-left: 0.75rem;
+    }
+
+    .fp-divider {
+        margin: 0.875rem 0;
+    }
+
+    .fp-card p,
+    .fp-card li {
+        margin-bottom: 0.3rem;
+    }
+
+    .fp-back {
+        font-size: 0.66rem;
+    }
+
+    .fp-intro {
+        font-size: 0.46rem;
+    }
+
+    .fp-form label {
+        font-size: 0.51rem;
+    }
+
+    .fp-form input,
+    .fp-form select,
+    .fp-form textarea {
+        font-size: 0.63rem;
+        padding: 0.4rem 0.5rem;
+    }
+
+    .fp-btn {
+        font-size: 0.48rem;
+        padding: 0.5rem 1rem;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .fp-form .fp-btn {
+        width: 30%;
+    }
+
+    .fp-sitemap-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.6rem;
+    }
+
+    .fp-sitemap-section h3 {
+        font-size: 0.45rem;
+    }
+
+    .fp-sitemap-section a {
+        font-size: 0.559rem;
+    }
+
+    .fp-footer {
+        font-size: 0.47rem;
+    }
+
+    .fp-pref-row {
+        flex-direction: row;
+        align-items: center;
+    }
+}
