@@ -293,13 +293,19 @@ class ExportImportService {
      * Otherwise fall back to direct filesystem read via UPLOADS_PATH.
      */
     async createUploadsArchiveStream() {
-        if (process.env.TOTILOVE_URL && process.env.EXPORT_SECRET) {
-            return this.createProxiedArchiveStream();
+        // Prefer direct filesystem access when UPLOADS_PATH is mounted for this service.
+        // Only fall back to proxy mode when the volume is not accessible.
+        try {
+            const { uploadsRoot, filename } = await this.getUploadsExportInfo();
+            const archive = archiver('zip', { zlib: { level: 9 } });
+            archive.directory(uploadsRoot, 'uploads');
+            return { archive, filename };
+        } catch (directError) {
+            if (process.env.TOTILOVE_URL && process.env.EXPORT_SECRET) {
+                return this.createProxiedArchiveStream();
+            }
+            throw directError;
         }
-        const { uploadsRoot, filename } = await this.getUploadsExportInfo();
-        const archive = archiver('zip', { zlib: { level: 9 } });
-        archive.directory(uploadsRoot, 'uploads');
-        return { archive, filename };
     }
 
     /**
@@ -349,43 +355,25 @@ class ExportImportService {
      * Fetch folder stats from the main totilove service (proxy) or local filesystem.
      */
     async getUploadsInfo() {
-        if (process.env.TOTILOVE_URL && process.env.EXPORT_SECRET) {
-            const url = require('url');
-            const base = process.env.TOTILOVE_URL.replace(/\/$/, '');
-            const secret = process.env.EXPORT_SECRET;
-            const infoUrl = `${base}/uploads-info?secret=${encodeURIComponent(secret)}`;
-
-            return new Promise((resolve, reject) => {
-                const parsedUrl = url.parse(infoUrl);
-                const lib = parsedUrl.protocol === 'https:' ? require('https') : require('http');
-
-                const req = lib.get(infoUrl, (response) => {
-                    let body = '';
-                    response.on('data', (chunk) => { body += chunk; });
-                    response.on('end', () => {
-                        try {
-                            const json = JSON.parse(body);
-                            if (response.statusCode !== 200) {
-                                reject(new Error(json.error || `Upstream returned ${response.statusCode}`));
-                            } else {
-                                resolve(json);
-                            }
-                        } catch {
-                            reject(new Error(`Upstream returned non-JSON response (${response.statusCode})`));
-                        }
-                    });
-                });
-                req.on('error', (err) => reject(new Error(`Failed to reach main service: ${err.message}`)));
-                req.setTimeout(30000, () => { req.destroy(); reject(new Error('Upstream request timed out')); });
-            });
+        // Prefer direct filesystem mode when UPLOADS_PATH is mounted for this service.
+        let uploadsRoot = null;
+        try {
+            // getUploadsExportInfo validates UPLOADS_PATH in Railway and ensures it exists.
+            const info = await this.getUploadsExportInfo();
+            uploadsRoot = info.uploadsRoot;
+        } catch (_) {
+            // fall back to candidate resolution (dev/local)
+            uploadsRoot = await this.resolveLocalUploadsRoot();
         }
 
-        // Direct filesystem mode
-        const uploadsRoot = await this.resolveLocalUploadsRoot();
         const fsp = require('fs').promises;
         const fsSync = require('fs');
 
         if (!fsSync.existsSync(uploadsRoot)) {
+            // If direct mode isn't available, fall back to proxy when configured.
+            if (process.env.TOTILOVE_URL && process.env.EXPORT_SECRET) {
+                return this.getUploadsInfoViaProxy();
+            }
             throw new Error(`Uploads path does not exist: ${uploadsRoot}`);
         }
 
@@ -423,6 +411,37 @@ class ExportImportService {
             subfolders: info.subfolders,
             scannedAt: new Date().toISOString()
         };
+    }
+
+    async getUploadsInfoViaProxy() {
+        const url = require('url');
+        const base = process.env.TOTILOVE_URL.replace(/\/$/, '');
+        const secret = process.env.EXPORT_SECRET;
+        const infoUrl = `${base}/uploads-info?secret=${encodeURIComponent(secret)}`;
+
+        return new Promise((resolve, reject) => {
+            const parsedUrl = url.parse(infoUrl);
+            const lib = parsedUrl.protocol === 'https:' ? require('https') : require('http');
+
+            const req = lib.get(infoUrl, (response) => {
+                let body = '';
+                response.on('data', (chunk) => { body += chunk; });
+                response.on('end', () => {
+                    try {
+                        const json = JSON.parse(body);
+                        if (response.statusCode !== 200) {
+                            reject(new Error(json.error || `Upstream returned ${response.statusCode}`));
+                        } else {
+                            resolve(json);
+                        }
+                    } catch {
+                        reject(new Error(`Upstream returned non-JSON response (${response.statusCode})`));
+                    }
+                });
+            });
+            req.on('error', (err) => reject(new Error(`Failed to reach main service: ${err.message}`)));
+            req.setTimeout(30000, () => { req.destroy(); reject(new Error('Upstream request timed out')); });
+        });
     }
 
     /**
