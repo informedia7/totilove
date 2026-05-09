@@ -247,6 +247,7 @@ async function scanUploads() {
 
     try {
         const res = await fetch('/api/export-import/images/info');
+        const scanHdr = res.headers.get('X-Totilove-Uploads-Scan');
         const raw = await res.text();
         let json;
         try {
@@ -254,6 +255,18 @@ async function scanUploads() {
         } catch {
             throw new Error(
                 `Server returned ${res.status} (not JSON). First bytes: ${raw.slice(0, 160).replace(/\s+/g, ' ')}`
+            );
+        }
+
+        if (scanHdr !== 'local-only-v2') {
+            const extra =
+                json && json.error
+                    ? String(json.error)
+                    : raw.slice(0, 200).replace(/\s+/g, ' ');
+            throw new Error(
+                `This admin API is an old deployment (expected header X-Totilove-Uploads-Scan: local-only-v2; got ${scanHdr || 'nothing'}). ` +
+                    `Redeploy admin-server from latest GitHub main, wait for build, then hard-refresh (Ctrl+Shift+R). ` +
+                    `Server said: ${extra}`
             );
         }
 

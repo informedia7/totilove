@@ -156,8 +156,17 @@ app.use(session({
 // Trust proxy (if behind reverse proxy)
 app.set('trust proxy', 1);
 
-// Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Static files (admin JS/CSS must not stay stale after deploys)
+app.use(
+    express.static(path.join(__dirname, 'public'), {
+        setHeaders(res, filePath) {
+            if (/\.(js|css)$/i.test(filePath)) {
+                res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+                res.setHeader('Pragma', 'no-cache');
+            }
+        }
+    })
+);
 
 // Serve user uploaded images
 // Try multiple possible locations for uploads directory

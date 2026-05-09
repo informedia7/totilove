@@ -6,6 +6,7 @@ class ExportImportController {
      * Return JSON stats about the uploads folder tree.
      */
     async getUploadsInfo(req, res) {
+        res.setHeader('X-Totilove-Uploads-Scan', 'local-only-v2');
         try {
             const info = await exportImportService.getUploadsInfo();
             res.json({ success: true, data: info });
