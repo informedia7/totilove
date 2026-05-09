@@ -104,6 +104,40 @@ class ExportImportService {
     }
 
     /**
+     * Safe snapshot for ADMIN_DIAGNOSTIC_UPLOADS (no secrets).
+     */
+    diagnoseUploadsResolution() {
+        const rows = [];
+        for (const p of UPLOAD_PATH_CANDIDATES) {
+            try {
+                const st = fs.statSync(p);
+                rows.push({
+                    path: p,
+                    exists: true,
+                    isDirectory: st.isDirectory(),
+                    readable: true
+                });
+            } catch (e) {
+                rows.push({
+                    path: p,
+                    exists: false,
+                    code: e.code || null,
+                    message: e.message
+                });
+            }
+        }
+        return {
+            cwd: process.cwd(),
+            adminRoot,
+            EXPORT_IMPORT_PROXY: process.env.EXPORT_IMPORT_PROXY || '(unset)',
+            UPLOADS_PATH: process.env.UPLOADS_PATH ? '(set)' : '(unset)',
+            TOTILOVE_URL: process.env.TOTILOVE_URL ? '(set)' : '(unset)',
+            EXPORT_SECRET: process.env.EXPORT_SECRET ? '(set)' : '(unset)',
+            candidates: rows
+        };
+    }
+
+    /**
      * Resolve and validate uploads root for image export.
      */
     async getUploadsExportInfo() {
@@ -328,37 +362,15 @@ class ExportImportService {
     }
 
     /**
-     * Fetch folder stats from local uploads. Proxy only when EXPORT_IMPORT_PROXY=true.
+     * Fetch folder stats from local uploads only (never proxies — proxy caused 302/HTML from main app).
      */
     async getUploadsInfo() {
-        const hasUploadsPath = Boolean(process.env.UPLOADS_PATH && String(process.env.UPLOADS_PATH).trim());
-        let uploadsRoot;
-        try {
-            uploadsRoot = await this.ensureConfiguredUploadsRoot();
-        } catch (directErr) {
-            if (
-                uploadsProxyAllowed() &&
-                !hasUploadsPath &&
-                process.env.TOTILOVE_URL &&
-                process.env.EXPORT_SECRET
-            ) {
-                return this.getUploadsInfoViaProxy();
-            }
-            throw directErr;
-        }
+        const uploadsRoot = await this.ensureConfiguredUploadsRoot();
 
         const fsp = require('fs').promises;
         const fsSync = require('fs');
 
         if (!fsSync.existsSync(uploadsRoot)) {
-            if (
-                uploadsProxyAllowed() &&
-                !hasUploadsPath &&
-                process.env.TOTILOVE_URL &&
-                process.env.EXPORT_SECRET
-            ) {
-                return this.getUploadsInfoViaProxy();
-            }
             throw new Error(`Uploads path does not exist: ${uploadsRoot}`);
         }
 
@@ -401,50 +413,39 @@ class ExportImportService {
             return { fileCount, totalSize, lastModified, subfolders };
         }
 
-        const info = await scanDir(uploadsRoot, new Set(), 0);
+        let info;
+        try {
+            info = await scanDir(uploadsRoot, new Set(), 0);
+        } catch (scanErr) {
+            const wrapped = new Error(
+                `Scan failed under ${uploadsRoot}: ${scanErr.message}${scanErr.code ? ` (${scanErr.code})` : ''}`
+            );
+            wrapped.code = scanErr.code;
+            throw wrapped;
+        }
+
+        const iso = (d) => (d instanceof Date ? d.toISOString() : d);
+
+        function normalizeFolder(f) {
+            return {
+                ...f,
+                lastModified: f.lastModified != null ? iso(f.lastModified) : null,
+                subfolders: Array.isArray(f.subfolders) ? f.subfolders.map(normalizeFolder) : []
+            };
+        }
+
+        const normalizedSubfolders = Array.isArray(info.subfolders)
+            ? info.subfolders.map(normalizeFolder)
+            : [];
+
         return {
             path: uploadsRoot,
             fileCount: info.fileCount,
             totalSize: info.totalSize,
-            lastModified: info.lastModified,
-            subfolders: info.subfolders,
+            lastModified: info.lastModified != null ? iso(info.lastModified) : null,
+            subfolders: normalizedSubfolders,
             scannedAt: new Date().toISOString()
         };
-    }
-
-    async getUploadsInfoViaProxy() {
-        const url = require('url');
-        const base = process.env.TOTILOVE_URL.replace(/\/$/, '');
-        const secret = process.env.EXPORT_SECRET;
-        const infoUrl = `${base}/uploads-info?secret=${encodeURIComponent(secret)}`;
-
-        return new Promise((resolve, reject) => {
-            const parsedUrl = url.parse(infoUrl);
-            const lib = parsedUrl.protocol === 'https:' ? require('https') : require('http');
-
-            const req = lib.get(infoUrl, (response) => {
-                let body = '';
-                response.on('data', (chunk) => { body += chunk; });
-                response.on('end', () => {
-                    try {
-                        const json = JSON.parse(body);
-                        if (response.statusCode !== 200) {
-                            reject(new Error(json.error || `Upstream returned ${response.statusCode}`));
-                        } else {
-                            resolve(json);
-                        }
-                    } catch {
-                        const hint =
-                            response.statusCode === 302 || response.statusCode === 301
-                                ? ' (redirect often means wrong TOTILOVE_URL or EXPORT_SECRET; prefer mounting UPLOADS_PATH on admin-server)'
-                                : '';
-                        reject(new Error(`Upstream returned non-JSON response (${response.statusCode})${hint}`));
-                    }
-                });
-            });
-            req.on('error', (err) => reject(new Error(`Failed to reach main service: ${err.message}`)));
-            req.setTimeout(30000, () => { req.destroy(); reject(new Error('Upstream request timed out')); });
-        });
     }
 
     /**

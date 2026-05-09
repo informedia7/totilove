@@ -11,7 +11,19 @@ class ExportImportController {
             res.json({ success: true, data: info });
         } catch (error) {
             logger.error('Error in getUploadsInfo controller:', error);
-            res.status(500).json({ success: false, error: error.message || 'Failed to scan uploads folder' });
+            const diagnostic =
+                String(process.env.ADMIN_DIAGNOSTIC_UPLOADS || '').toLowerCase() === 'true';
+            const payload = {
+                success: false,
+                error: error.message || 'Failed to scan uploads folder',
+                hint:
+                    'Attach the uploads volume to admin-server (e.g. /app/app/uploads) or set UPLOADS_PATH. ' +
+                    'ZIP export may still use EXPORT_IMPORT_PROXY=true without affecting scan.'
+            };
+            if (diagnostic) {
+                payload.debug = exportImportService.diagnoseUploadsResolution();
+            }
+            res.status(500).json(payload);
         }
     }
 

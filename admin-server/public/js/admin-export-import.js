@@ -247,21 +247,38 @@ async function scanUploads() {
 
     try {
         const res = await fetch('/api/export-import/images/info');
-        const json = await res.json();
+        const raw = await res.text();
+        let json;
+        try {
+            json = JSON.parse(raw);
+        } catch {
+            throw new Error(
+                `Server returned ${res.status} (not JSON). First bytes: ${raw.slice(0, 160).replace(/\s+/g, ' ')}`
+            );
+        }
 
         if (!res.ok || !json.success) {
-            throw new Error(json.error || 'Scan failed');
+            const bits = [json.error || 'Scan failed'];
+            if (json.hint) bits.push(json.hint);
+            const err = new Error(bits.join('\n\n'));
+            err.debug = json.debug;
+            throw err;
         }
 
         renderUploadsTree(json.data);
         dlBtn.disabled = false;
         setUploadsStatus(`Scanned at ${fmtDate(json.data.scannedAt)}`, 'info');
     } catch (err) {
+        let debugBlock = '';
+        if (err.debug) {
+            debugBlock = `<pre style="margin-top:8px;font-size:11px;overflow:auto;max-height:240px;background:#f8f9fa;padding:8px;border-radius:4px;">${escapeHtml(JSON.stringify(err.debug, null, 2))}</pre>`;
+        }
         panel.innerHTML = `<div class="scan-placeholder" style="border-color:#f8d7da; color:#842029;">
-            ❌ ${escapeHtml(err.message)}
+            ❌ ${escapeHtml(err.message).replace(/\n/g, '<br>')}
+            ${debugBlock}
         </div>`;
         setUploadsStatus(
-            'Scan failed — mount the uploads volume on admin-server and/or set UPLOADS_PATH (proxy scan requires EXPORT_IMPORT_PROXY=true).',
+            'Scan uses local volume only. Set ADMIN_DIAGNOSTIC_UPLOADS=true on the server and redeploy to show path checks.',
             'error'
         );
     } finally {
