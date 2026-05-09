@@ -103,18 +103,38 @@
         .time-chip { font-size: 11px; color: #888; }
 
         /* ── Image browser ── */
-        .uploads-tools {
+        .ei-subtitle { margin: 4px 0 0; font-size: 13px; color:#666; }
+        .ei-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 14px;
-            margin: 14px 0 18px;
+            gap: 16px;
         }
-        .uploads-tools-card {
+        @media (min-width: 1100px) {
+            .ei-grid { grid-template-columns: 1.6fr 1fr; align-items: start; }
+        }
+        .ei-card {
             background: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 16px;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,.04);
         }
+        .ei-card__header {
+            display:flex;
+            align-items:flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 16px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            background: linear-gradient(180deg, #fbfbff 0%, #ffffff 100%);
+        }
+        .ei-card__title { margin: 0; font-size: 14px; font-weight: 800; color:#1f2937; letter-spacing: .01em; }
+        .ei-card__desc { margin: 4px 0 0; font-size: 12px; color:#6b7280; }
+        .ei-card__actions { display:flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: flex-end; }
+        .ei-card__body { padding: 14px 16px 16px; }
+        .ei-stack { display:flex; flex-direction: column; gap: 16px; }
+        .ei-divider { height: 1px; background: #f1f5f9; margin: 12px 0; }
+
         .uploads-tools-card h3 { margin: 0 0 10px; font-size: 14px; }
         .uploads-tools-row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
         .uploads-tools-row input[type="file"] { display: none; }
@@ -165,6 +185,9 @@
         }
         .uploads-thumb-meta a { color:#3c67d6; text-decoration:none; }
         .uploads-thumb-meta a:hover { text-decoration: underline; }
+
+        /* tighten scan placeholder inside cards */
+        .scan-placeholder { margin: 0; }
     </style>
 </head>
 <body>
@@ -192,75 +215,99 @@
                  TAB 1 — Uploads Folder
             ══════════════════════════════════════════════════════ -->
             <div class="tab-panel active" id="tab-uploads">
-
-                <!-- Top action bar -->
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
-                    <div>
-                        <h2 style="margin:0;">🖼️ Uploads Folder</h2>
-                        <p style="margin:4px 0 0; font-size:13px; color:#666;">Scan to inspect contents, then download a full or partial ZIP.</p>
-                    </div>
-                    <div style="display:flex; gap:10px; align-items:center;">
-                        <button class="btn btn-secondary btn-sm" id="scanBtn" onclick="scanUploads()">🔍 Scan Folder</button>
-                        <button class="btn btn-primary btn-sm" id="dlAllBtn" onclick="downloadUploads(null)" disabled>⬇ Download All ZIP</button>
-                    </div>
+                <div style="margin-bottom: 14px;">
+                    <h2 style="margin:0;">🖼️ Uploads Folder</h2>
+                    <p class="ei-subtitle">Scan what’s on the volume, preview images, download ZIP backups, or restore from a ZIP.</p>
                 </div>
 
-                <!-- Upload + gallery tools -->
-                <div class="uploads-tools">
-                    <div class="uploads-tools-card">
-                        <h3>⬆ Upload ZIP into <code>UPLOADS_PATH</code></h3>
-                        <div class="uploads-dropzone" id="uploadsZipDropzone" onclick="document.getElementById('uploadsZipInput').click()">
-                            <input type="file" id="uploadsZipInput" accept=".zip" />
-                            <div><strong>Click to select</strong> an uploads ZIP (or drag & drop)</div>
-                            <div class="uploads-filemeta" id="uploadsZipMeta">No file selected</div>
+                <div class="ei-grid">
+                    <!-- Left: scan + download -->
+                    <div class="ei-card">
+                        <div class="ei-card__header">
+                            <div>
+                                <div class="ei-card__title">Scan & download</div>
+                                <div class="ei-card__desc">Shows a size breakdown by folder and enables full/partial ZIP download.</div>
+                            </div>
+                            <div class="ei-card__actions">
+                                <button class="btn btn-secondary btn-sm" id="scanBtn" onclick="scanUploads()">🔍 Scan</button>
+                                <button class="btn btn-primary btn-sm" id="dlAllBtn" onclick="downloadUploads(null)" disabled>⬇ Download ZIP</button>
+                            </div>
                         </div>
-                        <div class="uploads-tools-row" style="margin-top:10px;">
-                            <label style="font-size:12px; color:#666; display:flex; gap:8px; align-items:center;">
-                                <input type="checkbox" id="uploadsZipOverwrite" checked />
-                                Overwrite existing files
-                            </label>
-                            <button class="btn btn-primary btn-sm" id="uploadsZipUploadBtn" onclick="uploadUploadsZip()" disabled>Upload ZIP</button>
-                            <button class="btn btn-outline btn-sm" type="button" onclick="clearUploadsZip()">Clear</button>
-                            <span style="font-size:12px; color:#888;" id="uploadsZipUploadNote"></span>
+                        <div class="ei-card__body">
+                            <div class="dl-progress" id="dlProgress">
+                                <span class="spinner"></span>
+                                <span id="dlProgressText">Preparing ZIP — this may take a while for large folders…</span>
+                            </div>
+
+                            <div id="uploadsPanel">
+                                <div class="scan-placeholder" id="scanPlaceholder">
+                                    Click <strong>Scan</strong> to inspect the uploads directory on the server.
+                                </div>
+                            </div>
+
+                            <div class="status-message" id="uploadsStatus" style="margin-top:12px;"></div>
                         </div>
                     </div>
 
-                    <div class="uploads-tools-card">
-                        <h3>🖼 View images on Railway</h3>
-                        <div class="uploads-gallery-toolbar">
-                            <label style="font-size:12px;color:#666;">Folder</label>
-                            <select id="uploadsGalleryFolder">
-                                <option value="profile_images">profile_images</option>
-                                <option value="chat_images/images">chat_images/images</option>
-                                <option value="chat_images/thumbnails">chat_images/thumbnails</option>
-                            </select>
-                            <label style="font-size:12px;color:#666;">Limit</label>
-                            <select id="uploadsGalleryLimit">
-                                <option value="30">30</option>
-                                <option value="60" selected>60</option>
-                                <option value="120">120</option>
-                            </select>
-                            <button class="btn btn-secondary btn-sm" id="uploadsGalleryRefreshBtn" onclick="refreshUploadsGallery()">Refresh</button>
+                    <!-- Right: upload + gallery -->
+                    <div class="ei-stack">
+                        <div class="ei-card">
+                            <div class="ei-card__header">
+                                <div>
+                                    <div class="ei-card__title">Restore from ZIP</div>
+                                    <div class="ei-card__desc">Extracts into <code>UPLOADS_PATH</code> on the server.</div>
+                                </div>
+                            </div>
+                            <div class="ei-card__body">
+                                <div class="uploads-dropzone" id="uploadsZipDropzone" onclick="document.getElementById('uploadsZipInput').click()">
+                                    <input type="file" id="uploadsZipInput" accept=".zip" />
+                                    <div><strong>Select a ZIP</strong> (or drag & drop)</div>
+                                    <div class="uploads-filemeta" id="uploadsZipMeta">No file selected</div>
+                                </div>
+
+                                <div class="uploads-tools-row" style="margin-top:12px;">
+                                    <label style="font-size:12px; color:#666; display:flex; gap:8px; align-items:center;">
+                                        <input type="checkbox" id="uploadsZipOverwrite" checked />
+                                        Overwrite
+                                    </label>
+                                    <button class="btn btn-primary btn-sm" id="uploadsZipUploadBtn" onclick="uploadUploadsZip()" disabled>Upload</button>
+                                    <button class="btn btn-outline btn-sm" type="button" onclick="clearUploadsZip()">Clear</button>
+                                    <span style="font-size:12px; color:#888;" id="uploadsZipUploadNote"></span>
+                                </div>
+                            </div>
                         </div>
-                        <div id="uploadsGallery" class="uploads-gallery"></div>
-                        <div class="uploads-filemeta" id="uploadsGalleryMeta"></div>
+
+                        <div class="ei-card">
+                            <div class="ei-card__header">
+                                <div>
+                                    <div class="ei-card__title">Image browser</div>
+                                    <div class="ei-card__desc">Quickly preview what’s on the volume without downloading.</div>
+                                </div>
+                                <div class="ei-card__actions">
+                                    <button class="btn btn-secondary btn-sm" id="uploadsGalleryRefreshBtn" onclick="refreshUploadsGallery()">Refresh</button>
+                                </div>
+                            </div>
+                            <div class="ei-card__body">
+                                <div class="uploads-gallery-toolbar">
+                                    <label style="font-size:12px;color:#666;">Folder</label>
+                                    <select id="uploadsGalleryFolder">
+                                        <option value="profile_images">profile_images</option>
+                                        <option value="chat_images/images">chat_images/images</option>
+                                        <option value="chat_images/thumbnails">chat_images/thumbnails</option>
+                                    </select>
+                                    <label style="font-size:12px;color:#666;">Limit</label>
+                                    <select id="uploadsGalleryLimit">
+                                        <option value="30">30</option>
+                                        <option value="60" selected>60</option>
+                                        <option value="120">120</option>
+                                    </select>
+                                </div>
+                                <div id="uploadsGallery" class="uploads-gallery"></div>
+                                <div class="uploads-filemeta" id="uploadsGalleryMeta"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Download progress bar -->
-                <div class="dl-progress" id="dlProgress">
-                    <span class="spinner"></span>
-                    <span id="dlProgressText">Preparing ZIP — this may take a while for large folders…</span>
-                </div>
-
-                <!-- Scan result area -->
-                <div id="uploadsPanel">
-                    <div class="scan-placeholder" id="scanPlaceholder">
-                        Click <strong>Scan Folder</strong> to inspect the uploads directory on the server.
-                    </div>
-                </div>
-
-                <div class="status-message" id="uploadsStatus" style="margin-top:14px;"></div>
             </div>
 
             <!-- ══════════════════════════════════════════════════════
