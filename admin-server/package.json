@@ -33,9 +33,11 @@
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.0",
     "morgan": "^1.10.0",
+    "multer": "^2.0.2",
     "mssql": "^10.0.1",
     "pg": "^8.11.0",
-    "redis": "^4.6.0"
+    "redis": "^4.6.0",
+    "unzipper": "^0.12.3"
   },
   "devDependencies": {
     "jest": "^29.5.0",

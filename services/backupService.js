@@ -4,6 +4,7 @@ const { exec } = require('child_process');
 const { promisify } = require('util');
 const archiver = require('archiver');
 const crypto = require('crypto');
+const { resolveUploadsRoot } = require('../utils/uploads');
 
 const execAsync = promisify(exec);
 
@@ -149,7 +150,7 @@ class BackupService {
 
     async createFileBackup(backupPath) {
         try {
-            const uploadsDir = path.join(__dirname, '..', 'app', 'uploads');
+            const uploadsDir = resolveUploadsRoot();
             const filesBackupDir = path.join(backupPath, 'files');
             
             // Check if uploads directory exists
@@ -430,7 +431,7 @@ class BackupService {
 
     async restoreFiles(filesDir) {
         try {
-            const uploadsDir = path.join(__dirname, '..', 'app', 'uploads');
+            const uploadsDir = resolveUploadsRoot();
             
             // Create uploads directory if it doesn't exist
             await fs.mkdir(uploadsDir, { recursive: true });

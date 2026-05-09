@@ -5,6 +5,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const { resolveUploadsDir } = require('../../utils/uploads');
 
 /**
  * Setup image serving routes
@@ -15,7 +16,7 @@ function setupImageRoutes(app) {
     app.get('/api/images/:filename', (req, res) => {
         try {
             const filename = req.params.filename;
-            const imagePath = path.join(__dirname, '../../app', 'uploads', 'chat_images', 'images', filename);
+            const imagePath = resolveUploadsDir('chat_images', 'images', filename);
             
             if (fs.existsSync(imagePath)) {
                 res.sendFile(imagePath);
@@ -38,7 +39,7 @@ function setupImageRoutes(app) {
     app.get('/api/thumbnails/:filename', (req, res) => {
         try {
             const filename = req.params.filename;
-            const thumbnailPath = path.join(__dirname, '../../app', 'uploads', 'chat_images', 'thumbnails', filename);
+            const thumbnailPath = resolveUploadsDir('chat_images', 'thumbnails', filename);
             
             if (fs.existsSync(thumbnailPath)) {
                 res.sendFile(thumbnailPath);

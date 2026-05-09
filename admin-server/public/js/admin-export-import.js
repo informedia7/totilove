@@ -8,7 +8,178 @@ const folderCollapsedState = {};
 document.addEventListener('DOMContentLoaded', () => {
     setupFileUpload();
     setupExportScope();
+    setupUploadsZipUi();
+    refreshUploadsGallery().catch(() => {});
 });
+
+// ── Uploads Folder: ZIP upload UI ─────────────────────────────────────────────
+let selectedUploadsZip = null;
+
+function setupUploadsZipUi() {
+    const input = document.getElementById('uploadsZipInput');
+    const dz = document.getElementById('uploadsZipDropzone');
+    const meta = document.getElementById('uploadsZipMeta');
+    const btn = document.getElementById('uploadsZipUploadBtn');
+    if (!input || !dz || !meta || !btn) return;
+
+    function setMeta(file) {
+        if (!file) {
+            meta.textContent = 'No file selected';
+            btn.disabled = true;
+            return;
+        }
+        meta.textContent = `${file.name} (${fmtBytes(file.size)})`;
+        btn.disabled = false;
+    }
+
+    input.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0] ? e.target.files[0] : null;
+        selectedUploadsZip = file;
+        setMeta(file);
+    });
+
+    const prevent = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, prevent));
+    dz.addEventListener('dragover', () => dz.classList.add('dragover'));
+    dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+    dz.addEventListener('drop', (e) => {
+        dz.classList.remove('dragover');
+        const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0] ? e.dataTransfer.files[0] : null;
+        if (!file) return;
+        if (!String(file.name || '').toLowerCase().endsWith('.zip')) {
+            setUploadsStatus('❌ Only .zip files are allowed', 'error');
+            return;
+        }
+        selectedUploadsZip = file;
+        // reflect selection in input for user visibility
+        try { input.files = e.dataTransfer.files; } catch {}
+        setMeta(file);
+    });
+}
+
+function clearUploadsZip() {
+    selectedUploadsZip = null;
+    const input = document.getElementById('uploadsZipInput');
+    const meta = document.getElementById('uploadsZipMeta');
+    const btn = document.getElementById('uploadsZipUploadBtn');
+    if (input) input.value = '';
+    if (meta) meta.textContent = 'No file selected';
+    if (btn) btn.disabled = true;
+}
+
+async function uploadUploadsZip() {
+    const btn = document.getElementById('uploadsZipUploadBtn');
+    const note = document.getElementById('uploadsZipUploadNote');
+    const overwrite = document.getElementById('uploadsZipOverwrite');
+
+    if (!selectedUploadsZip) {
+        setUploadsStatus('❌ Select a ZIP file first', 'error');
+        return;
+    }
+
+    if (btn) btn.disabled = true;
+    if (note) note.textContent = 'Uploading…';
+    setUploadsStatus('Uploading ZIP to server…', 'info');
+
+    try {
+        const form = new FormData();
+        form.append('zip', selectedUploadsZip);
+        form.append('overwrite', overwrite && overwrite.checked ? 'true' : 'false');
+
+        const res = await fetch('/api/export-import/images', {
+            method: 'POST',
+            body: form
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || !json.success) {
+            throw new Error(json.error || 'Upload failed');
+        }
+
+        const data = json.data || {};
+        setUploadsStatus(
+            `✅ Imported ZIP into <code>${escapeHtml(data.uploadsRoot || '')}</code>. Extracted ${Number(data.extractedFiles || 0)} files, skipped ${Number(data.skippedFiles || 0)}.`,
+            'success'
+        );
+        clearUploadsZip();
+        // Refresh scan + gallery (best effort)
+        refreshUploadsGallery().catch(() => {});
+    } catch (e) {
+        setUploadsStatus('❌ ' + escapeHtml(e.message), 'error');
+    } finally {
+        if (btn) btn.disabled = !selectedUploadsZip;
+        if (note) note.textContent = '';
+    }
+}
+
+// ── Uploads Folder: Gallery ──────────────────────────────────────────────────
+async function refreshUploadsGallery() {
+    const folderEl = document.getElementById('uploadsGalleryFolder');
+    const limitEl = document.getElementById('uploadsGalleryLimit');
+    const grid = document.getElementById('uploadsGallery');
+    const meta = document.getElementById('uploadsGalleryMeta');
+    const btn = document.getElementById('uploadsGalleryRefreshBtn');
+
+    if (!folderEl || !limitEl || !grid || !meta) return;
+
+    const folder = folderEl.value;
+    const limit = limitEl.value;
+
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Refreshing…';
+    }
+
+    grid.innerHTML = '';
+    meta.textContent = 'Loading…';
+
+    try {
+        const res = await fetch(`/api/export-import/images/list?folder=${encodeURIComponent(folder)}&limit=${encodeURIComponent(limit)}`);
+        const json = await res.json();
+        if (!res.ok || !json.success) {
+            throw new Error(json.error || 'Failed to list files');
+        }
+
+        const data = json.data || {};
+        const files = Array.isArray(data.files) ? data.files : [];
+        if (files.length === 0) {
+            meta.textContent = `No files found in ${folder}.`;
+            return;
+        }
+
+        const html = files.map(f => {
+            const url = f.url;
+            const name = escapeHtml(f.name || '');
+            const size = fmtBytes(Number(f.size || 0));
+            const mod = fmtDate(f.modifiedAt);
+            const href = escapeHtml(url);
+            return `
+                <div class="uploads-thumb">
+                    <a href="${href}" target="_blank" rel="noopener">
+                        <img src="${href}" alt="${name}" loading="lazy" onerror="this.style.display='none'">
+                    </a>
+                    <div class="uploads-thumb-meta">
+                        <a href="${href}" target="_blank" rel="noopener" title="${name}">open</a>
+                        <span title="${name}">${size}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        grid.innerHTML = html;
+        meta.textContent = `Showing ${files.length} / ${Number(data.total || files.length)} files from ${folder}.`;
+    } catch (e) {
+        meta.textContent = '';
+        setUploadsStatus('❌ ' + escapeHtml(e.message), 'error');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = 'Refresh';
+        }
+    }
+}
 
 // ── Tab switching ─────────────────────────────────────────────────────────────
 function switchTab(name) {

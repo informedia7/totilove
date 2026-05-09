@@ -3,6 +3,7 @@ const logger = require('../utils/logger');
 const path = require('path');
 const fs = require('fs');
 const archiver = require('archiver');
+const unzipper = require('unzipper');
 
 const UPLOAD_PATH_CANDIDATES = [
     process.env.UPLOADS_PATH,
@@ -120,6 +121,167 @@ class ExportImportService {
 
             throw new Error(`Uploads folder is not accessible: ${uploadsRoot}`);
         }
+    }
+
+    async getUploadsImportRoot() {
+        if (!this.isRailwayEnvironment()) {
+            throw new Error('Uploads import is only available in Railway environment');
+        }
+
+        if (!process.env.UPLOADS_PATH) {
+            throw new Error('UPLOADS_PATH is required in Railway to import uploads folder');
+        }
+
+        const uploadsRoot = path.resolve(process.env.UPLOADS_PATH);
+        const stats = await fs.promises.stat(uploadsRoot);
+        if (!stats.isDirectory()) {
+            throw new Error(`UPLOADS_PATH is not a directory: ${uploadsRoot}`);
+        }
+
+        await fs.promises.access(uploadsRoot, fs.constants.W_OK | fs.constants.X_OK);
+        return uploadsRoot;
+    }
+
+    /**
+     * Import a ZIP into UPLOADS_PATH. The ZIP may contain:
+     * - `uploads/<...>` (preferred, produced by our export)
+     * - `<subfolder>/<...>` directly (e.g. `profile_images/foo.jpg`)
+     */
+    async importUploadsZip(zipFilePath, options = {}) {
+        const { overwrite = true } = options;
+
+        if (!zipFilePath) {
+            throw new Error('zipFilePath is required');
+        }
+
+        const uploadsRoot = await this.getUploadsImportRoot();
+
+        const opened = await unzipper.Open.file(zipFilePath);
+        const files = opened.files || [];
+
+        let extractedFiles = 0;
+        let skippedFiles = 0;
+
+        for (const entry of files) {
+            if (!entry || entry.type !== 'File') {
+                continue;
+            }
+
+            const rawPath = String(entry.path || '').replace(/\\/g, '/');
+            if (!rawPath || rawPath.includes('..')) {
+                skippedFiles++;
+                continue;
+            }
+
+            // Strip "uploads/" prefix if present (our export uses archive.directory(uploadsRoot, 'uploads')).
+            const relative = rawPath.startsWith('uploads/') ? rawPath.slice('uploads/'.length) : rawPath;
+            if (!relative) {
+                skippedFiles++;
+                continue;
+            }
+
+            const destPath = path.resolve(uploadsRoot, relative);
+            if (!destPath.startsWith(`${uploadsRoot}${path.sep}`) && destPath !== uploadsRoot) {
+                skippedFiles++;
+                continue;
+            }
+
+            await fs.promises.mkdir(path.dirname(destPath), { recursive: true });
+
+            if (!overwrite) {
+                try {
+                    await fs.promises.access(destPath, fs.constants.F_OK);
+                    skippedFiles++;
+                    continue;
+                } catch {
+                    // Doesn't exist, proceed.
+                }
+            }
+
+            await new Promise((resolve, reject) => {
+                const readStream = entry.stream();
+                const writeStream = fs.createWriteStream(destPath);
+                readStream.on('error', reject);
+                writeStream.on('error', reject);
+                writeStream.on('finish', resolve);
+                readStream.pipe(writeStream);
+            });
+
+            extractedFiles++;
+        }
+
+        return {
+            uploadsRoot,
+            extractedFiles,
+            skippedFiles,
+            totalEntries: files.length
+        };
+    }
+
+    /**
+     * List recent files under UPLOADS_PATH for browser preview.
+     * @param {object} options
+     * @param {string} options.folder - one of: profile_images, chat_images/images, chat_images/thumbnails
+     * @param {number} options.limit
+     * @param {number} options.offset
+     */
+    async listUploadsFiles(options = {}) {
+        const folder = String(options.folder || '').trim();
+        const limit = Math.min(Math.max(parseInt(options.limit, 10) || 60, 1), 200);
+        const offset = Math.max(parseInt(options.offset, 10) || 0, 0);
+
+        const allowed = new Set([
+            'profile_images',
+            'chat_images/images',
+            'chat_images/thumbnails'
+        ]);
+        if (!allowed.has(folder)) {
+            throw new Error(`Invalid folder. Allowed: ${Array.from(allowed).join(', ')}`);
+        }
+
+        const uploadsRoot = await this.resolveLocalUploadsRoot();
+        const targetDir = path.resolve(uploadsRoot, folder);
+        const rootResolved = path.resolve(uploadsRoot);
+        if (!targetDir.startsWith(`${rootResolved}${path.sep}`)) {
+            throw new Error('Invalid folder path');
+        }
+
+        const entries = await fs.promises.readdir(targetDir, { withFileTypes: true });
+        const files = [];
+
+        for (const entry of entries) {
+            if (!entry.isFile()) {
+                continue;
+            }
+            const name = entry.name;
+            const abs = path.join(targetDir, name);
+            try {
+                const stat = await fs.promises.stat(abs);
+                files.push({
+                    name,
+                    relativePath: `${folder}/${name}`.replace(/\\/g, '/'),
+                    size: stat.size,
+                    modifiedAt: stat.mtime
+                });
+            } catch (e) {
+                // ignore unreadable entries
+            }
+        }
+
+        files.sort((a, b) => new Date(b.modifiedAt).getTime() - new Date(a.modifiedAt).getTime());
+        const paged = files.slice(offset, offset + limit);
+
+        return {
+            root: uploadsRoot,
+            folder,
+            limit,
+            offset,
+            total: files.length,
+            files: paged.map(f => ({
+                ...f,
+                url: `/uploads/${f.relativePath}`
+            }))
+        };
     }
 
     /**

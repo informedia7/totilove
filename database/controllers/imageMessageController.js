@@ -5,11 +5,14 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
 const sharp = require('sharp');
+const { resolveUploadsDir, ensureDirSync } = require('../../utils/uploads');
 
 // Simple storage configuration
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'app/uploads/chat_images/');
+        const dir = resolveUploadsDir('chat_images', 'images');
+        ensureDirSync(dir);
+        cb(null, dir);
     },
     filename: (req, file, cb) => {
         const timestamp = Date.now();
@@ -254,7 +257,7 @@ class ImageMessageController {
     static async serveImage(req, res) {
         try {
             const { filename } = req.params;
-            const filePath = path.join(__dirname, '../app/uploads/chat_images/', filename);
+            const filePath = resolveUploadsDir('chat_images', 'images', filename);
             
             // Check if file exists
             try {

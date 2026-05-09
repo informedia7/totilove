@@ -3,6 +3,7 @@ const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs').promises;
 const crypto = require('crypto');
+const { resolveUploadsDir, ensureDirSync } = require('./uploads');
 
 let ClamScan = null;
 let clamscan = null;
@@ -17,10 +18,15 @@ try {
 
 class ChatImageHandler {
     constructor() {
-        this.uploadDir = path.join(__dirname, '..', 'app', 'uploads', 'chat_images');
+        this.uploadDir = resolveUploadsDir('chat_images');
         this.imagesDir = path.join(this.uploadDir, 'images');
         this.thumbnailsDir = path.join(this.uploadDir, 'thumbnails');
         this.tempDir = path.join(this.uploadDir, 'temp');
+
+        ensureDirSync(this.uploadDir);
+        ensureDirSync(this.imagesDir);
+        ensureDirSync(this.thumbnailsDir);
+        ensureDirSync(this.tempDir);
         
         // Supported image formats
         this.allowedMimeTypes = [
@@ -357,15 +363,13 @@ class ChatImageHandler {
             // Delete main image file
             if (filePath) {
                 try {
-                    // Fix path resolution: database paths start with /uploads/chat_images/
-                    // but the actual files are in app/uploads/chat_images/
                     let resolvedImagePath;
                     if (filePath.startsWith('/uploads/chat_images/')) {
-                        // Remove leading slash and add 'app' prefix
-                        const relativePath = 'app' + filePath; // Add 'app' prefix
-                        resolvedImagePath = path.join(process.cwd(), relativePath);
+                        resolvedImagePath = path.join(resolveUploadsDir(), filePath.replace('/uploads/', ''));
                     } else {
-                        resolvedImagePath = path.join(process.cwd(), filePath);
+                        resolvedImagePath = path.isAbsolute(filePath)
+                            ? filePath
+                            : path.join(process.cwd(), filePath);
                     }
                     
                             // Attempting to delete image file
@@ -389,11 +393,11 @@ class ChatImageHandler {
                     // but the actual files are in app/uploads/chat_images/
                     let resolvedThumbPath;
                     if (thumbnailPath.startsWith('/uploads/chat_images/')) {
-                        // Remove leading slash and add 'app' prefix
-                        const relativePath = 'app' + thumbnailPath; // Add 'app' prefix
-                        resolvedThumbPath = path.join(process.cwd(), relativePath);
+                        resolvedThumbPath = path.join(resolveUploadsDir(), thumbnailPath.replace('/uploads/', ''));
                     } else {
-                        resolvedThumbPath = path.join(process.cwd(), thumbnailPath);
+                        resolvedThumbPath = path.isAbsolute(thumbnailPath)
+                            ? thumbnailPath
+                            : path.join(process.cwd(), thumbnailPath);
                     }
                     
                             // Attempting to delete thumbnail

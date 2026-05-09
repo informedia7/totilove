@@ -24,6 +24,7 @@ const multer = require('multer');
 const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs');
+const { resolveUploadsDir, ensureDirSync } = require('../../utils/uploads');
 const { imageUploadLimiter } = require('../middleware/rateLimiter');
 const { requestLogger } = require('../middleware/requestLogger');
 const { requireAuth } = require('../middleware/authMiddleware');
@@ -308,11 +309,8 @@ function validateImageUpload(req, res, next) {
 function createProfileImageUpload(baseDir) {
     const profileImageStorage = multer.diskStorage({
         destination: (req, file, cb) => {
-            const uploadDir = path.join(baseDir, 'app', 'uploads', 'profile_images');
-            // Ensure directory exists
-            if (!fs.existsSync(uploadDir)) {
-                fs.mkdirSync(uploadDir, { recursive: true });
-            }
+            const uploadDir = resolveUploadsDir('profile_images');
+            ensureDirSync(uploadDir);
             cb(null, uploadDir);
         },
         filename: (req, file, cb) => {
@@ -623,7 +621,7 @@ function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
             await db.query('DELETE FROM user_images WHERE id = $1', [imageId]);
 
             // Delete file and thumbnails
-            const filePath = path.join(baseDir, 'app', 'uploads', 'profile_images', fileName);
+            const filePath = resolveUploadsDir('profile_images', fileName);
             const baseName = path.basename(fileName, path.extname(fileName));
             const dirName = path.dirname(filePath);
             

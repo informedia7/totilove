@@ -7,6 +7,7 @@ const express = require('express');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const { resolveUploadsRoot } = require('../../utils/uploads');
 const {
     createPerRequestCorsMiddleware,
     warnProductionWithoutExplicitOrigins,
@@ -65,12 +66,12 @@ function configureExpress(app) {
     
     // Static file serving - specific paths first
     app.use('/assets', express.static(path.join(__dirname, '../../app', 'assets')));
-    app.use('/uploads', express.static(path.join(__dirname, '../../app', 'uploads')));
+    app.use('/uploads', express.static(resolveUploadsRoot()));
     app.use('/js', express.static(path.join(__dirname, '../../app', 'js')));
     app.use('/components', express.static(path.join(__dirname, '../../app', 'components')));
     
     // Ensure chat images are served from the correct path
-    app.use('/uploads/chat_images', express.static(path.join(__dirname, '../../app', 'uploads', 'chat_images')));
+    app.use('/uploads/chat_images', express.static(path.join(resolveUploadsRoot(), 'chat_images')));
     
     // Catch-all static file serving - MUST be before routes
     app.use('/', express.static(path.join(__dirname, '../../app')));

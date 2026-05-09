@@ -1,6 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const { messageCountLimiter } = require('./middleware/rateLimiter');
+const { resolveUploadsDir, ensureDirSync } = require('../utils/uploads');
 
 class MessageRoutes {
     constructor(messageController, authMiddleware) {
@@ -16,7 +17,9 @@ class MessageRoutes {
         // Configure multer for file uploads
         const storage = multer.diskStorage({
             destination: (req, file, cb) => {
-                cb(null, 'app/uploads/chat_images/temp');
+                const dir = resolveUploadsDir('chat_images', 'temp');
+                ensureDirSync(dir);
+                cb(null, dir);
             },
             filename: (req, file, cb) => {
                 const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);

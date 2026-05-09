@@ -101,6 +101,70 @@
 
         /* last-modified chip */
         .time-chip { font-size: 11px; color: #888; }
+
+        /* ── Image browser ── */
+        .uploads-tools {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            margin: 14px 0 18px;
+        }
+        .uploads-tools-card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 16px;
+        }
+        .uploads-tools-card h3 { margin: 0 0 10px; font-size: 14px; }
+        .uploads-tools-row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+        .uploads-tools-row input[type="file"] { display: none; }
+        .uploads-dropzone {
+            border: 2px dashed #d0d0d0;
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+            cursor: pointer;
+            color: #666;
+            background: #fafbff;
+        }
+        .uploads-dropzone:hover { border-color:#667eea; background:#f3f5ff; }
+        .uploads-filemeta { font-size: 12px; color:#666; margin-top: 8px; }
+        .uploads-gallery-toolbar {
+            display:flex;
+            gap:10px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .uploads-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 10px;
+        }
+        .uploads-thumb {
+            border: 1px solid #e6e6e6;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+        }
+        .uploads-thumb img {
+            display:block;
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            background: #f5f5f5;
+        }
+        .uploads-thumb-meta {
+            padding: 8px 10px;
+            font-size: 11px;
+            color: #666;
+            display:flex;
+            gap: 8px;
+            justify-content: space-between;
+            align-items:center;
+        }
+        .uploads-thumb-meta a { color:#3c67d6; text-decoration:none; }
+        .uploads-thumb-meta a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -138,6 +202,48 @@
                     <div style="display:flex; gap:10px; align-items:center;">
                         <button class="btn btn-secondary btn-sm" id="scanBtn" onclick="scanUploads()">🔍 Scan Folder</button>
                         <button class="btn btn-primary btn-sm" id="dlAllBtn" onclick="downloadUploads(null)" disabled>⬇ Download All ZIP</button>
+                    </div>
+                </div>
+
+                <!-- Upload + gallery tools -->
+                <div class="uploads-tools">
+                    <div class="uploads-tools-card">
+                        <h3>⬆ Upload ZIP into <code>UPLOADS_PATH</code></h3>
+                        <div class="uploads-dropzone" id="uploadsZipDropzone" onclick="document.getElementById('uploadsZipInput').click()">
+                            <input type="file" id="uploadsZipInput" accept=".zip" />
+                            <div><strong>Click to select</strong> an uploads ZIP (or drag & drop)</div>
+                            <div class="uploads-filemeta" id="uploadsZipMeta">No file selected</div>
+                        </div>
+                        <div class="uploads-tools-row" style="margin-top:10px;">
+                            <label style="font-size:12px; color:#666; display:flex; gap:8px; align-items:center;">
+                                <input type="checkbox" id="uploadsZipOverwrite" checked />
+                                Overwrite existing files
+                            </label>
+                            <button class="btn btn-primary btn-sm" id="uploadsZipUploadBtn" onclick="uploadUploadsZip()" disabled>Upload ZIP</button>
+                            <button class="btn btn-outline btn-sm" type="button" onclick="clearUploadsZip()">Clear</button>
+                            <span style="font-size:12px; color:#888;" id="uploadsZipUploadNote"></span>
+                        </div>
+                    </div>
+
+                    <div class="uploads-tools-card">
+                        <h3>🖼 View images on Railway</h3>
+                        <div class="uploads-gallery-toolbar">
+                            <label style="font-size:12px;color:#666;">Folder</label>
+                            <select id="uploadsGalleryFolder">
+                                <option value="profile_images">profile_images</option>
+                                <option value="chat_images/images">chat_images/images</option>
+                                <option value="chat_images/thumbnails">chat_images/thumbnails</option>
+                            </select>
+                            <label style="font-size:12px;color:#666;">Limit</label>
+                            <select id="uploadsGalleryLimit">
+                                <option value="30">30</option>
+                                <option value="60" selected>60</option>
+                                <option value="120">120</option>
+                            </select>
+                            <button class="btn btn-secondary btn-sm" id="uploadsGalleryRefreshBtn" onclick="refreshUploadsGallery()">Refresh</button>
+                        </div>
+                        <div id="uploadsGallery" class="uploads-gallery"></div>
+                        <div class="uploads-filemeta" id="uploadsGalleryMeta"></div>
                     </div>
                 </div>
 
