@@ -16,8 +16,15 @@ function resolveMediaUrl(path) {
     if (!path) return '';
     const s = String(path).trim();
     if (s.startsWith('http://') || s.startsWith('https://')) return s;
-    if (s.startsWith('/')) return s;
-    return `/${s}`;
+    const base = (typeof window !== 'undefined' && window.__TOTILOVE_URL)
+        ? String(window.__TOTILOVE_URL).replace(/\/$/, '')
+        : '';
+    const rel = s.startsWith('/') ? s : `/${s}`;
+    // Files are stored on the main Totilove app volume; admin Railway service usually does not share it.
+    if (base && rel.startsWith('/uploads/')) {
+        return `${base}${rel}`;
+    }
+    return rel;
 }
 
 function selectSuspensionReason(title = 'Select Suspension Reason') {
