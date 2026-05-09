@@ -36,6 +36,11 @@ const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs');
 const { resolveUploadsDir, ensureDirSync } = require('../../utils/uploads');
+const {
+    getClamScanner,
+    isClamAvExplicitlyDisabled,
+    isClamAvRequired
+} = require('../../utils/clamAvScanner');
 const { imageUploadLimiter } = require('../middleware/rateLimiter');
 const { requestLogger } = require('../middleware/requestLogger');
 const { requireAuth } = require('../middleware/authMiddleware');
@@ -115,16 +120,8 @@ class ApiError extends Error {
 }
 
 // ============================================================================
-// 4. VIRUS SCANNING (node-clamscan: async init + isInfected per file)
+// 4. VIRUS SCANNING via ../../utils/clamAvScanner (shared with chat uploads)
 // ============================================================================
-function isClamAvExplicitlyDisabled() {
-    return String(process.env.CLAMAV_DISABLED || '').toLowerCase() === 'true';
-}
-
-function isClamAvRequired() {
-    return String(process.env.CLAMAV_REQUIRED || '').toLowerCase() === 'true';
-}
-
 async function unlinkUploadedFiles(files) {
     if (!files || !files.length) {
         return;
@@ -140,61 +137,6 @@ async function unlinkUploadedFiles(files) {
             }
         })
     );
-}
-
-let clamscanInitPromise = null;
-
-async function getClamScanner() {
-    if (isClamAvExplicitlyDisabled()) {
-        return null;
-    }
-    if (!clamscanInitPromise) {
-        clamscanInitPromise = (async () => {
-            try {
-                const NodeClam = require('clamscan');
-                const rawSocket = (process.env.CLAMD_SOCKET || '').trim();
-                const rawHost = (process.env.CLAMD_HOST || '').trim();
-                const socket = rawSocket || false;
-                const host = rawHost || false;
-                const port = host
-                    ? Number(String(process.env.CLAMD_PORT || '3310').trim()) || 3310
-                    : (process.env.CLAMD_PORT || '').trim()
-                        ? Number(String(process.env.CLAMD_PORT).trim())
-                        : false;
-
-                const useRemote = !!(socket || host);
-                const preference =
-                    process.env.CLAMAV_PREFERENCE ||
-                    (useRemote ? 'clamdscan' : 'clamscan');
-
-                const scanner = await new NodeClam().init({
-                    debugMode: process.env.CLAMAV_DEBUG === 'true',
-                    preference,
-                    clamdscan: {
-                        socket,
-                        host,
-                        port,
-                        timeout: process.env.CLAMD_TIMEOUT_MS ? Number(process.env.CLAMD_TIMEOUT_MS) : 60000,
-                        active: process.env.CLAMD_DISABLE !== 'true',
-                        path: process.env.CLAMDSCAN_PATH || '/usr/bin/clamdscan',
-                        localFallback: process.env.CLAMD_LOCAL_FALLBACK !== 'false',
-                        bypassTest: process.env.CLAMD_BYPASS_PING === 'true'
-                    },
-                    clamscan: {
-                        path: process.env.CLAMSCAN_PATH || '/usr/bin/clamscan',
-                        active: process.env.CLAMSCAN_DISABLE !== 'true'
-                    }
-                });
-                console.log('[ImageRoutes] ClamAV initialized; profile uploads will be scanned');
-                return scanner;
-            } catch (e) {
-                const msg = e && e.message ? e.message : String(e);
-                console.warn('[ImageRoutes] ClamAV init failed:', msg);
-                return null;
-            }
-        })();
-    }
-    return clamscanInitPromise;
 }
 
 // ============================================================================

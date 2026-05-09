@@ -4,17 +4,11 @@ const path = require('path');
 const fs = require('fs').promises;
 const crypto = require('crypto');
 const { resolveUploadsDir, ensureDirSync } = require('./uploads');
-
-let ClamScan = null;
-let clamscan = null;
-try {
-    ClamScan = require('clamscan');
-    clamscan = new ClamScan();
-    console.log('[ChatImageHandler] ClamAV virus scanning enabled');
-} catch (error) {
-    console.warn('[ChatImageHandler] ClamAV not available. Install with: npm install clamscan');
-    console.warn('[ChatImageHandler] Virus scanning disabled for chat uploads.');
-}
+const {
+    getClamScanner,
+    isClamAvExplicitlyDisabled,
+    isClamAvRequired
+} = require('./clamAvScanner');
 
 class ChatImageHandler {
     constructor() {
@@ -31,6 +25,8 @@ class ChatImageHandler {
         // Supported image formats
         this.allowedMimeTypes = [
             'image/jpeg',
+            'image/jpg',
+            'image/pjpeg',
             'image/png',
             'image/gif',
             'image/webp'
@@ -39,6 +35,8 @@ class ChatImageHandler {
         this.allowedExtensions = [
             '.jpg',
             '.jpeg',
+            '.jfif',
+            '.jpe',
             '.png',
             '.gif',
             '.webp'
@@ -71,16 +69,20 @@ class ChatImageHandler {
     }
 
     isVirusScannerEnabled() {
-        return !!clamscan;
+        return !isClamAvExplicitlyDisabled();
     }
 
     async scanUploadedFile(filePath) {
-        if (!clamscan) {
+        const scanner = await getClamScanner();
+        if (!scanner) {
+            if (isClamAvRequired()) {
+                throw new Error('Virus scanning is required but unavailable');
+            }
             return { clean: true };
         }
 
         try {
-            const scanResult = await clamscan.scanFile(filePath);
+            const scanResult = await scanner.isInfected(filePath);
             if (scanResult.isInfected) {
                 return {
                     clean: false,
@@ -90,7 +92,13 @@ class ChatImageHandler {
             return { clean: true };
         } catch (error) {
             console.error('[ChatImageHandler] Virus scan error:', error);
-            throw new Error('File security check failed');
+            const failClosed =
+                isClamAvRequired() ||
+                String(process.env.CLAMAV_FAIL_CLOSED || '').toLowerCase() === 'true';
+            if (failClosed) {
+                throw new Error('File security check failed');
+            }
+            return { clean: true };
         }
     }
 
