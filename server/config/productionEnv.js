@@ -213,6 +213,31 @@ function assertProductionBaseUrl() {
 /**
  * Non-fatal warnings for production configuration.
  */
+/**
+ * Uploads must persist on a mounted volume in production (Railway etc.).
+ * Set UPLOADS_PATH to the volume Mount Path (often /app/app/uploads).
+ * Opt out only with ALLOW_EPHEMERAL_UPLOADS_IN_PRODUCTION=true (files lost on redeploy).
+ */
+function assertProductionUploadsVolume() {
+    if (process.env.NODE_ENV !== 'production') {
+        return;
+    }
+    if (process.env.ALLOW_EPHEMERAL_UPLOADS_IN_PRODUCTION === 'true') {
+        console.warn(
+            '[productionEnv] ALLOW_EPHEMERAL_UPLOADS_IN_PRODUCTION=true — uploads may use container disk and be lost on restart.'
+        );
+        return;
+    }
+    const uploadsPath = (process.env.UPLOADS_PATH || '').trim();
+    if (!uploadsPath) {
+        console.error(
+            '[productionEnv] Set UPLOADS_PATH to your persistent volume directory (Railway: same as the volume Mount Path, often /app/app/uploads). ' +
+                'Without UPLOADS_PATH uploads will not target your volume. To skip: ALLOW_EPHEMERAL_UPLOADS_IN_PRODUCTION=true.'
+        );
+        process.exit(1);
+    }
+}
+
 function warnProductionConfiguration() {
     if (process.env.NODE_ENV !== 'production') {
         return;
@@ -238,5 +263,6 @@ module.exports = {
     assertRedisDeclaredIfRequired,
     assertProductionDatabaseCredentials,
     assertProductionBaseUrl,
+    assertProductionUploadsVolume,
     warnProductionConfiguration
 };

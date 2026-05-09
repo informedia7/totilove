@@ -29,6 +29,7 @@ const {
     assertRedisDeclaredIfRequired,
     assertProductionDatabaseCredentials,
     assertProductionBaseUrl,
+    assertProductionUploadsVolume,
     warnProductionConfiguration
 } = require('./server/config/productionEnv');
 
@@ -108,6 +109,7 @@ class Server {
         assertProductionEnvironment();
         assertProductionDatabaseCredentials();
         assertProductionBaseUrl();
+        assertProductionUploadsVolume();
         assertProductionCorsOrigins();
         assertProductionHttpsBaseUrl();
         assertRedisDeclaredIfRequired();

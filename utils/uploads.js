@@ -7,8 +7,14 @@ function resolveUploadsRoot() {
         return path.resolve(fromEnv);
     }
 
-    // Default next to repo `app/uploads`. Resolved from this module — NOT process.cwd() — so profile/chat
-    // uploads match express.static `/uploads` even when cwd differs (Railway, PM2, nested scripts).
+    // Production without UPLOADS_PATH should not happen — startup asserts REQUIRE UPLOADS_PATH unless opted out.
+    // Fallback matches typical Railway volume Mount Path when ALLOW_EPHEMERAL_UPLOADS_IN_PRODUCTION=true.
+    if (process.env.NODE_ENV === 'production') {
+        const fallback = (process.env.DEFAULT_UPLOADS_PATH || '/app/app/uploads').trim();
+        return path.resolve(fallback);
+    }
+
+    // Dev: stable path relative to this module (not process.cwd()).
     return path.resolve(__dirname, '..', 'app', 'uploads');
 }
 
