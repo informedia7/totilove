@@ -93,6 +93,8 @@ class ExportImportService {
         const uploadsRoot = path.resolve(process.env.UPLOADS_PATH);
 
         try {
+            // Create the directory if it doesn't exist yet (common when a fresh volume is mounted).
+            await fs.promises.mkdir(uploadsRoot, { recursive: true });
             const stats = await fs.promises.stat(uploadsRoot);
             if (!stats.isDirectory()) {
                 throw new Error(`UPLOADS_PATH is not a directory: ${uploadsRoot}`);
@@ -133,6 +135,7 @@ class ExportImportService {
         }
 
         const uploadsRoot = path.resolve(process.env.UPLOADS_PATH);
+        await fs.promises.mkdir(uploadsRoot, { recursive: true });
         const stats = await fs.promises.stat(uploadsRoot);
         if (!stats.isDirectory()) {
             throw new Error(`UPLOADS_PATH is not a directory: ${uploadsRoot}`);

@@ -135,6 +135,31 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve user uploaded images
 // Try multiple possible locations for uploads directory
+// If UPLOADS_PATH is set but missing, create it so Railway volume mounts work cleanly.
+if (process.env.UPLOADS_PATH) {
+    try {
+        const resolvedUploads = path.resolve(process.env.UPLOADS_PATH);
+        if (!fs.existsSync(resolvedUploads)) {
+            fs.mkdirSync(resolvedUploads, { recursive: true });
+            logger.info(`Created UPLOADS_PATH directory: ${resolvedUploads}`);
+        }
+        // Also ensure common subfolders exist (safe no-op if already present)
+        const ensureDirs = [
+            path.join(resolvedUploads, 'profile_images'),
+            path.join(resolvedUploads, 'chat_images', 'images'),
+            path.join(resolvedUploads, 'chat_images', 'thumbnails'),
+            path.join(resolvedUploads, 'chat_images', 'temp')
+        ];
+        ensureDirs.forEach((dir) => {
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
+        });
+    } catch (e) {
+        logger.warn(`Failed ensuring UPLOADS_PATH directories: ${e.message}`);
+    }
+}
+
 const possibleUploadPaths = [
     process.env.UPLOADS_PATH,
     path.join(__dirname, '..', 'app', 'uploads', 'profile_images'), // Direct profile_images path
