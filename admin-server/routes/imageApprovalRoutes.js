@@ -16,7 +16,19 @@ router.use(auditLog);
 router.get('/image/:filename', async (req, res) => {
     try {
         const filename = req.params.filename;
-        
+
+        if (
+            !filename ||
+            filename !== path.basename(filename) ||
+            filename.includes('..') ||
+            /[/\\]/.test(filename)
+        ) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid filename'
+            });
+        }
+
         // Check if it's an image file first
         const ext = path.extname(filename).toLowerCase();
         const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
@@ -26,6 +38,15 @@ router.get('/image/:filename', async (req, res) => {
                 error: 'Invalid file type'
             });
         }
+
+        const contentType =
+            {
+                '.jpg': 'image/jpeg',
+                '.jpeg': 'image/jpeg',
+                '.png': 'image/png',
+                '.gif': 'image/gif',
+                '.webp': 'image/webp'
+            }[ext] || 'image/jpeg';
 
         // Try multiple possible locations for uploads directory
         const possibleUploadPaths = [
@@ -87,12 +108,36 @@ router.get('/image/:filename', async (req, res) => {
         }
 
         if (!imagePath) {
-            logger.warn(`Image not found: ${filename}`);
-            logger.warn(`Searched in ${possibleUploadPaths.length} possible locations`);
-            // Log first few paths for debugging (avoid logging all paths in production)
+            logger.warn(`Image not found locally: ${filename}`);
             if (possibleUploadPaths.length > 0) {
                 logger.warn(`Sample paths checked: ${possibleUploadPaths.slice(0, 3).join(', ')}`);
             }
+
+            const base = (process.env.TOTILOVE_URL || '').trim().replace(/\/$/, '');
+            if (base) {
+                try {
+                    const fetch = require('node-fetch');
+                    const url = `${base}/uploads/profile_images/${encodeURIComponent(filename)}`;
+                    const upstream = await fetch(url, { timeout: 20000 });
+                    if (upstream.ok) {
+                        const ct = upstream.headers.get('content-type') || contentType;
+                        res.setHeader('Content-Type', ct);
+                        res.setHeader('Cache-Control', 'private, max-age=120');
+                        upstream.body.pipe(res);
+                        upstream.body.on('error', (err) => {
+                            logger.warn(`Totilove image stream error (${filename}): ${err.message}`);
+                            if (!res.headersSent) {
+                                res.status(502).end();
+                            }
+                        });
+                        return;
+                    }
+                    logger.warn(`Totilove image upstream ${upstream.status} for ${url}`);
+                } catch (e) {
+                    logger.warn(`Totilove image proxy failed (${filename}): ${e.message}`);
+                }
+            }
+
             return res.status(404).json({
                 success: false,
                 error: 'Image not found',
@@ -102,15 +147,6 @@ router.get('/image/:filename', async (req, res) => {
 
         // Ensure path is absolute
         const absoluteImagePath = path.resolve(imagePath);
-
-        // Set proper content type
-        const contentType = {
-            '.jpg': 'image/jpeg',
-            '.jpeg': 'image/jpeg',
-            '.png': 'image/png',
-            '.gif': 'image/gif',
-            '.webp': 'image/webp'
-        }[ext] || 'image/jpeg';
 
         res.setHeader('Content-Type', contentType);
         res.sendFile(absoluteImagePath);

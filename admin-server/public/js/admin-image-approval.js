@@ -6,6 +6,22 @@ let currentPage = {
     all: 1
 };
 
+function profileImageSrcPair(fileName) {
+    const enc = encodeURIComponent(fileName);
+    const adminProxy = `/api/image-approval/image/${enc}`;
+    const base = (window.__TOTILOVE_URL || '').replace(/\/$/, '');
+    if (base) {
+        return {
+            primary: `${base}/uploads/profile_images/${enc}`,
+            fallback: adminProxy
+        };
+    }
+    return {
+        primary: adminProxy,
+        fallback: adminProxy
+    };
+}
+
 // Load data on page load
 document.addEventListener('DOMContentLoaded', () => {
     loadStatistics();
@@ -245,12 +261,9 @@ function renderImages(images, pagination, type) {
     }
 
     grid.innerHTML = images.map(image => {
-        // Try static path first, fallback to API endpoint
-        const base = (window.__TOTILOVE_URL || '').replace(/\/$/, '');
-        const imageUrl = `${base}/uploads/profile_images/${image.file_name}`;
-        const imageApiUrl = `/api/image-approval/image/${image.file_name}`;
+        const { primary: imageUrl, fallback: imageApiUrl } = profileImageSrcPair(image.file_name);
         const status = image.approval_status || 'pending';
-        
+
         return `
             <div class="image-card" data-image-id="${image.id}" data-image-url="${imageUrl}" data-status="${status}">
                 <img src="${imageUrl}" alt="${escapeHtml(image.file_name)}" 
@@ -409,9 +422,10 @@ function previewImage(imageId, imageUrl, status) {
     const uid = row && row.user_id != null ? Number(row.user_id) : null;
     const suspended = imageApprovalUserSuspended(row);
 
-    // Extract filename from URL for fallback
-    const filename = imageUrl.split('/').pop();
-    const imageApiUrl = `/api/image-approval/image/${filename}`;
+    const fileName =
+        (row && row.file_name) ||
+        decodeURIComponent(String(imageUrl.split('/').pop() || '').split('?')[0]);
+    const { primary: previewSrc, fallback: imageApiUrl } = profileImageSrcPair(fileName);
     const previewContent = document.getElementById('imagePreviewContent');
     let metaHtml = '';
     if (row && Number.isFinite(uid) && uid > 0) {
@@ -426,7 +440,7 @@ function previewImage(imageId, imageUrl, status) {
     }
     previewContent.innerHTML = `
         ${metaHtml}
-        <img src="${imageUrl}" alt="Preview" data-fallback="${imageApiUrl}" data-retry-attempts="0" style="max-width:100%;max-height:55vh;object-fit:contain;">
+        <img src="${previewSrc}" alt="Preview" data-fallback="${imageApiUrl}" data-retry-attempts="0" style="max-width:100%;max-height:55vh;object-fit:contain;">
     `;
 
     const previewImg = previewContent.querySelector('img');

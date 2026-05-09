@@ -602,8 +602,38 @@ function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
                             : null;
                         const thumbnailPath = thumbnailMediumPath || thumbnailSmallPath;
                         
-                        // Insert into database with explicit column set
-                        const insertResult = await db.query(`
+                        // Insert — approval_status 'pending' so admin image-approval lists new uploads
+                        const insertParams = [
+                            userId,
+                            file.filename,
+                            metadata ? JSON.stringify(metadata) : null,
+                            thumbnailPath,
+                            thumbnailSmallPath,
+                            thumbnailMediumPath
+                        ];
+                        let insertResult;
+                        try {
+                            insertResult = await db.query(
+                                `
+                            INSERT INTO user_images (
+                                user_id,
+                                file_name,
+                                is_profile,
+                                featured,
+                                metadata,
+                                thumbnail_path,
+                                thumbnail_small_path,
+                                thumbnail_medium_path,
+                                approval_status
+                            ) VALUES ($1, $2, 0, 0, $3, $4, $5, $6, 'pending')
+                            RETURNING id, file_name, is_profile, featured, uploaded_at, thumbnail_path, thumbnail_small_path, thumbnail_medium_path, metadata
+                        `,
+                                insertParams
+                            );
+                        } catch (insertErr) {
+                            if (insertErr && insertErr.code === '42703') {
+                                insertResult = await db.query(
+                                    `
                             INSERT INTO user_images (
                                 user_id,
                                 file_name,
@@ -615,14 +645,13 @@ function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
                                 thumbnail_medium_path
                             ) VALUES ($1, $2, 0, 0, $3, $4, $5, $6)
                             RETURNING id, file_name, is_profile, featured, uploaded_at, thumbnail_path, thumbnail_small_path, thumbnail_medium_path, metadata
-                        `, [
-                            userId,
-                            file.filename,
-                            metadata ? JSON.stringify(metadata) : null,
-                            thumbnailPath,
-                            thumbnailSmallPath,
-                            thumbnailMediumPath
-                        ]);
+                        `,
+                                    insertParams
+                                );
+                            } else {
+                                throw insertErr;
+                            }
+                        }
 
                         const imageRow = insertResult.rows[0];
                         const processingTime = Date.now() - fileStartTime;
