@@ -188,6 +188,7 @@ if (process.env.UPLOADS_PATH) {
 
 const possibleUploadPaths = [
     process.env.UPLOADS_PATH,
+    path.join(__dirname, 'app', 'uploads'), // Railway layout: code at /app, volume at /app/app/uploads
     path.join(__dirname, '..', 'app', 'uploads', 'profile_images'), // Direct profile_images path
     path.join(__dirname, '..', 'app', 'uploads'), // ../app/uploads
     path.join(__dirname, '..', 'uploads'),

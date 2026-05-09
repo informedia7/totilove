@@ -5,11 +5,16 @@ const fs = require('fs');
 const archiver = require('archiver');
 const unzipper = require('unzipper');
 
+// Same resolution idea as server.js (admin root = parent of this file's folder).
+const adminRoot = path.join(__dirname, '..');
 const UPLOAD_PATH_CANDIDATES = [
     process.env.UPLOADS_PATH,
-    path.join(__dirname, '..', 'uploads'),
-    path.join(__dirname, '..', '..', 'uploads'),
-    path.join(__dirname, '..', '..', 'app', 'uploads'),
+    path.join(adminRoot, 'app', 'uploads'), // Railway: /app/app/uploads when adminRoot is /app
+    path.join(adminRoot, '..', 'app', 'uploads', 'profile_images'),
+    path.join(adminRoot, '..', 'app', 'uploads'),
+    path.join(adminRoot, '..', 'uploads'),
+    path.join(adminRoot, '..', '..', 'uploads'),
+    path.join(adminRoot, 'uploads'),
     path.join(process.cwd(), 'uploads'),
     path.join(process.cwd(), '..', 'uploads'),
     path.join(process.cwd(), '..', 'app', 'uploads'),
@@ -95,41 +100,14 @@ class ExportImportService {
      * Resolve and validate uploads root for image export.
      */
     async getUploadsExportInfo() {
-        if (!process.env.UPLOADS_PATH || !String(process.env.UPLOADS_PATH).trim()) {
-            throw new Error('UPLOADS_PATH is required to export uploads folder');
-        }
-
         const uploadsRoot = await this.ensureConfiguredUploadsRoot();
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = `uploads_export_${timestamp}.zip`;
 
-        try {
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            const filename = `uploads_export_${timestamp}.zip`;
-
-            return { uploadsRoot, filename };
-        } catch (error) {
-            logger.error('Error resolving uploads export path:', {
-                uploadsRoot,
-                message: error.message,
-                code: error.code
-            });
-
-            if (error.code === 'ENOENT') {
-                throw new Error(`Uploads path does not exist: ${uploadsRoot}`);
-            }
-
-            if (error.code === 'EACCES' || error.code === 'EPERM') {
-                throw new Error(`Uploads path is not readable: ${uploadsRoot}`);
-            }
-
-            throw new Error(`Uploads folder is not accessible: ${uploadsRoot}`);
-        }
+        return { uploadsRoot, filename };
     }
 
     async getUploadsImportRoot() {
-        if (!process.env.UPLOADS_PATH || !String(process.env.UPLOADS_PATH).trim()) {
-            throw new Error('UPLOADS_PATH is required to import uploads folder');
-        }
-
         return await this.ensureConfiguredUploadsRoot({ requireWritable: true });
     }
 
@@ -363,7 +341,21 @@ class ExportImportService {
             throw new Error(`Uploads path does not exist: ${uploadsRoot}`);
         }
 
-        async function scanDir(dirPath) {
+        async function scanDir(dirPath, visitedCanonical, depth) {
+            if (depth > 64) {
+                throw new Error(`Uploads scan stopped: directory depth exceeded at ${dirPath}`);
+            }
+            let canonical;
+            try {
+                canonical = await fsp.realpath(dirPath);
+            } catch {
+                canonical = path.resolve(dirPath);
+            }
+            if (visitedCanonical.has(canonical)) {
+                return { fileCount: 0, totalSize: 0, lastModified: null, subfolders: [] };
+            }
+            visitedCanonical.add(canonical);
+
             const entries = await fsp.readdir(dirPath, { withFileTypes: true });
             let fileCount = 0;
             let totalSize = 0;
@@ -371,9 +363,9 @@ class ExportImportService {
             const subfolders = [];
 
             for (const entry of entries) {
-                const fullPath = require('path').join(dirPath, entry.name);
+                const fullPath = path.join(dirPath, entry.name);
                 if (entry.isDirectory()) {
-                    const sub = await scanDir(fullPath);
+                    const sub = await scanDir(fullPath, visitedCanonical, depth + 1);
                     subfolders.push({ name: entry.name, path: entry.name, ...sub });
                     fileCount += sub.fileCount;
                     totalSize += sub.totalSize;
@@ -388,7 +380,7 @@ class ExportImportService {
             return { fileCount, totalSize, lastModified, subfolders };
         }
 
-        const info = await scanDir(uploadsRoot);
+        const info = await scanDir(uploadsRoot, new Set(), 0);
         return {
             path: uploadsRoot,
             fileCount: info.fileCount,

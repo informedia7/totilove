@@ -9,12 +9,28 @@ const logLevels = {
 
 const currentLevel = logLevels[config.logging.level] || logLevels.info;
 
+const serializeData = (data) => {
+    if (data instanceof Error) {
+        return JSON.stringify({
+            message: data.message,
+            code: data.code,
+            name: data.name,
+            stack: data.stack
+        });
+    }
+    try {
+        return JSON.stringify(data);
+    } catch {
+        return String(data);
+    }
+};
+
 const formatMessage = (level, message, data = null) => {
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}] [${level.toUpperCase()}] [Admin Server]`;
     
-    if (data) {
-        return `${prefix} ${message} ${JSON.stringify(data)}`;
+    if (data !== null && data !== undefined) {
+        return `${prefix} ${message} ${serializeData(data)}`;
     }
     return `${prefix} ${message}`;
 };
