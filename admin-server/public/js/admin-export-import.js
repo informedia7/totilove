@@ -260,7 +260,10 @@ async function scanUploads() {
         panel.innerHTML = `<div class="scan-placeholder" style="border-color:#f8d7da; color:#842029;">
             ❌ ${escapeHtml(err.message)}
         </div>`;
-        setUploadsStatus('Scan failed — verify TOTILOVE_URL/EXPORT_SECRET or local uploads path.', 'error');
+        setUploadsStatus(
+            'Scan failed — mount the uploads volume on admin-server and/or set UPLOADS_PATH (proxy scan requires EXPORT_IMPORT_PROXY=true).',
+            'error'
+        );
     } finally {
         btn.disabled = false;
         btn.innerHTML = '🔍 Scan Folder';

@@ -7,8 +7,15 @@ const unzipper = require('unzipper');
 
 // Same resolution idea as server.js (admin root = parent of this file's folder).
 const adminRoot = path.join(__dirname, '..');
+
+/** Off by default — proxy hits main app /uploads-info and often gets 302 login HTML. */
+function uploadsProxyAllowed() {
+    return String(process.env.EXPORT_IMPORT_PROXY || '').toLowerCase() === 'true';
+}
+
 const UPLOAD_PATH_CANDIDATES = [
     process.env.UPLOADS_PATH,
+    '/app/app/uploads', // explicit Railway volume mount (does not depend on __dirname)
     path.join(adminRoot, 'app', 'uploads'), // Railway: /app/app/uploads when adminRoot is /app
     path.join(adminRoot, '..', 'app', 'uploads', 'profile_images'),
     path.join(adminRoot, '..', 'app', 'uploads'),
@@ -254,9 +261,8 @@ class ExportImportService {
     }
 
     /**
-     * Create ZIP stream for uploads folder.
-     * If TOTILOVE_URL + EXPORT_SECRET are set, proxy from main service (recommended).
-     * Otherwise fall back to direct filesystem read via UPLOADS_PATH.
+     * Create ZIP stream for uploads folder (local volume).
+     * Proxy stream only if EXPORT_IMPORT_PROXY=true and TOTILOVE_URL + EXPORT_SECRET are set.
      */
     async createUploadsArchiveStream() {
         const hasUploadsPath = Boolean(process.env.UPLOADS_PATH && String(process.env.UPLOADS_PATH).trim());
@@ -266,7 +272,12 @@ class ExportImportService {
             archive.directory(uploadsRoot, 'uploads');
             return { archive, filename };
         } catch (directError) {
-            if (!hasUploadsPath && process.env.TOTILOVE_URL && process.env.EXPORT_SECRET) {
+            if (
+                uploadsProxyAllowed() &&
+                !hasUploadsPath &&
+                process.env.TOTILOVE_URL &&
+                process.env.EXPORT_SECRET
+            ) {
                 return this.createProxiedArchiveStream();
             }
             throw directError;
@@ -317,7 +328,7 @@ class ExportImportService {
     }
 
     /**
-     * Fetch folder stats from the main totilove service (proxy) or local filesystem.
+     * Fetch folder stats from local uploads. Proxy only when EXPORT_IMPORT_PROXY=true.
      */
     async getUploadsInfo() {
         const hasUploadsPath = Boolean(process.env.UPLOADS_PATH && String(process.env.UPLOADS_PATH).trim());
@@ -325,7 +336,12 @@ class ExportImportService {
         try {
             uploadsRoot = await this.ensureConfiguredUploadsRoot();
         } catch (directErr) {
-            if (!hasUploadsPath && process.env.TOTILOVE_URL && process.env.EXPORT_SECRET) {
+            if (
+                uploadsProxyAllowed() &&
+                !hasUploadsPath &&
+                process.env.TOTILOVE_URL &&
+                process.env.EXPORT_SECRET
+            ) {
                 return this.getUploadsInfoViaProxy();
             }
             throw directErr;
@@ -335,7 +351,12 @@ class ExportImportService {
         const fsSync = require('fs');
 
         if (!fsSync.existsSync(uploadsRoot)) {
-            if (!hasUploadsPath && process.env.TOTILOVE_URL && process.env.EXPORT_SECRET) {
+            if (
+                uploadsProxyAllowed() &&
+                !hasUploadsPath &&
+                process.env.TOTILOVE_URL &&
+                process.env.EXPORT_SECRET
+            ) {
                 return this.getUploadsInfoViaProxy();
             }
             throw new Error(`Uploads path does not exist: ${uploadsRoot}`);
