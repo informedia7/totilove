@@ -153,7 +153,10 @@ class CSRFMiddleware {
                 '/login',
                 '/register',
                 '/logout', // Logout endpoint (common pattern to exclude)
-                '/api/csrf-token' // Token generation endpoint
+                '/api/csrf-token', // Token generation endpoint
+                // Server-to-server uploads (EXPORT_SECRET); curl/admin forwarding has no browser session
+                '/uploads-import',
+                '/uploads-put'
             ];
             
             // Profile update endpoints (already authenticated via session token in cookie)

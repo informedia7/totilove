@@ -14,6 +14,11 @@ const serverConfig = require('./config/server');
 const { healthCheck } = require('./config/database');
 const redis = require('./config/redis');
 const logger = require('./utils/logger');
+const {
+    trimTotiloveBase,
+    resolveTotilovePushBase,
+    pushLikelyBehindCdn
+} = require('./utils/totiloveOrigins');
 
 // Import routes
 const routes = require('./routes');
@@ -278,8 +283,10 @@ app.engine('html', require('ejs').renderFile);
 
 // Template globals (no secrets)
 app.use((req, res, next) => {
-    const base = typeof process.env.TOTILOVE_URL === 'string' ? process.env.TOTILOVE_URL.trim().replace(/\/$/, '') : '';
-    res.locals.totiloveUrl = base;
+    res.locals.totiloveUrl = trimTotiloveBase(process.env.TOTILOVE_URL);
+    const pushBase = resolveTotilovePushBase();
+    res.locals.totilovePushUrl = pushBase;
+    res.locals.showCfZipTip = pushLikelyBehindCdn(pushBase);
     next();
 });
 

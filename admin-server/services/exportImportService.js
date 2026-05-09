@@ -1,5 +1,6 @@
 const { query } = require('../config/database');
 const logger = require('../utils/logger');
+const { resolveTotilovePushBase } = require('../utils/totiloveOrigins');
 const path = require('path');
 const fs = require('fs');
 const archiver = require('archiver');
@@ -231,15 +232,21 @@ class ExportImportService {
     /**
      * Forward a ZIP to the main Totilove service to import into its UPLOADS_PATH.
      * Uses the main app endpoint: POST /uploads-import?secret=EXPORT_SECRET (multipart field: zip).
+     *
+     * Prefers `TOTILOVE_BACKEND_URL` / `TOTILOVE_RAILWAY_URL` / `TOTILOVE_INTERNAL_URL` / `TOTILOVE_PRIVATE_URL`,
+     * then `TOTILOVE_URL`. Use a Railway `*.up.railway.app` or `http://<service>.railway.internal:<PORT>` origin
+     * so large ZIP POSTs skip Cloudflare (502/timeouts).
      */
     async pushUploadsZipToMain(zipFilePath, options = {}) {
         const { overwrite = true } = options;
 
-        const base = typeof process.env.TOTILOVE_URL === 'string' ? process.env.TOTILOVE_URL.trim().replace(/\/$/, '') : '';
+        const pushBase = resolveTotilovePushBase();
         const secret = typeof process.env.EXPORT_SECRET === 'string' ? process.env.EXPORT_SECRET.trim() : '';
 
-        if (!base) {
-            throw new Error('TOTILOVE_URL is not configured on admin-server');
+        if (!pushBase) {
+            throw new Error(
+                'Configure TOTILOVE_URL or TOTILOVE_BACKEND_URL (or TOTILOVE_RAILWAY_URL / private mesh URL) on admin-server'
+            );
         }
         if (!secret) {
             throw new Error('EXPORT_SECRET is not configured on admin-server');
@@ -255,7 +262,7 @@ class ExportImportService {
         });
         form.append('overwrite', overwrite ? 'true' : 'false');
 
-        const url = `${base}/uploads-import?secret=${encodeURIComponent(secret)}`;
+        const url = `${pushBase}/uploads-import?secret=${encodeURIComponent(secret)}`;
         const response = await fetch(url, {
             method: 'POST',
             body: form,
@@ -268,7 +275,18 @@ class ExportImportService {
         try {
             json = JSON.parse(text);
         } catch {
-            throw new Error(`Totilove returned ${response.status} (non-JSON). First bytes: ${text.slice(0, 200)}`);
+            let hint = '';
+            const sniff = text.toLowerCase();
+            if (
+                (response.status === 502 || response.status === 524) &&
+                (sniff.includes('cloudflare') || sniff.includes('bad gateway'))
+            ) {
+                hint =
+                    ' Large uploads through Cloudflare often fail with 502/524. Set admin-server env TOTILOVE_BACKEND_URL to Totilove’s Railway URL (direct HTTPS origin), or split into smaller ZIPs and retry.';
+            } else if (response.status >= 500) {
+                hint = ' Check Totilove logs on Railway for crashes/OOM while extracting the ZIP; try a smaller archive.';
+            }
+            throw new Error(`Totilove returned ${response.status} (non-JSON).${hint ? ` ${hint}` : ''} First bytes: ${text.slice(0, 200)}`);
         }
 
         if (!response.ok || !json.success) {

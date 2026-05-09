@@ -226,6 +226,16 @@ class Server {
             logger.info('Server listening', { port: PORT, env: process.env.NODE_ENV || 'development' });
         });
 
+        // uploads-import can take a long time on large ZIPs (upload + disk extract).
+        const uploadImportMs = Number(process.env.UPLOAD_IMPORT_TIMEOUT_MS || 900000);
+        if (Number.isFinite(uploadImportMs) && uploadImportMs > 0 && typeof this.server.requestTimeout !== 'undefined') {
+            this.server.requestTimeout = uploadImportMs;
+            const headersExtra = Math.min(120000, Math.floor(uploadImportMs * 0.25));
+            if (typeof this.server.headersTimeout !== 'undefined') {
+                this.server.headersTimeout = uploadImportMs + headersExtra;
+            }
+        }
+
         // Graceful shutdown handling
         process.on('SIGTERM', this.gracefulShutdown.bind(this));
         process.on('SIGINT', this.gracefulShutdown.bind(this));

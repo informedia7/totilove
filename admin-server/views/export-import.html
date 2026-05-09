@@ -276,8 +276,16 @@
                                     <span style="font-size:12px; color:#888;" id="uploadsZipUploadNote"></span>
                                 </div>
                                 <div class="uploads-filemeta" style="margin-top:10px;">
-                                    Tip: “Send to Totilove” copies the ZIP into the main app’s <code>UPLOADS_PATH</code> (Totilove volume).
+                                    “Send to Totilove” POSTs to <code style="word-break:break-all;"><%= typeof totilovePushUrl === 'string' ? totilovePushUrl : '' %>/uploads-import</code> (Totilove volume).
                                 </div>
+                                <% if (typeof showCfZipTip !== 'undefined' && showCfZipTip) { %>
+                                <div class="status-message warning" style="margin-top:10px;font-size:12px;">
+                                    Large ZIPs through a CDN/custom domain often return <strong>502 Bad Gateway</strong>.
+                                    Set admin-server env <code>TOTILOVE_BACKEND_URL</code> to Totilove’s Railway URL (<code>https://….up.railway.app</code>),
+                                    or private <code>http://&lt;service-name&gt;.railway.internal:&lt;PORT&gt;</code> (same Railway project).
+                                    Keep <code>TOTILOVE_URL=https://totilove.com</code> for links in the UI.
+                                </div>
+                                <% } %>
                             </div>
                         </div>
 
