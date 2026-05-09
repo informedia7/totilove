@@ -35,7 +35,22 @@ try {
 
 // Default skip paths include health + high-frequency presence/search polling endpoints
 // so the UI doesn't DOS itself in production.
-const healthPathList = (process.env.RATE_LIMIT_HEALTH_PATHS || '/health,/live,/status,/healthz,/api/search,/api/search/filters,/api/presence,/api/users-online-status,/presence/subscribe')
+//
+// IMPORTANT: env-provided paths should be additive (not replacing defaults), otherwise a production
+// env like RATE_LIMIT_HEALTH_PATHS="/health" would accidentally re-enable rate limiting on /api/search.
+const DEFAULT_SKIP_PATHS = [
+    '/health',
+    '/live',
+    '/status',
+    '/healthz',
+    '/api/search',
+    '/api/search/filters',
+    '/api/presence',
+    '/api/users-online-status',
+    '/presence/subscribe'
+];
+
+const healthPathList = (process.env.RATE_LIMIT_HEALTH_PATHS || '')
     .split(',')
     .map((path) => path.trim())
     .filter(Boolean);
@@ -43,7 +58,7 @@ const extraSkipPaths = (process.env.RATE_LIMIT_SKIP_PATHS || '')
     .split(',')
     .map((path) => path.trim())
     .filter(Boolean);
-const RATE_LIMIT_SKIP_PATHS = [...new Set([...healthPathList, ...extraSkipPaths])];
+const RATE_LIMIT_SKIP_PATHS = [...new Set([...DEFAULT_SKIP_PATHS, ...healthPathList, ...extraSkipPaths])];
 const baseTrustedIps = process.env.NODE_ENV === 'production' ? [] : ['127.0.0.1', '::1'];
 const configuredTrustedIps = (process.env.RATE_LIMIT_TRUSTED_IPS || '')
     .split(',')
