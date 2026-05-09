@@ -21,6 +21,32 @@ const routes = require('./routes');
 const app = express();
 const PORT = serverConfig.port;
 
+// Public probes first — before helmet/session/routes so nothing can answer with a login redirect.
+app.get('/live', (_req, res) => {
+    res.status(200).json({ ok: true, service: 'admin-server' });
+});
+
+app.get('/health', async (req, res) => {
+    try {
+        const dbHealth = await healthCheck();
+        res.status(200).json({
+            status: 'ok',
+            server: 'admin-server',
+            port: PORT,
+            database: dbHealth.status,
+            redis: redis.enabled ? (redis.client ? 'connected' : 'disconnected') : 'disabled',
+            timestamp: new Date().toISOString()
+        });
+    } catch (err) {
+        res.status(503).json({
+            status: 'error',
+            server: 'admin-server',
+            error: err.message,
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+
 // Security middleware
 app.use(helmet({
     contentSecurityPolicy: {
@@ -129,18 +155,6 @@ app.use(session({
 
 // Trust proxy (if behind reverse proxy)
 app.set('trust proxy', 1);
-
-app.get('/health', async (req, res) => {
-    const dbHealth = await healthCheck();
-    res.json({
-        status: 'ok',
-        server: 'admin-server',
-        port: PORT,
-        database: dbHealth.status,
-        redis: redis.enabled ? (redis.client ? 'connected' : 'disconnected') : 'disabled',
-        timestamp: new Date().toISOString()
-    });
-});
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
