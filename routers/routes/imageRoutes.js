@@ -9,13 +9,24 @@
  * - POST /api/profile/set-featured-image - Set featured image
  * 
  * Features:
- * - Virus scanning with ClamAV (if available)
+ * - Virus scanning with ClamAV (see env vars below)
  * - Image compression and optimization
  * - Thumbnail generation
  * - Image metadata extraction
  * - Image moderation
  * - Monitoring and metrics
  * - Configurable via environment variables
+ *
+ * ClamAV env:
+ * - CLAMAV_DISABLED=true — skip scanning entirely (dev/local without daemon)
+ * - CLAMAV_REQUIRED=true — reject uploads with 503 if scanner cannot initialize
+ * - CLAMD_SOCKET — path to clamd UNIX socket (optional)
+ * - CLAMD_HOST / CLAMD_PORT — TCP to clamd (port defaults to 3310 when host is set)
+ * - CLAMDSCAN_PATH / CLAMSCAN_PATH — binary paths (defaults /usr/bin/clamdscan, /usr/bin/clamscan)
+ * - CLAMD_BYPASS_PING=true — skip initial TCP/socket ping test
+ * - CLAMD_LOCAL_FALLBACK=false — do not fall back to local clamscan binary when using TCP/socket
+ * - CLAMAV_PREFERENCE — clamscan | clamdscan (auto: clamdscan if socket/host set)
+ * - CLAMAV_FAIL_CLOSED=true — treat scan errors like outages (503) even if CLAMAV_REQUIRED is false
  */
 
 const express = require('express');
@@ -38,8 +49,19 @@ const IMAGE_CONFIG = {
     MAX_FILE_SIZE: parseInt(process.env.IMAGE_MAX_SIZE) || 5 * 1024 * 1024, // 5MB
     MAX_FILES: parseInt(process.env.IMAGE_MAX_FILES) || 10,
     MAX_USER_IMAGES: parseInt(process.env.IMAGE_MAX_PER_USER) || 6,
-    ALLOWED_MIME_TYPES: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
-    ALLOWED_EXTENSIONS: ['.jpg', '.jpeg', '.png', '.gif', '.webp'],
+    ALLOWED_MIME_TYPES: [
+        'image/jpeg',
+        'image/jpg',
+        'image/pjpeg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+        'image/bmp',
+        'image/x-ms-bmp',
+        'image/tiff',
+        'image/tif'
+    ],
+    ALLOWED_EXTENSIONS: ['.jpg', '.jpeg', '.jfif', '.jpe', '.png', '.gif', '.webp', '.bmp', '.tif', '.tiff'],
     THUMBNAIL_SIZES: {
         small: { width: 150, height: 150, quality: 60 },
         medium: { width: 400, height: 400, quality: 70 }
@@ -59,7 +81,8 @@ const ERROR_MESSAGES = {
     NO_IMAGES: 'No images provided',
     USER_ID_REQUIRED: 'User ID is required',
     IMAGE_NOT_FOUND: 'Image not found',
-    UNAUTHORIZED: 'Unauthorized'
+    UNAUTHORIZED: 'Unauthorized',
+    CLAMAV_UNAVAILABLE: 'Virus scanning is required but the scanner is not available. Try again later.'
 };
 
 // ============================================================================
@@ -82,18 +105,96 @@ class ApiResponse {
     }
 }
 
+class ApiError extends Error {
+    constructor(statusCode, message) {
+        super(message);
+        this.statusCode = statusCode;
+        this.status = statusCode;
+        this.name = 'ApiError';
+    }
+}
+
 // ============================================================================
-// 4. VIRUS SCANNING SETUP
+// 4. VIRUS SCANNING (node-clamscan: async init + isInfected per file)
 // ============================================================================
-let ClamScan = null;
-let clamscan = null;
-try {
-    ClamScan = require('clamscan');
-    clamscan = new ClamScan();
-    console.log('[ImageRoutes] ClamAV virus scanning enabled');
-} catch (e) {
-    console.warn('[ImageRoutes] ClamAV not available. Install with: npm install clamscan');
-    console.warn('[ImageRoutes] Virus scanning disabled. Images will be uploaded without scanning.');
+function isClamAvExplicitlyDisabled() {
+    return String(process.env.CLAMAV_DISABLED || '').toLowerCase() === 'true';
+}
+
+function isClamAvRequired() {
+    return String(process.env.CLAMAV_REQUIRED || '').toLowerCase() === 'true';
+}
+
+async function unlinkUploadedFiles(files) {
+    if (!files || !files.length) {
+        return;
+    }
+    await Promise.all(
+        files.map(async (f) => {
+            try {
+                if (f?.path && fs.existsSync(f.path)) {
+                    await fs.promises.unlink(f.path);
+                }
+            } catch {
+                // ignore
+            }
+        })
+    );
+}
+
+let clamscanInitPromise = null;
+
+async function getClamScanner() {
+    if (isClamAvExplicitlyDisabled()) {
+        return null;
+    }
+    if (!clamscanInitPromise) {
+        clamscanInitPromise = (async () => {
+            try {
+                const NodeClam = require('clamscan');
+                const rawSocket = (process.env.CLAMD_SOCKET || '').trim();
+                const rawHost = (process.env.CLAMD_HOST || '').trim();
+                const socket = rawSocket || false;
+                const host = rawHost || false;
+                const port = host
+                    ? Number(String(process.env.CLAMD_PORT || '3310').trim()) || 3310
+                    : (process.env.CLAMD_PORT || '').trim()
+                        ? Number(String(process.env.CLAMD_PORT).trim())
+                        : false;
+
+                const useRemote = !!(socket || host);
+                const preference =
+                    process.env.CLAMAV_PREFERENCE ||
+                    (useRemote ? 'clamdscan' : 'clamscan');
+
+                const scanner = await new NodeClam().init({
+                    debugMode: process.env.CLAMAV_DEBUG === 'true',
+                    preference,
+                    clamdscan: {
+                        socket,
+                        host,
+                        port,
+                        timeout: process.env.CLAMD_TIMEOUT_MS ? Number(process.env.CLAMD_TIMEOUT_MS) : 60000,
+                        active: process.env.CLAMD_DISABLE !== 'true',
+                        path: process.env.CLAMDSCAN_PATH || '/usr/bin/clamdscan',
+                        localFallback: process.env.CLAMD_LOCAL_FALLBACK !== 'false',
+                        bypassTest: process.env.CLAMD_BYPASS_PING === 'true'
+                    },
+                    clamscan: {
+                        path: process.env.CLAMSCAN_PATH || '/usr/bin/clamscan',
+                        active: process.env.CLAMSCAN_DISABLE !== 'true'
+                    }
+                });
+                console.log('[ImageRoutes] ClamAV initialized; profile uploads will be scanned');
+                return scanner;
+            } catch (e) {
+                const msg = e && e.message ? e.message : String(e);
+                console.warn('[ImageRoutes] ClamAV init failed:', msg);
+                return null;
+            }
+        })();
+    }
+    return clamscanInitPromise;
 }
 
 // ============================================================================
@@ -403,22 +504,25 @@ function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
                 const uploadedImages = [];
                 const errors = [];
 
-                // VIRUS SCANNING: Scan all files before processing
-                if (clamscan) {
+                let scannedForViruses = false;
+                const avScanner = await getClamScanner();
+
+                if (!avScanner && isClamAvRequired()) {
+                    await unlinkUploadedFiles(req.files);
+                    return res.status(503).json({
+                        success: false,
+                        error: ERROR_MESSAGES.CLAMAV_UNAVAILABLE,
+                        code: 'CLAMAV_UNAVAILABLE'
+                    });
+                }
+
+                if (avScanner) {
+                    scannedForViruses = true;
                     for (const file of req.files) {
                         try {
-                            const scanResult = await clamscan.scanFile(file.path);
+                            const scanResult = await avScanner.isInfected(file.path);
                             if (scanResult.isInfected) {
-                                // Clean up infected files
-                                for (const f of req.files) {
-                                    try {
-                                        if (fs.existsSync(f.path)) {
-                                            await fs.promises.unlink(f.path);
-                                        }
-                                    } catch (cleanupError) {
-                                        // Ignore cleanup errors
-                                    }
-                                }
+                                await unlinkUploadedFiles(req.files);
                                 return res.status(400).json({
                                     success: false,
                                     error: ERROR_MESSAGES.VIRUS_DETECTED,
@@ -429,24 +533,25 @@ function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
                                 });
                             }
                         } catch (scanError) {
-                            // If scanning fails, clean up files and reject upload
                             console.error('[ImageRoutes] Virus scan error:', scanError);
-                            for (const f of req.files) {
-                                try {
-                                    if (fs.existsSync(f.path)) {
-                                        await fs.promises.unlink(f.path);
-                                    }
-                                } catch (cleanupError) {
-                                    // Ignore cleanup errors
-                                }
-                            }
-                            return res.status(400).json({
+                            await unlinkUploadedFiles(req.files);
+                            const scanFailedClosed =
+                                isClamAvRequired() ||
+                                String(process.env.CLAMAV_FAIL_CLOSED || '').toLowerCase() === 'true';
+                            const status = scanFailedClosed ? 503 : 400;
+                            const errorMsg = scanFailedClosed
+                                ? ERROR_MESSAGES.CLAMAV_UNAVAILABLE
+                                : 'File security check failed';
+                            return res.status(status).json({
                                 success: false,
-                                error: 'File security check failed',
-                                details: {
-                                    filename: file.originalname,
-                                    reason: 'Unable to verify file safety'
-                                }
+                                error: errorMsg,
+                                code: scanFailedClosed ? 'CLAMAV_SCAN_FAILED' : undefined,
+                                details: scanFailedClosed
+                                    ? undefined
+                                    : {
+                                          filename: file.originalname,
+                                          reason: 'Unable to verify file safety'
+                                      }
                             });
                         }
                     }
@@ -564,7 +669,7 @@ function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
                     count: uploadedImages.length,
                     errors: errors.length > 0 ? errors : undefined
                 }, {
-                    scannedForViruses: clamscan !== null,
+                    scannedForViruses,
                     compressionApplied: true,
                     thumbnailsGenerated: uploadedImages.length > 0,
                     processingTime: totalProcessingTime,
@@ -801,6 +906,40 @@ function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
                 error: 'Failed to get image metrics'
             });
         }
+    });
+
+    if (!isClamAvExplicitlyDisabled()) {
+        getClamScanner()
+            .then((scanner) => {
+                if (scanner) {
+                    console.log('[ImageRoutes] ClamAV scanner ready for profile uploads');
+                } else if (isClamAvRequired()) {
+                    console.error(
+                        '[ImageRoutes] CLAMAV_REQUIRED=true but ClamAV did not initialize — uploads will be rejected until fixed'
+                    );
+                } else {
+                    console.warn(
+                        '[ImageRoutes] ClamAV not running — uploads proceed without scanning (set CLAMD_HOST + CLAMD_PORT or CLAMD_SOCKET; CLAMAV_DISABLED=true silences this)'
+                    );
+                }
+            })
+            .catch((e) => {
+                console.error('[ImageRoutes] ClamAV warmup failed:', e.message || e);
+            });
+    }
+
+    router.use((err, req, res, next) => {
+        if (res.headersSent) {
+            return next(err);
+        }
+        const status = err.statusCode || err.status || (err.name === 'MulterError' ? 400 : 500);
+        const message =
+            err.message ||
+            (err.name === 'MulterError' ? ERROR_MESSAGES.NO_IMAGES : 'Upload failed');
+        res.status(status).json({
+            success: false,
+            error: message
+        });
     });
 
     return router;
