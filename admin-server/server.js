@@ -26,6 +26,19 @@ app.get('/live', (_req, res) => {
     res.status(200).json({ ok: true, service: 'admin-server' });
 });
 
+app.get('/version', (_req, res) => {
+    res.status(200).json({
+        service: 'admin-server',
+        version: process.env.RAILWAY_GIT_COMMIT_SHA ||
+            process.env.RAILWAY_GIT_SHA ||
+            process.env.GIT_COMMIT ||
+            '(unknown)',
+        builtAt: process.env.BUILT_AT || '(unset)',
+        node: process.version,
+        env: process.env.NODE_ENV || '(unset)'
+    });
+});
+
 app.get('/health', async (req, res) => {
     try {
         const dbHealth = await healthCheck();
