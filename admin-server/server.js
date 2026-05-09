@@ -276,6 +276,13 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'html');
 app.engine('html', require('ejs').renderFile);
 
+// Template globals (no secrets)
+app.use((req, res, next) => {
+    const base = typeof process.env.TOTILOVE_URL === 'string' ? process.env.TOTILOVE_URL.trim().replace(/\/$/, '') : '';
+    res.locals.totiloveUrl = base;
+    next();
+});
+
 // Routes
 app.use('/', routes);
 

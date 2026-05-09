@@ -246,7 +246,8 @@ function renderImages(images, pagination, type) {
 
     grid.innerHTML = images.map(image => {
         // Try static path first, fallback to API endpoint
-        const imageUrl = `/uploads/profile_images/${image.file_name}`;
+        const base = (window.__TOTILOVE_URL || '').replace(/\/$/, '');
+        const imageUrl = `${base}/uploads/profile_images/${image.file_name}`;
         const imageApiUrl = `/api/image-approval/image/${image.file_name}`;
         const status = image.approval_status || 'pending';
         
@@ -272,11 +273,13 @@ function renderImages(images, pagination, type) {
                         <div class="image-actions">
                             <button class="btn-approve" data-action="approve" data-image-id="${image.id}">Approve</button>
                             <button class="btn-reject" data-action="reject" data-image-id="${image.id}">Delete image</button>
+                            <a class="btn btn-secondary btn-sm" href="${imageUrl}" target="_blank" rel="noopener">Open</a>
                         </div>
                     ` : status === 'approved' ? `
                         <div class="image-actions">
                             <button class="btn-disapprove" data-action="disapprove" data-image-id="${image.id}">Disapprove</button>
                             <button class="btn-reject" data-action="reject" data-image-id="${image.id}">Delete image</button>
+                            <a class="btn btn-secondary btn-sm" href="${imageUrl}" target="_blank" rel="noopener">Open</a>
                         </div>
                     ` : ''}
                 </div>

@@ -30,6 +30,14 @@ function setupUploadsImportRoutes(app) {
     const uploadsTmpDir = path.join(os.tmpdir(), 'totilove-uploads-import');
     ensureDirSync(uploadsTmpDir);
 
+    const fileUpload = multer({
+        dest: uploadsTmpDir,
+        limits: {
+            fileSize: 25 * 1024 * 1024, // 25MB per file
+            files: 1
+        }
+    });
+
     const zipUpload = multer({
         dest: uploadsTmpDir,
         limits: {
@@ -139,6 +147,64 @@ function setupUploadsImportRoutes(app) {
             }
         }
     );
+
+    /**
+     * Upload a single file into a subfolder under UPLOADS_PATH.
+     * Expects multipart/form-data:
+     * - file: <binary>
+     * - folder: one of profile_images, chat_images/images, chat_images/thumbnails, chat_images/temp
+     * - filename: optional override (defaults to original name)
+     */
+    router.post('/uploads-put', requireExportSecret, fileUpload.single('file'), async (req, res) => {
+        const file = req.file;
+        if (!file?.path) {
+            return res.status(400).json({ success: false, error: 'file is required (field name: file)' });
+        }
+
+        const folder = String(req.body?.folder || '').trim();
+        const allowed = new Set([
+            'profile_images',
+            'chat_images/images',
+            'chat_images/thumbnails',
+            'chat_images/temp'
+        ]);
+        if (!allowed.has(folder)) {
+            try { await fs.promises.unlink(file.path); } catch {}
+            return res.status(400).json({ success: false, error: `Invalid folder. Allowed: ${Array.from(allowed).join(', ')}` });
+        }
+
+        const uploadsRoot = resolveUploadsRoot();
+        ensureDirSync(uploadsRoot);
+
+        const original = String(file.originalname || 'file.bin').replace(/\\/g, '/').split('/').pop();
+        const requested = typeof req.body?.filename === 'string' ? req.body.filename : '';
+        const safeNameRaw = (requested || original || '').replace(/\\/g, '/').split('/').pop();
+        const safeName = safeNameRaw.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 180) || `upload_${Date.now()}`;
+
+        const destDir = path.resolve(uploadsRoot, folder);
+        const destPath = path.resolve(destDir, safeName);
+        if (!destPath.startsWith(`${destDir}${path.sep}`)) {
+            try { await fs.promises.unlink(file.path); } catch {}
+            return res.status(400).json({ success: false, error: 'Invalid filename' });
+        }
+
+        try {
+            await fs.promises.mkdir(destDir, { recursive: true });
+            await fs.promises.rename(file.path, destPath);
+            return res.json({
+                success: true,
+                data: {
+                    uploadsRoot,
+                    folder,
+                    filename: safeName,
+                    url: `/uploads/${folder}/${encodeURIComponent(safeName)}`.replace(/%2F/g, '/')
+                }
+            });
+        } catch (error) {
+            try { await fs.promises.unlink(file.path); } catch {}
+            return res.status(500).json({ success: false, error: error.message || 'Failed to save file' });
+        }
+    });
 
     app.use(router);
 }
