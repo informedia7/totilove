@@ -38,6 +38,8 @@ function configureExpress(app) {
         helmet({
             contentSecurityPolicy: false,
             crossOriginEmbedderPolicy: false,
+            // Default same-origin blocks cross-origin <img> embeds (admin dashboard on another host).
+            crossOriginResourcePolicy: false,
             ...(process.env.NODE_ENV === 'production' && process.env.HELMET_DISABLE_HSTS !== 'true'
                 ? {
                       strictTransportSecurity: {
@@ -66,6 +68,11 @@ function configureExpress(app) {
     
     // Static file serving - specific paths first
     app.use('/assets', express.static(path.join(__dirname, '../../app', 'assets')));
+    // Allow embedding uploads from other origins (admin UI, etc.). Helmet would send CORP: same-origin otherwise.
+    app.use('/uploads', (req, res, next) => {
+        res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+        next();
+    });
     app.use('/uploads', express.static(resolveUploadsRoot()));
     app.use('/js', express.static(path.join(__dirname, '../../app', 'js')));
     app.use('/components', express.static(path.join(__dirname, '../../app', 'components')));
