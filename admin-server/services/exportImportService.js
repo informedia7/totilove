@@ -45,6 +45,30 @@ async function directoryExists(dirPath) {
 }
 
 class ExportImportService {
+    /**
+     * Prefer UPLOADS_PATH when set: resolve, mkdir, and validate access.
+     * Avoids falling through to proxy (302 login) when the volume path exists but
+     * Railway-only helpers or candidate scans pick the wrong directory.
+     */
+    async ensureConfiguredUploadsRoot(options = {}) {
+        const { requireWritable = false } = options;
+        const raw = typeof process.env.UPLOADS_PATH === 'string' ? process.env.UPLOADS_PATH.trim() : '';
+        if (raw) {
+            const uploadsRoot = path.resolve(raw);
+            await fs.promises.mkdir(uploadsRoot, { recursive: true });
+            const stats = await fs.promises.stat(uploadsRoot);
+            if (!stats.isDirectory()) {
+                throw new Error(`UPLOADS_PATH is not a directory: ${uploadsRoot}`);
+            }
+            await fs.promises.access(uploadsRoot, fs.constants.R_OK | fs.constants.X_OK);
+            if (requireWritable) {
+                await fs.promises.access(uploadsRoot, fs.constants.W_OK);
+            }
+            return uploadsRoot;
+        }
+        return await this.resolveLocalUploadsRoot();
+    }
+
     async resolveLocalUploadsRoot() {
         for (const candidate of UPLOAD_PATH_CANDIDATES) {
             if (!(await directoryExists(candidate))) {
@@ -68,40 +92,16 @@ class ExportImportService {
     }
 
     /**
-     * Export uploads is intentionally Railway-only.
-     */
-    isRailwayEnvironment() {
-        return Boolean(
-            process.env.RAILWAY_ENVIRONMENT ||
-            process.env.RAILWAY_PROJECT_ID ||
-            process.env.RAILWAY_STATIC_URL
-        );
-    }
-
-    /**
      * Resolve and validate uploads root for image export.
      */
     async getUploadsExportInfo() {
-        if (!this.isRailwayEnvironment()) {
-            throw new Error('Uploads export is only available in Railway environment');
+        if (!process.env.UPLOADS_PATH || !String(process.env.UPLOADS_PATH).trim()) {
+            throw new Error('UPLOADS_PATH is required to export uploads folder');
         }
 
-        if (!process.env.UPLOADS_PATH) {
-            throw new Error('UPLOADS_PATH is required in Railway to export uploads folder');
-        }
-
-        const uploadsRoot = path.resolve(process.env.UPLOADS_PATH);
+        const uploadsRoot = await this.ensureConfiguredUploadsRoot();
 
         try {
-            // Create the directory if it doesn't exist yet (common when a fresh volume is mounted).
-            await fs.promises.mkdir(uploadsRoot, { recursive: true });
-            const stats = await fs.promises.stat(uploadsRoot);
-            if (!stats.isDirectory()) {
-                throw new Error(`UPLOADS_PATH is not a directory: ${uploadsRoot}`);
-            }
-
-            await fs.promises.access(uploadsRoot, fs.constants.R_OK | fs.constants.X_OK);
-
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
             const filename = `uploads_export_${timestamp}.zip`;
 
@@ -126,23 +126,11 @@ class ExportImportService {
     }
 
     async getUploadsImportRoot() {
-        if (!this.isRailwayEnvironment()) {
-            throw new Error('Uploads import is only available in Railway environment');
+        if (!process.env.UPLOADS_PATH || !String(process.env.UPLOADS_PATH).trim()) {
+            throw new Error('UPLOADS_PATH is required to import uploads folder');
         }
 
-        if (!process.env.UPLOADS_PATH) {
-            throw new Error('UPLOADS_PATH is required in Railway to import uploads folder');
-        }
-
-        const uploadsRoot = path.resolve(process.env.UPLOADS_PATH);
-        await fs.promises.mkdir(uploadsRoot, { recursive: true });
-        const stats = await fs.promises.stat(uploadsRoot);
-        if (!stats.isDirectory()) {
-            throw new Error(`UPLOADS_PATH is not a directory: ${uploadsRoot}`);
-        }
-
-        await fs.promises.access(uploadsRoot, fs.constants.W_OK | fs.constants.X_OK);
-        return uploadsRoot;
+        return await this.ensureConfiguredUploadsRoot({ requireWritable: true });
     }
 
     /**
@@ -242,7 +230,7 @@ class ExportImportService {
             throw new Error(`Invalid folder. Allowed: ${Array.from(allowed).join(', ')}`);
         }
 
-        const uploadsRoot = await this.resolveLocalUploadsRoot();
+        const uploadsRoot = await this.ensureConfiguredUploadsRoot();
         const targetDir = path.resolve(uploadsRoot, folder);
         const rootResolved = path.resolve(uploadsRoot);
         if (!targetDir.startsWith(`${rootResolved}${path.sep}`)) {
@@ -293,15 +281,14 @@ class ExportImportService {
      * Otherwise fall back to direct filesystem read via UPLOADS_PATH.
      */
     async createUploadsArchiveStream() {
-        // Prefer direct filesystem access when UPLOADS_PATH is mounted for this service.
-        // Only fall back to proxy mode when the volume is not accessible.
+        const hasUploadsPath = Boolean(process.env.UPLOADS_PATH && String(process.env.UPLOADS_PATH).trim());
         try {
             const { uploadsRoot, filename } = await this.getUploadsExportInfo();
             const archive = archiver('zip', { zlib: { level: 9 } });
             archive.directory(uploadsRoot, 'uploads');
             return { archive, filename };
         } catch (directError) {
-            if (process.env.TOTILOVE_URL && process.env.EXPORT_SECRET) {
+            if (!hasUploadsPath && process.env.TOTILOVE_URL && process.env.EXPORT_SECRET) {
                 return this.createProxiedArchiveStream();
             }
             throw directError;
@@ -355,23 +342,22 @@ class ExportImportService {
      * Fetch folder stats from the main totilove service (proxy) or local filesystem.
      */
     async getUploadsInfo() {
-        // Prefer direct filesystem mode when UPLOADS_PATH is mounted for this service.
-        let uploadsRoot = null;
+        const hasUploadsPath = Boolean(process.env.UPLOADS_PATH && String(process.env.UPLOADS_PATH).trim());
+        let uploadsRoot;
         try {
-            // getUploadsExportInfo validates UPLOADS_PATH in Railway and ensures it exists.
-            const info = await this.getUploadsExportInfo();
-            uploadsRoot = info.uploadsRoot;
-        } catch (_) {
-            // fall back to candidate resolution (dev/local)
-            uploadsRoot = await this.resolveLocalUploadsRoot();
+            uploadsRoot = await this.ensureConfiguredUploadsRoot();
+        } catch (directErr) {
+            if (!hasUploadsPath && process.env.TOTILOVE_URL && process.env.EXPORT_SECRET) {
+                return this.getUploadsInfoViaProxy();
+            }
+            throw directErr;
         }
 
         const fsp = require('fs').promises;
         const fsSync = require('fs');
 
         if (!fsSync.existsSync(uploadsRoot)) {
-            // If direct mode isn't available, fall back to proxy when configured.
-            if (process.env.TOTILOVE_URL && process.env.EXPORT_SECRET) {
+            if (!hasUploadsPath && process.env.TOTILOVE_URL && process.env.EXPORT_SECRET) {
                 return this.getUploadsInfoViaProxy();
             }
             throw new Error(`Uploads path does not exist: ${uploadsRoot}`);
@@ -435,7 +421,11 @@ class ExportImportService {
                             resolve(json);
                         }
                     } catch {
-                        reject(new Error(`Upstream returned non-JSON response (${response.statusCode})`));
+                        const hint =
+                            response.statusCode === 302 || response.statusCode === 301
+                                ? ' (redirect often means wrong TOTILOVE_URL or EXPORT_SECRET; prefer mounting UPLOADS_PATH on admin-server)'
+                                : '';
+                        reject(new Error(`Upstream returned non-JSON response (${response.statusCode})${hint}`));
                     }
                 });
             });
