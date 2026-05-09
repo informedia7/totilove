@@ -7,9 +7,9 @@ function resolveUploadsRoot() {
         return path.resolve(fromEnv);
     }
 
-    // Default for local dev. In Railway with a repo at /app and a volume mounted at /app/app/uploads,
-    // setting UPLOADS_PATH=/app/app/uploads will override this.
-    return path.resolve(process.cwd(), 'app', 'uploads');
+    // Default next to repo `app/uploads`. Resolved from this module — NOT process.cwd() — so profile/chat
+    // uploads match express.static `/uploads` even when cwd differs (Railway, PM2, nested scripts).
+    return path.resolve(__dirname, '..', 'app', 'uploads');
 }
 
 function resolveUploadsDir(...segments) {
