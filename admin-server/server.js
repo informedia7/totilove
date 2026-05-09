@@ -130,6 +130,18 @@ app.use(session({
 // Trust proxy (if behind reverse proxy)
 app.set('trust proxy', 1);
 
+app.get('/health', async (req, res) => {
+    const dbHealth = await healthCheck();
+    res.json({
+        status: 'ok',
+        server: 'admin-server',
+        port: PORT,
+        database: dbHealth.status,
+        redis: redis.enabled ? (redis.client ? 'connected' : 'disconnected') : 'disabled',
+        timestamp: new Date().toISOString()
+    });
+});
+
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -228,19 +240,6 @@ app.engine('html', require('ejs').renderFile);
 
 // Routes
 app.use('/', routes);
-
-// Health check endpoint (no auth required)
-app.get('/health', async (req, res) => {
-    const dbHealth = await healthCheck();
-    res.json({
-        status: 'ok',
-        server: 'admin-server',
-        port: PORT,
-        database: dbHealth.status,
-        redis: redis.enabled ? (redis.client ? 'connected' : 'disconnected') : 'disabled',
-        timestamp: new Date().toISOString()
-    });
-});
 
 // 404 handler
 app.use((req, res) => {

@@ -92,7 +92,7 @@ router.use('/api/image-approval', imageApprovalRoutes);
 router.use('/api/export-import', exportImportRoutes);
 router.use('/api/messages', messageRoutes);
 router.use('/api/chat-images', chatImageMonitorRoutes);
-router.use('/', backupRestoreRoutes);
+router.use('/api/backup', backupRestoreRoutes);
 router.use('/api/corruption', corruptionRoutes);
 router.use('/api/page-analysis', pageAnalysisRoutes);
 router.use('/api/presence-tests', presenceTestRoutes);
