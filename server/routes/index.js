@@ -14,6 +14,7 @@ const { setupSearchRoutes } = require('./api/search');
 const { setupMonitoringRoutes } = require('./api/monitoring');
 const { setupPresenceRoutes } = require('./api/presence');
 const { setupStateRoutes } = require('./api/state');
+const { setupUploadsImportRoutes } = require('./api/uploadsImport');
 const { setupImageRoutes } = require('./images');
 
 // Route modules
@@ -109,6 +110,7 @@ function setupRoutes(app, dependencies) {
     setupMonitoringRoutes(app, monitoringUtils, { db, redis });
     setupStateRoutes(app, { stateService, authMiddleware });
     setupPresenceRoutes(app, { presenceService, authMiddleware, monitoringUtils });
+    setupUploadsImportRoutes(app);
     setupImageRoutes(app);
 
     // Analytics event sink - accepts client-side analytics batches, no-op response
