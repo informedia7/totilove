@@ -341,67 +341,12 @@ function createProfileImageUpload(baseDir) {
 }
 
 // ============================================================================
-// 12. CLEANUP SERVICE
-// ============================================================================
-function startCleanupService(db, baseDir) {
-    const cleanupInterval = 24 * 60 * 60 * 1000; // 24 hours
-    
-    const cleanupOrphanedFiles = async () => {
-        try {
-            const uploadDir = path.join(baseDir, 'app', 'uploads', 'profile_images');
-            if (!fs.existsSync(uploadDir)) {
-                return;
-            }
-            
-            const files = await fs.promises.readdir(uploadDir);
-            
-            for (const file of files) {
-                const filePath = path.join(uploadDir, file);
-                
-                try {
-                    // Check if file exists in database
-                    const result = await db.query(
-                        'SELECT id FROM user_images WHERE file_name = $1',
-                        [file]
-                    );
-                    
-                    if (result.rows.length === 0) {
-                        // File not in database, check age
-                        const stat = await fs.promises.stat(filePath);
-                        const ageInDays = (Date.now() - stat.mtimeMs) / (1000 * 60 * 60 * 24);
-                        
-                        if (ageInDays > 1) { // Keep files for 1 day
-                            await fs.promises.unlink(filePath);
-                            console.log(`[ImageRoutes] Cleaned up orphaned file: ${file}`);
-                        }
-                    }
-                } catch (fileError) {
-                    // Skip files that can't be processed
-                    console.warn(`[ImageRoutes] Error processing file ${file}:`, fileError.message);
-                }
-            }
-        } catch (error) {
-            console.error('[ImageRoutes] Cleanup service error:', error);
-        }
-    };
-    
-    // Run cleanup immediately, then on interval
-    cleanupOrphanedFiles();
-    setInterval(cleanupOrphanedFiles, cleanupInterval);
-    
-    console.log('[ImageRoutes] Cleanup service started (runs every 24 hours)');
-}
-
-// ============================================================================
 // MAIN ROUTE CREATION FUNCTION
 // ============================================================================
 function createImageRoutes(db, authMiddleware, baseDir = __dirname) {
     if (!db) {
         throw new Error('Database connection is required for image routes');
     }
-
-    // Start cleanup service
-    startCleanupService(db, baseDir);
 
     // Apply rate limiting and logging to API routes only
     router.use('/api', imageUploadLimiter);
