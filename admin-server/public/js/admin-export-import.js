@@ -20,16 +20,19 @@ function setupUploadsZipUi() {
     const dz = document.getElementById('uploadsZipDropzone');
     const meta = document.getElementById('uploadsZipMeta');
     const btn = document.getElementById('uploadsZipUploadBtn');
+    const sendBtn = document.getElementById('uploadsZipSendToMainBtn');
     if (!input || !dz || !meta || !btn) return;
 
     function setMeta(file) {
         if (!file) {
             meta.textContent = 'No file selected';
             btn.disabled = true;
+            if (sendBtn) sendBtn.disabled = true;
             return;
         }
         meta.textContent = `${file.name} (${fmtBytes(file.size)})`;
         btn.disabled = false;
+        if (sendBtn) sendBtn.disabled = false;
     }
 
     input.addEventListener('change', (e) => {
@@ -65,13 +68,16 @@ function clearUploadsZip() {
     const input = document.getElementById('uploadsZipInput');
     const meta = document.getElementById('uploadsZipMeta');
     const btn = document.getElementById('uploadsZipUploadBtn');
+    const sendBtn = document.getElementById('uploadsZipSendToMainBtn');
     if (input) input.value = '';
     if (meta) meta.textContent = 'No file selected';
     if (btn) btn.disabled = true;
+    if (sendBtn) sendBtn.disabled = true;
 }
 
 async function uploadUploadsZip() {
     const btn = document.getElementById('uploadsZipUploadBtn');
+    const sendBtn = document.getElementById('uploadsZipSendToMainBtn');
     const note = document.getElementById('uploadsZipUploadNote');
     const overwrite = document.getElementById('uploadsZipOverwrite');
 
@@ -81,6 +87,7 @@ async function uploadUploadsZip() {
     }
 
     if (btn) btn.disabled = true;
+    if (sendBtn) sendBtn.disabled = true;
     if (note) note.textContent = 'Uploading…';
     setUploadsStatus('Uploading ZIP to server…', 'info');
 
@@ -110,6 +117,51 @@ async function uploadUploadsZip() {
         setUploadsStatus('❌ ' + escapeHtml(e.message), 'error');
     } finally {
         if (btn) btn.disabled = !selectedUploadsZip;
+        if (sendBtn) sendBtn.disabled = !selectedUploadsZip;
+        if (note) note.textContent = '';
+    }
+}
+
+async function uploadUploadsZipToMain() {
+    const btn = document.getElementById('uploadsZipSendToMainBtn');
+    const localBtn = document.getElementById('uploadsZipUploadBtn');
+    const note = document.getElementById('uploadsZipUploadNote');
+    const overwrite = document.getElementById('uploadsZipOverwrite');
+
+    if (!selectedUploadsZip) {
+        setUploadsStatus('❌ Select a ZIP file first', 'error');
+        return;
+    }
+
+    if (btn) btn.disabled = true;
+    if (localBtn) localBtn.disabled = true;
+    if (note) note.textContent = 'Sending…';
+    setUploadsStatus('Sending ZIP to Totilove…', 'info');
+
+    try {
+        const form = new FormData();
+        form.append('zip', selectedUploadsZip);
+        form.append('overwrite', overwrite && overwrite.checked ? 'true' : 'false');
+
+        const res = await fetch('/api/export-import/images/push-to-main', {
+            method: 'POST',
+            body: form
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || !json.success) {
+            throw new Error(json.error || 'Send failed');
+        }
+
+        const data = json.data || {};
+        setUploadsStatus(
+            `✅ Sent ZIP to Totilove. Extracted ${Number(data.extractedFiles || 0)} files, skipped ${Number(data.skippedFiles || 0)}.`,
+            'success'
+        );
+    } catch (e) {
+        setUploadsStatus('❌ ' + escapeHtml(e.message), 'error');
+    } finally {
+        if (btn) btn.disabled = !selectedUploadsZip;
+        if (localBtn) localBtn.disabled = !selectedUploadsZip;
         if (note) note.textContent = '';
     }
 }

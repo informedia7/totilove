@@ -98,6 +98,35 @@ class ExportImportController {
     }
 
     /**
+     * Send uploads ZIP to main Totilove service to import into its volume.
+     * Requires admin-server env: TOTILOVE_URL + EXPORT_SECRET.
+     */
+    async pushUploadsZipToMain(req, res) {
+        try {
+            const file = req.file;
+            if (!file || !file.path) {
+                return res.status(400).json({ success: false, error: 'zip file is required' });
+            }
+
+            const overwrite = String(req.body?.overwrite || 'true').toLowerCase() !== 'false';
+            const result = await exportImportService.pushUploadsZipToMain(file.path, { overwrite });
+
+            // Cleanup temp file
+            try {
+                const fsp = require('fs').promises;
+                await fsp.unlink(file.path);
+            } catch {
+                // ignore
+            }
+
+            return res.json({ success: true, data: result });
+        } catch (error) {
+            logger.error('Error in pushUploadsZipToMain controller:', error);
+            return res.status(500).json({ success: false, error: error.message || 'Failed to send ZIP to Totilove' });
+        }
+    }
+
+    /**
      * List recent files for UI preview.
      */
     async listUploadsFiles(req, res) {

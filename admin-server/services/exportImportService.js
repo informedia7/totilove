@@ -229,6 +229,56 @@ class ExportImportService {
     }
 
     /**
+     * Forward a ZIP to the main Totilove service to import into its UPLOADS_PATH.
+     * Uses the main app endpoint: POST /uploads-import?secret=EXPORT_SECRET (multipart field: zip).
+     */
+    async pushUploadsZipToMain(zipFilePath, options = {}) {
+        const { overwrite = true } = options;
+
+        const base = typeof process.env.TOTILOVE_URL === 'string' ? process.env.TOTILOVE_URL.trim().replace(/\/$/, '') : '';
+        const secret = typeof process.env.EXPORT_SECRET === 'string' ? process.env.EXPORT_SECRET.trim() : '';
+
+        if (!base) {
+            throw new Error('TOTILOVE_URL is not configured on admin-server');
+        }
+        if (!secret) {
+            throw new Error('EXPORT_SECRET is not configured on admin-server');
+        }
+
+        const fetch = require('node-fetch');
+        const FormData = require('form-data');
+
+        const form = new FormData();
+        form.append('zip', fs.createReadStream(zipFilePath), {
+            filename: path.basename(zipFilePath),
+            contentType: 'application/zip'
+        });
+        form.append('overwrite', overwrite ? 'true' : 'false');
+
+        const url = `${base}/uploads-import?secret=${encodeURIComponent(secret)}`;
+        const response = await fetch(url, {
+            method: 'POST',
+            body: form,
+            headers: form.getHeaders(),
+            timeout: 600000 // 10 minutes for large zips
+        });
+
+        const text = await response.text();
+        let json;
+        try {
+            json = JSON.parse(text);
+        } catch {
+            throw new Error(`Totilove returned ${response.status} (non-JSON). First bytes: ${text.slice(0, 200)}`);
+        }
+
+        if (!response.ok || !json.success) {
+            throw new Error(json.error || `Totilove returned ${response.status}`);
+        }
+
+        return json.data || {};
+    }
+
+    /**
      * List recent files under UPLOADS_PATH for browser preview.
      * @param {object} options
      * @param {string} options.folder - one of: profile_images, chat_images/images, chat_images/thumbnails

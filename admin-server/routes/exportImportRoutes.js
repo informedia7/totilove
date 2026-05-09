@@ -41,6 +41,7 @@ router.get('/images/info', exportImportController.getUploadsInfo.bind(exportImpo
 router.get('/images', exportImportController.exportUploadsFolder.bind(exportImportController));
 router.get('/images/list', exportImportController.listUploadsFiles.bind(exportImportController));
 router.post('/images', zipUpload.single('zip'), exportImportController.importUploadsFolder.bind(exportImportController));
+router.post('/images/push-to-main', zipUpload.single('zip'), exportImportController.pushUploadsZipToMain.bind(exportImportController));
 
 module.exports = router;
 
