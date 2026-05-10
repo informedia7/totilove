@@ -247,7 +247,8 @@ button:contains('âž¤'),
     position: relative;
     display: inline-flex;
     align-items: center;
-    order: 50;
+    /* After chat back (55) so narrow headers clip account first, not the back control */
+    order: 60;
 }
 
 .header-actions #searchPanelBtn {
@@ -255,7 +256,7 @@ button:contains('âž¤'),
 }
 
 .header-actions #chatBackBtn {
-    order: 60;
+    order: 55;
 }
 
 .account-btn {

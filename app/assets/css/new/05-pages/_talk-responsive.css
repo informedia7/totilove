@@ -2055,6 +2055,9 @@
         background: var(--color-white) !important;
         border-radius: 0 !important;
         gap: var(--spacing-xs);
+        flex-wrap: nowrap !important;
+        /* Override _talk-layout overflow-x: hidden so the right-side cluster is not clipped */
+        overflow-x: visible !important;
       }
 
       body.dark-mode .header {
