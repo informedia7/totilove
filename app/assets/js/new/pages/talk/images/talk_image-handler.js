@@ -21,7 +21,7 @@ function isUploadableImageFile(file) {
     return supportedExtensions.has(extension);
 }
 
-function handleImageSelect(event) {
+async function handleImageSelect(event) {
     const selectedFiles = Array.from(event.target.files || []);
 
     if (selectedFiles.length === 0) {
@@ -30,6 +30,7 @@ function handleImageSelect(event) {
 
     if (!currentConversation) {
         showNotification('No conversation selected', 'error');
+        event.target.value = '';
         return;
     }
 
@@ -65,27 +66,60 @@ function handleImageSelect(event) {
         return mb >= 1 ? `${mb} MB (${kb} KB)` : `${kb} KB`;
     };
 
-    // Keep chat upload input identical to profile-photo flow (no client recompression).
-    Array.from(files).forEach((file) => {
-        const isImageMime = Boolean(file && file.type && file.type.toLowerCase().startsWith('image/'));
-        if (!isImageMime) {
-            showNotification(`Not an image: ${file.name}`, 'warning');
-            return;
-        }
+    const maxFile = CONFIG.LIMITS.MAX_FILE_SIZE;
+    // Compress before queue so uploads stay smaller/faster (reduces proxy resets after a heavy image).
+    const compressMinBytes = 450 * 1024;
 
-        if (file.size > CONFIG.LIMITS.MAX_FILE_SIZE) {
-            showNotification(
-                `Image too large: ${file.name}. Max ${formatBytes(CONFIG.LIMITS.MAX_FILE_SIZE)}`,
-                'warning'
-            );
-            return;
-        }
+    try {
+        for (const file of files) {
+            const isImageMime = Boolean(file && file.type && file.type.toLowerCase().startsWith('image/'));
+            if (!isImageMime) {
+                showNotification(`Not an image: ${file.name}`, 'warning');
+                continue;
+            }
 
-        if (file.type.startsWith('image/') && file.size <= CONFIG.LIMITS.MAX_FILE_SIZE) {
-            selectedImages.push(file);
-            createImagePreview(file, URL.createObjectURL(file));
+            let fileToQueue = file;
+            const mime = (file.type || '').toLowerCase();
+            const canCanvasCompress =
+                mime === 'image/jpeg' ||
+                mime === 'image/jpg' ||
+                mime === 'image/pjpeg' ||
+                mime === 'image/png' ||
+                mime === 'image/webp';
+
+            if (
+                file.size > compressMinBytes &&
+                file.size <= maxFile &&
+                canCanvasCompress &&
+                typeof Utils !== 'undefined' &&
+                Utils.image &&
+                typeof Utils.image.compress === 'function'
+            ) {
+                try {
+                    const result = await Utils.image.compress(file);
+                    if (result && result.file && result.file.size <= maxFile) {
+                        fileToQueue = result.file;
+                    }
+                } catch (_) {
+                    /* keep original */
+                }
+            }
+
+            if (fileToQueue.size > maxFile) {
+                showNotification(
+                    `Image too large: ${file.name}. Max ${formatBytes(maxFile)}`,
+                    'warning'
+                );
+                continue;
+            }
+
+            selectedImages.push(fileToQueue);
+            createImagePreview(fileToQueue, URL.createObjectURL(fileToQueue));
         }
-    });
+    } catch (err) {
+        console.error('handleImageSelect:', err);
+        showNotification('Could not add images. Please try again.', 'error');
+    }
 
     // Show preview area
     const previewArea = document.getElementById('imagePreviewArea');

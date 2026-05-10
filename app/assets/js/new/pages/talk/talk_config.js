@@ -13,7 +13,9 @@ const CONFIG = {
         TYPING_DEBOUNCE: 1000,
         SEARCH_DEBOUNCE: 300,
         IMAGE_LOAD_TIMEOUT: 10000,
-        STUCK_MESSAGE_TIMEOUT: 30010
+        STUCK_MESSAGE_TIMEOUT: 30010,
+        /** XHR timeout for POST /api/messages/upload-images (multi-file). */
+        CHAT_IMAGE_UPLOAD_MS: 180000
     },
     LIMITS: {
         MAX_IMAGE_SIZE: 800,

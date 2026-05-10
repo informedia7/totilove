@@ -160,6 +160,11 @@ function uploadChatImagesWithProgress(formData, currentUserId, onProgress) {
         const xhr = new XMLHttpRequest();
         xhr.open('POST', '/api/messages/upload-images');
         xhr.withCredentials = true;
+        // Large multi-image uploads on slow links or through proxies can exceed default (no) timeout.
+        xhr.timeout = typeof CONFIG !== 'undefined' && CONFIG.TIMEOUTS && CONFIG.TIMEOUTS.CHAT_IMAGE_UPLOAD_MS
+            ? CONFIG.TIMEOUTS.CHAT_IMAGE_UPLOAD_MS
+            : 180000;
+
         xhr.setRequestHeader('X-User-ID', currentUserId);
 
         const sessionToken = typeof window.getSessionToken === 'function'
@@ -179,7 +184,14 @@ function uploadChatImagesWithProgress(formData, currentUserId, onProgress) {
             onProgress(progress);
         };
 
+        const connectionLostMessage =
+            'Upload connection was interrupted. If this happened after a large photo, try one image at a time or use a smaller file.';
+
         xhr.onload = () => {
+            if (xhr.status === 0) {
+                reject(new Error(connectionLostMessage));
+                return;
+            }
             let response;
             try {
                 response = JSON.parse(xhr.responseText || '{}');
@@ -201,7 +213,15 @@ function uploadChatImagesWithProgress(formData, currentUserId, onProgress) {
         };
 
         xhr.onerror = () => {
-            reject(new Error('Network error during upload'));
+            reject(new Error(connectionLostMessage));
+        };
+
+        xhr.ontimeout = () => {
+            reject(new Error('Upload timed out. Try fewer or smaller images.'));
+        };
+
+        xhr.onabort = () => {
+            reject(new Error('Upload was cancelled.'));
         };
 
         xhr.send(formData);
@@ -347,6 +367,18 @@ async function sendImagesWithPreviews() {
         messagesArea.scrollTop = messagesArea.scrollHeight;
 
         // Upload images with progress tracking
+        const maxBytes =
+            typeof CONFIG !== 'undefined' && CONFIG.LIMITS && CONFIG.LIMITS.MAX_FILE_SIZE
+                ? CONFIG.LIMITS.MAX_FILE_SIZE
+                : 5 * 1024 * 1024;
+        for (const f of selectedImages) {
+            if (f && f.size > maxBytes) {
+                throw new Error(
+                    `Image too large: ${f.name || 'file'}. Maximum ${Math.round(maxBytes / (1024 * 1024))} MB per file.`
+                );
+            }
+        }
+
         const formData = new FormData();
         formData.append('partnerId', conversation.partnerId);
         formData.append('messageId', createdMessageId);
@@ -414,6 +446,19 @@ async function sendImagesWithPreviews() {
         }
 
         showNotification(`Failed to upload images: ${error.message}`, 'error');
+
+        // Avoid a stuck queue of the same (possibly oversized) files after a failed attempt.
+        try {
+            if (typeof clearImagePreviews === 'function') {
+                clearImagePreviews();
+            }
+        } catch (_) {
+            /* ignore */
+        }
+        const imageInputEl = document.getElementById('imageInput');
+        if (imageInputEl) {
+            imageInputEl.value = '';
+        }
     }
 }
 
