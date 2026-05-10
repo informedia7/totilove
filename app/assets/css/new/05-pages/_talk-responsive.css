@@ -2133,6 +2133,8 @@
 
       body[data-nav-state="NAV_CHAT"] .header-actions {
         gap: 2px !important;
+        /* Pull cluster off the clipped right edge; uses free space left of margin-left:auto */
+        margin-inline-end: max(50px, env(safe-area-inset-right, 0px)) !important;
       }
 
       .app-container>.main-content {
@@ -2483,6 +2485,7 @@
 
       body[data-nav-state="NAV_CHAT"] .header-actions {
         gap: 4px !important;
+        margin-inline-end: max(48px, env(safe-area-inset-right, 0px)) !important;
       }
 
       body[data-nav-state="NAV_CHAT"] .chat-back-btn-mobile,
