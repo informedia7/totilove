@@ -66,6 +66,75 @@
         }, 5000);
     }
 
+    // Single sticky toast that shows upload progress as a smooth bar.
+    // Reuses one DOM node across calls so we don't stack/jump multiple toasts.
+    const UPLOAD_TOAST_ID = 'talk-upload-progress-toast';
+
+    function ensureUploadProgressToast() {
+        let toast = document.getElementById(UPLOAD_TOAST_ID);
+        if (toast) {
+            return toast;
+        }
+
+        toast = document.createElement('div');
+        toast.id = UPLOAD_TOAST_ID;
+        toast.className = 'toast toast-info toast-upload-progress';
+        toast.style.cssText = [
+            'position: fixed',
+            'top: 8px',
+            'right: 20px',
+            'background: #667eea',
+            'color: white',
+            'padding: 0.75rem 1rem',
+            'border-radius: 8px',
+            'box-shadow: 0 4px 12px rgba(0,0,0,0.15)',
+            'z-index: 10000',
+            'min-width: 240px',
+            'max-width: 320px',
+            'animation: slideInRight 0.3s ease-out',
+            'display: flex',
+            'flex-direction: column',
+            'gap: 0.4rem'
+        ].join(';');
+
+        toast.innerHTML = `
+            <div class="toast-upload-progress__row" style="display:flex;align-items:center;gap:0.5rem;">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span class="toast-upload-progress__label" style="flex:1;">Uploading…</span>
+                <span class="toast-upload-progress__percent" style="font-variant-numeric: tabular-nums;font-weight:600;">0%</span>
+            </div>
+            <div class="toast-upload-progress__track" style="height:4px;background:rgba(255,255,255,0.25);border-radius:999px;overflow:hidden;">
+                <div class="toast-upload-progress__fill" style="height:100%;width:0%;background:#fff;border-radius:999px;transition:width 0.2s ease-out;"></div>
+            </div>
+        `;
+
+        document.body.appendChild(toast);
+        return toast;
+    }
+
+    function showUploadProgress(progress, label) {
+        if (!document) {
+            return;
+        }
+        const safeProgress = Math.max(0, Math.min(100, Math.round(Number(progress) || 0)));
+        const toast = ensureUploadProgressToast();
+        const fill = toast.querySelector('.toast-upload-progress__fill');
+        const percent = toast.querySelector('.toast-upload-progress__percent');
+        const labelEl = toast.querySelector('.toast-upload-progress__label');
+        if (fill) fill.style.width = `${safeProgress}%`;
+        if (percent) percent.textContent = `${safeProgress}%`;
+        if (labelEl && typeof label === 'string' && label.length > 0) {
+            labelEl.textContent = label;
+        }
+    }
+
+    function hideUploadProgress() {
+        const toast = document.getElementById(UPLOAD_TOAST_ID);
+        if (toast && toast.parentNode) {
+            toast.remove();
+        }
+    }
+
     function playNotificationSound() {
         try {
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -117,6 +186,8 @@
     }
 
     window.showNotification = showNotification;
+    window.showUploadProgress = showUploadProgress;
+    window.hideUploadProgress = hideUploadProgress;
     window.resolveTalkAvailabilityMessage = resolveTalkAvailabilityMessage;
     window.playNotificationSound = playNotificationSound;
     window.updateConnectionStatus = updateConnectionStatus;
