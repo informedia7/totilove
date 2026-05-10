@@ -2122,6 +2122,19 @@
         max-width: none !important;
       }
 
+      /* Back stays rightmost; shrink other actions in chat so the row fits ≤390px */
+      body[data-nav-state="NAV_CHAT"] .header-actions .header-btn:not(.chat-back-btn-mobile) {
+        min-width: 50px !important;
+        width: 50px !important;
+        height: 50px !important;
+        flex: 0 0 50px !important;
+        font-size: 22px !important;
+      }
+
+      body[data-nav-state="NAV_CHAT"] .header-actions {
+        gap: 2px !important;
+      }
+
       .app-container>.main-content {
         height: calc(100vh - 86px) !important;
         height: calc(100svh - 86px) !important;
@@ -2457,6 +2470,28 @@
 
       .header-actions .header-btn {
         min-width: 56px !important;
+      }
+
+      /* Back stays rightmost; tighten row in chat so it fits 391–480px widths */
+      body[data-nav-state="NAV_CHAT"] .header-actions .header-btn:not(.chat-back-btn-mobile) {
+        min-width: 48px !important;
+        width: 48px !important;
+        height: 48px !important;
+        flex: 0 0 48px !important;
+        font-size: 22px !important;
+      }
+
+      body[data-nav-state="NAV_CHAT"] .header-actions {
+        gap: 4px !important;
+      }
+
+      body[data-nav-state="NAV_CHAT"] .chat-back-btn-mobile,
+      body.dark-mode[data-nav-state="NAV_CHAT"] .chat-back-btn-mobile {
+        min-width: 48px !important;
+        width: 48px !important;
+        height: 48px !important;
+        margin-right: 6px !important;
+        flex: 0 0 48px !important;
       }
 
       .connection-status {
