@@ -589,6 +589,26 @@ function addImagesToMessage(messageElement, attachments) {
 
     const messageText = messageElement.querySelector('.message-text');
     if (messageText && ['📷', '', null].includes(messageText.textContent.trim())) messageText.style.display = 'none';
+
+    // CRITICAL: Mirror the sender path (replaceProgressWithImages). The stale
+    // .message-actions bar was anchored to .message-bubble (back when this
+    // bubble had no images). Clearing it and re-running addMessageActions
+    // re-anchors against the new .message-images-container / .message-attachments
+    // so the mobile tap-to-show-eye behavior wires up correctly without a
+    // page refresh.
+    messageElement.querySelectorAll('.message-actions').forEach((el) => el.remove());
+    messageElement.querySelectorAll('.message-action-anchor').forEach((el) => {
+        el.classList.remove('message-action-anchor');
+    });
+
+    if (typeof addMessageActions === 'function') {
+        const messageMeta = {
+            id: messageElement.getAttribute('data-message-id'),
+            type: messageElement.classList.contains('sent') ? 'sent' : 'received',
+            isUploading: false
+        };
+        addMessageActions(messageElement, messageMeta);
+    }
 }
 
 /**
