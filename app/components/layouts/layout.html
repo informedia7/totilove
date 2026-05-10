@@ -98,7 +98,7 @@
                         <i class="fas fa-user profile-avatar-fallback" id="layoutUserAvatarFallback"></i>
                     </div>
                     <div class="profile-main user-info">
-                        <span class="profile-real_name username" id="real_name">Hi, {{real_name}}!</span>
+                        <span class="profile-real_name username" id="real_name">{{if:real_name}}Hi, {{real_name}}!{{else}}Hi there!{{/if}}</span>
                     </div>
                 </div>
                 <div class="profile-header-right header-actions" role="group" aria-label="Primary user actions">

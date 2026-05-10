@@ -45,6 +45,10 @@ function handleEmailVerificationRedirectParams() {
             defaults[state] ||
             defaults.error;
 
+        if (state === 'success') {
+            sessionStorage.setItem('totilove_account_email_verified_ok', '1');
+        }
+
         const type =
             state === 'success'
                 ? 'success'
@@ -64,10 +68,81 @@ function handleEmailVerificationRedirectParams() {
     }
 }
 
+/** Rendered when /account loads without a session (e.g. after clicking verify-email link). */
+function applyLoggedOutAccountExperience() {
+    document.body.classList.add('account-page-needs-login');
+
+    const created = document.getElementById('account-created-date');
+    const loginRow = document.getElementById('last-login-date');
+    if (created) created.textContent = '—';
+    if (loginRow) loginRow.textContent = 'Sign in to view';
+
+    const pwdChanged = document.getElementById('password-last-changed');
+    if (pwdChanged) pwdChanged.textContent = 'Sign in to view';
+
+    const loadingSection = document.getElementById('email-verification-loading');
+    const verifiedSection = document.getElementById('email-verified-section');
+    const notVerifiedSection = document.getElementById('email-not-verified-section');
+    if (loadingSection) loadingSection.style.display = 'none';
+    if (verifiedSection) verifiedSection.style.display = 'none';
+    if (notVerifiedSection) notVerifiedSection.style.display = 'none';
+
+    const planName = document.getElementById('current-plan-name-display');
+    const planBadge = document.getElementById('current-plan-badge-display');
+    const planDesc = document.getElementById('current-plan-description-display');
+    const planExpiry = document.getElementById('current-plan-expiry-display');
+    if (planName) planName.textContent = '—';
+    if (planBadge) planBadge.textContent = '—';
+    if (planDesc) planDesc.textContent = 'Sign in to see subscription details.';
+    if (planExpiry) planExpiry.style.display = 'none';
+
+    const justVerified = sessionStorage.getItem('totilove_account_email_verified_ok') === '1';
+    if (justVerified) {
+        sessionStorage.removeItem('totilove_account_email_verified_ok');
+    }
+
+    if (document.getElementById('account-login-required-banner')) {
+        return;
+    }
+
+    const header = document.querySelector('.account-ui2 .ui2-header');
+    if (!header || !header.parentElement) {
+        return;
+    }
+
+    const banner = document.createElement('div');
+    banner.id = 'account-login-required-banner';
+    banner.style.cssText =
+        'grid-column:1/-1;margin:0 0 1rem 0;padding:1rem 1.1rem;border-radius:14px;border:1px solid #cfe8f6;background:#f5fbff;color:#1a5a7a;font-size:0.92rem;line-height:1.45;';
+
+    if (justVerified) {
+        banner.innerHTML = `
+            <strong style="display:block;margin-bottom:0.35rem;">Email verified</strong>
+            <span>Your email is confirmed. <strong>Log in</strong> to unlock messaging, profile views, likes, and the rest of your account.</span>
+            <div style="margin-top:0.75rem;display:flex;flex-wrap:wrap;gap:0.5rem;">
+                <a href="/login" style="display:inline-flex;align-items:center;padding:0.45rem 0.95rem;border-radius:10px;background:#1a5a7a;color:#fff;text-decoration:none;font-weight:600;">Log in</a>
+                <a href="/register" style="display:inline-flex;align-items:center;padding:0.45rem 0.95rem;border-radius:10px;border:1px solid #9fbdcf;color:#1a5a7a;text-decoration:none;font-weight:600;">Create account</a>
+            </div>`;
+    } else {
+        banner.innerHTML = `
+            <strong style="display:block;margin-bottom:0.35rem;">Sign in required</strong>
+            <span>To manage security, billing, and account actions we need an active session.</span>
+            <div style="margin-top:0.75rem;display:flex;flex-wrap:wrap;gap:0.5rem;">
+                <a href="/login" style="display:inline-flex;align-items:center;padding:0.45rem 0.95rem;border-radius:10px;background:#1a5a7a;color:#fff;text-decoration:none;font-weight:600;">Log in</a>
+                <a href="/register" style="display:inline-flex;align-items:center;padding:0.45rem 0.95rem;border-radius:10px;border:1px solid #9fbdcf;color:#1a5a7a;text-decoration:none;font-weight:600;">Register</a>
+            </div>`;
+    }
+
+    header.parentElement.insertBefore(banner, header.nextSibling);
+}
+
 // Load account data on page load
 document.addEventListener('DOMContentLoaded', async function() {
     handleEmailVerificationRedirectParams();
-    await loadAccountData();
+    const sessionOk = await loadAccountData();
+    if (!sessionOk) {
+        return;
+    }
     await loadProfileCompletion();
     await checkEmailVerification();
     await loadCurrentPlan();
@@ -150,13 +225,18 @@ async function loadAccountData() {
             method: 'GET',
             credentials: 'same-origin'
         });
-        
+
+        if (response.status === 401 || response.status === 403) {
+            applyLoggedOutAccountExperience();
+            return false;
+        }
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             currentAccountStatus = data.accountStatus === 'paused' ? 'paused' : 'active';
             updatePauseAccountButton(currentAccountStatus);
@@ -211,15 +291,18 @@ async function loadAccountData() {
                 document.getElementById('last-login-date').textContent = 'Never';
             }
         }
+        return true;
     } catch (error) {
         console.error('Error loading account data:', error);
         const lastLoginElement = document.getElementById('last-login-date');
         if (lastLoginElement) {
-            const errorMessage = error.message && error.message.includes('HTTP error') 
-                ? 'Unable to load (network error)' 
-                : 'Unable to load';
+            const errorMessage =
+                error.message && error.message.includes('HTTP error')
+                    ? 'Unable to load (server error)'
+                    : 'Unable to load';
             lastLoginElement.textContent = errorMessage;
         }
+        return true;
     }
 }
 
