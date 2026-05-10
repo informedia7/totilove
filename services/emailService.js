@@ -18,7 +18,7 @@ class EmailService {
         this.primaryProvider = null;
         this.smtpConfigured = false;
         this.resendConfigured = false;
-        this.fromName = process.env.SMTP_FROM_NAME || config.email?.smtp?.fromName || 'Totilove';
+        this.fromName = process.env.SMTP_FROM_NAME || config.email?.smtp?.fromName || 'Totilove1';
         this.usingDefaultFromEmail = false;
         this.fromEmail = this.determineFromEmail();
         this.baseUrl = config.email?.baseUrl || process.env.BASE_URL || 'http://localhost:3001';
@@ -219,7 +219,7 @@ class EmailService {
         const mailOptions = {
             from: this.buildFromAddress(),
             to: to,
-            subject: 'Verify Your Email Address - Totilove',
+            subject: 'Verify Your Email Address - Totilove1',
             html: `
                 <!DOCTYPE html>
                 <html>
@@ -239,11 +239,11 @@ class EmailService {
                 <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #ffffff;">
                     <div class="container" style="max-width: 600px; margin: 0 auto; padding: 20px;">
                         <div class="header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                            <h1 style="margin: 0; color: #eab308; font-size: 2rem; line-height: 1.2;">Welcome to Totilove!</h1>
+                            <h1 style="margin: 0; color: #eab308; font-size: 2rem; line-height: 1.2;">Welcome to Totilove1!</h1>
                         </div>
                         <div class="content" style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
                             <p>Hi ${real_name},</p>
-                            <p>Thank you for registering with Totilove! To complete your registration and start connecting with others, please verify your email address using one of the methods below:</p>
+                            <p>Thank you for registering with Totilove1! To complete your registration and start connecting with others, please verify your email address using one of the methods below:</p>
                             
                             <div style="background: white; padding: 1.5rem; border-radius: 8px; margin: 1.5rem 0; border: 2px solid #eab308;">
                                 <h3 style="margin: 0 0 1rem 0; color: #ca8a04; font-size: 1.1rem;">Method 1: Click the Link (Easiest)</h3>
@@ -272,21 +272,21 @@ class EmailService {
                             ` : ''}
                             
                             <p style="margin-top: 1.5rem; font-size: 0.9rem; color: #666;">Both methods will expire in 24 hours.</p>
-                            <p style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">If you didn't create an account with Totilove, please ignore this email.</p>
+                            <p style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">If you didn't create an account with Totilove1, please ignore this email.</p>
                         </div>
                         <div class="footer" style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
-                            <p style="margin: 0;">&copy; ${new Date().getFullYear()} Totilove. All rights reserved.</p>
+                            <p style="margin: 0;">&copy; ${new Date().getFullYear()} Totilove1. All rights reserved.</p>
                         </div>
                     </div>
                 </body>
                 </html>
             `,
             text: `
-                Welcome to Totilove!
+                Welcome to Totilove1!
                 
                 Hi ${real_name},
                 
-                Thank you for registering with Totilove! To complete your registration, please verify your email address using one of these methods:
+                Thank you for registering with Totilove1! To complete your registration, please verify your email address using one of these methods:
                 
                 Method 1: Click this link:
                 ${confirmationUrl}
@@ -306,7 +306,7 @@ class EmailService {
                 
                 Both methods will expire in 24 hours.
                 
-                If you didn't create an account with Totilove, please ignore this email.
+                If you didn't create an account with Totilove1, please ignore this email.
             `
         };
 
@@ -339,7 +339,7 @@ class EmailService {
         const mailOptions = {
             from: this.buildFromAddress(),
             to: to,
-            subject: 'Reset Your Password - Totilove',
+            subject: 'Reset Your Password - Totilove1',
             html: `
                 <!DOCTYPE html>
                 <html>
@@ -371,7 +371,7 @@ class EmailService {
                             <p>If you didn't request a password reset, please ignore this email.</p>
                         </div>
                         <div class="footer">
-                            <p>&copy; ${new Date().getFullYear()} Totilove. All rights reserved.</p>
+                            <p>&copy; ${new Date().getFullYear()} Totilove1. All rights reserved.</p>
                         </div>
                     </div>
                 </body>
