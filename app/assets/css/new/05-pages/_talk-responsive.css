@@ -2017,9 +2017,13 @@
       max-width: 100% !important;
     }
 
-    .messages-area,
     .conversations {
       overflow-x: hidden !important;
+    }
+
+    /* Let shadows / sent timestamps breathe; chat-area still constrains page width */
+    .messages-area {
+      overflow-x: visible !important;
     }
 
     .conversation-item {
@@ -2056,6 +2060,12 @@
       word-break: break-word !important;
     }
 
+    .message.sent .message-time {
+      max-width: 70% !important;
+      align-self: flex-end !important;
+      box-sizing: border-box !important;
+    }
+
     /* iPhone 12 & small mobile (390px and below) */
     @media (max-width: 390px) {
 
@@ -2071,7 +2081,6 @@
       .app-container>.main-content,
       .sidebar,
       .chat-area,
-      .messages-area,
       .conversations {
         width: 100% !important;
         max-width: 100% !important;
@@ -2079,6 +2088,16 @@
         margin: 0 !important;
         left: 0 !important;
         right: 0 !important;
+      }
+
+      .messages-area {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        overflow-x: visible !important;
+        overflow-y: auto !important;
       }
 
       .app-container {
@@ -2342,7 +2361,7 @@
       }
 
       .messages-area {
-        padding: var(--spacing-md) var(--spacing-sm) !important;
+        padding: var(--spacing-md) var(--spacing-md) !important;
         background: var(--color-white) !important;
         -webkit-overflow-scrolling: touch !important;
       }
@@ -2447,8 +2466,8 @@
 
         .messages-area {
           padding-top: max(var(--spacing-sm), env(safe-area-inset-top)) !important;
-          padding-left: calc(var(--spacing-xs) + min(env(safe-area-inset-left, 0px), 20px)) !important;
-          padding-right: calc(var(--spacing-xs) + min(env(safe-area-inset-right, 0px), 20px)) !important;
+          padding-left: max(var(--spacing-md), calc(var(--spacing-xs) + min(env(safe-area-inset-left, 0px), 20px))) !important;
+          padding-right: max(var(--spacing-md), calc(var(--spacing-xs) + min(env(safe-area-inset-right, 0px), 20px))) !important;
         }
       }
     }
@@ -2742,8 +2761,8 @@
 
         .messages-area {
           padding-top: max(var(--spacing-sm), env(safe-area-inset-top)) !important;
-          padding-left: calc(var(--spacing-xs) + min(env(safe-area-inset-left, 0px), 20px)) !important;
-          padding-right: calc(var(--spacing-xs) + min(env(safe-area-inset-right, 0px), 20px)) !important;
+          padding-left: max(var(--spacing-md), calc(var(--spacing-xs) + min(env(safe-area-inset-left, 0px), 20px))) !important;
+          padding-right: max(var(--spacing-md), calc(var(--spacing-xs) + min(env(safe-area-inset-right, 0px), 20px))) !important;
         }
       }
 
@@ -2756,11 +2775,14 @@
         .app-container>.main-content,
         .sidebar,
         .chat-area,
-        .messages-area,
         .conversations {
           width: 100% !important;
           max-width: 100% !important;
           overflow-x: hidden !important;
+        }
+
+        .messages-area {
+          overflow-x: visible !important;
         }
 
         html,
@@ -2776,8 +2798,8 @@
 
         .messages-area,
         .conversations {
-          padding-left: var(--spacing-xs) !important;
-          padding-right: var(--spacing-xs) !important;
+          padding-left: var(--spacing-md) !important;
+          padding-right: var(--spacing-md) !important;
         }
       }
     }
