@@ -263,16 +263,16 @@
     .global-online-indicator::after {
         content: '';
         position: absolute;
-        bottom: 0;
-        right: 0;
+        bottom: 4px;
+        right: 4px;
         width: 6px;
         height: 6px;
         background: #00b894;
-        border: 1px solid white;
+        border: 1px solid rgba(255, 255, 255, 0.95);
         border-radius: 50%;
         box-sizing: border-box;
         z-index: 2;
-        transform: translate(5%, 5%);
+        pointer-events: none;
     }
 
 /* Auth buttons for guests */
