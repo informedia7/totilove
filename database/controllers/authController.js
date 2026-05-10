@@ -2573,6 +2573,59 @@ class AuthController {
     }
 
     /**
+     * Owning the inbox proves identity enough to open a session after verify-email link (same as login UX expectation).
+     */
+    async grantSessionAfterEmailVerification(userId, res) {
+        try {
+            if (!this.auth || typeof this.auth.createSession !== 'function') {
+                return { ok: false, error: 'Auth unavailable' };
+            }
+
+            await ensureAccountStatusSchema(this.db);
+
+            const userResult = await this.db.query(
+                `SELECT id, real_name, email, birthdate, gender,
+                        city_id, country_id, state_id, date_joined, last_login,
+                        COALESCE(email_verified, false) as email_verified,
+                        COALESCE(is_suspended, false) as is_suspended,
+                        COALESCE(account_status, 'active') as account_status
+                 FROM users WHERE id = $1`,
+                [userId]
+            );
+
+            if (userResult.rows.length === 0) {
+                return { ok: false, error: 'User not found' };
+            }
+
+            const user = userResult.rows[0];
+            if (user.is_suspended) {
+                return { ok: false, error: 'suspended' };
+            }
+
+            await this.db.query(
+                'UPDATE users SET previous_login = last_login, last_login = NOW() WHERE id = $1',
+                [user.id]
+            );
+
+            const sessionToken = this.auth.createSession(user);
+            const isProduction = process.env.NODE_ENV === 'production';
+            res.cookie('sessionToken', sessionToken, {
+                httpOnly: true,
+                secure: isProduction,
+                // Lax so session is applied when user opens the verify link from an email client (top-level navigation).
+                sameSite: 'lax',
+                maxAge: config.session?.duration || (2 * 60 * 60 * 1000),
+                path: '/'
+            });
+
+            return { ok: true };
+        } catch (err) {
+            console.error('❌ grantSessionAfterEmailVerification:', err);
+            return { ok: false, error: err.message };
+        }
+    }
+
+    /**
      * Verify email address using token
      */
     async verifyEmail(req, res) {
@@ -2644,12 +2697,28 @@ class AuthController {
 
             const tokenData = tokenResult.rows[0];
 
-            // Check if email is already verified
+            // Check if email is already verified (valid unused token still proves inbox — sign them in)
             if (tokenData.email_verified) {
+                const granted = await this.grantSessionAfterEmailVerification(tokenData.user_id, res);
+                if (!granted.ok && granted.error === 'suspended') {
+                    if (wantsHtmlResponse) {
+                        return redirectVerifyHtml(
+                            'error',
+                            'Your account has been suspended.'
+                        );
+                    }
+                    return res.status(403).json({
+                        success: false,
+                        error: 'Your account has been suspended'
+                    });
+                }
+
                 if (wantsHtmlResponse) {
                     return redirectVerifyHtml(
                         'already-verified',
-                        'Your email is already verified. You can log in to continue.'
+                        granted.ok
+                            ? 'Your email is already verified. You are signed in.'
+                            : 'Your email is already verified. You can log in to continue.'
                     );
                 }
 
@@ -2683,16 +2752,29 @@ class AuthController {
 
             console.log(`✅ Email verified for user ${tokenData.user_id} (${tokenData.email})`);
 
+            const granted = await this.grantSessionAfterEmailVerification(tokenData.user_id, res);
+            if (!granted.ok) {
+                console.warn(
+                    `⚠️ Email verified but session not issued for user ${tokenData.user_id}:`,
+                    granted.error
+                );
+            }
+
             if (wantsHtmlResponse) {
                 return redirectVerifyHtml(
                     'success',
-                    'Email verified successfully. You can log in to use your account.'
+                    granted.ok
+                        ? 'Email verified successfully. You are signed in.'
+                        : 'Email verified successfully. Please log in to continue.'
                 );
             }
 
             res.json({
                 success: true,
-                message: 'Email verified successfully! You can now log in.',
+                message: granted.ok
+                    ? 'Email verified successfully. You are signed in.'
+                    : 'Email verified successfully! You can now log in.',
+                sessionIssued: granted.ok,
                 user: {
                     id: tokenData.user_id,
                     real_name: tokenData.real_name,
