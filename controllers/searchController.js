@@ -1,8 +1,32 @@
 const { Pool } = require('pg');
 const path = require('path');
 
+function shouldFilterOnlineNow(onlineNow, onlineStatus) {
+    const visit = (value) => {
+        if (value === undefined || value === null) {
+            return false;
+        }
+        if (Array.isArray(value)) {
+            return value.some(visit);
+        }
+        if (value === true) {
+            return true;
+        }
+        if (value === false || value === 0) {
+            return false;
+        }
+        const s = String(value).trim().toLowerCase();
+        if (!s || s === 'false' || s === '0' || s === 'no' || s === 'off') {
+            return false;
+        }
+        return s === 'true' || s === '1' || s === 'yes' || s === 'on' || s === 'online';
+    };
+    return visit(onlineNow) || visit(onlineStatus);
+}
+
 class SearchController {
-    constructor() {
+    constructor(presenceService = null) {
+        this.presenceService = presenceService || null;
         // Database connection
         this.db = new Pool({
             user: process.env.DB_USER || 'postgres',
@@ -70,9 +94,19 @@ class SearchController {
                 // If table doesn't exist or error, continue without preferences
             }
             
-            // Map unused parameters to used ones
-            const effectiveOnlineNow = onlineNow || onlineStatus;
+            const wantsOnlineNowFilter = shouldFilterOnlineNow(onlineNow, onlineStatus);
             const effectiveWithImages = withImages || withPhotos;
+
+            let presenceOnlineUserIds = [];
+            if (wantsOnlineNowFilter && this.presenceService?.isEnabled?.()) {
+                try {
+                    if (typeof this.presenceService.getOnlineUserIdsFromIndex === 'function') {
+                        presenceOnlineUserIds = await this.presenceService.getOnlineUserIdsFromIndex(8000);
+                    }
+                } catch (_) {
+                    presenceOnlineUserIds = [];
+                }
+            }
             
             // Validate age inputs
             let effectiveAgeMin = ageMin ? parseInt(ageMin) : null;
@@ -412,13 +446,20 @@ class SearchController {
                 query += ` AND ui.file_name IS NOT NULL`;
             }
             
-            if (effectiveOnlineNow === 'true' || effectiveOnlineNow === true) {
-                query += ` AND EXISTS (
+            if (wantsOnlineNowFilter) {
+                const sessionOnlineSql = `EXISTS (
                     SELECT 1 FROM user_sessions us
-                    WHERE us.user_id = u.id 
-                    AND us.is_active = true 
+                    WHERE us.user_id = u.id
+                    AND us.is_active = true
                     AND us.last_activity > NOW() - INTERVAL '2 minutes'
                 )`;
+                if (presenceOnlineUserIds.length > 0) {
+                    query += ` AND (${sessionOnlineSql} OR u.id = ANY($${paramIndex}::int[]))`;
+                    queryParams.push(presenceOnlineUserIds);
+                    paramIndex++;
+                } else {
+                    query += ` AND ${sessionOnlineSql}`;
+                }
             }
             
             if (recentlyActive === 'true' || recentlyActive === true) {
@@ -786,13 +827,20 @@ class SearchController {
                 countQuery += ` AND ui.file_name IS NOT NULL`;
             }
             
-            if (effectiveOnlineNow === 'true' || effectiveOnlineNow === true) {
-                countQuery += ` AND EXISTS (
+            if (wantsOnlineNowFilter) {
+                const sessionOnlineSqlCount = `EXISTS (
                     SELECT 1 FROM user_sessions us
-                    WHERE us.user_id = u.id 
-                    AND us.is_active = true 
+                    WHERE us.user_id = u.id
+                    AND us.is_active = true
                     AND us.last_activity > NOW() - INTERVAL '2 minutes'
                 )`;
+                if (presenceOnlineUserIds.length > 0) {
+                    countQuery += ` AND (${sessionOnlineSqlCount} OR u.id = ANY($${countParamIndex}::int[]))`;
+                    countParams.push(presenceOnlineUserIds);
+                    countParamIndex++;
+                } else {
+                    countQuery += ` AND ${sessionOnlineSqlCount}`;
+                }
             }
             
             if (recentlyActive === 'true' || recentlyActive === true) {

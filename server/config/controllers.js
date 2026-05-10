@@ -32,7 +32,7 @@ function setupControllers(
     const authController = new AuthController(db, authMiddleware, sessionTracker, presenceService);
     const messageController = new MessageController(db, messageService, io, presenceService);
     const templateController = new TemplateController(db);
-    const searchController = new SearchController();
+    const searchController = new SearchController(presenceService);
     const activityController = new ActivityController(db, presenceService);
     const matchesController = new MatchesController(db, redis || null);
 

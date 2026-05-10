@@ -436,6 +436,33 @@ class PresenceService extends EventEmitter {
         return statuses ? statuses[userId] || null : null;
     }
 
+    /**
+     * User ids currently indexed as online (sorted-set score > now).
+     * Used by search and other server-side filters when session rows lag Redis presence.
+     */
+    async getOnlineUserIdsFromIndex(maxCount = 5000) {
+        if (!this.enabled) {
+            return [];
+        }
+        const cap = Math.min(Math.max(parseInt(maxCount, 10) || 5000, 1), 20000);
+        const now = Date.now();
+        try {
+            const minExclusive = `(${now}`;
+            const members = await this.redis.zRangeByScore(
+                this.options.onlineIndexKey,
+                minExclusive,
+                '+inf',
+                { LIMIT: { offset: 0, count: cap } }
+            );
+            return (members || [])
+                .map((m) => parseInt(m, 10))
+                .filter((id) => Number.isInteger(id) && id > 0);
+        } catch (error) {
+            this.logError('getOnlineUserIdsFromIndex', error);
+            return [];
+        }
+    }
+
     async getStatuses(userIds = []) {
         if (!this.enabled || !Array.isArray(userIds) || userIds.length === 0) {
             return null;
