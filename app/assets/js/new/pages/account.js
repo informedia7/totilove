@@ -814,7 +814,12 @@ async function verifyEmailByCode() {
         });
         const accountData = await accountResponse.json();
         
-        if (!accountData.success || !accountData.userId) {
+        const resolvedUserId =
+            accountData.userId ??
+            accountData.id ??
+            accountData.user?.id ??
+            accountData.user?.userId;
+        if (!accountData.success || resolvedUserId == null || resolvedUserId === '') {
             throw new Error('Unable to get user ID');
         }
         
@@ -826,15 +831,16 @@ async function verifyEmailByCode() {
             },
             body: JSON.stringify({ 
                 code: code,
-                userId: accountData.userId
+                userId: resolvedUserId
             })
         });
         
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        const data = await response.json().catch(() => ({}));
         
-        const data = await response.json();
+        if (!response.ok) {
+            const apiErr = data.error || data.message || `Request failed (${response.status})`;
+            throw new Error(apiErr);
+        }
         
         if (data.success) {
             // Show success message
@@ -882,9 +888,13 @@ async function verifyEmailByCode() {
             messageDiv.style.background = '#fee';
             messageDiv.style.color = '#dc3545';
             messageDiv.style.border = '1px solid #dc3545';
-            const errorMessage = error.message && error.message.includes('HTTP error') 
-                ? 'Network error. Please check your connection and try again.' 
-                : 'Failed to verify code. Please try again.';
+            const msg = error?.message || '';
+            const errorMessage =
+                msg.includes('Unable to get user ID')
+                    ? 'Please refresh the page and sign in again, then retry the code.'
+                    : msg.includes('Failed to fetch') || msg.includes('NetworkError')
+                      ? 'Network error. Please check your connection and try again.'
+                      : msg || 'Failed to verify code. Please try again.';
             messageDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${errorMessage}`;
         }
         

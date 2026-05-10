@@ -2577,7 +2577,20 @@ class AuthController {
      */
     async verifyEmail(req, res) {
         try {
-            const { token } = req.query;
+            let rawToken = req.query.token;
+            if (Array.isArray(rawToken)) {
+                rawToken = rawToken[0];
+            }
+            // Email clients / copy-paste often append commas or punctuation after the token in the URL
+            const token =
+                rawToken != null
+                    ? String(rawToken)
+                          .trim()
+                          .replace(/^[<("'[{]+/, '')
+                          .replace(/[,.;)\]}>'"`\s]+$/g, '')
+                          .trim()
+                    : '';
+
             const wantsHtmlResponse = (() => {
                 const acceptHeader = req.get('accept') || '';
                 const fetchDestination = req.get('sec-fetch-dest') || '';
@@ -2692,9 +2705,15 @@ class AuthController {
      */
     async verifyEmailByCode(req, res) {
         try {
-            const { code, userId } = req.body;
+            const body = req.body || {};
+            const code = body.code != null ? String(body.code).trim() : '';
+            const rawUserId = body.userId ?? body.user_id ?? body.id;
+            const parsedUserId =
+                rawUserId !== undefined && rawUserId !== null && String(rawUserId).trim() !== ''
+                    ? parseInt(String(rawUserId).trim(), 10)
+                    : NaN;
 
-            if (!code || !userId) {
+            if (!code || !Number.isInteger(parsedUserId) || parsedUserId < 1) {
                 return res.status(400).json({
                     success: false,
                     error: 'Verification code and user ID are required'
@@ -2709,16 +2728,16 @@ class AuthController {
                 });
             }
 
-            // Find the code in database
+            // Compare verification_code as text so varchar/int columns and leading zeros behave consistently
             const codeResult = await this.db.query(`
                 SELECT evt.*, u.id as user_id, u.email, u.real_name, u.email_verified
                 FROM email_verification_tokens evt
                 JOIN users u ON evt.user_id = u.id
-                WHERE evt.verification_code = $1
-                AND evt.user_id = $2
+                WHERE evt.verification_code IS NOT NULL
+                AND TRIM(evt.verification_code::text) = $1
                 AND evt.expires_at > NOW()
                 AND evt.used_at IS NULL
-            `, [code, userId]);
+            `, [code]);
 
             if (codeResult.rows.length === 0) {
                 return res.status(400).json({
@@ -2727,7 +2746,16 @@ class AuthController {
                 });
             }
 
-            const codeData = codeResult.rows[0];
+            const forUser = codeResult.rows.filter((row) => Number(row.user_id) === parsedUserId);
+            if (forUser.length === 0) {
+                return res.status(400).json({
+                    success: false,
+                    error:
+                        'This code does not match your account. Use the code from your latest email, or request a new verification email.'
+                });
+            }
+
+            const codeData = forUser[0];
 
             // Check if email is already verified
             if (codeData.email_verified) {
@@ -2741,9 +2769,9 @@ class AuthController {
             await this.db.query(`
                 UPDATE email_verification_tokens
                 SET used_at = NOW()
-                WHERE verification_code = $1
+                WHERE TRIM(verification_code::text) = $1
                 AND user_id = $2
-            `, [code, userId]);
+            `, [code, parsedUserId]);
 
             // Update user's email_verified status
             await this.db.query(`
@@ -2757,7 +2785,7 @@ class AuthController {
                 DELETE FROM email_verification_tokens
                 WHERE user_id = $1
                 AND used_at IS NULL
-                AND verification_code != $2
+                AND TRIM(verification_code::text) != $2
             `, [codeData.user_id, code]);
 
             console.log(`✅ Email verified by code for user ${codeData.user_id} (${codeData.email})`);
