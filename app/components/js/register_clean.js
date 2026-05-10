@@ -571,7 +571,7 @@ app.get('/contact', (req, res) => {
         </head>
         <body>
             <div id="navbar-placeholder"></div>
-            <script src="/components/navbar/global-navbar.js?v=20260509-navbar-ui"></script>
+            <script src="/components/navbar/global-navbar.js?v=20260509-avatar-photo"></script>
             
             <div class="container">
                 <h1>💌 Contact Us</h1>

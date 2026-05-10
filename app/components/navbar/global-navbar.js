@@ -47,6 +47,71 @@ class GlobalNavbar {
         return baseUrl + cleanPath;
     }
 
+    escapeHtml(text) {
+        if (text == null) return '';
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    escapeAttr(text) {
+        if (text == null) return '';
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;');
+    }
+
+    sanitizeNavbarAvatarUrl(url) {
+        const u = String(url || '').trim();
+        if (!u || u === 'null' || u === 'undefined') return null;
+        const head = u.slice(0, 16).toLowerCase();
+        if (head.startsWith('javascript:') || head.startsWith('vbscript:')) return null;
+        if (/^https?:\/\//i.test(u) || u.startsWith('/') || u.startsWith('blob:')) return u;
+        return null;
+    }
+
+    resolveNavbarAvatarPhotoUrl(user) {
+        if (!user) return null;
+        const candidates = [
+            user.avatar_photo,
+            user.profile_image,
+            user.avatar_url,
+            user.avatar,
+            user.photo_url,
+            user.profileImage
+        ];
+        for (let i = 0; i < candidates.length; i++) {
+            const safe = this.sanitizeNavbarAvatarUrl(candidates[i]);
+            if (safe) return safe;
+        }
+        return null;
+    }
+
+    navbarAvatarInitial(real_name, email) {
+        const base = String(real_name || email || '?').trim();
+        if (!base) return '?';
+        const first = [...base][0];
+        return first ? first.toUpperCase() : '?';
+    }
+
+    getNavbarAvatarInnerHTML(user) {
+        if (!user) {
+            return '<span class="global-user-avatar-fill"><span class="global-user-avatar-initial" aria-hidden="true">?</span></span>';
+        }
+        const photo = this.resolveNavbarAvatarPhotoUrl(user);
+        const rn = user.real_name || user.name || user.email || '';
+        const initial = this.escapeHtml(this.navbarAvatarInitial(rn, user.email));
+        if (photo) {
+            const src = this.escapeAttr(photo);
+            return `<span class="global-user-avatar-fill"><img class="global-user-avatar-img" src="${src}" alt="" loading="lazy" decoding="async"></span>`;
+        }
+        return `<span class="global-user-avatar-fill"><span class="global-user-avatar-initial" aria-hidden="true">${initial}</span></span>`;
+    }
+
     // Get current page name (similar to PHP basename($_SERVER['PHP_SELF']))
     getCurrentPageName() {
         const path = window.location.pathname;
@@ -277,7 +342,7 @@ class GlobalNavbar {
 
         // Only show user section if authenticated (like PHP if ($loggedIn))
         if (this.isAuthenticated && this.currentUser) {
-            const real_name = this.currentUser.real_name || this.currentUser.real_name || this.currentUser.name || this.currentUser.email || 'User';
+            const real_name = this.currentUser.real_name || this.currentUser.name || this.currentUser.email || 'User';
             const displayName = real_name.length > 20 ? real_name.substring(0, 20) + '...' : real_name;
 
             // Showing authenticated user section
@@ -287,8 +352,8 @@ class GlobalNavbar {
                     <span class="global-user-greeting">Hi, ${displayName}</span>
                     ${languageSwitcherHTML}
                     <div class="global-user-menu">
-                        <div class="global-user-avatar global-online-indicator" id="globalUserAvatar">
-                            <i class="fas fa-user"></i>
+                        <div class="global-user-avatar global-online-indicator" id="globalUserAvatar" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false" aria-controls="globalUserDropdown">
+                            ${this.getNavbarAvatarInnerHTML(this.currentUser)}
                         </div>
                         <div class="global-user-dropdown" id="globalUserDropdown">
                             <a href="${this.resolveUrl('/profile-full')}" class="global-dropdown-item">
@@ -415,10 +480,26 @@ class GlobalNavbar {
 
             // Add language switcher functionality
             this.setupLanguageSwitcher();
+            this.bindNavbarAvatarFallback();
         } catch (error) {
             // Error attaching event listeners
             this.trackAnalytics('error', 'attachEventListeners', { error: error.message });
         }
+    }
+
+    bindNavbarAvatarFallback() {
+        const avatarEl = document.getElementById('globalUserAvatar');
+        if (!avatarEl || !this.currentUser) return;
+        const img = avatarEl.querySelector('.global-user-avatar-img');
+        if (!img || img.dataset.fallbackBound === '1') return;
+        img.dataset.fallbackBound = '1';
+        img.addEventListener('error', () => {
+            const fill = avatarEl.querySelector('.global-user-avatar-fill');
+            if (!fill) return;
+            const rn = this.currentUser.real_name || this.currentUser.name || this.currentUser.email || '';
+            const initial = this.escapeHtml(this.navbarAvatarInitial(rn, this.currentUser.email));
+            fill.innerHTML = `<span class="global-user-avatar-initial" aria-hidden="true">${initial}</span>`;
+        }, { once: true });
     }
 
     setupLanguageSwitcher() {
@@ -595,6 +676,11 @@ class GlobalNavbar {
                 const rn = this.currentUser.real_name || this.currentUser.name || this.currentUser.email || 'User';
                 const displayName = rn.length > 20 ? rn.substring(0, 20) + '...' : rn;
                 userInfo.textContent = `Hi, ${displayName}`;
+            }
+            const avatarEl = document.getElementById('globalUserAvatar');
+            if (avatarEl) {
+                avatarEl.innerHTML = this.getNavbarAvatarInnerHTML(this.currentUser);
+                this.bindNavbarAvatarFallback();
             }
         }
     }

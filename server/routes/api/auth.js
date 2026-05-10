@@ -44,7 +44,8 @@ function setupAuthRoutes(app, authMiddleware, csrfMiddleware) {
                         id: session.user.id,
                         real_name: session.user.real_name || session.user.real_name || '',
                         email: session.user.email,
-                        profile_image: session.user.profile_image
+                        profile_image: session.user.profile_image,
+                        avatar_photo: session.user.avatar_photo || session.user.profile_image
                     },
                     expiresAt: session.expiresAt
                 });
