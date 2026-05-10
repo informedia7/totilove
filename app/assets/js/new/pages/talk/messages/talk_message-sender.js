@@ -389,11 +389,23 @@ async function sendImagesWithPreviews() {
             formData.append('images', file);
         });
 
+        if (typeof showUploadProgress === 'function') {
+            showUploadProgress(0, 'Uploading…');
+        }
+
         const uploadData = await uploadChatImagesWithProgress(formData, currentUserId, (progress) => {
-            showNotification(`📤 Uploading... ${progress}%`, 'info');
+            if (typeof showUploadProgress === 'function') {
+                showUploadProgress(progress, 'Uploading…');
+            }
         });
 
         if (uploadData && uploadData.success) {
+            if (typeof showUploadProgress === 'function') {
+                showUploadProgress(100, 'Upload complete');
+            }
+            if (typeof hideUploadProgress === 'function') {
+                setTimeout(hideUploadProgress, 280);
+            }
             showNotification(`✅ Successfully uploaded ${uploadData.data.totalProcessed} image(s)`, 'success');
             clearImagePreviews();
 
@@ -414,6 +426,10 @@ async function sendImagesWithPreviews() {
         }
 
     } catch (error) {
+        if (typeof hideUploadProgress === 'function') {
+            hideUploadProgress();
+        }
+
         const messageIdToRemove = createdMessageId || uploadingMessageId;
 
         // Remove placeholder message from UI + local state (so "📷 Image" doesn't look like it succeeded)
