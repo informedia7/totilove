@@ -96,6 +96,21 @@ body {
     margin: 0;
 }
 
+.register-page-footer .register-footer-links {
+    margin: 0 0 0.5rem;
+}
+
+.register-page-footer .register-footer-links a {
+    color: #ffffff;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.register-page-footer .register-footer-links a:hover {
+    color: #e0e7ff;
+}
+
 .header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -267,6 +282,26 @@ textarea.form-control {
     transform: none;
 }
 
+.register-legal-note {
+    text-align: center;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: #5c616a;
+    margin: 0 0 0.85rem;
+    padding: 0 0.25rem;
+}
+
+.register-legal-note a {
+    color: #667eea;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.register-legal-note a:hover {
+    color: #5a67d8;
+}
+
 .form-footer {
     text-align: center;
     margin-top: 0.75rem;
@@ -425,6 +460,18 @@ html[data-theme="dark"] .header {
 html[data-theme="dark"] .header p,
 html[data-theme="dark"] .form-footer p {
     color: #cbd5e1;
+}
+
+html[data-theme="dark"] .register-legal-note {
+    color: #94a3b8;
+}
+
+html[data-theme="dark"] .register-legal-note a {
+    color: #93c5fd;
+}
+
+html[data-theme="dark"] .register-page-footer .register-footer-links a {
+    color: #e2e8f0;
 }
 
 html[data-theme="dark"] .welcome-card {
