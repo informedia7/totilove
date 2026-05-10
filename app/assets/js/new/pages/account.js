@@ -45,10 +45,6 @@ function handleEmailVerificationRedirectParams() {
             defaults[state] ||
             defaults.error;
 
-        if (state === 'success') {
-            sessionStorage.setItem('totilove_account_email_verified_ok', '1');
-        }
-
         const type =
             state === 'success'
                 ? 'success'
@@ -68,116 +64,10 @@ function handleEmailVerificationRedirectParams() {
     }
 }
 
-/** Password, pause, delete, and billing require a session — keep them inert when logged out. */
-function disableAccountActionsNeedingSession() {
-    const root = document.querySelector('.account-section.account-ui2');
-    if (root) {
-        root.classList.add('account-actions-locked');
-    }
-
-    const pwdBtn = document.getElementById('changePasswordBtn');
-    if (pwdBtn) {
-        pwdBtn.disabled = true;
-        pwdBtn.setAttribute('aria-disabled', 'true');
-        pwdBtn.title = 'Sign in to change your password';
-    }
-
-    const pauseToggle = document.getElementById('pauseAccountToggle');
-    if (pauseToggle) {
-        pauseToggle.disabled = true;
-        pauseToggle.setAttribute('aria-disabled', 'true');
-    }
-
-    document.querySelectorAll('.delete-account-btn').forEach((btn) => {
-        btn.disabled = true;
-        btn.setAttribute('aria-disabled', 'true');
-        btn.title = 'Sign in to delete your account';
-    });
-
-    const billing = document.querySelector('a.manage-billing-link[href="/billing.html"]');
-    if (billing) {
-        billing.href = '/login';
-        billing.setAttribute('aria-label', 'Sign in to manage billing');
-        billing.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign in for billing';
-    }
-}
-
-/** Rendered when /account loads without a session (e.g. after clicking verify-email link). */
-function applyLoggedOutAccountExperience() {
-    document.body.classList.add('account-page-needs-login');
-    disableAccountActionsNeedingSession();
-
-    const created = document.getElementById('account-created-date');
-    const loginRow = document.getElementById('last-login-date');
-    if (created) created.textContent = '—';
-    if (loginRow) loginRow.textContent = 'Sign in to view';
-
-    const pwdChanged = document.getElementById('password-last-changed');
-    if (pwdChanged) pwdChanged.textContent = 'Sign in to view';
-
-    const loadingSection = document.getElementById('email-verification-loading');
-    const verifiedSection = document.getElementById('email-verified-section');
-    const notVerifiedSection = document.getElementById('email-not-verified-section');
-    if (loadingSection) loadingSection.style.display = 'none';
-    if (verifiedSection) verifiedSection.style.display = 'none';
-    if (notVerifiedSection) notVerifiedSection.style.display = 'none';
-
-    const planName = document.getElementById('current-plan-name-display');
-    const planBadge = document.getElementById('current-plan-badge-display');
-    const planDesc = document.getElementById('current-plan-description-display');
-    const planExpiry = document.getElementById('current-plan-expiry-display');
-    if (planName) planName.textContent = '—';
-    if (planBadge) planBadge.textContent = '—';
-    if (planDesc) planDesc.textContent = 'Sign in to see subscription details.';
-    if (planExpiry) planExpiry.style.display = 'none';
-
-    const justVerified = sessionStorage.getItem('totilove_account_email_verified_ok') === '1';
-    if (justVerified) {
-        sessionStorage.removeItem('totilove_account_email_verified_ok');
-    }
-
-    if (document.getElementById('account-login-required-banner')) {
-        return;
-    }
-
-    const header = document.querySelector('.account-ui2 .ui2-header');
-    if (!header || !header.parentElement) {
-        return;
-    }
-
-    const banner = document.createElement('div');
-    banner.id = 'account-login-required-banner';
-    banner.style.cssText =
-        'grid-column:1/-1;margin:0 0 1rem 0;padding:1rem 1.1rem;border-radius:14px;border:1px solid #cfe8f6;background:#f5fbff;color:#1a5a7a;font-size:0.92rem;line-height:1.45;';
-
-    if (justVerified) {
-        banner.innerHTML = `
-            <strong style="display:block;margin-bottom:0.35rem;">Email verified — sign in next</strong>
-            <span>Your email is confirmed. Sign in once to load your account details and use password, pause, billing, and delete options below.</span>
-            <div style="margin-top:0.75rem;display:flex;flex-wrap:wrap;gap:0.5rem;">
-                <a href="/login" style="display:inline-flex;align-items:center;padding:0.45rem 0.95rem;border-radius:10px;background:#1a5a7a;color:#fff;text-decoration:none;font-weight:600;">Log in</a>
-                <a href="/register" style="display:inline-flex;align-items:center;padding:0.45rem 0.95rem;border-radius:10px;border:1px solid #9fbdcf;color:#1a5a7a;text-decoration:none;font-weight:600;">Create account</a>
-            </div>`;
-    } else {
-        banner.innerHTML = `
-            <strong style="display:block;margin-bottom:0.35rem;">Sign in required</strong>
-            <span>To manage security, billing, and account actions we need an active session.</span>
-            <div style="margin-top:0.75rem;display:flex;flex-wrap:wrap;gap:0.5rem;">
-                <a href="/login" style="display:inline-flex;align-items:center;padding:0.45rem 0.95rem;border-radius:10px;background:#1a5a7a;color:#fff;text-decoration:none;font-weight:600;">Log in</a>
-                <a href="/register" style="display:inline-flex;align-items:center;padding:0.45rem 0.95rem;border-radius:10px;border:1px solid #9fbdcf;color:#1a5a7a;text-decoration:none;font-weight:600;">Register</a>
-            </div>`;
-    }
-
-    header.parentElement.insertBefore(banner, header.nextSibling);
-}
-
-// Load account data on page load
+// Load account data on page load — matches totilove_remote - Copy flow: always run follow-up loaders.
 document.addEventListener('DOMContentLoaded', async function() {
     handleEmailVerificationRedirectParams();
-    const sessionOk = await loadAccountData();
-    if (!sessionOk) {
-        return;
-    }
+    await loadAccountData();
     await loadProfileCompletion();
     await checkEmailVerification();
     await loadCurrentPlan();
@@ -255,8 +145,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 async function loadAccountData() {
     try {
-        // Cookie-based auth - cookies sent automatically.
-        // redirect:'manual' — some gateways redirect /api instead of returning JSON 401; following would yield HTML 200 and JSON.parse errors.
         const response = await fetch('/api/account/info', {
             method: 'GET',
             credentials: 'same-origin',
@@ -264,14 +152,7 @@ async function loadAccountData() {
         });
 
         if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
-            applyLoggedOutAccountExperience();
-            return false;
-        }
-
-        const unauthorized = response.status === 401 || response.status === 403;
-        if (unauthorized) {
-            applyLoggedOutAccountExperience();
-            return false;
+            throw new Error('HTTP error! status: redirect');
         }
 
         const raw = await response.text();
@@ -284,14 +165,12 @@ async function loadAccountData() {
             }
         }
 
-        if (!data || typeof data !== 'object') {
-            applyLoggedOutAccountExperience();
-            return false;
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        if (!response.ok || data.success !== true) {
-            applyLoggedOutAccountExperience();
-            return false;
+        if (!data || typeof data !== 'object' || data.success !== true) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         currentAccountStatus = data.accountStatus === 'paused' ? 'paused' : 'active';
@@ -348,12 +227,16 @@ async function loadAccountData() {
         } else {
             document.getElementById('last-login-date').textContent = 'Never';
         }
-
-        return true;
     } catch (error) {
         console.error('Error loading account data:', error);
-        applyLoggedOutAccountExperience();
-        return false;
+        const lastLoginElement = document.getElementById('last-login-date');
+        if (lastLoginElement) {
+            const errorMessage =
+                error.message && error.message.includes('HTTP error')
+                    ? 'Unable to load (network error)'
+                    : 'Unable to load';
+            lastLoginElement.textContent = errorMessage;
+        }
     }
 }
 
