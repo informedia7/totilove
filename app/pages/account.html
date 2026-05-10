@@ -684,19 +684,20 @@
                                     <ol class="margin-0-padding-left-1-2-color-856404-font-0-85-line-height-1-6">
                                         <li class="margin-bottom-0-25">Check your inbox at <strong id="user-email-display">{{userEmail}}</strong></li>
                                         <li class="margin-bottom-0-25"><strong>Method 1:</strong> Click the verification link in the email (easiest)</li>
-                                        <li class="margin-bottom-0-25"><strong>Method 2:</strong> If the link doesn&rsquo;t work, use the 6-digit code from your email:</li>
-                                        <li class="margin-bottom-0-25">Log in with your email and password</li>
-                                        <li class="margin-bottom-0-25">Go to <strong>Account</strong></li>
-                                        <li class="margin-bottom-0-25">Under <strong>Security</strong>, expand &lsquo;Email Not Verified&rsquo;</li>
-                                        <li>In <strong>Verify with Code</strong>, enter the code</li>
                                     </ol>
+                                    <p class="margin-0-color-856404-font-0-85-line-height-1-5 margin-bottom-0-25 margin-top-0-5"><strong>Method 2: Enter Verification Code</strong></p>
+                                    <p style="font-size: 0.85rem; color: #666; margin: 0 0 0.35rem 0; line-height: 1.5;">If the link doesn&rsquo;t work, you can verify using this 6-digit code:</p>
+                                    <p style="font-size: 0.85rem; color: #666; margin: 0 0 0.35rem 0; line-height: 1.5;">Login with your email and password</p>
+                                    <p style="font-size: 0.85rem; color: #666; margin: 0 0 0.35rem 0; line-height: 1.5;">Go to: Account</p>
+                                    <p style="font-size: 0.85rem; color: #666; margin: 0 0 0.35rem 0; line-height: 1.5;">Click on: &lsquo;Email Not Verified&rsquo; under SECURITY</p>
+                                    <p style="font-size: 0.85rem; color: #666; margin: 0 0 0.5rem 0; line-height: 1.5;">In &lsquo;Verify with Code&rsquo; enter the 6-digit verification code from below:</p>
                                 </div>
 
                                 <div class="bg-blue-light-padding-0-75-border-radius-8-mb-0-75-border-2-solid-blue">
                                     <h4 class="margin-0-0-0-5-0-color-blue-font-0-9-weight-700-flex-align-center-gap-0-4">
                                         <i class="fas fa-key"></i> Verify with Code
                                     </h4>
-                                    <p class="margin-0-0-0-5-0-color-blue-font-0-8">Enter the 6-digit verification code from your email:</p>
+                                    <p class="margin-0-0-0-5-0-color-blue-font-0-8">Enter the 6-digit verification code from below:</p>
                                     <div class="display-flex-gap-0-5-align-center-flex-wrap">
                                         <input type="text" id="verification-code-input" class="verification-code-input" placeholder="000000" maxlength="6" pattern="[0-9]{6}" onclick="event.stopPropagation();">
                                         <button id="verify-code-btn" class="verify-code-btn" disabled onclick="event.stopPropagation();">
@@ -967,4 +968,4 @@
 <!-- Account Page JavaScript - Moved to new structure (Phase 1 CSS/JS Extraction) -->
 <script src="/assets/js/shared/password-validator.js"></script>
 <script src="/assets/js/new/pages/account-delete.js"></script>
-<script src="/assets/js/new/pages/account.js?v=20260511-verify-copy"></script>
+<script src="/assets/js/new/pages/account.js?v=20260512-method2-copy"></script>
