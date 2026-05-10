@@ -19,8 +19,54 @@ function showNotification(message, type = 'info') {
     }, 5000);
 }
 
+/**
+ * After GET /api/verify-email we redirect here with ?emailVerification=&message=
+ */
+function handleEmailVerificationRedirectParams() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const state = params.get('emailVerification');
+        if (!state) {
+            return;
+        }
+
+        const messageParam = params.get('message');
+        const defaults = {
+            success: 'Your email is verified.',
+            'already-verified': 'This email is already verified.',
+            'invalid-or-expired':
+                'This verification link is invalid or has expired. Request a new one from the login or register page.',
+            'missing-token': 'Verification link is incomplete. Use the full link from your email.',
+            error: 'Something went wrong while verifying your email. Please try again.'
+        };
+
+        const text =
+            (messageParam && messageParam.trim()) ||
+            defaults[state] ||
+            defaults.error;
+
+        const type =
+            state === 'success'
+                ? 'success'
+                : state === 'already-verified'
+                  ? 'info'
+                  : 'error';
+
+        showNotification(text, type);
+
+        params.delete('emailVerification');
+        params.delete('message');
+        const qs = params.toString();
+        const nextUrl = `${window.location.pathname}${qs ? `?${qs}` : ''}${window.location.hash || ''}`;
+        window.history.replaceState({}, '', nextUrl);
+    } catch (e) {
+        console.warn('[account] handleEmailVerificationRedirectParams:', e);
+    }
+}
+
 // Load account data on page load
 document.addEventListener('DOMContentLoaded', async function() {
+    handleEmailVerificationRedirectParams();
     await loadAccountData();
     await loadProfileCompletion();
     await checkEmailVerification();

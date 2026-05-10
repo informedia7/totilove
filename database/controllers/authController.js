@@ -2597,11 +2597,19 @@ class AuthController {
                 return fetchDestination === 'document' || acceptHeader.includes('text/html');
             })();
 
-            const redirectToLogin = (message) => res.redirect(303, `/login?message=${encodeURIComponent(message)}`);
+            /** Browser clicks land on /account (allowed without session when emailVerification is set — see pageRoutes). */
+            const redirectVerifyHtml = (state, message) =>
+                res.redirect(
+                    303,
+                    `/account?emailVerification=${encodeURIComponent(state)}&message=${encodeURIComponent(message)}`
+                );
 
             if (!token) {
                 if (wantsHtmlResponse) {
-                    return redirectToLogin('Verification token is required.');
+                    return redirectVerifyHtml(
+                        'missing-token',
+                        'Verification link is incomplete. Open the link from your email or paste the full URL.'
+                    );
                 }
 
                 return res.status(400).json({
@@ -2622,7 +2630,10 @@ class AuthController {
 
             if (tokenResult.rows.length === 0) {
                 if (wantsHtmlResponse) {
-                    return redirectToLogin('Invalid or expired verification link. Please request a new one.');
+                    return redirectVerifyHtml(
+                        'invalid-or-expired',
+                        'Invalid or expired verification link. Please request a new one from the login or register page.'
+                    );
                 }
 
                 return res.status(400).json({
@@ -2636,7 +2647,10 @@ class AuthController {
             // Check if email is already verified
             if (tokenData.email_verified) {
                 if (wantsHtmlResponse) {
-                    return redirectToLogin('Email is already verified. Please log in.');
+                    return redirectVerifyHtml(
+                        'already-verified',
+                        'Your email is already verified. You can log in to continue.'
+                    );
                 }
 
                 return res.status(400).json({
@@ -2670,7 +2684,10 @@ class AuthController {
             console.log(`✅ Email verified for user ${tokenData.user_id} (${tokenData.email})`);
 
             if (wantsHtmlResponse) {
-                return redirectToLogin('Email verified successfully. You can now log in.');
+                return redirectVerifyHtml(
+                    'success',
+                    'Email verified successfully. You can log in to use your account.'
+                );
             }
 
             res.json({
@@ -2689,7 +2706,11 @@ class AuthController {
             const acceptHeader = req.get('accept') || '';
             const fetchDestination = req.get('sec-fetch-dest') || '';
             if (fetchDestination === 'document' || acceptHeader.includes('text/html')) {
-                return res.redirect(303, '/login?message=' + encodeURIComponent('Email verification failed. Please try again.'));
+                return res.redirect(
+                    303,
+                    '/account?emailVerification=error&message=' +
+                        encodeURIComponent('Email verification failed. Please try again or request a new verification email.')
+                );
             }
 
             res.status(500).json({
