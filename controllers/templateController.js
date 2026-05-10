@@ -58,6 +58,7 @@ class TemplateController {
             // Add feature flags to userData for template processing
             const htmlContent = this.templateUtils.processTemplateVariables(layoutContent, {
                 ...userData,
+                layoutWelcomeMessage: userData.layoutWelcomeMessage || 'Hi there!',
                 ...featureFlagsData,
                 FEATURE_FLAGS_JSON: JSON.stringify(featureFlagsData)
             });
@@ -497,9 +498,15 @@ class TemplateController {
             return 'View and update your Totilove dating profile.';
         })();
 
+        const welcomeNameRaw = user.real_name != null ? String(user.real_name).trim() : '';
+        const layoutWelcomeMessage = welcomeNameRaw
+            ? `Hi, ${welcomeNameRaw.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}!`
+            : 'Hi there!';
+
         const userData = {
                         pageTitle,
                         pageDescription,
+                        layoutWelcomeMessage,
                         userId: user.id,
                         real_name: user.real_name,
                         realName: user.real_name || '', // For template use (camelCase)

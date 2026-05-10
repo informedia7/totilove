@@ -45,16 +45,30 @@ class TemplateUtils {
 
         // Conditionals must run before stripping unknown {{word}} tokens — otherwise {{else}}
         // matches the fallback regex and if/else blocks break (e.g. "Hi, Lucy!Hi there!").
-        const ifRegex = /\{\{if:([^}]+)\}\}(.*?)\{\{\/if\}\}/gs;
-        const ifElseRegex = /\{\{if:([^}]+)\}\}(.*?)\{\{else\}\}(.*?)\{\{\/if\}\}/gs;
+        //
+        // Naive (.*?){{else}} pairs the FIRST {{else}} in the document with an earlier {{if:}},
+        // e.g. {{if:userAvatar}}...{{if:real_name}}...{{else}} leaks {{/if}} and corrupts HTML.
+        // Use tempered fragments so branches cannot cross nested {{if:; repeat to peel nested blocks.
+        const ifElseTempered =
+            /\{\{if:([^}]+)\}\}((?:(?!\{\{if:)[\s\S])*?)\{\{else\}\}((?:(?!\{\{if:)[\s\S])*?)\{\{\/if\}\}/gs;
+        let prevIfElse;
+        do {
+            prevIfElse = content;
+            content = content.replace(ifElseTempered, (match, condition, ifBranch, elseBranch) => (
+                this.evaluateCondition(condition.trim(), variables) ? ifBranch : elseBranch
+            ));
+        } while (content !== prevIfElse);
 
-        content = content.replace(ifElseRegex, (match, condition, ifContent, elseContent) => {
-            return this.evaluateCondition(condition, variables) ? ifContent : elseContent;
-        });
-
-        content = content.replace(ifRegex, (match, condition, ifContent) => {
-            return this.evaluateCondition(condition, variables) ? ifContent : '';
-        });
+        // Simple if (no {{else}} between opening and closing). Must not span {{else}} or nested {{if:
+        const simpleIfTempered =
+            /\{\{if:([^}]+)\}\}((?:(?!\{\{else\}\}|\{\{if:)[\s\S])*?)\{\{\/if\}\}/gs;
+        let prevSimple;
+        do {
+            prevSimple = content;
+            content = content.replace(simpleIfTempered, (match, condition, inner) => (
+                this.evaluateCondition(condition.trim(), variables) ? inner : ''
+            ));
+        } while (content !== prevSimple);
 
         const foreachRegex = /\{\{foreach:([^}]+)\}\}(.*?)\{\{\/foreach\}\}/gs;
         content = content.replace(foreachRegex, (match, arrayName, loopContent) => {

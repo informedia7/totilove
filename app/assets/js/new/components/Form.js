@@ -274,7 +274,8 @@ export class Form extends BaseComponent {
                         // Update display
                         const realNameElement = document.getElementById('real_name');
                         if (realNameElement) {
-                            realNameElement.textContent = result.real_name;
+                            const n = (result.real_name || '').trim();
+                            realNameElement.textContent = n ? `Hi, ${n}!` : 'Hi there!';
                         }
                     }
                     
