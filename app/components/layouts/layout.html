@@ -21,6 +21,7 @@
 
     <!-- Layout CSS - Extracted from inline styles - Phase 1 CSS Extraction -->
     <link rel="stylesheet" href="/assets/css/new/03-layout.css">
+    <link rel="stylesheet" href="/assets/css/new/02-components/_layout-shell-footer.css?v=20260512">
 
     <script>
         (function initializeTheme() {
@@ -75,7 +76,7 @@
     <script src="/assets/js/new/pwa-init.js"></script>
 </head>
 
-<body class="layout-shell" data-user-id="{{userId}}" data-user-real-name="{{real_name}}" data-user-email="{{userEmail}}"
+<body class="layout-shell layout-shell--with-footer" data-user-id="{{userId}}" data-user-real-name="{{real_name}}" data-user-email="{{userEmail}}"
     data-user-age="{{userAge}}" data-user-gender="{{userGenderRaw}}" data-user-location="{{userLocation}}"
     data-user-member-since="{{memberSince}}" data-user-last-active="{{lastActive}}">
 
@@ -210,6 +211,16 @@
         </div>
 
     </div> <!-- End #app-root wrapper -->
+
+    <footer class="layout-shell-footer" role="contentinfo" aria-label="Site">
+        <p class="layout-shell-footer__text">&copy; <span class="layout-shell-footer__year"></span> Totilove. All rights reserved. Made with ❤️ for love without borders.</p>
+    </footer>
+    <script>
+        (function () {
+            var el = document.querySelector('.layout-shell-footer .layout-shell-footer__year');
+            if (el) el.textContent = String(new Date().getFullYear());
+        })();
+    </script>
 
     <!-- Scripts -->
     {{if:presence.socketEnabled}}
