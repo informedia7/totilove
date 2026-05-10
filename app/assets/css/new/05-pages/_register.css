@@ -356,16 +356,22 @@ textarea.form-control {
 .welcome-card.welcome-card--cta .button-container {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
     justify-content: flex-start;
     width: 100%;
     margin: 0;
     gap: 0.5rem;
 }
 
-.welcome-card.welcome-card--cta .submit-button {
+.welcome-card.welcome-card--cta .button-container .error-message {
     width: 100%;
-    max-width: none;
+    align-self: stretch;
+    text-align: center;
+}
+
+.welcome-card.welcome-card--cta .submit-button {
+    width: fit-content;
+    max-width: 100%;
     padding: 0.875rem 1.25rem;
     font-size: 1rem;
     font-weight: 600;
