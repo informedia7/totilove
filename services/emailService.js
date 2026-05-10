@@ -8,6 +8,9 @@ try {
 }
 const config = require('../config/config');
 
+const RESEND_FALLBACK_FROM =
+    config.email?.resend?.defaultFromEmail || 'onboarding@resend.dev';
+
 class EmailService {
     constructor() {
         this.resend = null;
@@ -15,48 +18,75 @@ class EmailService {
         this.primaryProvider = null;
         this.smtpConfigured = false;
         this.resendConfigured = false;
-        this.fromName = process.env.SMTP_FROM_NAME || 'Totilove';
-        this.fromEmail = process.env.RESEND_FROM_EMAIL || process.env.SMTP_USER || '';
+        this.fromName = process.env.SMTP_FROM_NAME || config.email?.smtp?.fromName || 'Totilove';
+        this.usingDefaultFromEmail = false;
+        this.fromEmail = this.determineFromEmail();
+        this.baseUrl = config.email?.baseUrl || process.env.BASE_URL || 'http://localhost:3001';
         this.isConfigured = false;
         this.init();
     }
 
-    init() {
-        const resendApiKey = (process.env.RESEND_API_KEY || '').trim();
+    /**
+     * Match totilove_remote: explicit from (env/config/SMTP user), else Resend sandbox sender.
+     */
+    determineFromEmail() {
+        const configured =
+            process.env.EMAIL_FROM ||
+            process.env.RESEND_FROM_EMAIL ||
+            config.email?.resend?.fromEmail ||
+            process.env.SMTP_USER ||
+            config.email?.smtp?.user ||
+            '';
+        const trimmed = typeof configured === 'string' ? configured.trim() : '';
+        if (trimmed) {
+            this.usingDefaultFromEmail = false;
+            return trimmed;
+        }
+        this.usingDefaultFromEmail = true;
+        return RESEND_FALLBACK_FROM;
+    }
 
-        // Configure Resend first so it can act as primary provider.
-        if (resendApiKey && this.fromEmail) {
+    init() {
+        const resendApiKey = (
+            process.env.RESEND_API_KEY ||
+            config.email?.resend?.apiKey ||
+            ''
+        ).trim();
+
+        // Configure Resend first so it can act as primary provider (key only is enough with fallback from).
+        if (resendApiKey) {
             if (!Resend) {
                 console.warn('⚠️ Resend SDK not installed - Resend API disabled (run: npm install resend)');
             } else {
-            try {
-                this.resend = new Resend(resendApiKey);
-                this.resendConfigured = true;
-                this.primaryProvider = 'resend';
-                this.isConfigured = true;
-                console.log('✅ Email service configured with Resend API (primary)');
-            } catch (error) {
-                this.resendConfigured = false;
-                console.error('❌ Failed to configure Resend API:', error.message);
-            }
+                try {
+                    this.resend = new Resend(resendApiKey);
+                    this.resendConfigured = true;
+                    this.primaryProvider = 'resend';
+                    this.isConfigured = true;
+                    if (this.usingDefaultFromEmail) {
+                        console.warn(
+                            '⚠️ No EMAIL_FROM / RESEND_FROM_EMAIL / SMTP_USER — using Resend fallback sender %s (set RESEND_FROM_EMAIL for production).',
+                            this.fromEmail
+                        );
+                    }
+                    console.log('✅ Email service configured with Resend API (primary)');
+                } catch (error) {
+                    this.resendConfigured = false;
+                    console.error('❌ Failed to configure Resend API:', error.message);
+                }
             }
         } else {
-            if (!resendApiKey) {
-                console.warn('⚠️ RESEND_API_KEY not set - Resend API disabled');
-            }
-            if (!this.fromEmail) {
-                console.warn('⚠️ RESEND_FROM_EMAIL or SMTP_USER not set - missing sender address for Resend');
-            }
+            console.warn('⚠️ RESEND_API_KEY not set - Resend API disabled');
         }
 
-        // Email SMTP configuration from environment variables
+        // Email SMTP configuration from environment variables and config
         const emailConfig = {
-            host: process.env.SMTP_HOST || 'smtp.gmail.com',
-            port: parseInt(process.env.SMTP_PORT || '587'),
-            secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+            host: process.env.SMTP_HOST || config.email?.smtp?.host || 'smtp.gmail.com',
+            port: parseInt(process.env.SMTP_PORT || String(config.email?.smtp?.port || '587'), 10),
+            secure: process.env.SMTP_SECURE === 'true' || Boolean(config.email?.smtp?.secure),
             auth: {
-                user: process.env.SMTP_USER || '',
-                pass: process.env.SMTP_PASSWORD || ''
+                user: process.env.SMTP_USER || config.email?.smtp?.user || '',
+                pass: process.env.SMTP_PASSWORD || config.email?.smtp?.password || ''
             }
         };
 
@@ -84,7 +114,7 @@ class EmailService {
 
         if (!this.isConfigured) {
             console.warn('⚠️ Email service not configured - no provider available');
-            console.warn('   Configure RESEND_API_KEY + RESEND_FROM_EMAIL, or SMTP_USER + SMTP_PASSWORD');
+            console.warn('   Set RESEND_API_KEY (optional: RESEND_FROM_EMAIL), or SMTP_USER + SMTP_PASSWORD');
         }
     }
 
@@ -184,8 +214,7 @@ class EmailService {
             return { success: false, error: 'Email service not configured' };
         }
 
-        const baseUrl = process.env.BASE_URL || 'http://localhost:3001';
-        const confirmationUrl = `${baseUrl}/api/verify-email?token=${token}`;
+        const confirmationUrl = `${this.baseUrl}/api/verify-email?token=${token}`;
 
         const mailOptions = {
             from: this.buildFromAddress(),
@@ -289,8 +318,7 @@ class EmailService {
             return { success: false, error: 'Email service not configured' };
         }
 
-        const baseUrl = process.env.BASE_URL || 'http://localhost:3001';
-        const resetUrl = `${baseUrl}/reset-password?token=${token}`;
+        const resetUrl = `${this.baseUrl}/reset-password?token=${token}`;
 
         const mailOptions = {
             from: this.buildFromAddress(),
