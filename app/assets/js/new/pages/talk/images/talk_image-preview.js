@@ -78,14 +78,25 @@ function replaceProgressWithImages(messageElement, attachments) {
     if (attachmentsDiv) {
         attachmentsDiv.innerHTML = '';
 
-
         const imageAttachments = attachments.filter((attachment) => attachment.attachment_type === 'image');
+        const galleryItems = imageAttachments
+            .filter((att) => att.file_path || att.thumbnail_path)
+            .map((att) => ({
+                file_path: att.file_path || att.thumbnail_path,
+                thumbnail_path: att.thumbnail_path || att.file_path,
+                original_filename: att.original_filename || ''
+            }));
 
         attachments.forEach((attachment, index) => {
-
             if (attachment.attachment_type === 'image') {
                 const imageContainer = document.createElement('div');
                 imageContainer.className = 'message-image-wrapper';
+
+                const eyeBtn = document.createElement('button');
+                eyeBtn.type = 'button';
+                eyeBtn.className = 'mobile-eye-btn';
+                eyeBtn.setAttribute('aria-label', 'Open image');
+                eyeBtn.textContent = '👁️';
 
                 const img = document.createElement('img');
                 img.className = 'message-image-clean';
@@ -93,6 +104,7 @@ function replaceProgressWithImages(messageElement, attachments) {
                 img.alt = '';
                 img.style.cursor = 'pointer';
                 img.style.opacity = '0';
+                imageContainer.classList.add('loading');
 
                 const imagePaths = [];
                 if (attachment.thumbnail_path) {
@@ -105,6 +117,7 @@ function replaceProgressWithImages(messageElement, attachments) {
                 img.onload = function () {
                     this.style.transition = 'all 0.3s ease';
                     this.style.opacity = '1';
+                    imageContainer.classList.remove('loading');
                 };
 
                 img.onerror = function () {
@@ -113,25 +126,48 @@ function replaceProgressWithImages(messageElement, attachments) {
 
                 loadImageWithFallback(img, imagePaths);
 
+                const galleryIndex = galleryItems.findIndex((item) =>
+                    item.file_path === (attachment.file_path || attachment.thumbnail_path)
+                );
+
                 img.onclick = () => {
                     if (typeof openImageViewer === 'function') {
                         openImageViewer(
                             attachment.file_path || attachment.thumbnail_path,
                             '',
-                            imageAttachments,
-                            imageAttachments.findIndex((item) => item === attachment)
+                            galleryItems,
+                            galleryIndex >= 0 ? galleryIndex : 0
+                        );
+                    }
+                };
+
+                eyeBtn.onclick = (event) => {
+                    event.stopPropagation();
+                    if (typeof openImageViewer === 'function') {
+                        openImageViewer(
+                            attachment.file_path || attachment.thumbnail_path,
+                            '',
+                            galleryItems,
+                            galleryIndex >= 0 ? galleryIndex : 0
                         );
                     }
                 };
 
                 imageContainer.appendChild(img);
+                imageContainer.appendChild(eyeBtn);
                 attachmentsDiv.appendChild(imageContainer);
             }
         });
 
         // Timestamp is handled by message-time class in message factory - no need to add separate timestamp here
 
-        // After replacing progress with images, ensure message has actions
+        // Re-bind hover / mobile image listeners: addMessageActions early-returns if .message-actions exists,
+        // and clearing images may have left a stale bar on another anchor — remove so hooks match new DOM.
+        messageElement.querySelectorAll('.message-actions').forEach((el) => el.remove());
+        messageElement.querySelectorAll('.message-action-anchor').forEach((el) => {
+            el.classList.remove('message-action-anchor');
+        });
+
         const message = {
             id: messageElement.getAttribute('data-message-id'),
             type: messageElement.classList.contains('sent') ? 'sent' : 'received',
