@@ -518,10 +518,31 @@ function addImagesToMessage(messageElement, attachments) {
 
     imageContainer.innerHTML = '';
 
+    // Build a gallery list once so the eye button / image click can navigate
+    // through every image in this message (matches createMessageElement).
+    const imageAttachments = attachments.filter(a => a && (a.attachment_type === 'image' || !a.attachment_type));
+    const galleryItems = imageAttachments
+        .filter((att) => att.file_path || att.thumbnail_path)
+        .map((att) => ({
+            file_path: att.file_path || att.thumbnail_path,
+            thumbnail_path: att.thumbnail_path || att.file_path,
+            original_filename: att.original_filename || ''
+        }));
+
     attachments.forEach(attachment => {
         if (attachment.attachment_type === 'image') {
             const imgWrapper = document.createElement('div');
             imgWrapper.className = 'message-image-wrapper';
+
+            // Mobile-eye button: same pattern as createMessageElement so realtime
+            // received images get the same overlay-tap-to-open behavior as
+            // images rendered after a page refresh.
+            const eyeBtn = document.createElement('button');
+            eyeBtn.type = 'button';
+            eyeBtn.className = 'mobile-eye-btn';
+            eyeBtn.setAttribute('aria-label', 'Open image');
+            eyeBtn.textContent = '👁️';
+
             const img = document.createElement('img');
             img.className = 'message-image-clean';
             img.classList.add('message__image-clean');
@@ -539,8 +560,29 @@ function addImagesToMessage(messageElement, attachments) {
             if (typeof loadImageWithFallback === 'function') loadImageWithFallback(img, paths);
             else img.src = paths[0] || '';
 
-            img.onclick = () => { if (typeof openImageViewer === 'function') openImageViewer(attachment.file_path || attachment.thumbnail_path, ''); };
+            const galleryIndex = galleryItems.findIndex((item) =>
+                item.file_path === (attachment.file_path || attachment.thumbnail_path)
+            );
+
+            const openViewer = () => {
+                if (typeof openImageViewer === 'function') {
+                    openImageViewer(
+                        attachment.file_path || attachment.thumbnail_path,
+                        '',
+                        galleryItems,
+                        galleryIndex >= 0 ? galleryIndex : 0
+                    );
+                }
+            };
+
+            img.onclick = openViewer;
+            eyeBtn.onclick = (event) => {
+                event.stopPropagation();
+                openViewer();
+            };
+
             imgWrapper.appendChild(img);
+            imgWrapper.appendChild(eyeBtn);
             imageContainer.appendChild(imgWrapper);
         }
     });
