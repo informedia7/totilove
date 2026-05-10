@@ -407,7 +407,20 @@ class AuthController {
     async register(req, res) {
         try {
             // Extract only the fields we need, ignore confirmPassword and other extra fields
-            const { real_name, email, password, birthdate, gender, country, state, city, age_min, age_max, preferred_gender, location_radius } = req.body;
+            const { real_name, email, password, birthdate, gender, country, state, city, age_min, age_max, preferred_gender, location_radius, agree_terms } = req.body;
+
+            const agreeTermsAccepted =
+                agree_terms === true ||
+                agree_terms === 'true' ||
+                agree_terms === 'on' ||
+                agree_terms === 1 ||
+                agree_terms === '1';
+            if (!agreeTermsAccepted) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'You must agree to the Terms of Service and Privacy Policy.'
+                });
+            }
             
             // Use real_name
             const displayName = real_name;

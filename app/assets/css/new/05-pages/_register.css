@@ -290,22 +290,41 @@ textarea.form-control {
     gap: 1rem;
 }
 
-.register-legal-note {
-    text-align: center;
-    font-size: 0.875rem;
-    line-height: 1.55;
-    color: #475569;
-    margin: 0;
-    padding: 0.85rem 1rem;
+.register-agreement {
     width: 100%;
-    max-width: none;
     box-sizing: border-box;
+    padding: 0.85rem 1rem;
     border-radius: 10px;
     background: #f1f5f9;
     border: 1px solid #e2e8f0;
 }
 
-.register-legal-note a {
+.register-agreement-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    cursor: pointer;
+    margin: 0;
+    font-weight: 400;
+}
+
+.register-agreement-row input[type="checkbox"] {
+    width: 1.15rem;
+    height: 1.15rem;
+    margin-top: 0.18rem;
+    flex-shrink: 0;
+    accent-color: #667eea;
+    cursor: pointer;
+}
+
+.register-agreement-text {
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: #475569;
+    text-align: left;
+}
+
+.register-agreement-text a {
     color: #4338ca;
     font-weight: 700;
     text-decoration: underline;
@@ -313,13 +332,24 @@ textarea.form-control {
     text-underline-offset: 3px;
 }
 
-.register-legal-note a:hover {
+.register-agreement-text a:hover {
     color: #3730a3;
 }
 
-.register-legal-note a:focus-visible {
+.register-agreement-text a:focus-visible {
     outline: 2px solid #667eea;
     outline-offset: 3px;
+    border-radius: 4px;
+}
+
+.register-agreement #agree-terms-error {
+    margin-top: 0.45rem;
+    margin-left: 0;
+    padding-left: 1.78rem;
+}
+
+#agree-terms.error {
+    box-shadow: 0 0 0 2px #dc3545;
     border-radius: 4px;
 }
 
@@ -340,6 +370,11 @@ textarea.form-control {
     font-size: 1rem;
     font-weight: 600;
     box-sizing: border-box;
+}
+
+.welcome-card.welcome-card--cta .submit-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
 }
 
 .form-footer {
@@ -502,25 +537,32 @@ html[data-theme="dark"] .form-footer p {
     color: #cbd5e1;
 }
 
-html[data-theme="dark"] .register-legal-note {
-    color: #f1f5f9;
+html[data-theme="dark"] .register-agreement {
     background: rgba(15, 23, 42, 0.72);
     border: 1px solid rgba(125, 211, 252, 0.45);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-html[data-theme="dark"] .welcome-card.welcome-card--cta .register-legal-note a {
+html[data-theme="dark"] .register-agreement-text {
+    color: #f1f5f9;
+}
+
+html[data-theme="dark"] .welcome-card.welcome-card--cta .register-agreement-text a {
     color: #7dd3fc;
     text-decoration-color: rgba(125, 211, 252, 0.95);
 }
 
-html[data-theme="dark"] .welcome-card.welcome-card--cta .register-legal-note a:hover {
+html[data-theme="dark"] .welcome-card.welcome-card--cta .register-agreement-text a:hover {
     color: #e0f2fe;
     text-decoration-color: #e0f2fe;
 }
 
-html[data-theme="dark"] .welcome-card.welcome-card--cta .register-legal-note a:focus-visible {
+html[data-theme="dark"] .welcome-card.welcome-card--cta .register-agreement-text a:focus-visible {
     outline-color: #38bdf8;
+}
+
+html[data-theme="dark"] .register-agreement-row input[type="checkbox"] {
+    accent-color: #38bdf8;
 }
 
 html[data-theme="dark"] .register-page-footer .register-footer-links a {

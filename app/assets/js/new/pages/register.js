@@ -243,8 +243,25 @@ function setupEventListeners() {
     // Form submission
     document.getElementById('registerForm').addEventListener('submit', onFormSubmit);
 
+    const agreeTermsEl = document.getElementById('agree-terms');
+    if (agreeTermsEl) {
+        agreeTermsEl.addEventListener('change', syncAgreementSubmitButton);
+        syncAgreementSubmitButton();
+    }
+
     // Age validation using AgeValidation
     AgeValidation.initNumberInputs('age_min', 'age_max');
+}
+
+function syncAgreementSubmitButton() {
+    const cb = document.getElementById('agree-terms');
+    const btn = document.getElementById('submit-btn');
+    if (!cb || !btn) {
+        return;
+    }
+    const on = cb.checked;
+    btn.disabled = !on;
+    btn.setAttribute('aria-disabled', on ? 'false' : 'true');
 }
 
 async function loadCountries() {
@@ -807,6 +824,12 @@ function validateForm() {
     const emailVal = (document.getElementById('email')?.value || '').trim();
     if (emailVal && (emailVal.length > 50 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal))) {
         showError('email', 'Please enter a valid email (max 50 characters)');
+        isValid = false;
+    }
+
+    const agreeTermsInput = document.getElementById('agree-terms');
+    if (agreeTermsInput && !agreeTermsInput.checked) {
+        showError('agree-terms', 'Please agree to the Terms of Service and Privacy Policy.');
         isValid = false;
     }
 
