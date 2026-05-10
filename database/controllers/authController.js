@@ -225,6 +225,68 @@ class AuthController {
         return registrationIps;
     }
 
+    /**
+     * Turn stored profile file name or path into a public URL path for the navbar / API.
+     */
+    normalizeProfileImagePublicUrl(fileNameOrPath) {
+        if (fileNameOrPath === undefined || fileNameOrPath === null) return null;
+        const trimmed = String(fileNameOrPath).trim();
+        if (!trimmed || trimmed.toLowerCase() === 'null' || trimmed.toLowerCase() === 'undefined') {
+            return null;
+        }
+        if (/^https?:\/\//i.test(trimmed)) return trimmed;
+        if (trimmed.startsWith('/')) return trimmed;
+        const clean = trimmed.replace(/^\/?uploads\/profile_images\//i, '');
+        if (!clean) return null;
+        return `/uploads/profile_images/${clean}`;
+    }
+
+    async fetchApprovedPrimaryProfileFileName(userId) {
+        if (!userId || !this.db) return null;
+        const result = await this.db.query(
+            `
+            SELECT ui_choice.file_name
+            FROM user_images ui_choice
+            WHERE ui_choice.user_id = $1
+              AND ui_choice.file_name IS NOT NULL
+              AND ui_choice.approval_status = 'approved'
+            ORDER BY
+                CASE
+                    WHEN ui_choice.is_profile = 1 THEN 0
+                    WHEN ui_choice.featured = 1 THEN 1
+                    ELSE 2
+                END,
+                ui_choice.uploaded_at DESC NULLS LAST,
+                ui_choice.id DESC
+            LIMIT 1
+        `,
+            [userId]
+        );
+        return result.rows[0]?.file_name || null;
+    }
+
+    /**
+     * Ensures session.user carries profile_image / avatar_photo for clients (e.g. homepage navbar).
+     * Mutates sessionUser and caches on the in-memory session object.
+     */
+    async enrichSessionUserProfileImages(sessionUser) {
+        if (!sessionUser || sessionUser.id == null || !this.db) return;
+        const existingRaw = sessionUser.profile_image || sessionUser.avatar_photo;
+        let normalized = this.normalizeProfileImagePublicUrl(existingRaw);
+        if (!normalized) {
+            try {
+                const fileName = await this.fetchApprovedPrimaryProfileFileName(sessionUser.id);
+                normalized = this.normalizeProfileImagePublicUrl(fileName);
+            } catch (err) {
+                console.warn('[AuthController] enrichSessionUserProfileImages:', err.message);
+            }
+        }
+        if (normalized) {
+            sessionUser.profile_image = normalized;
+            sessionUser.avatar_photo = normalized;
+        }
+    }
+
     async adminBlacklistGate(req, res, normalizedEmail) {
         const registrationIps = this.collectRegistrationIps(req);
         const ipCsv = registrationIps.join(',');

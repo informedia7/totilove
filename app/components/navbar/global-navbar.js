@@ -85,7 +85,19 @@ class GlobalNavbar {
             user.profileImage
         ];
         for (let i = 0; i < candidates.length; i++) {
-            const safe = this.sanitizeNavbarAvatarUrl(candidates[i]);
+            let safe = this.sanitizeNavbarAvatarUrl(candidates[i]);
+            const raw = candidates[i];
+            if (
+                !safe &&
+                raw != null &&
+                String(raw).trim() !== '' &&
+                !/^https?:\/\//i.test(String(raw)) &&
+                !String(raw).startsWith('/') &&
+                !String(raw).startsWith('blob:')
+            ) {
+                const clean = String(raw).trim().replace(/^\/?uploads\/profile_images\//i, '');
+                if (clean) safe = this.sanitizeNavbarAvatarUrl(`/uploads/profile_images/${clean}`);
+            }
             if (safe) return safe;
         }
         return null;

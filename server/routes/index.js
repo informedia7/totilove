@@ -75,7 +75,7 @@ function setupRoutes(app, dependencies) {
     }
     
     // Setup API routes FIRST (before other route modules to ensure proper route matching)
-    setupAuthRoutes(app, authMiddleware, csrfMiddleware);
+    setupAuthRoutes(app, authMiddleware, csrfMiddleware, controllers.authController);
     setupUserRoutes(app, db, redis, io, blockRateLimiter);
     
     // Setup activity routes BEFORE authRoutes to avoid rate limiting conflicts

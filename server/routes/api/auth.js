@@ -13,12 +13,12 @@ const SESSION_DURATION_MS = config.session?.duration || (2 * 60 * 60 * 1000);
  * @param {Object} authMiddleware - Auth middleware instance
  * @param {Object} csrfMiddleware - CSRF middleware instance
  */
-function setupAuthRoutes(app, authMiddleware, csrfMiddleware) {
+function setupAuthRoutes(app, authMiddleware, csrfMiddleware, authController = null) {
     const csrfRateLimitMiddleware = createCSRFRateLimit();
     
     // Session check endpoint for authentication status
     // Cookie-based auth only (no URL tokens)
-    app.get('/api/auth/check-session', (req, res) => {
+    app.get('/api/auth/check-session', async (req, res) => {
         try {
             // Cookie-based auth only (no URL tokens for security)
             const token = req.cookies?.sessionToken || req.cookies?.session;
@@ -36,7 +36,11 @@ function setupAuthRoutes(app, authMiddleware, csrfMiddleware) {
             if (session && session.expiresAt > Date.now()) {
                 // Extend session
                 session.expiresAt = Date.now() + SESSION_DURATION_MS;
-                
+
+                if (authController?.enrichSessionUserProfileImages && session.user) {
+                    await authController.enrichSessionUserProfileImages(session.user);
+                }
+
                 res.json({
                     success: true,
                     isAuthenticated: true,

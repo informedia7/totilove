@@ -124,7 +124,7 @@ function createAuthRoutes(authController, authMiddleware) {
     /**
      * GET /api/auth/check-session - Check session status
      */
-    router.get('/api/auth/check-session', (req, res) => {
+    router.get('/api/auth/check-session', async (req, res) => {
         try {
             const token = extractSessionToken(req);
             
@@ -148,6 +148,10 @@ function createAuthRoutes(authController, authMiddleware) {
 
             // Extend session
             session.expiresAt = Date.now() + SESSION_DURATION_MS;
+
+            if (authController?.enrichSessionUserProfileImages && session.user) {
+                await authController.enrichSessionUserProfileImages(session.user);
+            }
             
             res.json({
                 success: true,
