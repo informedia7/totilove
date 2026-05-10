@@ -282,14 +282,24 @@ textarea.form-control {
     transform: none;
 }
 
+/* Final CTA card: always stack legal copy → button (never share one row). */
+.welcome-card.welcome-card--cta {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+}
+
 .register-legal-note {
     text-align: center;
     font-size: 0.875rem;
-    line-height: 1.5;
+    line-height: 1.55;
     color: #475569;
-    margin: 0 auto 1rem;
-    padding: 0.75rem 1rem;
-    max-width: 28rem;
+    margin: 0;
+    padding: 0.85rem 1rem;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
     border-radius: 10px;
     background: #f1f5f9;
     border: 1px solid #e2e8f0;
@@ -313,8 +323,23 @@ textarea.form-control {
     border-radius: 4px;
 }
 
-.welcome-card--cta .button-container {
-    margin-top: 0.25rem;
+.welcome-card.welcome-card--cta .button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+    margin: 0;
+    gap: 0.5rem;
+}
+
+.welcome-card.welcome-card--cta .submit-button {
+    width: 100%;
+    max-width: none;
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+    box-sizing: border-box;
 }
 
 .form-footer {
@@ -484,17 +509,17 @@ html[data-theme="dark"] .register-legal-note {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-html[data-theme="dark"] .register-legal-note a {
+html[data-theme="dark"] .welcome-card.welcome-card--cta .register-legal-note a {
     color: #7dd3fc;
     text-decoration-color: rgba(125, 211, 252, 0.95);
 }
 
-html[data-theme="dark"] .register-legal-note a:hover {
+html[data-theme="dark"] .welcome-card.welcome-card--cta .register-legal-note a:hover {
     color: #e0f2fe;
     text-decoration-color: #e0f2fe;
 }
 
-html[data-theme="dark"] .register-legal-note a:focus-visible {
+html[data-theme="dark"] .welcome-card.welcome-card--cta .register-legal-note a:focus-visible {
     outline-color: #38bdf8;
 }
 
