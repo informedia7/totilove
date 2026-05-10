@@ -220,89 +220,99 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 async function loadAccountData() {
     try {
-        // Cookie-based auth - cookies sent automatically
+        // Cookie-based auth - cookies sent automatically.
+        // redirect:'manual' — some gateways redirect /api instead of returning JSON 401; following would yield HTML 200 and JSON.parse errors.
         const response = await fetch('/api/account/info', {
             method: 'GET',
-            credentials: 'same-origin'
+            credentials: 'same-origin',
+            redirect: 'manual'
         });
 
-        if (response.status === 401 || response.status === 403) {
+        if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
             applyLoggedOutAccountExperience();
             return false;
         }
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        const ct = response.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) {
+            applyLoggedOutAccountExperience();
+            return false;
         }
 
-        const data = await response.json();
+        let data;
+        try {
+            data = await response.json();
+        } catch (parseErr) {
+            console.warn('[account] account/info response was not valid JSON', parseErr);
+            applyLoggedOutAccountExperience();
+            return false;
+        }
 
-        if (data.success) {
-            currentAccountStatus = data.accountStatus === 'paused' ? 'paused' : 'active';
-            updatePauseAccountButton(currentAccountStatus);
+        if (!response.ok || data.success !== true) {
+            applyLoggedOutAccountExperience();
+            return false;
+        }
 
-            // Update account dates
+        currentAccountStatus = data.accountStatus === 'paused' ? 'paused' : 'active';
+        updatePauseAccountButton(currentAccountStatus);
+
+        const createdEl = document.getElementById('account-created-date');
+        if (createdEl) {
             if (data.accountCreated) {
                 const createdDate = new Date(data.accountCreated);
-                document.getElementById('account-created-date').textContent = createdDate.toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
+                createdEl.textContent = createdDate.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
                 });
-            }
-            
-            if (data.lastLogin) {
-                const loginDate = new Date(data.lastLogin);
-                const now = new Date();
-                const diffMs = now - loginDate;
-                const diffMins = Math.floor(diffMs / 60000);
-                const diffHours = Math.floor(diffMs / 3600000);
-                const diffDays = Math.floor(diffMs / 86400000);
-                
-                let timeAgo = '';
-                if (diffMins < 1) {
-                    // Show actual time instead of "Just now"
-                    timeAgo = loginDate.toLocaleDateString('en-US', { 
-                        year: 'numeric', 
-                        month: 'short', 
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                } else if (diffMins < 60) {
-                    timeAgo = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-                } else if (diffHours < 24) {
-                    timeAgo = `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-                } else if (diffDays < 7) {
-                    timeAgo = `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-                } else {
-                    timeAgo = loginDate.toLocaleDateString('en-US', { 
-                        year: 'numeric', 
-                        month: 'short', 
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                }
-                
-                document.getElementById('last-login-date').textContent = timeAgo;
             } else {
-                // No last login available (first time user or no sessions)
-                document.getElementById('last-login-date').textContent = 'Never';
+                createdEl.textContent = '—';
             }
         }
+
+        if (data.lastLogin) {
+            const loginDate = new Date(data.lastLogin);
+            const now = new Date();
+            const diffMs = now - loginDate;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            let timeAgo = '';
+            if (diffMins < 1) {
+                timeAgo = loginDate.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } else if (diffMins < 60) {
+                timeAgo = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+            } else if (diffHours < 24) {
+                timeAgo = `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+            } else if (diffDays < 7) {
+                timeAgo = `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+            } else {
+                timeAgo = loginDate.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
+            document.getElementById('last-login-date').textContent = timeAgo;
+        } else {
+            document.getElementById('last-login-date').textContent = 'Never';
+        }
+
         return true;
     } catch (error) {
         console.error('Error loading account data:', error);
-        const lastLoginElement = document.getElementById('last-login-date');
-        if (lastLoginElement) {
-            const errorMessage =
-                error.message && error.message.includes('HTTP error')
-                    ? 'Unable to load (server error)'
-                    : 'Unable to load';
-            lastLoginElement.textContent = errorMessage;
-        }
-        return true;
+        applyLoggedOutAccountExperience();
+        return false;
     }
 }
 
