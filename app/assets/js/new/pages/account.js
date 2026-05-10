@@ -64,6 +64,29 @@ function handleEmailVerificationRedirectParams() {
     }
 }
 
+/** True fetch/network failure vs 401/403/redirect (no session on this browser). */
+function classifyAccountInfoFailure(error) {
+    const msg = (error && error.message) || '';
+    if (error instanceof TypeError || /failed to fetch|networkerror|load failed/i.test(msg)) {
+        return 'network';
+    }
+    if (/HTTP error!\s*status:\s*redirect/i.test(msg)) {
+        return 'auth';
+    }
+    const m = msg.match(/HTTP error!\s*status:\s*(\d+)/i);
+    if (m) {
+        const code = parseInt(m[1], 10);
+        if (code === 401 || code === 403) {
+            return 'auth';
+        }
+        if (code >= 500) {
+            return 'server';
+        }
+        return 'http';
+    }
+    return 'unknown';
+}
+
 // Load account data on page load — matches totilove_remote - Copy flow: always run follow-up loaders.
 document.addEventListener('DOMContentLoaded', async function() {
     handleEmailVerificationRedirectParams();
@@ -229,13 +252,30 @@ async function loadAccountData() {
         }
     } catch (error) {
         console.error('Error loading account data:', error);
+        const createdEl = document.getElementById('account-created-date');
+        if (createdEl) {
+            createdEl.textContent = '—';
+        }
+
+        const kind = classifyAccountInfoFailure(error);
         const lastLoginElement = document.getElementById('last-login-date');
         if (lastLoginElement) {
-            const errorMessage =
-                error.message && error.message.includes('HTTP error')
-                    ? 'Unable to load (network error)'
-                    : 'Unable to load';
-            lastLoginElement.textContent = errorMessage;
+            if (kind === 'auth') {
+                lastLoginElement.textContent = 'Sign in to view';
+            } else if (kind === 'network') {
+                lastLoginElement.textContent = 'Unable to load (network error)';
+            } else if (kind === 'server') {
+                lastLoginElement.textContent = 'Unable to load (server error)';
+            } else {
+                lastLoginElement.textContent = 'Unable to load';
+            }
+        }
+
+        if (kind === 'auth') {
+            const pwdEl = document.getElementById('password-last-changed');
+            if (pwdEl) {
+                pwdEl.textContent = 'Sign in to view';
+            }
         }
     }
 }
@@ -281,59 +321,70 @@ async function checkEmailVerification() {
     const loadingSection = document.getElementById('email-verification-loading');
     const verifiedSection = document.getElementById('email-verified-section');
     const notVerifiedSection = document.getElementById('email-not-verified-section');
+    const needsSessionSection = document.getElementById('email-verification-needs-session');
     const messageDiv = document.getElementById('verification-message');
-    
-    // Show loading
-    loadingSection.style.display = 'block';
-    verifiedSection.style.display = 'none';
-    notVerifiedSection.style.display = 'none';
+
+    if (loadingSection) loadingSection.style.display = 'block';
+    if (verifiedSection) verifiedSection.style.display = 'none';
+    if (notVerifiedSection) notVerifiedSection.style.display = 'none';
+    if (needsSessionSection) needsSessionSection.style.display = 'none';
     if (messageDiv) messageDiv.style.display = 'none';
-    
+
     try {
-        // Cookie-based auth - cookies sent automatically
         const response = await fetch(`/api/account/info?t=${Date.now()}`, {
             method: 'GET',
             credentials: 'same-origin',
-            cache: 'no-cache'
+            cache: 'no-cache',
+            redirect: 'manual'
         });
-        
+
+        if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
+            throw new Error('HTTP error! status: redirect');
+        }
+
+        const raw = await response.text();
+        let data = null;
+        if (raw) {
+            try {
+                data = JSON.parse(raw);
+            } catch {
+                /* ignore */
+            }
+        }
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
-        const data = await response.json();
-        
+
+        if (!data || typeof data !== 'object') {
+            throw new Error('HTTP error! status: invalid');
+        }
+
         if (data.success) {
-            // Hide loading
-            loadingSection.style.display = 'none';
-            
+            if (loadingSection) loadingSection.style.display = 'none';
+
             if (data.emailVerified) {
-                // Show verified state
-                verifiedSection.style.display = 'block';
-                notVerifiedSection.style.display = 'none';
-                
-                // Update verified email display
+                if (verifiedSection) verifiedSection.style.display = 'block';
+                if (notVerifiedSection) notVerifiedSection.style.display = 'none';
+
                 const verifiedEmailDisplay = document.getElementById('verified-email-display');
                 if (verifiedEmailDisplay && data.email) {
                     verifiedEmailDisplay.textContent = data.email;
                 }
             } else {
-                // Show not verified state
-                verifiedSection.style.display = 'none';
-                notVerifiedSection.style.display = 'block';
-                
-                // Update user email display
+                if (verifiedSection) verifiedSection.style.display = 'none';
+                if (notVerifiedSection) notVerifiedSection.style.display = 'block';
+
                 const userEmailDisplay = document.getElementById('user-email-display');
                 if (userEmailDisplay && data.email) {
                     userEmailDisplay.textContent = data.email;
                 }
             }
         } else {
-            // Error state
-            loadingSection.style.display = 'none';
-            notVerifiedSection.style.display = 'block';
-            verifiedSection.style.display = 'none';
-            
+            if (loadingSection) loadingSection.style.display = 'none';
+            if (notVerifiedSection) notVerifiedSection.style.display = 'block';
+            if (verifiedSection) verifiedSection.style.display = 'none';
+
             if (messageDiv) {
                 messageDiv.style.display = 'block';
                 messageDiv.style.background = '#fee';
@@ -344,18 +395,30 @@ async function checkEmailVerification() {
         }
     } catch (error) {
         console.error('Error checking email verification:', error);
-        loadingSection.style.display = 'none';
-        notVerifiedSection.style.display = 'block';
-        verifiedSection.style.display = 'none';
-        
+        const kind = classifyAccountInfoFailure(error);
+
+        if (loadingSection) loadingSection.style.display = 'none';
+        if (verifiedSection) verifiedSection.style.display = 'none';
+
+        if (kind === 'auth') {
+            if (notVerifiedSection) notVerifiedSection.style.display = 'none';
+            if (needsSessionSection) needsSessionSection.style.display = 'block';
+            return;
+        }
+
+        if (notVerifiedSection) notVerifiedSection.style.display = 'block';
+
         if (messageDiv) {
             messageDiv.style.display = 'block';
             messageDiv.style.background = '#fee';
             messageDiv.style.color = '#dc3545';
             messageDiv.style.border = '1px solid #dc3545';
-            const errorMessage = error.message && error.message.includes('HTTP error') 
-                ? 'Network error. Please check your connection and try again.' 
-                : 'Error checking verification status. Please try again.';
+            let errorMessage = 'Error checking verification status. Please try again.';
+            if (kind === 'network') {
+                errorMessage = 'Network error. Please check your connection and try again.';
+            } else if (kind === 'server') {
+                errorMessage = 'Server error. Please try again in a moment.';
+            }
             messageDiv.textContent = errorMessage;
         }
     }
