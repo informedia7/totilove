@@ -1368,16 +1368,44 @@ class AuthController {
             `;
             
             const result = await this.db.query(query, [limitedUserIds]);
-            
+
+            let presenceMap = {};
+            if (
+                this.presenceService &&
+                typeof this.presenceService.isEnabled === 'function' &&
+                this.presenceService.isEnabled() &&
+                typeof this.presenceService.getStatuses === 'function'
+            ) {
+                try {
+                    const fetched = await this.presenceService.getStatuses(limitedUserIds);
+                    if (fetched && typeof fetched === 'object') {
+                        presenceMap = fetched;
+                    }
+                } catch (presenceError) {
+                    console.warn('⚠️ getUsersOnlineStatus: presence merge skipped:', presenceError.message);
+                }
+            }
+
             const statusMap = {};
             result.rows.forEach(user => {
-                const lastSeenTime = user.last_activity || user.last_login;
-                const isOnline = user.is_online;
-                
+                const uid = Number(user.id);
+                const presenceEntry =
+                    presenceMap && Number.isFinite(uid) ? presenceMap[uid] || presenceMap[String(uid)] : null;
+
+                let lastSeenTime = user.last_activity || user.last_login;
+                let isOnline = user.is_online;
+
+                if (presenceEntry && typeof presenceEntry.isOnline === 'boolean') {
+                    isOnline = presenceEntry.isOnline;
+                    if (presenceEntry.lastSeen != null) {
+                        lastSeenTime = presenceEntry.lastSeen;
+                    }
+                }
+
                 statusMap[user.id] = {
                     userId: user.id,
                     real_name: user.real_name,
-                    isOnline: isOnline,
+                    isOnline,
                     lastLogin: user.last_login,
                     lastActivity: user.last_activity,
                     lastSeen: lastSeenTime,
@@ -1385,7 +1413,7 @@ class AuthController {
                     timestamp: Date.now()
                 };
             });
-            
+
             res.json({
                 success: true,
                 statuses: statusMap,

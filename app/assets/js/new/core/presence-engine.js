@@ -41,6 +41,8 @@
         serverTtlSeconds: 30,
         sessionSwitchGraceMs: 4000,
         socketDisconnectHoldMs: 1800,
+        /** Ignore DB-backed HTTP "offline" briefly if realtime just showed this user online (session lag vs Redis). */
+        httpRealtimeOfflineGraceMs: 90000,
         
         // DOM Integration
         domScanSelectors: [
@@ -93,6 +95,8 @@
         const n = parseInt(s, 10);
         return Number.isInteger(n) && n > 0 ? n : null;
     }
+
+    const REALTIME_PRESENCE_SOURCES = new Set(['socket', 'sse', 'app-hint']);
 
     function resolveSessionToken() {
         try {
@@ -1094,6 +1098,20 @@
                 return previousRecord;
             }
 
+            const httpGrace = Number(this.config.httpRealtimeOfflineGraceMs);
+            const graceMs = Number.isFinite(httpGrace) && httpGrace > 0 ? httpGrace : 90000;
+            const rejectStaleHttpOffline = Boolean(
+                !normalizedOnline &&
+                payload.source === 'http' &&
+                previousRecord?.isOnline === true &&
+                REALTIME_PRESENCE_SOURCES.has(previousRecord.source || '') &&
+                now - (previousRecord.receivedAt || 0) < graceMs
+            );
+            if (rejectStaleHttpOffline) {
+                this.queueUserId(id);
+                return previousRecord || null;
+            }
+
             const holdDuration = this.getOfflineHoldDuration({
                 normalizedOnline,
                 payload: { ...payload, meta },
@@ -1453,11 +1471,23 @@
                 return;
             }
 
+            const now = Date.now();
+            const previousRecord = this.statusCache.get(id);
+            const httpGrace = Number(this.config.httpRealtimeOfflineGraceMs);
+            const graceMs = Number.isFinite(httpGrace) && httpGrace > 0 ? httpGrace : 90000;
+            if (
+                previousRecord?.isOnline === true &&
+                REALTIME_PRESENCE_SOURCES.has(previousRecord.source || '') &&
+                now - (previousRecord.receivedAt || 0) < graceMs
+            ) {
+                this.queueUserId(id);
+                return;
+            }
+
             this.retryCounts.delete(id);
             this.failedUserIds.delete(id);
             this.pendingUserIds.delete(id);
 
-            const now = Date.now();
             const record = {
                 userId: id,
                 isOnline: false,
