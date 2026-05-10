@@ -68,9 +68,44 @@ function handleEmailVerificationRedirectParams() {
     }
 }
 
+/** Password, pause, delete, and billing require a session — keep them inert when logged out. */
+function disableAccountActionsNeedingSession() {
+    const root = document.querySelector('.account-section.account-ui2');
+    if (root) {
+        root.classList.add('account-actions-locked');
+    }
+
+    const pwdBtn = document.getElementById('changePasswordBtn');
+    if (pwdBtn) {
+        pwdBtn.disabled = true;
+        pwdBtn.setAttribute('aria-disabled', 'true');
+        pwdBtn.title = 'Sign in to change your password';
+    }
+
+    const pauseToggle = document.getElementById('pauseAccountToggle');
+    if (pauseToggle) {
+        pauseToggle.disabled = true;
+        pauseToggle.setAttribute('aria-disabled', 'true');
+    }
+
+    document.querySelectorAll('.delete-account-btn').forEach((btn) => {
+        btn.disabled = true;
+        btn.setAttribute('aria-disabled', 'true');
+        btn.title = 'Sign in to delete your account';
+    });
+
+    const billing = document.querySelector('a.manage-billing-link[href="/billing.html"]');
+    if (billing) {
+        billing.href = '/login';
+        billing.setAttribute('aria-label', 'Sign in to manage billing');
+        billing.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign in for billing';
+    }
+}
+
 /** Rendered when /account loads without a session (e.g. after clicking verify-email link). */
 function applyLoggedOutAccountExperience() {
     document.body.classList.add('account-page-needs-login');
+    disableAccountActionsNeedingSession();
 
     const created = document.getElementById('account-created-date');
     const loginRow = document.getElementById('last-login-date');
@@ -117,8 +152,8 @@ function applyLoggedOutAccountExperience() {
 
     if (justVerified) {
         banner.innerHTML = `
-            <strong style="display:block;margin-bottom:0.35rem;">Email verified</strong>
-            <span>Your email is confirmed. <strong>Log in</strong> to unlock messaging, profile views, likes, and the rest of your account.</span>
+            <strong style="display:block;margin-bottom:0.35rem;">Email verified — sign in next</strong>
+            <span>Your email is confirmed. Sign in once to load your account details and use password, pause, billing, and delete options below.</span>
             <div style="margin-top:0.75rem;display:flex;flex-wrap:wrap;gap:0.5rem;">
                 <a href="/login" style="display:inline-flex;align-items:center;padding:0.45rem 0.95rem;border-radius:10px;background:#1a5a7a;color:#fff;text-decoration:none;font-weight:600;">Log in</a>
                 <a href="/register" style="display:inline-flex;align-items:center;padding:0.45rem 0.95rem;border-radius:10px;border:1px solid #9fbdcf;color:#1a5a7a;text-decoration:none;font-weight:600;">Create account</a>
@@ -233,17 +268,23 @@ async function loadAccountData() {
             return false;
         }
 
-        const ct = response.headers.get('content-type') || '';
-        if (!ct.includes('application/json')) {
+        const unauthorized = response.status === 401 || response.status === 403;
+        if (unauthorized) {
             applyLoggedOutAccountExperience();
             return false;
         }
 
-        let data;
-        try {
-            data = await response.json();
-        } catch (parseErr) {
-            console.warn('[account] account/info response was not valid JSON', parseErr);
+        const raw = await response.text();
+        let data = null;
+        if (raw) {
+            try {
+                data = JSON.parse(raw);
+            } catch (parseErr) {
+                console.warn('[account] account/info response was not valid JSON', parseErr);
+            }
+        }
+
+        if (!data || typeof data !== 'object') {
             applyLoggedOutAccountExperience();
             return false;
         }
