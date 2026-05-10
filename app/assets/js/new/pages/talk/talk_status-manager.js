@@ -494,7 +494,9 @@
                 delete indicator.dataset.userId;
             }
 
-            const initialOnline = Boolean(conversation.is_online);
+            const initialOnline = typeof normalizeConversationIsOnline === 'function'
+                ? normalizeConversationIsOnline(conversation)
+                : Boolean(conversation.is_online);
             indicator.classList.toggle('is-online', initialOnline);
             indicator.classList.toggle('is-offline', !initialOnline);
             applyStatusDecorations(indicator, initialOnline ? 'online' : 'offline');

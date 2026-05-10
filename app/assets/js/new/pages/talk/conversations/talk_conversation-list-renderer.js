@@ -248,10 +248,11 @@ function createConversationElement(conversation) {
         div.classList.add('active');
     }
 
-    // Check if user is online - use is_online property if available, otherwise check status string
-    const isOnline = conversation.is_online !== undefined 
-        ? conversation.is_online 
-        : (conversation.status && conversation.status.toLowerCase().includes('online'));
+    const isOnline = typeof normalizeConversationIsOnline === 'function'
+        ? normalizeConversationIsOnline(conversation)
+        : (conversation.is_online !== undefined
+            ? conversation.is_online
+            : (conversation.status && conversation.status.toLowerCase().includes('online')));
     
     // Check if user is deleted
     const isDeleted = conversation.isDeleted || conversation.name === 'Deleted User' || conversation.name === 'Account Deactivated';

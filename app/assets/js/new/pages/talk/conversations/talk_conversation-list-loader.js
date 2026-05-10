@@ -77,11 +77,12 @@ async function loadConversations() {
                                  conv.name === 'Deleted User' || 
                                  conv.name === 'Account Deactivated';
                 
-                // Determine is_online from status or explicit is_online property
                 const statusLower = (conv.status || 'offline').toLowerCase();
-                const isOnline = conv.is_online !== undefined 
-                    ? conv.is_online 
-                    : statusLower.includes('online');
+                const isOnline = typeof normalizeConversationIsOnline === 'function'
+                    ? normalizeConversationIsOnline(conv)
+                    : (conv.is_online !== undefined
+                        ? conv.is_online
+                        : statusLower.includes('online'));
                 
                 // Ensure last message timestamp is always numeric
                 let timestamp = conv.lastMessageTimestamp;

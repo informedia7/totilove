@@ -385,8 +385,9 @@ function updateChatHeader(conversation) {
     const isDeleted = conversation.isDeleted || conversation.name === 'Deleted User' || conversation.name === 'Account Deactivated';
     const availability = !isDeleted ? resolveConversationAvailability(conversation) : { isUnavailable: false, isSuspended: false, isPaused: false };
 
-    // Check if user is online
-    const isOnline = conversation.is_online !== undefined && conversation.is_online !== null && conversation.is_online === true;
+    const isOnline = typeof normalizeConversationIsOnline === 'function'
+        ? normalizeConversationIsOnline(conversation)
+        : (conversation.is_online === true);
     const presenceEnabled = presenceSystemEnabled();
 
     if (chatName) {

@@ -43,6 +43,36 @@
         return true;
     }
 
+    /**
+     * Normalize API `is_online` (boolean, 0/1, truthy strings) and optional status text.
+     * Keeps list row, chat header, and presence initial state aligned.
+     */
+    function normalizeConversationIsOnline(conversation) {
+        if (!conversation) {
+            return false;
+        }
+        const raw = conversation.is_online;
+        if (raw !== undefined && raw !== null) {
+            if (typeof raw === 'boolean') {
+                return raw;
+            }
+            if (typeof raw === 'number') {
+                return raw === 1;
+            }
+            if (typeof raw === 'string') {
+                const t = raw.trim().toLowerCase();
+                if (t === 'true' || t === '1' || t === 'yes' || t === 'online') {
+                    return true;
+                }
+                if (t === 'false' || t === '0' || t === 'no' || t === 'offline') {
+                    return false;
+                }
+            }
+            return Boolean(raw);
+        }
+        return String(conversation.status || '').toLowerCase().includes('online');
+    }
+
     function setFilteredConversations(list) {
         const state = getTalkState();
         if (state && typeof state.setFilteredConversations === 'function') {
@@ -788,6 +818,7 @@
     window.createError = createError;
     window.validateMessageAndUser = validateMessageAndUser;
     window.isPresenceSystemEnabled = isPresenceSystemEnabled;
+    window.normalizeConversationIsOnline = normalizeConversationIsOnline;
     window.markConversationAsRead = markConversationAsRead;
     window.markMessageAsRead = markMessageAsRead;
     window.checkMessageReadStatus = checkMessageReadStatus;
