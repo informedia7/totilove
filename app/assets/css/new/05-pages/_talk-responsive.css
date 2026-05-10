@@ -2000,6 +2000,62 @@
       background: #0a0a0a !important;
     }
 
+    /* Stacked talk layout: flex defaults (min-width:auto) let long text widen past the viewport */
+    .app-container > .main-content {
+      min-width: 0 !important;
+      overflow-x: hidden !important;
+    }
+
+    .app-container > .main-content > .sidebar,
+    .app-container > .main-content > .chat-area,
+    .sidebar,
+    .sidebar-header,
+    .chat-area,
+    .messages-area,
+    .conversations {
+      min-width: 0 !important;
+      max-width: 100% !important;
+    }
+
+    .messages-area,
+    .conversations {
+      overflow-x: hidden !important;
+    }
+
+    .conversation-item {
+      min-width: 0 !important;
+    }
+
+    .conversation-info {
+      min-width: 0 !important;
+      flex: 1 1 0% !important;
+      overflow: hidden !important;
+    }
+
+    .conversation-preview {
+      overflow-wrap: anywhere !important;
+      word-break: break-word !important;
+    }
+
+    .search-container {
+      max-width: 100% !important;
+      min-width: 0 !important;
+    }
+
+    .search-input {
+      max-width: 100% !important;
+    }
+
+    .messages-area .message {
+      min-width: 0 !important;
+      max-width: 100% !important;
+    }
+
+    .message-content {
+      overflow-wrap: anywhere !important;
+      word-break: break-word !important;
+    }
+
     /* iPhone 12 & small mobile (390px and below) */
     @media (max-width: 390px) {
 
@@ -2057,8 +2113,7 @@
         border-radius: 0 !important;
         gap: var(--spacing-xs);
         flex-wrap: nowrap !important;
-        /* Override _talk-layout overflow-x: hidden so the right-side cluster is not clipped */
-        overflow-x: visible !important;
+        overflow-x: hidden !important;
       }
 
       body.dark-mode .header {
@@ -2180,9 +2235,10 @@
 
       .search-input {
         font-size: 21px !important;
-        padding: var(--spacing-sm) var(--spacing-xl) var(--spacing-sm) var(--spacing-md) !important;
+        padding: var(--spacing-sm) 44px var(--spacing-sm) var(--spacing-sm) !important;
         min-height: 54px !important;
         border-radius: 9px !important;
+        box-sizing: border-box !important;
       }
 
       .conversations {
@@ -2318,8 +2374,9 @@
       }
 
       .message-image-container {
-        min-width: 180px !important;
-        max-width: 225px !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        max-width: min(100%, 225px) !important;
         border-radius: var(--border-radius-md) !important;
       }
 
@@ -2439,7 +2496,7 @@
         gap: var(--spacing-xs) !important;
         border-radius: 0 !important;
         flex-wrap: nowrap !important;
-        overflow-x: visible !important;
+        overflow-x: hidden !important;
         background: var(--color-white) !important;
       }
 
