@@ -2418,13 +2418,17 @@
         background: #0a0a0a !important;
       }
 
+      /* Match ≤390px “iPhone 12 class” header strip (incl. 414×896 Pro Max portrait) */
       .header {
-        height: 70px !important;
-        padding: 0 var(--spacing-sm) !important;
+        height: 86px !important;
+        min-height: 86px !important;
+        max-height: 86px !important;
+        padding: 0 var(--spacing-xs) !important;
+        border-bottom: 0 !important;
         gap: var(--spacing-xs) !important;
         border-radius: 0 !important;
         flex-wrap: nowrap !important;
-        overflow: visible !important;
+        overflow-x: visible !important;
         background: var(--color-white) !important;
       }
 
@@ -2434,8 +2438,12 @@
       }
 
       .avatar-img {
-        width: calc(var(--avatar-size-conversation) * 1.15) !important;
-        height: calc(var(--avatar-size-conversation) * 1.15) !important;
+        width: var(--avatar-size-conversation) !important;
+        height: var(--avatar-size-conversation) !important;
+      }
+
+      .user-avatar {
+        margin-right: calc(var(--spacing-xs) * 0.2) !important;
       }
 
       .username {
@@ -2448,53 +2456,57 @@
       }
 
       .header-btn {
-        min-width: 56px !important;
-        width: 56px !important;
-        height: 56px !important;
-        font-size: 26px !important;
+        min-width: 62px !important;
+        width: 62px !important;
+        height: 62px !important;
+        flex: 0 0 62px;
+        font-size: 28px !important;
+        padding: 0 !important;
+        color: var(--color-text-primary) !important;
       }
 
       .chat-back-btn-mobile,
       body.dark-mode .chat-back-btn-mobile {
-        min-width: 70px !important;
-        width: 70px !important;
-        height: 70px !important;
+        width: 38px !important;
+        height: 38px !important;
+        min-width: 38px !important;
+        flex: 0 0 38px;
         margin-right: 8px !important;
+        border-radius: 50% !important;
+      }
+
+      .chat-back-btn-mobile .back-icon {
+        width: 100% !important;
+        height: 100% !important;
       }
 
       .header-actions {
-        flex: 0 0 auto !important;
-        justify-content: flex-end !important;
-        gap: var(--spacing-xs) !important;
-        min-width: auto !important;
+        width: auto !important;
         margin-left: auto !important;
+        gap: calc(var(--spacing-xs) * 0.4) !important;
+        flex: 0 0 auto;
+        min-width: 0;
+        padding: 0;
+        justify-content: flex-end !important;
       }
 
       .header-actions .header-btn {
-        min-width: 56px !important;
+        flex: 0 0 auto;
+        min-width: 48px !important;
+        max-width: none !important;
       }
 
-      /* Back stays rightmost; tighten row in chat so it fits 391–480px widths */
       body[data-nav-state="NAV_CHAT"] .header-actions .header-btn:not(.chat-back-btn-mobile) {
-        min-width: 48px !important;
-        width: 48px !important;
-        height: 48px !important;
-        flex: 0 0 48px !important;
+        min-width: 50px !important;
+        width: 50px !important;
+        height: 50px !important;
+        flex: 0 0 50px !important;
         font-size: 22px !important;
       }
 
       body[data-nav-state="NAV_CHAT"] .header-actions {
-        gap: 4px !important;
-        margin-inline-end: max(48px, env(safe-area-inset-right, 0px)) !important;
-      }
-
-      body[data-nav-state="NAV_CHAT"] .chat-back-btn-mobile,
-      body.dark-mode[data-nav-state="NAV_CHAT"] .chat-back-btn-mobile {
-        min-width: 48px !important;
-        width: 48px !important;
-        height: 48px !important;
-        margin-right: 6px !important;
-        flex: 0 0 48px !important;
+        gap: 2px !important;
+        margin-inline-end: max(50px, env(safe-area-inset-right, 0px)) !important;
       }
 
       .connection-status {
@@ -2509,9 +2521,9 @@
       }
 
       .app-container>.main-content {
-        height: calc(100vh - 70px) !important;
-        height: calc(100svh - 70px) !important;
-        height: calc(100dvh - 70px) !important;
+        height: calc(100vh - 86px) !important;
+        height: calc(100svh - 86px) !important;
+        height: calc(100dvh - 86px) !important;
       }
 
       .chat-header {
@@ -2560,9 +2572,9 @@
       .sidebar {
         width: 100% !important;
         max-width: 100% !important;
-        height: calc(100vh - 48px) !important;
-        height: calc(100svh - 48px) !important;
-        height: calc(100dvh - 48px) !important;
+        height: calc(100vh - 86px) !important;
+        height: calc(100svh - 86px) !important;
+        height: calc(100dvh - 86px) !important;
         border-radius: 0 !important;
         background: var(--color-white) !important;
       }
@@ -2574,9 +2586,9 @@
       .conversations {
         padding: var(--spacing-xs) !important;
         margin: 0 !important;
-        height: calc(100vh - 48px - 64px) !important;
-        height: calc(100svh - 48px - 64px) !important;
-        height: calc(100dvh - 48px - 64px) !important;
+        height: calc(100vh - 86px - 64px) !important;
+        height: calc(100svh - 86px - 64px) !important;
+        height: calc(100dvh - 86px - 64px) !important;
         overflow-y: auto !important;
         background: var(--color-white) !important;
       }
@@ -2643,6 +2655,27 @@
         color: var(--color-text-primary) !important;
         border-color: rgba(var(--color-white-rgb), 0.15) !important;
         box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55) !important;
+      }
+
+      @supports (padding: max(0px)) {
+
+        .header,
+        .chat-header {
+          padding-left: max(var(--spacing-xs), env(safe-area-inset-left)) !important;
+          padding-right: max(var(--spacing-xs), env(safe-area-inset-right)) !important;
+        }
+
+        .message-input-area {
+          padding-bottom: max(var(--spacing-xxs, 4px), env(safe-area-inset-bottom)) !important;
+          padding-left: max(var(--spacing-sm), env(safe-area-inset-left)) !important;
+          padding-right: max(var(--spacing-sm), env(safe-area-inset-right)) !important;
+        }
+
+        .messages-area {
+          padding-top: max(var(--spacing-sm), env(safe-area-inset-top)) !important;
+          padding-left: max(var(--spacing-xs), env(safe-area-inset-left)) !important;
+          padding-right: max(var(--spacing-xs), env(safe-area-inset-right)) !important;
+        }
       }
 
       /* Samsung Galaxy S-series 360x740 portrait */
