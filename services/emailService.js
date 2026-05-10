@@ -202,7 +202,10 @@ class EmailService {
     }
 
     /**
-     * Send email verification email
+     * Send email verification email (registration + resend).
+     * HTML and `text` parts must stay in sync; many clients show plain text only.
+     * Method 2 (numbered steps + code) renders only when `verificationCode` is passed — registration does this when `verification_code` exists on `email_verification_tokens`.
+     *
      * @param {string} to - Recipient email address
      * @param {string} real_name - Username
      * @param {string} token - Verification token
@@ -259,7 +262,7 @@ class EmailService {
                                 <h3 style="margin: 0 0 1rem 0; color: #4a90e2; font-size: 1.1rem;">Method 2: Enter Verification Code</h3>
                                 <p style="margin: 0 0 1rem 0; font-size: 0.95rem;">If the link doesn't work, you can verify using this 6-digit code:</p>
                                 <ol style="margin: 0 0 1rem 1.25rem; padding: 0; font-size: 0.95rem; line-height: 1.65; color: #333;">
-                                    <li style="margin-bottom: 0.35rem;">Login with your username and password</li>
+                                    <li style="margin-bottom: 0.35rem;">Login with your email and password</li>
                                     <li style="margin-bottom: 0.35rem;">Go to: Account</li>
                                     <li style="margin-bottom: 0.35rem;">Click on: &lsquo;Email Not Verified&rsquo; under SECURITY</li>
                                     <li style="margin-bottom: 0;">In &lsquo;Verify with Code&rsquo; enter the 6-digit verification code from your email:</li>
@@ -295,7 +298,7 @@ class EmailService {
 
                 If the link doesn't work, you can verify using this 6-digit code:
 
-                1. Login with your username and password
+                1. Login with your email and password
                 2. Go to: Account
                 3. Click on: 'Email Not Verified' under SECURITY
                 4. In 'Verify with Code' enter the 6-digit verification code from your email:
