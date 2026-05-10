@@ -878,6 +878,78 @@
         </script>
 
         <script>
+            // 360-740px header fit: shrink action icons + push the group ~50px
+            // left via element.style (inline styles outrank stylesheet rules,
+            // bypassing CSS cascade / specificity / cache issues).
+            window.talkHeaderFit360_740 = (function talkHeaderFit360_740() {
+                const RANGE_MIN = 360;
+                const RANGE_MAX = 740;
+
+                function applyFit() {
+                    const header = document.querySelector('body.talk-page .header');
+                    const actions = document.querySelector('body.talk-page .header .header-actions');
+                    if (!header || !actions) return;
+
+                    const w = window.innerWidth;
+                    const inRange = w >= RANGE_MIN && w <= RANGE_MAX;
+
+                    const resetEl = (el, props) => {
+                        if (!el) return;
+                        props.forEach((p) => el.style.removeProperty(p));
+                    };
+                    const headerProps = ['padding-left', 'padding-right', 'gap'];
+                    const actionsProps = ['margin-right', 'gap', 'min-width', 'flex'];
+                    const btnProps = ['width', 'min-width', 'max-width', 'height', 'flex', 'padding', 'font-size'];
+
+                    resetEl(header, headerProps);
+                    resetEl(actions, actionsProps);
+                    const actionBtns = actions ? actions.querySelectorAll('.header-btn, .account-btn, a.header-btn') : [];
+                    actionBtns.forEach((b) => resetEl(b, btnProps));
+
+                    if (!inRange) return;
+
+                    header.style.setProperty('padding-left', '6px', 'important');
+                    header.style.setProperty('padding-right', '6px', 'important');
+                    header.style.setProperty('gap', '4px', 'important');
+
+                    actions.style.setProperty('margin-right', '50px', 'important');
+                    actions.style.setProperty('gap', '2px', 'important');
+                    actions.style.setProperty('min-width', '0', 'important');
+                    actions.style.setProperty('flex', '0 1 auto', 'important');
+
+                    actionBtns.forEach((btn) => {
+                        const isBack = btn.classList.contains('chat-back-btn-mobile')
+                            || btn.id === 'chatBackBtn';
+                        // Non-back buttons enlarged by ~15% twice (38 -> 44 -> 51px); back button unchanged at 42px.
+                        const size = isBack ? 42 : 51;
+                        btn.style.setProperty('width', size + 'px', 'important');
+                        btn.style.setProperty('min-width', size + 'px', 'important');
+                        btn.style.setProperty('max-width', size + 'px', 'important');
+                        btn.style.setProperty('height', size + 'px', 'important');
+                        btn.style.setProperty('flex', '0 0 ' + size + 'px', 'important');
+                        btn.style.setProperty('padding', '0', 'important');
+                        if (!isBack) {
+                            btn.style.setProperty('font-size', '24px', 'important');
+                        }
+                    });
+                }
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', applyFit);
+                } else {
+                    applyFit();
+                }
+                window.addEventListener('resize', applyFit);
+                window.addEventListener('orientationchange', applyFit);
+
+                const navObserver = new MutationObserver(applyFit);
+                navObserver.observe(document.body, { attributes: true, attributeFilter: ['data-nav-state', 'class'] });
+
+                return applyFit;
+            })();
+        </script>
+
+        <script>
             (function syncLayoutTheme() {
                 const root = document.documentElement;
                 const THEME_STORAGE_KEY = (window.__talkThemeState && window.__talkThemeState.key) || 'totilove-theme';
