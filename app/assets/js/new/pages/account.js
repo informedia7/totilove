@@ -64,30 +64,7 @@ function handleEmailVerificationRedirectParams() {
     }
 }
 
-/** True fetch/network failure vs 401/403/redirect (no session on this browser). */
-function classifyAccountInfoFailure(error) {
-    const msg = (error && error.message) || '';
-    if (error instanceof TypeError || /failed to fetch|networkerror|load failed/i.test(msg)) {
-        return 'network';
-    }
-    if (/HTTP error!\s*status:\s*redirect/i.test(msg)) {
-        return 'auth';
-    }
-    const m = msg.match(/HTTP error!\s*status:\s*(\d+)/i);
-    if (m) {
-        const code = parseInt(m[1], 10);
-        if (code === 401 || code === 403) {
-            return 'auth';
-        }
-        if (code >= 500) {
-            return 'server';
-        }
-        return 'http';
-    }
-    return 'unknown';
-}
-
-// Load account data on page load — matches totilove_remote - Copy flow: always run follow-up loaders.
+// Load account data on page load
 document.addEventListener('DOMContentLoaded', async function() {
     handleEmailVerificationRedirectParams();
     await loadAccountData();
@@ -168,114 +145,80 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 async function loadAccountData() {
     try {
+        // Cookie-based auth - cookies sent automatically
         const response = await fetch('/api/account/info', {
             method: 'GET',
-            credentials: 'same-origin',
-            redirect: 'manual'
+            credentials: 'same-origin'
         });
-
-        if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
-            throw new Error('HTTP error! status: redirect');
-        }
-
-        const raw = await response.text();
-        let data = null;
-        if (raw) {
-            try {
-                data = JSON.parse(raw);
-            } catch (parseErr) {
-                console.warn('[account] account/info response was not valid JSON', parseErr);
-            }
-        }
-
+        
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            currentAccountStatus = data.accountStatus === 'paused' ? 'paused' : 'active';
+            updatePauseAccountButton(currentAccountStatus);
 
-        if (!data || typeof data !== 'object' || data.success !== true) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        currentAccountStatus = data.accountStatus === 'paused' ? 'paused' : 'active';
-        updatePauseAccountButton(currentAccountStatus);
-
-        const createdEl = document.getElementById('account-created-date');
-        if (createdEl) {
+            // Update account dates
             if (data.accountCreated) {
                 const createdDate = new Date(data.accountCreated);
-                createdEl.textContent = createdDate.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-            } else {
-                createdEl.textContent = '—';
-            }
-        }
-
-        if (data.lastLogin) {
-            const loginDate = new Date(data.lastLogin);
-            const now = new Date();
-            const diffMs = now - loginDate;
-            const diffMins = Math.floor(diffMs / 60000);
-            const diffHours = Math.floor(diffMs / 3600000);
-            const diffDays = Math.floor(diffMs / 86400000);
-
-            let timeAgo = '';
-            if (diffMins < 1) {
-                timeAgo = loginDate.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            } else if (diffMins < 60) {
-                timeAgo = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-            } else if (diffHours < 24) {
-                timeAgo = `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-            } else if (diffDays < 7) {
-                timeAgo = `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-            } else {
-                timeAgo = loginDate.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
+                document.getElementById('account-created-date').textContent = createdDate.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
                 });
             }
-
-            document.getElementById('last-login-date').textContent = timeAgo;
-        } else {
-            document.getElementById('last-login-date').textContent = 'Never';
+            
+            if (data.lastLogin) {
+                const loginDate = new Date(data.lastLogin);
+                const now = new Date();
+                const diffMs = now - loginDate;
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffHours = Math.floor(diffMs / 3600000);
+                const diffDays = Math.floor(diffMs / 86400000);
+                
+                let timeAgo = '';
+                if (diffMins < 1) {
+                    // Show actual time instead of "Just now"
+                    timeAgo = loginDate.toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                } else if (diffMins < 60) {
+                    timeAgo = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+                } else if (diffHours < 24) {
+                    timeAgo = `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+                } else if (diffDays < 7) {
+                    timeAgo = `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+                } else {
+                    timeAgo = loginDate.toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
+                
+                document.getElementById('last-login-date').textContent = timeAgo;
+            } else {
+                // No last login available (first time user or no sessions)
+                document.getElementById('last-login-date').textContent = 'Never';
+            }
         }
     } catch (error) {
         console.error('Error loading account data:', error);
-        const createdEl = document.getElementById('account-created-date');
-        if (createdEl) {
-            createdEl.textContent = '—';
-        }
-
-        const kind = classifyAccountInfoFailure(error);
         const lastLoginElement = document.getElementById('last-login-date');
         if (lastLoginElement) {
-            if (kind === 'auth') {
-                lastLoginElement.textContent = 'Sign in to view';
-            } else if (kind === 'network') {
-                lastLoginElement.textContent = 'Unable to load (network error)';
-            } else if (kind === 'server') {
-                lastLoginElement.textContent = 'Unable to load (server error)';
-            } else {
-                lastLoginElement.textContent = 'Unable to load';
-            }
-        }
-
-        if (kind === 'auth') {
-            const pwdEl = document.getElementById('password-last-changed');
-            if (pwdEl) {
-                pwdEl.textContent = 'Sign in to view';
-            }
+            const errorMessage = error.message && error.message.includes('HTTP error') 
+                ? 'Unable to load (network error)' 
+                : 'Unable to load';
+            lastLoginElement.textContent = errorMessage;
         }
     }
 }
@@ -321,70 +264,59 @@ async function checkEmailVerification() {
     const loadingSection = document.getElementById('email-verification-loading');
     const verifiedSection = document.getElementById('email-verified-section');
     const notVerifiedSection = document.getElementById('email-not-verified-section');
-    const needsSessionSection = document.getElementById('email-verification-needs-session');
     const messageDiv = document.getElementById('verification-message');
-
-    if (loadingSection) loadingSection.style.display = 'block';
-    if (verifiedSection) verifiedSection.style.display = 'none';
-    if (notVerifiedSection) notVerifiedSection.style.display = 'none';
-    if (needsSessionSection) needsSessionSection.style.display = 'none';
+    
+    // Show loading
+    loadingSection.style.display = 'block';
+    verifiedSection.style.display = 'none';
+    notVerifiedSection.style.display = 'none';
     if (messageDiv) messageDiv.style.display = 'none';
-
+    
     try {
+        // Cookie-based auth - cookies sent automatically
         const response = await fetch(`/api/account/info?t=${Date.now()}`, {
             method: 'GET',
             credentials: 'same-origin',
-            cache: 'no-cache',
-            redirect: 'manual'
+            cache: 'no-cache'
         });
-
-        if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
-            throw new Error('HTTP error! status: redirect');
-        }
-
-        const raw = await response.text();
-        let data = null;
-        if (raw) {
-            try {
-                data = JSON.parse(raw);
-            } catch {
-                /* ignore */
-            }
-        }
-
+        
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-
-        if (!data || typeof data !== 'object') {
-            throw new Error('HTTP error! status: invalid');
-        }
-
+        
+        const data = await response.json();
+        
         if (data.success) {
-            if (loadingSection) loadingSection.style.display = 'none';
-
+            // Hide loading
+            loadingSection.style.display = 'none';
+            
             if (data.emailVerified) {
-                if (verifiedSection) verifiedSection.style.display = 'block';
-                if (notVerifiedSection) notVerifiedSection.style.display = 'none';
-
+                // Show verified state
+                verifiedSection.style.display = 'block';
+                notVerifiedSection.style.display = 'none';
+                
+                // Update verified email display
                 const verifiedEmailDisplay = document.getElementById('verified-email-display');
                 if (verifiedEmailDisplay && data.email) {
                     verifiedEmailDisplay.textContent = data.email;
                 }
             } else {
-                if (verifiedSection) verifiedSection.style.display = 'none';
-                if (notVerifiedSection) notVerifiedSection.style.display = 'block';
-
+                // Show not verified state
+                verifiedSection.style.display = 'none';
+                notVerifiedSection.style.display = 'block';
+                
+                // Update user email display
                 const userEmailDisplay = document.getElementById('user-email-display');
                 if (userEmailDisplay && data.email) {
                     userEmailDisplay.textContent = data.email;
                 }
             }
         } else {
-            if (loadingSection) loadingSection.style.display = 'none';
-            if (notVerifiedSection) notVerifiedSection.style.display = 'block';
-            if (verifiedSection) verifiedSection.style.display = 'none';
-
+            // Error state
+            loadingSection.style.display = 'none';
+            notVerifiedSection.style.display = 'block';
+            verifiedSection.style.display = 'none';
+            
             if (messageDiv) {
                 messageDiv.style.display = 'block';
                 messageDiv.style.background = '#fee';
@@ -395,30 +327,18 @@ async function checkEmailVerification() {
         }
     } catch (error) {
         console.error('Error checking email verification:', error);
-        const kind = classifyAccountInfoFailure(error);
-
-        if (loadingSection) loadingSection.style.display = 'none';
-        if (verifiedSection) verifiedSection.style.display = 'none';
-
-        if (kind === 'auth') {
-            if (notVerifiedSection) notVerifiedSection.style.display = 'none';
-            if (needsSessionSection) needsSessionSection.style.display = 'block';
-            return;
-        }
-
-        if (notVerifiedSection) notVerifiedSection.style.display = 'block';
-
+        loadingSection.style.display = 'none';
+        notVerifiedSection.style.display = 'block';
+        verifiedSection.style.display = 'none';
+        
         if (messageDiv) {
             messageDiv.style.display = 'block';
             messageDiv.style.background = '#fee';
             messageDiv.style.color = '#dc3545';
             messageDiv.style.border = '1px solid #dc3545';
-            let errorMessage = 'Error checking verification status. Please try again.';
-            if (kind === 'network') {
-                errorMessage = 'Network error. Please check your connection and try again.';
-            } else if (kind === 'server') {
-                errorMessage = 'Server error. Please try again in a moment.';
-            }
+            const errorMessage = error.message && error.message.includes('HTTP error') 
+                ? 'Network error. Please check your connection and try again.' 
+                : 'Error checking verification status. Please try again.';
             messageDiv.textContent = errorMessage;
         }
     }
