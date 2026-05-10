@@ -50,6 +50,22 @@
         return true;
     }
 
+    /** Same rules as presence-engine parsePresenceUserId — partner ids only, never names. */
+    function parseTalkPresenceUserId(raw) {
+        if (raw === undefined || raw === null) {
+            return null;
+        }
+        if (typeof raw === 'number') {
+            return Number.isInteger(raw) && raw > 0 ? raw : null;
+        }
+        const s = String(raw).trim();
+        if (!s || !/^\d+$/.test(s)) {
+            return null;
+        }
+        const n = parseInt(s, 10);
+        return Number.isInteger(n) && n > 0 ? n : null;
+    }
+
     function getTalkState() {
         return window.TalkState || null;
     }
@@ -200,18 +216,12 @@
     }
 
     function refreshConversationIndicators(userId, isOnline) {
-        if (!userId) {
+        const id = parseTalkPresenceUserId(userId);
+        if (id === null) {
             return;
         }
 
-        if (!isPresenceActive()) {
-            document.querySelectorAll('.conversation-item .online-indicator').forEach(indicator => {
-                indicator.style.display = 'none';
-            });
-            return;
-        }
-
-        const indicators = document.querySelectorAll(`.conversation-item .online-indicator[data-user-id='${userId}']`);
+        const indicators = document.querySelectorAll(`.conversation-item .online-indicator[data-user-id='${id}']`);
         if (indicators.length === 0) {
             return;
         }
@@ -222,7 +232,7 @@
             applyStatusDecorations(indicator, isOnline ? 'online' : 'offline');
 
             // Presence engine will repaint bound nodes; fall back to manual display toggle otherwise
-            if (!window.Presence || indicator.dataset.presenceBound !== 'true') {
+            if (!isPresenceActive() || !window.Presence || indicator.dataset.presenceBound !== 'true') {
                 indicator.style.display = isOnline ? 'block' : 'none';
             }
         });
@@ -233,8 +243,8 @@
             return;
         }
 
-        const numericUserId = Number(userId);
-        if (!Number.isFinite(numericUserId)) {
+        const numericUserId = parseTalkPresenceUserId(userId);
+        if (numericUserId === null) {
             return;
         }
 
@@ -513,11 +523,16 @@
         },
 
         updateUserOnline: async function (userId, isOnline) {
+            const numericPartnerId = parseTalkPresenceUserId(userId);
+            if (numericPartnerId === null) {
+                return;
+            }
+
             const conversations = getConversations();
             let statusUpdated = false;
 
             Object.values(conversations).forEach(conversation => {
-                if (conversation.partnerId == userId) {
+                if (conversation.partnerId == numericPartnerId) {
                     conversation.status = isOnline ? 'Online' : 'Offline';
                     conversation.is_online = isOnline;
                     if (isOnline) {
@@ -529,12 +544,12 @@
 
             if (statusUpdated) {
                 setConversations(conversations);
-                refreshConversationIndicators(userId, isOnline);
-                pushPresenceRealtimeHint(userId, isOnline);
+                refreshConversationIndicators(numericPartnerId, isOnline);
+                pushPresenceRealtimeHint(numericPartnerId, isOnline);
             }
 
             const currentConversationKey = getCurrentConversationKey();
-            if (currentConversationKey && conversations[currentConversationKey] && conversations[currentConversationKey].partnerId == userId) {
+            if (currentConversationKey && conversations[currentConversationKey] && conversations[currentConversationKey].partnerId == numericPartnerId) {
                 await this.updateCurrentChat();
             }
         },
@@ -560,8 +575,8 @@
     }
 
     async function updateUserOnlineStatus(userId, isOnline) {
-        const numericUserId = Number(userId);
-        if (!Number.isFinite(numericUserId)) {
+        const numericUserId = parseTalkPresenceUserId(userId);
+        if (numericUserId === null) {
             return;
         }
 

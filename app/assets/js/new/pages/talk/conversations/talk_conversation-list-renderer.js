@@ -410,7 +410,11 @@ function registerOnlineIndicators() {
         : true;
 
     if (!presenceEnabled) {
-        document.querySelectorAll('.online-indicator').forEach(el => {
+        const listRootOff = document.getElementById('conversationsList');
+        const offNodes = listRootOff
+            ? listRootOff.querySelectorAll('.online-indicator')
+            : document.querySelectorAll('.conversation-item .online-indicator');
+        offNodes.forEach(el => {
             el.style.display = 'none';
         });
         return;
