@@ -377,8 +377,8 @@ class InstantStatusManager {
             return; // Don't register large container elements
         }
         if (!element || !userId) return;
-        const userIdNum = typeof userId === 'string' ? parseInt(userId, 10) : userId;
-        if (isNaN(userIdNum)) {
+        const userIdNum = typeof userId === 'string' ? parseInt(String(userId).trim(), 10) : userId;
+        if (!Number.isInteger(userIdNum) || userIdNum < 1) {
             console.warn('Invalid user ID:', userId);
             return;
         }

@@ -646,8 +646,13 @@ class GlobalNavbar {
                 this.trackAnalytics('realtime', 'connected');
 
                 // Join user room for personalized updates
-                if (this.currentUser?.id) {
-                    socket.emit('join_user_room', this.currentUser.id);
+                const joinIdRaw = this.currentUser?.id;
+                const joinStr = joinIdRaw != null ? String(joinIdRaw).trim() : '';
+                if (joinStr && /^\d+$/.test(joinStr)) {
+                    const joinId = parseInt(joinStr, 10);
+                    if (Number.isInteger(joinId) && joinId > 0) {
+                        socket.emit('join_user_room', joinId);
+                    }
                 }
             });
 

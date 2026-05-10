@@ -562,10 +562,16 @@ function bindResultsIndicators(statusElements) {
     }
 
     statusElements.forEach(element => {
-        const userId = element.dataset.userId;
-        if (userId) {
-            presence.bindIndicator(element, userId, { variant: 'dot' });
+        const raw = element.dataset.userId;
+        const s = raw != null ? String(raw).trim() : '';
+        if (!s || !/^\d+$/.test(s)) {
+            return;
         }
+        const userId = parseInt(s, 10);
+        if (!Number.isInteger(userId) || userId < 1) {
+            return;
+        }
+        presence.bindIndicator(element, userId, { variant: 'dot' });
     });
 
     resetResultsPresenceFallbacks();

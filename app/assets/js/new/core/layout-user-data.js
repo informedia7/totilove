@@ -28,10 +28,13 @@
         if (!bodyEl) return;
         
         // Read user data from body data attributes
-        const userId = bodyEl.getAttribute('data-user-id');
-        
+        const userIdRaw = bodyEl.getAttribute('data-user-id');
+        const userIdStr = userIdRaw && userIdRaw !== 'null' ? String(userIdRaw).trim() : '';
+        const parsedUserId = userIdStr && /^\d+$/.test(userIdStr) ? parseInt(userIdStr, 10) : NaN;
+        const userId = Number.isInteger(parsedUserId) && parsedUserId > 0 ? parsedUserId : null;
+
         window.currentUser = {
-            id: userId && userId !== 'null' && userId !== '' ? parseInt(userId) : null,
+            id: userId,
             real_name: bodyEl.getAttribute('data-user-real-name') || '',
             email: bodyEl.getAttribute('data-user-email') || '',
             age: (() => {

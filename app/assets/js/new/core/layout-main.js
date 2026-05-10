@@ -117,10 +117,16 @@ function initializePresenceEngine() {
         const registerDots = (root = document) => {
             const selectors = '.online-dot-results[data-user-id]';
             root.querySelectorAll(selectors).forEach(element => {
-                const userId = element.dataset.userId;
-                if (userId) {
-                    window.Presence.bindIndicator(element, userId, { variant: 'dot' });
+                const raw = element.dataset.userId;
+                const s = raw != null ? String(raw).trim() : '';
+                if (!s || !/^\d+$/.test(s)) {
+                    return;
                 }
+                const userId = parseInt(s, 10);
+                if (!Number.isInteger(userId) || userId < 1) {
+                    return;
+                }
+                window.Presence.bindIndicator(element, userId, { variant: 'dot' });
             });
         };
 
@@ -159,7 +165,10 @@ function getLayoutCurrentUser() {
         ...(window.currentUser || {})
     };
 
-    const resolvedId = mergedUser.id || parsedBodyUserId;
+    const resolvedRaw = mergedUser.id ?? parsedBodyUserId;
+    const resolvedStr = resolvedRaw != null && resolvedRaw !== '' ? String(resolvedRaw).trim() : '';
+    const resolvedParsed = resolvedStr && /^\d+$/.test(resolvedStr) ? parseInt(resolvedStr, 10) : NaN;
+    const resolvedId = Number.isInteger(resolvedParsed) && resolvedParsed > 0 ? resolvedParsed : null;
     if (!resolvedId) {
         return null;
     }

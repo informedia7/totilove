@@ -424,10 +424,16 @@ function registerOnlineIndicators() {
         : document.querySelectorAll('.conversation-item .online-indicator[data-user-id]');
     if (window.Presence) {
         statusElements.forEach(element => {
-            const userId = element.dataset.userId;
-            if (userId) {
-                window.Presence.bindIndicator(element, userId, { variant: 'dot' });
+            const raw = element.dataset.userId;
+            const s = raw != null ? String(raw).trim() : '';
+            if (!s || !/^\d+$/.test(s)) {
+                return;
             }
+            const userId = parseInt(s, 10);
+            if (!Number.isInteger(userId) || userId < 1) {
+                return;
+            }
+            window.Presence.bindIndicator(element, userId, { variant: 'dot' });
         });
         return;
     }

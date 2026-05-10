@@ -75,6 +75,25 @@
         meta: null
     };
 
+    /**
+     * Other-user presence keys must be positive integers — never names (real_name, etc.).
+     * Rejects "", NaN, 0, floats, and parseInt-style prefixes (e.g. "12abc" → invalid).
+     */
+    function parsePresenceUserId(raw) {
+        if (raw === undefined || raw === null) {
+            return null;
+        }
+        if (typeof raw === 'number') {
+            return Number.isInteger(raw) && raw > 0 ? raw : null;
+        }
+        const s = String(raw).trim();
+        if (!s || !/^\d+$/.test(s)) {
+            return null;
+        }
+        const n = parseInt(s, 10);
+        return Number.isInteger(n) && n > 0 ? n : null;
+    }
+
     function resolveSessionToken() {
         try {
             if (window.sessionManager?.getToken) {
@@ -1047,8 +1066,10 @@
         }
 
         applyStatus(userId, payload = {}) {
-            const id = Number(userId);
-            if (!Number.isFinite(id)) return;
+            const id = parsePresenceUserId(userId);
+            if (id === null) {
+                return;
+            }
 
             const normalizedOnline = this.normalizeIsOnline(payload.isOnline);
             if (normalizedOnline === null) return;
@@ -1186,8 +1207,8 @@
 
         // === Status Requests ===
         requestStatus(userId, options = {}) {
-            const id = Number(userId);
-            if (!Number.isFinite(id)) {
+            const id = parsePresenceUserId(userId);
+            if (id === null) {
                 return Promise.reject(new Error('Invalid user id'));
             }
 
@@ -1293,7 +1314,7 @@
         }
 
         async requestStatuses(userIds = [], options = {}) {
-            const ids = [...new Set(userIds.map(id => Number(id)).filter(id => Number.isFinite(id)))];
+            const ids = [...new Set(userIds.map(uid => parsePresenceUserId(uid)).filter(uid => uid !== null))];
             if (ids.length === 0) return {};
 
             const results = await Promise.allSettled(
@@ -1317,13 +1338,17 @@
 
         // === Batch Processing ===
         queueUserId(userId) {
+            const id = parsePresenceUserId(userId);
+            if (id === null) {
+                return;
+            }
             if (this.pageHidden) {
-                this.hiddenQueue.add(userId);
+                this.hiddenQueue.add(id);
                 this.scheduleHiddenRefresh();
                 return;
             }
             
-            this.pendingUserIds.add(userId);
+            this.pendingUserIds.add(id);
             if (this.batchTimer) {
                 clearTimeout(this.batchTimer);
             }
@@ -1423,8 +1448,10 @@
         }
 
         handleMissingUser(userId) {
-            const id = Number(userId);
-            if (!Number.isFinite(id)) return;
+            const id = parsePresenceUserId(userId);
+            if (id === null) {
+                return;
+            }
 
             this.retryCounts.delete(id);
             this.failedUserIds.delete(id);
@@ -1456,37 +1483,37 @@
             const element = typeof target === 'string' ? document.getElementById(target) : target;
             if (!element?.isConnected) return Promise.resolve(null);
 
-            const id = Number(userId);
-            if (!Number.isFinite(id)) {
-                console.warn('PresenceEngine: invalid user id for element', element);
+            const id = parsePresenceUserId(userId);
+            if (id === null) {
+                console.warn('PresenceEngine: invalid user id for element', userId, element);
                 return Promise.resolve(null);
             }
 
             const alreadyBound = element.dataset?.presenceBound === 'true';
-            const existingId = Number(element.dataset?.userId);
-            if (alreadyBound && Number.isFinite(existingId) && existingId === id) {
-                const variant = options.variant || this.detectVariant(element);
-                const mergedOptions = {
-                    variant,
-                    showLastSeen: options.showLastSeen !== false,
-                    onlineText: options.onlineText,
-                    offlineText: options.offlineText,
-                    emphasize: options.emphasize || false,
-                    subtle: options.subtle || false
-                };
-                this.elementMeta.set(element, mergedOptions);
-                const cached = this.getCachedStatus(id);
-                if (cached) {
-                    this.renderElement(element, cached);
-                    return Promise.resolve(cached);
-                }
-                return this.requestStatus(id).then(status => {
-                    this.renderElement(element, status);
-                    return status;
-                });
-            }
+            const existingId = parsePresenceUserId(element.dataset?.userId);
 
-            if (alreadyBound && Number.isFinite(existingId) && existingId !== id) {
+            if (alreadyBound) {
+                if (existingId === id) {
+                    const variant = options.variant || this.detectVariant(element);
+                    const mergedOptions = {
+                        variant,
+                        showLastSeen: options.showLastSeen !== false,
+                        onlineText: options.onlineText,
+                        offlineText: options.offlineText,
+                        emphasize: options.emphasize || false,
+                        subtle: options.subtle || false
+                    };
+                    this.elementMeta.set(element, mergedOptions);
+                    const cached = this.getCachedStatus(id);
+                    if (cached) {
+                        this.renderElement(element, cached);
+                        return Promise.resolve(cached);
+                    }
+                    return this.requestStatus(id).then(status => {
+                        this.renderElement(element, status);
+                        return status;
+                    });
+                }
                 this.unbindIndicator(element);
             }
 
@@ -1520,10 +1547,10 @@
         unbindIndicator(element) {
             if (!element) return;
             
-            const userId = element.dataset?.userId;
-            if (!userId) return;
-            
-            const id = Number(userId);
+            const id = parsePresenceUserId(element.dataset?.userId);
+            if (id === null) {
+                return;
+            }
             this.stopObservingVisibility(element, id);
             
             const bucket = this.elementRegistry.get(id);
@@ -1649,8 +1676,8 @@
         handleVisibilityEntries(entries) {
             entries.forEach(entry => {
                 const element = entry.target;
-                const userId = Number(element.dataset?.userId || element.dataset?.visibilityUserId);
-                if (!Number.isFinite(userId)) return;
+                const userId = parsePresenceUserId(element.dataset?.userId || element.dataset?.visibilityUserId);
+                if (userId === null) return;
 
                 if (entry.isIntersecting && entry.intersectionRatio > 0) {
                     this.handleElementVisible(userId, element);
@@ -1811,7 +1838,7 @@
             const selectors = this.config.domScanSelectors.join(',');
             document.querySelectorAll(selectors).forEach(node => {
                 const userId = this.resolveNodeUserId(node);
-                if (userId) this.bindIndicator(node, userId);
+                if (userId !== null) this.bindIndicator(node, userId);
             });
         }
 
@@ -1826,11 +1853,11 @@
                         if (node.nodeType !== Node.ELEMENT_NODE) return;
                         if (this.matchesDomScanSelector(node)) {
                             const userId = this.resolveNodeUserId(node);
-                            if (userId) this.bindIndicator(node, userId);
+                            if (userId !== null) this.bindIndicator(node, userId);
                         }
                         node.querySelectorAll?.(selectors).forEach(child => {
                             const childUserId = this.resolveNodeUserId(child);
-                            if (childUserId) this.bindIndicator(child, childUserId);
+                            if (childUserId !== null) this.bindIndicator(child, childUserId);
                         });
                     });
                     
@@ -1847,7 +1874,8 @@
         }
 
         resolveNodeUserId(element) {
-            return element?.dataset?.userId || element?.dataset?.presenceId || null;
+            const raw = element?.dataset?.userId || element?.dataset?.presenceId;
+            return parsePresenceUserId(raw);
         }
 
         matchesDomScanSelector(element) {
@@ -1901,8 +1929,8 @@
 
         // === Subscribers ===
         subscribe(userId, callback) {
-            const id = Number(userId);
-            if (!Number.isFinite(id) || typeof callback !== 'function') {
+            const id = parsePresenceUserId(userId);
+            if (id === null || typeof callback !== 'function') {
                 return () => {};
             }
             
@@ -1918,7 +1946,10 @@
         }
 
         unsubscribe(userId, callback) {
-            const id = Number(userId);
+            const id = parsePresenceUserId(userId);
+            if (id === null) {
+                return;
+            }
             const bucket = this.subscribers.get(id);
             if (!bucket) return;
             bucket.delete(callback);
@@ -1991,7 +2022,10 @@
         }
 
         getCachedStatus(userId) {
-            const id = Number(userId);
+            const id = parsePresenceUserId(userId);
+            if (id === null) {
+                return null;
+            }
             const record = this.statusCache.get(id);
             return record ? { ...record } : null;
         }
@@ -2001,8 +2035,8 @@
          * the same pipeline as socket/SSE presence so cache and UI stay aligned.
          */
         applyPresenceHint(userId, isOnline) {
-            const id = Number(userId);
-            if (!Number.isFinite(id)) {
+            const id = parsePresenceUserId(userId);
+            if (id === null) {
                 return null;
             }
             const now = Date.now();
