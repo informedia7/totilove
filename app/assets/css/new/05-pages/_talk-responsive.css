@@ -2472,6 +2472,53 @@
       }
     }
 
+    /* ≤380px (e.g. Galaxy S8+ 360): tighter chrome than 390px iPhones; clip stray horizontal overflow from off-canvas chat */
+    @media (max-width: 380px) {
+      .app-container {
+        overflow-x: clip !important;
+      }
+
+      .app-container > .main-content {
+        overflow-x: clip !important;
+      }
+
+      .header-btn {
+        min-width: 54px !important;
+        width: 54px !important;
+        height: 54px !important;
+        flex: 0 0 54px !important;
+        font-size: 22px !important;
+      }
+
+      .header-actions {
+        margin-inline-end: max(20px, env(safe-area-inset-right, 0px)) !important;
+      }
+
+      body[data-nav-state="NAV_CHAT"] .header-actions .header-btn:not(.chat-back-btn-mobile) {
+        min-width: 44px !important;
+        width: 44px !important;
+        height: 44px !important;
+        flex: 0 0 44px !important;
+        font-size: 20px !important;
+      }
+
+      body[data-nav-state="NAV_CHAT"] .header-actions {
+        margin-inline-end: max(44px, env(safe-area-inset-right, 0px)) !important;
+      }
+
+      .search-input {
+        font-size: 18px !important;
+        padding: var(--spacing-sm) 40px var(--spacing-sm) var(--spacing-sm) !important;
+      }
+
+      .sidebar,
+      .sidebar-header,
+      .conversations {
+        margin-inline-start: 0 !important;
+        margin-inline-end: 0 !important;
+      }
+    }
+
     /* Extra small mobile (391px to 480px) */
     @media (max-width: 480px) and (min-width: 391px) {
       .app-container {
