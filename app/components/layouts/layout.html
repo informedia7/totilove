@@ -21,7 +21,7 @@
 
     <!-- Layout CSS - Extracted from inline styles - Phase 1 CSS Extraction -->
     <link rel="stylesheet" href="/assets/css/new/03-layout.css">
-    <link rel="stylesheet" href="/assets/css/new/02-components/_layout-shell-footer.css?v=20260512">
+    <link rel="stylesheet" href="/assets/css/new/02-components/_layout-shell-footer.css?v=20260513">
 
     <script>
         (function initializeTheme() {
@@ -213,14 +213,8 @@
     </div> <!-- End #app-root wrapper -->
 
     <footer class="layout-shell-footer" role="contentinfo" aria-label="Site">
-        <p class="layout-shell-footer__text">&copy; <span class="layout-shell-footer__year"></span> Totilove. All rights reserved. Made with ❤️ for love without borders.</p>
+        <p class="layout-shell-footer__text">&copy; <span id="current-year"></span> Totilove. All rights reserved. Made with ❤️ for love without borders.</p>
     </footer>
-    <script>
-        (function () {
-            var el = document.querySelector('.layout-shell-footer .layout-shell-footer__year');
-            if (el) el.textContent = String(new Date().getFullYear());
-        })();
-    </script>
 
     <!-- Scripts -->
     {{if:presence.socketEnabled}}
@@ -259,7 +253,7 @@
     <!-- User authentication data (CSP-safe: data attributes) - must load after body exists -->
     <script src="/assets/js/new/core/layout-user-data.js?v=20260510-presenceid"></script>
     <script src="/assets/js/new/core/layout-main.js?v=20260510-presenceid"></script>
-    <script src="/assets/js/new/core/layout-init.js"></script>
+    <script src="/assets/js/new/core/layout-init.js?v=20260513-footer-year"></script>
     <script>
         (function setupThemeToggle() {
             const root = document.documentElement;

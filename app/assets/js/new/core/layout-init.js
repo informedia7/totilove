@@ -82,6 +82,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    const footerYear = document.getElementById('current-year');
+    if (footerYear && footerYear.closest('.layout-shell-footer')) {
+        footerYear.textContent = String(new Date().getFullYear());
+    }
+
     attachActivityLinkNavigation();
 
 });
