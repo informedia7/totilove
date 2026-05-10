@@ -416,7 +416,12 @@ function registerOnlineIndicators() {
         return;
     }
 
-    const statusElements = document.querySelectorAll('.online-indicator[data-user-id]');
+    // Only the sidebar list: rebinding #chatAvatar / header dots breaks visibility counts
+    // and makes one partner's presence cancel another's.
+    const listRoot = document.getElementById('conversationsList');
+    const statusElements = listRoot
+        ? listRoot.querySelectorAll('.online-indicator[data-user-id]')
+        : document.querySelectorAll('.conversation-item .online-indicator[data-user-id]');
     if (window.Presence) {
         statusElements.forEach(element => {
             const userId = element.dataset.userId;

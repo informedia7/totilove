@@ -1462,6 +1462,34 @@
                 return Promise.resolve(null);
             }
 
+            const alreadyBound = element.dataset?.presenceBound === 'true';
+            const existingId = Number(element.dataset?.userId);
+            if (alreadyBound && Number.isFinite(existingId) && existingId === id) {
+                const variant = options.variant || this.detectVariant(element);
+                const mergedOptions = {
+                    variant,
+                    showLastSeen: options.showLastSeen !== false,
+                    onlineText: options.onlineText,
+                    offlineText: options.offlineText,
+                    emphasize: options.emphasize || false,
+                    subtle: options.subtle || false
+                };
+                this.elementMeta.set(element, mergedOptions);
+                const cached = this.getCachedStatus(id);
+                if (cached) {
+                    this.renderElement(element, cached);
+                    return Promise.resolve(cached);
+                }
+                return this.requestStatus(id).then(status => {
+                    this.renderElement(element, status);
+                    return status;
+                });
+            }
+
+            if (alreadyBound && Number.isFinite(existingId) && existingId !== id) {
+                this.unbindIndicator(element);
+            }
+
             element.dataset.userId = id;
             element.dataset.presenceBound = 'true';
 
@@ -1968,6 +1996,28 @@
             return record ? { ...record } : null;
         }
 
+        /**
+         * Apply a coarse online/offline hint from app-level listeners (e.g. Talk) through
+         * the same pipeline as socket/SSE presence so cache and UI stay aligned.
+         */
+        applyPresenceHint(userId, isOnline) {
+            const id = Number(userId);
+            if (!Number.isFinite(id)) {
+                return null;
+            }
+            const now = Date.now();
+            const previous = this.statusCache.get(id);
+            const online = Boolean(isOnline);
+            return this.applyStatus(id, {
+                isOnline: online,
+                lastSeen: online ? (previous?.lastSeen || now) : now,
+                lastActivity: now,
+                timestamp: now,
+                source: 'app-hint',
+                meta: { channel: 'talk-realtime' }
+            });
+        }
+
         updateTTLAwareness(serverPayload) {
             if (serverPayload?.ttlSeconds) {
                 console.debug('PresenceEngine: Server TTL is', serverPayload.ttlSeconds, 'seconds');
@@ -2118,6 +2168,7 @@
             requestStatuses: async () => ({}),
             refreshAllKnownUsers: () => undefined,
             refreshTrackedUsers: () => undefined,
+            applyPresenceHint: () => null,
             queueUserId: () => undefined,
             metricsEnabled: () => false,
             captureBatchMetric: () => undefined,

@@ -238,34 +238,9 @@
             return;
         }
 
-        const now = Date.now();
-        const existing = typeof window.Presence.getCachedStatus === 'function'
-            ? window.Presence.getCachedStatus(numericUserId)
-            : (window.Presence.statusCache instanceof Map ? window.Presence.statusCache.get(numericUserId) : null);
-
-        const statusRecord = {
-            userId: numericUserId,
-            isOnline: !!isOnline,
-            lastSeen: !isOnline ? now : (existing?.lastSeen || now),
-            lastActivity: now,
-            lastLogin: isOnline ? now : (existing?.lastLogin || null),
-            receivedAt: now,
-            timestamp: now,
-            source: 'talk-realtime',
-            stale: false,
-            uiState: isOnline ? 'online' : 'offline'
-        };
-
-        if (window.Presence.statusCache instanceof Map) {
-            window.Presence.statusCache.set(numericUserId, statusRecord);
-        }
-
-        if (typeof window.Presence.renderRegisteredElements === 'function') {
-            window.Presence.renderRegisteredElements(numericUserId, statusRecord);
-        }
-
-        if (typeof window.Presence.notifySubscribers === 'function') {
-            window.Presence.notifySubscribers(numericUserId, statusRecord);
+        if (typeof window.Presence.applyPresenceHint === 'function') {
+            window.Presence.applyPresenceHint(numericUserId, isOnline);
+            return;
         }
     }
 
