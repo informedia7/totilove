@@ -126,9 +126,12 @@ class InstantStatusManager {
         const currentUser = window.sessionManager.getCurrentUser();
         if (!currentUser) return;
 
+        const userId = Number(currentUser.id);
+        if (!Number.isFinite(userId) || userId < 1) return;
+
         this.socket.emit('authenticate', {
-            userId: currentUser.id,
-            real_name: currentUser.real_name || currentUser.real_name || currentUser.email || ''
+            userId,
+            real_name: currentUser.real_name || currentUser.email || ''
         });
     }
 

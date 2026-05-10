@@ -255,14 +255,15 @@ function initializeLayoutNotifications() {
         layoutSocket.on('connect', () => {
             layoutSocketInitializing = false;
             const connectedUser = getLayoutCurrentUser();
-            if (!connectedUser || !connectedUser.id) {
+            const userId = Number(connectedUser?.id);
+            if (!connectedUser || !Number.isFinite(userId) || userId < 1) {
                 scheduleLayoutNotificationInitialization();
                 return;
             }
-            // Authenticate the socket connection
+            // Authenticate the socket connection (numeric user id only; real_name is display-only)
             const authData = {
-                userId: connectedUser.id,
-                real_name: connectedUser.real_name || connectedUser.email
+                userId,
+                real_name: connectedUser.real_name || connectedUser.email || ''
             };
             layoutSocket.emit('authenticate', authData);
         });

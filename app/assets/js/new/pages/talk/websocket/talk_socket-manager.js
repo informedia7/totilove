@@ -99,10 +99,11 @@ function initializeWebSocket() {
             window.isAuthenticated = false;
 
             // SECURITY: Authenticate user with WebSocket BEFORE allowing operations
-            const currentUserId = TalkState ? TalkState.getCurrentUserId() : (window.currentUser?.id || null);
-            if (currentUserId) {
+            const rawId = TalkState ? TalkState.getCurrentUserId() : (window.currentUser?.id ?? null);
+            const userId = Number(rawId);
+            if (Number.isFinite(userId) && userId >= 1) {
                 socket.emit('authenticate', {
-                    userId: currentUserId,
+                    userId,
                     real_name: window.currentUser?.real_name || 'User'
                 });
             }
@@ -194,10 +195,11 @@ function initializeWebSocket() {
             }
 
             // Re-authenticate after reconnection
-            const currentUserId = TalkState ? TalkState.getCurrentUserId() : (window.currentUser?.id || null);
-            if (currentUserId) {
+            const rawIdReconnect = TalkState ? TalkState.getCurrentUserId() : (window.currentUser?.id ?? null);
+            const userIdReconnect = Number(rawIdReconnect);
+            if (Number.isFinite(userIdReconnect) && userIdReconnect >= 1) {
                 socket.emit('authenticate', {
-                    userId: currentUserId,
+                    userId: userIdReconnect,
                     real_name: window.currentUser?.real_name || 'User'
                 });
             }

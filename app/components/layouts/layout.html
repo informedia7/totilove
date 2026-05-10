@@ -226,7 +226,7 @@
             }
             window.__presenceScriptsLoaded = true;
             const sources = [
-                '/assets/js/new/core/presence-engine.js?v=20260120'
+                '/assets/js/new/core/presence-engine.js?v=20260509-socketuid'
             ];
             const loadNext = (index) => {
                 if (index >= sources.length) {
@@ -247,7 +247,7 @@
     </script>
     <!-- User authentication data (CSP-safe: data attributes) - must load after body exists -->
     <script src="/assets/js/new/core/layout-user-data.js"></script>
-    <script src="/assets/js/new/core/layout-main.js"></script>
+    <script src="/assets/js/new/core/layout-main.js?v=20260509-socketuid"></script>
     <script src="/assets/js/new/core/layout-init.js"></script>
     <script>
         (function setupThemeToggle() {

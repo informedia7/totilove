@@ -43,9 +43,14 @@ class WebSocketHandler {
             // Lightning-fast authentication with adaptive rate limiting
             socket.on('authenticate', async (data) => {
                 try {
-                    socket.userId = data.userId;
-                    socket.real_name = data.real_name;
-                    socket.join(`user_${data.userId}`);
+                    const userId = parseInt(data?.userId, 10);
+                    if (!Number.isInteger(userId) || userId < 1) {
+                        socket.emit('auth_error', { message: 'Invalid user id' });
+                        return;
+                    }
+                    socket.userId = userId;
+                    socket.real_name = typeof data?.real_name === 'string' ? data.real_name : '';
+                    socket.join(`user_${userId}`);
                     await this.touchPresence(socket.userId, 'socket-auth');
                     socket.emit('authenticated', { 
                         status: 'success',
@@ -60,8 +65,13 @@ class WebSocketHandler {
             // Alternative authentication method for compatibility
             socket.on('join_user_room', async (userId) => {
                 try {
-                    socket.userId = userId;
-                    socket.join(`user_${userId}`);
+                    const uid = parseInt(userId, 10);
+                    if (!Number.isInteger(uid) || uid < 1) {
+                        socket.emit('auth_error', { message: 'Invalid user id' });
+                        return;
+                    }
+                    socket.userId = uid;
+                    socket.join(`user_${uid}`);
                     await this.touchPresence(socket.userId, 'socket-join-room');
                     socket.emit('authenticated', { 
                         status: 'success',

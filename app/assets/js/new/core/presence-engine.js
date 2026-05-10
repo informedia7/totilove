@@ -857,8 +857,11 @@
             const currentUser = window.sessionManager?.getCurrentUser?.();
             if (!currentUser || !this.socket) return;
 
+            const userId = Number(currentUser.id);
+            if (!Number.isFinite(userId) || userId < 1) return;
+
             this.socket.emit('authenticate', {
-                userId: currentUser.id,
+                userId,
                 real_name: currentUser.real_name || currentUser.email || ''
             });
         }
