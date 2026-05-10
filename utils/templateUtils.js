@@ -42,31 +42,20 @@ class TemplateUtils {
                 console.log(`[TEMPLATE] Replaced ${beforeCount} instances of {{${key}}} with:`, JSON.stringify(replacementValue));
             }
         });
-        
-        // Final pass: Replace any remaining {{variable}} patterns with empty string (safety fallback)
-        const remainingVarsRegex = /\{\{([a-zA-Z_][a-zA-Z0-9_]*)\}\}/g;
-        const remainingMatches = content.match(remainingVarsRegex);
-        if (remainingMatches && remainingMatches.length > 0) {
-            console.warn(`[TEMPLATE] Warning: ${remainingMatches.length} unreplaced template variables found:`, remainingMatches);
-            // Optionally replace with empty string
-            content = content.replace(remainingVarsRegex, '');
-        }
 
-        // Process conditionals
+        // Conditionals must run before stripping unknown {{word}} tokens — otherwise {{else}}
+        // matches the fallback regex and if/else blocks break (e.g. "Hi, Lucy!Hi there!").
         const ifRegex = /\{\{if:([^}]+)\}\}(.*?)\{\{\/if\}\}/gs;
         const ifElseRegex = /\{\{if:([^}]+)\}\}(.*?)\{\{else\}\}(.*?)\{\{\/if\}\}/gs;
 
-        // Process if-else first
         content = content.replace(ifElseRegex, (match, condition, ifContent, elseContent) => {
             return this.evaluateCondition(condition, variables) ? ifContent : elseContent;
         });
 
-        // Process simple if
         content = content.replace(ifRegex, (match, condition, ifContent) => {
             return this.evaluateCondition(condition, variables) ? ifContent : '';
         });
 
-        // Process foreach loops
         const foreachRegex = /\{\{foreach:([^}]+)\}\}(.*?)\{\{\/foreach\}\}/gs;
         content = content.replace(foreachRegex, (match, arrayName, loopContent) => {
             const array = variables[arrayName];
@@ -81,6 +70,13 @@ class TemplateUtils {
                 return itemContent;
             }).join('');
         });
+
+        const remainingVarsRegex = /\{\{([a-zA-Z_][a-zA-Z0-9_]*)\}\}/g;
+        const remainingMatches = content.match(remainingVarsRegex);
+        if (remainingMatches && remainingMatches.length > 0) {
+            console.warn(`[TEMPLATE] Warning: ${remainingMatches.length} unreplaced template variables found:`, remainingMatches);
+            content = content.replace(remainingVarsRegex, '');
+        }
 
         return content;
     }
