@@ -284,7 +284,7 @@ class GlobalNavbar {
 
             return `
                 <div class="global-user-info">
-                    <span>Welcome, ${displayName}</span>
+                    <span class="global-user-greeting">Hi, ${displayName}</span>
                     ${languageSwitcherHTML}
                     <div class="global-user-menu">
                         <div class="global-user-avatar global-online-indicator" id="globalUserAvatar">
@@ -590,9 +590,11 @@ class GlobalNavbar {
 
     updateUserInfo() {
         if (this.currentUser) {
-            const userInfo = document.querySelector('.global-user-info span');
+            const userInfo = document.querySelector('.global-user-greeting');
             if (userInfo) {
-                userInfo.textContent = `Welcome, ${this.currentUser.real_name || this.currentUser.real_name || 'User'}`;
+                const rn = this.currentUser.real_name || this.currentUser.name || this.currentUser.email || 'User';
+                const displayName = rn.length > 20 ? rn.substring(0, 20) + '...' : rn;
+                userInfo.textContent = `Hi, ${displayName}`;
             }
         }
     }
