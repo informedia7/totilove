@@ -310,8 +310,12 @@ function initializeLayoutNotifications() {
                 return;
             }
 
-            // Check if this message is for the current user
-            if (messageData.receiverId == activeUser.id) {
+            // Check if this message is for the current user (support both receiverId + receiver_id payloads)
+            const receiverIdRaw = messageData?.receiverId ?? messageData?.receiver_id ?? null;
+            const receiverIdStr = receiverIdRaw != null ? String(receiverIdRaw).trim() : '';
+            const receiverId = receiverIdStr && /^\d+$/.test(receiverIdStr) ? parseInt(receiverIdStr, 10) : null;
+
+            if (receiverId && receiverId === Number(activeUser.id)) {
                 // Prevent duplicate notifications by checking source and message ID
                 const messageKey = `${messageData.id}_${messageData.source || 'unknown'}`;
                 if (window.processedMessages && window.processedMessages.has(messageKey)) {
