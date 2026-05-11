@@ -134,10 +134,16 @@ function initializePresenceEngine() {
         const registerDots = (root = document) => {
             const selectors = '.online-dot-results[data-user-id]';
             root.querySelectorAll(selectors).forEach(element => {
-                const userId = element.dataset.userId;
-                if (userId) {
-                    window.Presence.bindIndicator(element, userId, { variant: 'dot' });
+                const raw = element.dataset.userId;
+                const s = raw != null ? String(raw).trim() : '';
+                if (!s || !/^\d+$/.test(s)) {
+                    return;
                 }
+                const userId = parseInt(s, 10);
+                if (!Number.isInteger(userId) || userId < 1) {
+                    return;
+                }
+                window.Presence.bindIndicator(element, userId, { variant: 'dot' });
             });
         };
 
@@ -176,7 +182,10 @@ function getLayoutCurrentUser() {
         ...(window.currentUser || {})
     };
 
-    const resolvedId = mergedUser.id || parsedBodyUserId;
+    const resolvedRaw = mergedUser.id ?? parsedBodyUserId;
+    const resolvedStr = resolvedRaw != null && resolvedRaw !== '' ? String(resolvedRaw).trim() : '';
+    const resolvedParsed = resolvedStr && /^\d+$/.test(resolvedStr) ? parseInt(resolvedStr, 10) : NaN;
+    const resolvedId = Number.isInteger(resolvedParsed) && resolvedParsed > 0 ? resolvedParsed : null;
     if (!resolvedId) {
         return null;
     }
@@ -272,14 +281,15 @@ function initializeLayoutNotifications() {
         layoutSocket.on('connect', () => {
             layoutSocketInitializing = false;
             const connectedUser = getLayoutCurrentUser();
-            if (!connectedUser || !connectedUser.id) {
+            const userId = Number(connectedUser?.id);
+            if (!connectedUser || !Number.isFinite(userId) || userId < 1) {
                 scheduleLayoutNotificationInitialization();
                 return;
             }
-            // Authenticate the socket connection
+            // Authenticate the socket connection (numeric user id only; real_name is display-only)
             const authData = {
-                userId: connectedUser.id,
-                real_name: connectedUser.real_name || connectedUser.email
+                userId,
+                real_name: connectedUser.real_name || connectedUser.email || ''
             };
             layoutSocket.emit('authenticate', authData);
         });
@@ -310,12 +320,8 @@ function initializeLayoutNotifications() {
                 return;
             }
 
-            // Check if this message is for the current user (support both receiverId + receiver_id payloads)
-            const receiverIdRaw = messageData?.receiverId ?? messageData?.receiver_id ?? null;
-            const receiverIdStr = receiverIdRaw != null ? String(receiverIdRaw).trim() : '';
-            const receiverId = receiverIdStr && /^\d+$/.test(receiverIdStr) ? parseInt(receiverIdStr, 10) : null;
-
-            if (receiverId && receiverId === Number(activeUser.id)) {
+            // Check if this message is for the current user
+            if (messageData.receiverId == activeUser.id) {
                 // Prevent duplicate notifications by checking source and message ID
                 const messageKey = `${messageData.id}_${messageData.source || 'unknown'}`;
                 if (window.processedMessages && window.processedMessages.has(messageKey)) {
@@ -441,7 +447,7 @@ function showLayoutNotification(messageData) {
     const senderName = messageData.senderUsername || messageData.sender_real_name || 'Someone';
     const senderIdRaw = messageData?.senderId ?? messageData?.sender_id ?? null;
     const senderIdStr = senderIdRaw != null ? String(senderIdRaw).trim() : '';
-    const senderId = senderIdStr && /^\\d+$/.test(senderIdStr) ? parseInt(senderIdStr, 10) : null;
+    const senderId = senderIdStr && /^\d+$/.test(senderIdStr) ? parseInt(senderIdStr, 10) : null;
 
     // Create a dedicated host node outside any scroll container
     const notification = document.createElement('div');

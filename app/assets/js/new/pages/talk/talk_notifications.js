@@ -66,6 +66,84 @@
         }, 5000);
     }
 
+    function showIncomingMessageToast(senderName, senderId) {
+        if (!document) {
+            return;
+        }
+
+        // IMPORTANT: This is intentionally a copy of the layout toast UI/markup/styles
+        // so it renders exactly the same on talk.html.
+        const senderIdRaw = senderId != null ? senderId : null;
+        const senderIdStr = senderIdRaw != null ? String(senderIdRaw).trim() : '';
+        const resolvedSenderId = senderIdStr && /^\d+$/.test(senderIdStr) ? parseInt(senderIdStr, 10) : null;
+
+        // Create a dedicated host node outside any scroll container
+        const notification = document.createElement('div');
+        notification.setAttribute('data-layout-toast', '1');
+
+        // Use fully inline styles — immune to CSS class conflicts and overflow-x:hidden on body
+        Object.assign(notification.style, {
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            background: 'rgba(30, 30, 50, 0.97)',
+            color: '#fff',
+            borderRadius: '12px',
+            boxShadow: '0 8px 28px rgba(0,0,0,0.45)',
+            zIndex: '2147483647',
+            maxWidth: '340px',
+            minWidth: '240px',
+            padding: '14px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            border: '1px solid rgba(255,255,255,0.18)',
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+            fontSize: '14px',
+            lineHeight: '1.45',
+            transition: 'opacity 0.3s ease',
+            opacity: '1',
+            boxSizing: 'border-box',
+            userSelect: 'none',
+        });
+
+        notification.innerHTML = `
+        <span style="font-size:1.3rem;flex-shrink:0;line-height:1;">&#9993;&#65038;</span>
+        <div style="flex:1;min-width:0;overflow:hidden;">
+            <div style="font-weight:700;font-size:0.9rem;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">New Message!</div>
+            <div style="font-size:0.82rem;opacity:0.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">From ${senderName}</div>
+        </div>
+        <button data-close-toast style="background:none;border:none;color:rgba(255,255,255,0.55);cursor:pointer;padding:2px 4px;font-size:1rem;line-height:1;flex-shrink:0;border-radius:4px;" aria-label="Close">&#x2715;</button>
+    `;
+
+        // Close button
+        notification.querySelector('[data-close-toast]').addEventListener('click', (e) => {
+            e.stopPropagation();
+            notification.remove();
+        });
+
+        // Click anywhere on notification (except close) to go to Talk (same as layout behavior)
+        notification.addEventListener('click', () => {
+            const token = (typeof window.getSessionToken === 'function' ? window.getSessionToken() : '') || '';
+            const url = resolvedSenderId
+                ? `/talk?user=${encodeURIComponent(resolvedSenderId)}${token ? `&token=${encodeURIComponent(token)}` : ''}`
+                : `/talk${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+            window.location.href = url;
+        });
+
+        // Append to documentElement (<html>) to escape overflow-x:hidden on body
+        document.documentElement.appendChild(notification);
+
+        // Fade out then remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.parentNode && notification.remove(), 350);
+            }
+        }, 5000);
+    }
+
     // Single sticky toast that shows upload progress as a smooth bar.
     // Reuses one DOM node across calls so we don't stack/jump multiple toasts.
     const UPLOAD_TOAST_ID = 'talk-upload-progress-toast';
@@ -186,6 +264,7 @@
     }
 
     window.showNotification = showNotification;
+    window.showIncomingMessageToast = showIncomingMessageToast;
     window.showUploadProgress = showUploadProgress;
     window.hideUploadProgress = hideUploadProgress;
     window.resolveTalkAvailabilityMessage = resolveTalkAvailabilityMessage;
