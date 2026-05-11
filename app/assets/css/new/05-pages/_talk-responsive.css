@@ -3005,6 +3005,17 @@
         max-width: 100% !important;
         overflow-x: hidden !important;
       }
+
+      /* Avoid negative offsets creating subtle horizontal overflow on iOS */
+      .input-action-btn.toolbar-action-btn {
+        left: 0 !important;
+      }
+
+      /* Make first tap focus more reliable on iOS Chrome */
+      .message-input {
+        touch-action: manipulation;
+        -webkit-user-select: text;
+      }
     }
 
     /* Improved touch targets */
