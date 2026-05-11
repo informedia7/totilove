@@ -201,7 +201,7 @@ const MessageFactory = {
             alt: ''
         });
 
-        avatar.style.cssText = `width:${sizePx}px;height:${sizePx}px;border-radius:50%;margin-right:8px;padding-top:4px;box-sizing:border-box;position:relative;top:-2px;float:left;object-fit:cover;display:block;z-index:1;`;
+        avatar.style.cssText = `width:${sizePx}px;height:${sizePx}px;border-radius:50%;margin-right:8px;padding-top:4px;box-sizing:border-box;position:relative;top:-2px;float:left;object-fit:cover;display:block;`;
 
         let index = 0;
         const setNextSource = () => {
