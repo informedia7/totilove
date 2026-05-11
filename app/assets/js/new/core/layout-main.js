@@ -626,3 +626,4 @@ function setupLogoutHandling() {
     });
 }
 
+// sync-touch

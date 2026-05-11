@@ -1502,3 +1502,5 @@ if (typeof window !== 'undefined') {
     }, 100);
   };
 }
+
+// sync-touch
