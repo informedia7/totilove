@@ -34,12 +34,26 @@ window.handleLogout = async function(event) {
     }
 };
 
-// Mobile menu toggle function
+/** True when logged-in layout uses always-visible mobile nav (no Menu row). */
+function isAuthLayoutMobileNavPersistent() {
+    if (typeof window.matchMedia === 'function') {
+        return window.matchMedia('(max-width: 768px)').matches;
+    }
+    return window.innerWidth <= 768;
+}
+
+// Mobile menu toggle function (landscape / wide mobile: collapsible bar)
 function toggleMobileMenu(forceState) {
     const menuContainer = document.getElementById('mobile-menu-container');
     const menuToggle = document.getElementById('mobile-menu-toggle');
 
     if (!menuContainer || !menuToggle) {
+        return;
+    }
+
+    if (isAuthLayoutMobileNavPersistent()) {
+        menuContainer.classList.add('mobile-open');
+        menuToggle.setAttribute('aria-expanded', 'true');
         return;
     }
 
@@ -57,6 +71,9 @@ document.addEventListener('click', function(event) {
     const menuToggle = document.getElementById('mobile-menu-toggle');
 
     if (menuContainer && menuToggle && window.innerWidth <= 768) {
+        if (isAuthLayoutMobileNavPersistent()) {
+            return;
+        }
         const isClickInside = menuContainer.contains(event.target) || menuToggle.contains(event.target);
 
         if (!isClickInside && menuContainer.classList.contains('mobile-open')) {
@@ -70,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const menuItems = document.querySelectorAll('.mobile-menu-item');
     menuItems.forEach(item => {
         item.addEventListener('click', function() {
-            if (window.innerWidth <= 768) {
+            if (window.innerWidth <= 768 && !isAuthLayoutMobileNavPersistent()) {
                 toggleMobileMenu(false);
             }
         });

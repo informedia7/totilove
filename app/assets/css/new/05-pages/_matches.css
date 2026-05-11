@@ -1810,7 +1810,7 @@ body.dark-mode {
     }
 
     .online-users-grid.results-grid.list-view .uc-quick-action-view {
-        transform: translateY(-30px) !important;
+        transform: translateY(-52px) !important;
     }
 
     .online-users-grid.results-grid.list-view .uc-quick-action-like,

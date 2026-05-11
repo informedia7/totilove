@@ -1008,13 +1008,31 @@ html[data-theme="dark"] .profile-header .header-btn.theme-toggle,
     display: block;
 }
 
+/* Mobile (portrait + landscape): hide collapsible "Menu" bar; show nav strip directly */
+@media (max-width: 768px) {
+    .mobile-menu-toggle {
+        display: none !important;
+    }
+
+    .mobile-menu-container {
+        display: block !important;
+        margin-top: 0 !important;
+    }
+
+    .mobile-menu-wrapper {
+        margin-bottom: 0.5rem;
+    }
+}
+
 .mobile-menu-list {
     list-style: none;
-    padding: 0.5rem;
+    padding: 0.3rem 0.25rem;
     margin: 0;
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.5rem;
+    /* Seven primary nav items — one row on narrow viewports */
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.2rem;
+    align-items: stretch;
 }
 
 .mobile-menu-item {
@@ -1022,17 +1040,28 @@ html[data-theme="dark"] .profile-header .header-btn.theme-toggle,
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.35rem;
-    padding: 0.75rem;
-    border-radius: 14px;
+    justify-content: center;
+    gap: 0.15rem;
+    padding: 0.4rem 0.08rem;
+    min-width: 0;
+    border-radius: 12px;
     text-decoration: none;
     color: var(--nav-text-muted);
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: clamp(0.58rem, 2.4vw, 0.72rem);
+    line-height: 1.1;
     transition: background 0.2s ease, color 0.2s ease;
     border: 1px solid transparent;
+    text-align: center;
 }
 
+.mobile-menu-item > span {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 .mobile-menu-item:hover {
     background: rgba(255, 255, 255, 0.04);
     color: var(--nav-text);

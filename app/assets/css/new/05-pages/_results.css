@@ -545,7 +545,7 @@ html[data-theme="dark"] .view-btn.active {
     }
 
     .results-grid.list-view .uc-quick-action-view {
-        transform: translateY(-30px) !important;
+        transform: translateY(-52px) !important;
     }
 
     .results-grid.list-view .uc-info {

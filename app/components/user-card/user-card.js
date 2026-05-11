@@ -120,7 +120,7 @@ class UserCard {
                alt="${profile.name}"
                loading="lazy"
                width="300"
-               height="375">
+               height="300">
           
           <div class="uc-avatar-fallback">
             <i class="fas fa-user"></i>

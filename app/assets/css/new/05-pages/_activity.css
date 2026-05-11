@@ -1264,7 +1264,7 @@ body.dark-mode .unblock-confirm-yes {
     }
 
     .activity-card-grid.list-view .uc-quick-action-view {
-        transform: translateY(-30px) !important;
+        transform: translateY(-52px) !important;
     }
 
     .activity-card-grid.list-view .uc-info {
@@ -1305,7 +1305,7 @@ body.dark-mode .unblock-confirm-yes {
     }
 
     .activity-card-grid:not(.list-view) .uc-image-container {
-        aspect-ratio: 3 / 4;
+        aspect-ratio: 1 / 1;
     }
 
     .activity-card-grid:not(.list-view) .uc-quick-action {
