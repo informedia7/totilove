@@ -278,6 +278,12 @@ function setupRealtimeMessageHandlers() {
             // Check if this typing event is for the current conversation partner
             if (parseInt(data.userId) === parseInt(conversation.partnerId)) {
                 if (data.isTyping) {
+                    // Treat typing as a strong realtime hint that the partner is online.
+                    // This fixes cases where presence is stale and the avatar dot doesn't return immediately.
+                    if (typeof updateUserOnlineStatus === 'function') {
+                        updateUserOnlineStatus(data.userId, true);
+                    }
+
                     // Show typing indicator
                     if (typeof showTypingIndicator === 'function') {
                         showTypingIndicator(data.real_name || conversation.name);
