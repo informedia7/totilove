@@ -435,6 +435,9 @@ window.updateTalkNotificationBadge = async function() {
 // Show notification in layout
 function showLayoutNotification(messageData) {
     const senderName = messageData.senderUsername || messageData.sender_real_name || 'Someone';
+    const senderIdRaw = messageData?.senderId ?? messageData?.sender_id ?? null;
+    const senderIdStr = senderIdRaw != null ? String(senderIdRaw).trim() : '';
+    const senderId = senderIdStr && /^\\d+$/.test(senderIdStr) ? parseInt(senderIdStr, 10) : null;
 
     // Create a dedicated host node outside any scroll container
     const notification = document.createElement('div');
@@ -484,7 +487,11 @@ function showLayoutNotification(messageData) {
 
     // Click anywhere on notification (except close) to go to Talk
     notification.addEventListener('click', () => {
-        window.location.href = '/talk.html';
+        const token = (typeof window.getSessionToken === 'function' ? window.getSessionToken() : '') || '';
+        const url = senderId
+            ? `/talk?user=${encodeURIComponent(senderId)}${token ? `&token=${encodeURIComponent(token)}` : ''}`
+            : `/talk${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+        window.location.href = url;
     });
 
     // Append to documentElement (<html>) to escape overflow-x:hidden on body
