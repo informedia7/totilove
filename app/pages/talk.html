@@ -912,7 +912,8 @@
                     header.style.setProperty('padding-right', '6px', 'important');
                     header.style.setProperty('gap', '4px', 'important');
 
-                    actions.style.setProperty('margin-right', '50px', 'important');
+                    // Keep actions flush-right on mobile; avoid overlapping avatar on narrow screens
+                    actions.style.setProperty('margin-right', '0px', 'important');
                     actions.style.setProperty('gap', '2px', 'important');
                     actions.style.setProperty('min-width', '0', 'important');
                     actions.style.setProperty('flex', '0 1 auto', 'important');
