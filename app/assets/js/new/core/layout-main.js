@@ -117,16 +117,10 @@ function initializePresenceEngine() {
         const registerDots = (root = document) => {
             const selectors = '.online-dot-results[data-user-id]';
             root.querySelectorAll(selectors).forEach(element => {
-                const raw = element.dataset.userId;
-                const s = raw != null ? String(raw).trim() : '';
-                if (!s || !/^\d+$/.test(s)) {
-                    return;
+                const userId = element.dataset.userId;
+                if (userId) {
+                    window.Presence.bindIndicator(element, userId, { variant: 'dot' });
                 }
-                const userId = parseInt(s, 10);
-                if (!Number.isInteger(userId) || userId < 1) {
-                    return;
-                }
-                window.Presence.bindIndicator(element, userId, { variant: 'dot' });
             });
         };
 
@@ -165,10 +159,7 @@ function getLayoutCurrentUser() {
         ...(window.currentUser || {})
     };
 
-    const resolvedRaw = mergedUser.id ?? parsedBodyUserId;
-    const resolvedStr = resolvedRaw != null && resolvedRaw !== '' ? String(resolvedRaw).trim() : '';
-    const resolvedParsed = resolvedStr && /^\d+$/.test(resolvedStr) ? parseInt(resolvedStr, 10) : NaN;
-    const resolvedId = Number.isInteger(resolvedParsed) && resolvedParsed > 0 ? resolvedParsed : null;
+    const resolvedId = mergedUser.id || parsedBodyUserId;
     if (!resolvedId) {
         return null;
     }
@@ -264,15 +255,14 @@ function initializeLayoutNotifications() {
         layoutSocket.on('connect', () => {
             layoutSocketInitializing = false;
             const connectedUser = getLayoutCurrentUser();
-            const userId = Number(connectedUser?.id);
-            if (!connectedUser || !Number.isFinite(userId) || userId < 1) {
+            if (!connectedUser || !connectedUser.id) {
                 scheduleLayoutNotificationInitialization();
                 return;
             }
-            // Authenticate the socket connection (numeric user id only; real_name is display-only)
+            // Authenticate the socket connection
             const authData = {
-                userId,
-                real_name: connectedUser.real_name || connectedUser.email || ''
+                userId: connectedUser.id,
+                real_name: connectedUser.real_name || connectedUser.email
             };
             layoutSocket.emit('authenticate', authData);
         });
