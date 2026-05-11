@@ -158,6 +158,8 @@ function setupRealtimeMessageHandlers() {
                     if (isFromPartnerToMe) {
                         if (typeof window.showIncomingMessageToast === 'function') {
                             window.showIncomingMessageToast(conversation.name, messageData.senderId);
+                        } else if (typeof showNotification === 'function') {
+                            showNotification(`💬 New message from ${conversation.name}`, 'info');
                         }
                         if (typeof playNotificationSound === 'function') {
                             playNotificationSound();
@@ -212,6 +214,8 @@ function setupRealtimeMessageHandlers() {
                     if (isFromPartnerToMe) {
                         if (typeof window.showIncomingMessageToast === 'function') {
                             window.showIncomingMessageToast(conversation.name, messageData.senderId);
+                        } else if (typeof showNotification === 'function') {
+                            showNotification(`💬 New message from ${conversation.name}`, 'info');
                         }
 
                         // Play notification sound if available
@@ -235,9 +239,11 @@ function setupRealtimeMessageHandlers() {
             if (typeof playNotificationSound === 'function') {
                 playNotificationSound();
             }
+            const senderName = messageData.sender_real_name || messageData.senderName || messageData.senderUsername || 'New message';
             if (typeof window.showIncomingMessageToast === 'function') {
-                const senderName = messageData.sender_real_name || messageData.senderName || messageData.senderUsername || 'New message';
                 window.showIncomingMessageToast(senderName, messageData.senderId);
+            } else if (typeof showNotification === 'function') {
+                showNotification(`💬 New message from ${senderName}`, 'info');
             }
         }
 
