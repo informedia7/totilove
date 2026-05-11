@@ -213,11 +213,12 @@ function setupRealtimeMessageHandlers() {
                         if (typeof window.showIncomingMessageToast === 'function') {
                             window.showIncomingMessageToast(conversation.name, messageData.senderId);
                         }
+                        // We already surfaced a toast for this message; prevent the fallback toast below.
+                        notificationPlayed = true;
 
                         // Play notification sound if available
                         if (typeof playNotificationSound === 'function') {
                             playNotificationSound();
-                            notificationPlayed = true;
                         }
 
                         // Mark as read if conversation is active
