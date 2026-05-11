@@ -161,8 +161,6 @@ function setupRealtimeMessageHandlers() {
 
                         if (typeof window.showIncomingMessageToast === 'function') {
                             window.showIncomingMessageToast(conversation.name, messageData.senderId);
-                        } else if (typeof showNotification === 'function') {
-                            showNotification(`💬 New message from ${conversation.name}`, 'info');
                         }
                         if (typeof playNotificationSound === 'function') {
                             playNotificationSound();
