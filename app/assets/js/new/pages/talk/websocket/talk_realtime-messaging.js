@@ -156,12 +156,16 @@ function setupRealtimeMessageHandlers() {
 
                     // For received messages, still notify and mark read
                     if (isFromPartnerToMe) {
-                        if (typeof showNotification === 'function') {
+                        // Mark notified immediately so the fallback block won't duplicate sound/toast.
+                        notificationPlayed = true;
+
+                        if (typeof window.showIncomingMessageToast === 'function') {
+                            window.showIncomingMessageToast(conversation.name, messageData.senderId);
+                        } else if (typeof showNotification === 'function') {
                             showNotification(`💬 New message from ${conversation.name}`, 'info');
                         }
                         if (typeof playNotificationSound === 'function') {
                             playNotificationSound();
-                            notificationPlayed = true;
                         }
                         if (typeof markMessageAsRead === 'function') {
                             setTimeout(() => { markMessageAsRead(messageData.id); }, 500);
