@@ -65,8 +65,8 @@ function setupRealtimeMessageHandlers() {
         const currentUserId = TalkState ? TalkState.getCurrentUserId() : (window.currentUser?.id || null);
         const currentConversation = TalkState ? TalkState.getCurrentConversation() : window.currentConversation;
         const conversations = TalkState ? TalkState.getConversations() : window.conversations;
-        const messageSenderId = parseInt(messageData.senderId);
-        const messageReceiverId = parseInt(messageData.receiverId);
+        const messageSenderId = parseInt(messageData.senderId ?? messageData.sender_id);
+        const messageReceiverId = parseInt(messageData.receiverId ?? messageData.receiver_id);
         const isIncomingForMe = messageReceiverId === currentUserId;
         let notificationPlayed = false;
         
@@ -156,8 +156,9 @@ function setupRealtimeMessageHandlers() {
 
                     // For received messages, still notify and mark read
                     if (isFromPartnerToMe) {
+                        const senderIdForToast = messageData.senderId ?? messageData.sender_id;
                         if (typeof window.showIncomingMessageToast === 'function') {
-                            window.showIncomingMessageToast(conversation.name, messageData.senderId);
+                            window.showIncomingMessageToast(conversation.name, senderIdForToast);
                         } else if (typeof showNotification === 'function') {
                             showNotification(`💬 New message from ${conversation.name}`, 'info');
                         }
@@ -212,8 +213,9 @@ function setupRealtimeMessageHandlers() {
 
                     // Show notification for received messages only
                     if (isFromPartnerToMe) {
+                        const senderIdForToast = messageData.senderId ?? messageData.sender_id;
                         if (typeof window.showIncomingMessageToast === 'function') {
-                            window.showIncomingMessageToast(conversation.name, messageData.senderId);
+                            window.showIncomingMessageToast(conversation.name, senderIdForToast);
                         } else if (typeof showNotification === 'function') {
                             showNotification(`💬 New message from ${conversation.name}`, 'info');
                         }
@@ -240,8 +242,9 @@ function setupRealtimeMessageHandlers() {
                 playNotificationSound();
             }
             const senderName = messageData.sender_real_name || messageData.senderName || messageData.senderUsername || 'New message';
+            const senderIdForToast = messageData.senderId ?? messageData.sender_id;
             if (typeof window.showIncomingMessageToast === 'function') {
-                window.showIncomingMessageToast(senderName, messageData.senderId);
+                window.showIncomingMessageToast(senderName, senderIdForToast);
             } else if (typeof showNotification === 'function') {
                 showNotification(`💬 New message from ${senderName}`, 'info');
             }
