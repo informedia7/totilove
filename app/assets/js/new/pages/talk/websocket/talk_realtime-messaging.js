@@ -156,8 +156,8 @@ function setupRealtimeMessageHandlers() {
 
                     // For received messages, still notify and mark read
                     if (isFromPartnerToMe) {
-                        if (typeof showNotification === 'function') {
-                            showNotification(`💬 New message from ${conversation.name}`, 'info');
+                        if (typeof window.showIncomingMessageToast === 'function') {
+                            window.showIncomingMessageToast(conversation.name, messageData.senderId);
                         }
                         if (typeof playNotificationSound === 'function') {
                             playNotificationSound();
@@ -210,8 +210,8 @@ function setupRealtimeMessageHandlers() {
 
                     // Show notification for received messages only
                     if (isFromPartnerToMe) {
-                        if (typeof showNotification === 'function') {
-                            showNotification(`💬 New message from ${conversation.name}`, 'info');
+                        if (typeof window.showIncomingMessageToast === 'function') {
+                            window.showIncomingMessageToast(conversation.name, messageData.senderId);
                         }
 
                         // Play notification sound if available
@@ -235,9 +235,9 @@ function setupRealtimeMessageHandlers() {
             if (typeof playNotificationSound === 'function') {
                 playNotificationSound();
             }
-            if (typeof showNotification === 'function') {
+            if (typeof window.showIncomingMessageToast === 'function') {
                 const senderName = messageData.sender_real_name || messageData.senderName || messageData.senderUsername || 'New message';
-                showNotification(`💬 New message from ${senderName}`, 'info');
+                window.showIncomingMessageToast(senderName, messageData.senderId);
             }
         }
 
