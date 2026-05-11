@@ -96,9 +96,10 @@ button:contains('âž¤'),
 .app-container {
     display: flex;
     flex-direction: column;
+    /* Avoid fixed widths: iOS Safari can "widen" pages on input focus/keyboard */
+    width: 100%;
     max-width: 1200px;
-    width: 1200px;
-    min-width: 400px;
+    min-width: 0;
     height: calc(100vh - 40px); /* Account for top and bottom margins */
     height: calc(100dvh - 40px);
     min-height: 400px;
