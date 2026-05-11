@@ -280,8 +280,10 @@ function setupRealtimeMessageHandlers() {
                 if (data.isTyping) {
                     // Treat typing as a strong realtime hint that the partner is online.
                     // This fixes cases where presence is stale and the avatar dot doesn't return immediately.
-                    if (typeof updateUserOnlineStatus === 'function') {
-                        updateUserOnlineStatus(data.userId, true);
+                    if (typeof window.updateUserOnlineStatus === 'function') {
+                        window.updateUserOnlineStatus(data.userId, true);
+                    } else if (window.Presence && typeof window.Presence.applyPresenceHint === 'function') {
+                        window.Presence.applyPresenceHint(parseInt(data.userId), true);
                     }
 
                     // Show typing indicator
@@ -300,20 +302,20 @@ function setupRealtimeMessageHandlers() {
 
     // Listen for online status updates
     socket.on('user_online', (data) => {
-        if (typeof updateUserOnlineStatus === 'function') {
-            updateUserOnlineStatus(data.userId, true);
+        if (typeof window.updateUserOnlineStatus === 'function') {
+            window.updateUserOnlineStatus(data.userId, true);
         }
     });
 
     socket.on('user_offline', (data) => {
-        if (typeof updateUserOnlineStatus === 'function') {
-            updateUserOnlineStatus(data.userId, false);
+        if (typeof window.updateUserOnlineStatus === 'function') {
+            window.updateUserOnlineStatus(data.userId, false);
         }
     });
 
     socket.on('user_status_change', (data) => {
-        if (typeof updateUserOnlineStatus === 'function' && typeof data.isOnline === 'boolean') {
-            updateUserOnlineStatus(data.userId, data.isOnline);
+        if (typeof window.updateUserOnlineStatus === 'function' && typeof data.isOnline === 'boolean') {
+            window.updateUserOnlineStatus(data.userId, data.isOnline);
         }
     });
 
