@@ -65,8 +65,8 @@ function setupRealtimeMessageHandlers() {
         const currentUserId = TalkState ? TalkState.getCurrentUserId() : (window.currentUser?.id || null);
         const currentConversation = TalkState ? TalkState.getCurrentConversation() : window.currentConversation;
         const conversations = TalkState ? TalkState.getConversations() : window.conversations;
-        const messageSenderId = parseInt(messageData.senderId ?? messageData.sender_id);
-        const messageReceiverId = parseInt(messageData.receiverId ?? messageData.receiver_id);
+        const messageSenderId = parseInt(messageData.senderId);
+        const messageReceiverId = parseInt(messageData.receiverId);
         const isIncomingForMe = messageReceiverId === currentUserId;
         let notificationPlayed = false;
         
@@ -211,7 +211,7 @@ function setupRealtimeMessageHandlers() {
                     // Show notification for received messages only
                     if (isFromPartnerToMe) {
                         if (typeof window.showIncomingMessageToast === 'function') {
-                            window.showIncomingMessageToast(conversation.name, messageData.senderId ?? messageData.sender_id);
+                            window.showIncomingMessageToast(conversation.name, messageData.senderId);
                         }
 
                         // Play notification sound if available
@@ -237,7 +237,7 @@ function setupRealtimeMessageHandlers() {
             }
             if (typeof window.showIncomingMessageToast === 'function') {
                 const senderName = messageData.sender_real_name || messageData.senderName || messageData.senderUsername || 'Someone';
-                window.showIncomingMessageToast(senderName, messageData.senderId ?? messageData.sender_id);
+                window.showIncomingMessageToast(senderName, messageData.senderId);
             }
         }
 
