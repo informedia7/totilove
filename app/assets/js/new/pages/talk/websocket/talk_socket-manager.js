@@ -87,6 +87,30 @@ function initializeWebSocket() {
         pendingOperations = [];
         window.pendingOperations = [];
 
+        const resolveAuthUserId = () => {
+            try {
+                const fromState = (window.TalkState && typeof window.TalkState.getCurrentUserId === 'function')
+                    ? window.TalkState.getCurrentUserId()
+                    : null;
+                return fromState || window.currentUser?.id || null;
+            } catch (_error) {
+                return window.currentUser?.id || null;
+            }
+        };
+
+        const emitAuthenticateIfPossible = (reason = 'connect') => {
+            const rawId = resolveAuthUserId();
+            const userId = Number(rawId);
+            if (Number.isFinite(userId) && userId >= 1) {
+                socket.emit('authenticate', {
+                    userId,
+                    real_name: window.currentUser?.real_name || 'User'
+                });
+                return true;
+            }
+            return false;
+        };
+
         socket.on('connect', () => {
             isSocketConnected = true;
             window.isSocketConnected = true;
@@ -99,13 +123,22 @@ function initializeWebSocket() {
             window.isAuthenticated = false;
 
             // SECURITY: Authenticate user with WebSocket BEFORE allowing operations
-            const rawId = TalkState ? TalkState.getCurrentUserId() : (window.currentUser?.id ?? null);
-            const userId = Number(rawId);
-            if (Number.isFinite(userId) && userId >= 1) {
-                socket.emit('authenticate', {
-                    userId,
-                    real_name: window.currentUser?.real_name || 'User'
-                });
+            if (!emitAuthenticateIfPossible('connect')) {
+                // If TalkState isn't initialized yet, retry shortly.
+                let attempts = 0;
+                const retry = () => {
+                    if (window.isAuthenticated) {
+                        return;
+                    }
+                    attempts += 1;
+                    if (emitAuthenticateIfPossible('connect-retry')) {
+                        return;
+                    }
+                    if (attempts < 10) {
+                        setTimeout(retry, 250);
+                    }
+                };
+                setTimeout(retry, 250);
             }
 
             if (typeof showNotification === 'function') {
@@ -195,13 +228,21 @@ function initializeWebSocket() {
             }
 
             // Re-authenticate after reconnection
-            const rawIdReconnect = TalkState ? TalkState.getCurrentUserId() : (window.currentUser?.id ?? null);
-            const userIdReconnect = Number(rawIdReconnect);
-            if (Number.isFinite(userIdReconnect) && userIdReconnect >= 1) {
-                socket.emit('authenticate', {
-                    userId: userIdReconnect,
-                    real_name: window.currentUser?.real_name || 'User'
-                });
+            if (!emitAuthenticateIfPossible('reconnect')) {
+                let attempts = 0;
+                const retry = () => {
+                    if (window.isAuthenticated) {
+                        return;
+                    }
+                    attempts += 1;
+                    if (emitAuthenticateIfPossible('reconnect-retry')) {
+                        return;
+                    }
+                    if (attempts < 10) {
+                        setTimeout(retry, 250);
+                    }
+                };
+                setTimeout(retry, 250);
             }
 
             // Re-setup status listeners after reconnection (only if not already initialized)
