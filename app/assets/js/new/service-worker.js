@@ -5,8 +5,8 @@
  * Migration Phase 3: Week 11
  */
 
-const CACHE_NAME = 'totilove-v3';
-const RUNTIME_CACHE = 'totilove-runtime-v3';
+const CACHE_NAME = 'totilove-v4';
+const RUNTIME_CACHE = 'totilove-runtime-v4';
 
 // Assets to cache immediately
 const PRECACHE_ASSETS = [
@@ -75,6 +75,7 @@ self.addEventListener('fetch', (event) => {
   
   const requestUrl = new URL(event.request.url);
   const isStaticStyleOrScript = requestUrl.pathname.startsWith('/assets/css/') || requestUrl.pathname.startsWith('/assets/js/');
+  const isDocument = event.request.destination === 'document';
 
   // Network-first for CSS/JS to prevent stale UI after deploys/edits
   if (isStaticStyleOrScript) {
@@ -89,6 +90,29 @@ self.addEventListener('fetch', (event) => {
           return response;
         })
         .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Network-first for HTML documents to avoid serving stale layout/navigation from cache
+  if (isDocument) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200 && response.type === 'basic') {
+            const responseToCache = response.clone();
+            caches.open(RUNTIME_CACHE)
+              .then((cache) => cache.put(event.request, responseToCache));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+        .then((response) => {
+          if (response) {
+            return response;
+          }
+          return caches.match('/offline.html');
+        })
     );
     return;
   }
