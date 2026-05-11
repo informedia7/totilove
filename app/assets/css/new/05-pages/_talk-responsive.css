@@ -2986,6 +2986,27 @@
       font-size: 16px !important;
     }
 
+    /* iOS (Safari/Chrome): clamp horizontal layout during keyboard/focus */
+    @supports (-webkit-touch-callout: none) {
+      html,
+      body {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+      }
+
+      .app-container,
+      .app-container > .main-content,
+      .sidebar,
+      .chat-area,
+      .messages-area,
+      .message-input-area {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+      }
+    }
+
     /* Improved touch targets */
     @media (pointer: coarse) {
 
