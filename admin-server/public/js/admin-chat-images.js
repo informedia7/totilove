@@ -1,4 +1,4 @@
-/* Chat images monitor — card grid; click opens detail modal with large image + all controls */
+/* Chat images monitor — Grid or List layout; detail modal for full size + controls */
 
 let currentPage = 1;
 let totalPages = 1;
@@ -15,7 +15,7 @@ function getChatImageSelectionMode() {
 
 function getChatImageViewMode() {
     const el = document.getElementById('chatImageViewMode');
-    return el && el.value === 'compact' ? 'compact' : 'grid';
+    return el && el.value === 'list' ? 'list' : 'grid';
 }
 
 function syncChatImagesGridClasses() {
@@ -302,7 +302,7 @@ function buildQuery() {
 async function loadImages() {
     const grid = document.getElementById('chatImagesGrid');
     syncChatImagesGridClasses();
-    grid.innerHTML = '<div class="loading" style="grid-column:1/-1;text-align:center;padding:40px;">Loading…</div>';
+    grid.innerHTML = '<div class="loading chat-images-status-msg" style="width:100%;text-align:center;padding:40px;">Loading…</div>';
     try {
         const res = await fetch(`/api/chat-images?${buildQuery()}`);
         const data = await res.json();
@@ -315,7 +315,7 @@ async function loadImages() {
         renderPagination(data.pagination);
         loadStats();
     } catch (err) {
-        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:24px;color:#b91c1c;">${escapeHtml(err.message)}</div>`;
+        grid.innerHTML = `<div class="chat-images-status-msg" style="width:100%;text-align:center;padding:24px;color:#b91c1c;">${escapeHtml(err.message)}</div>`;
     }
 }
 
@@ -323,33 +323,75 @@ function chatImageSenderSuspended(row) {
     return row && (row.sender_is_suspended === true || row.sender_is_suspended === 't');
 }
 
+function buildChatImageListRowHtml(row, idx, multi) {
+    const previewSrc = resolveMediaUrl(row.file_path || row.thumbnail_path);
+    const suspended = chatImageSenderSuspended(row);
+    const when = formatWhen(row.uploaded_at || row.message_timestamp);
+    const sName = row.sender_username || 'User';
+    const rName = row.receiver_username || 'User';
+    const attachmentId = row.attachment_id;
+    const senderId = row.sender_id;
+    const checkOverlay = multi
+        ? `<label class="card-cb-overlay" onclick="event.stopPropagation()"><input type="checkbox" class="chat-image-checkbox" data-attachment-id="${attachmentId}" ${selectedAttachmentIds.has(attachmentId) ? 'checked' : ''} onchange="toggleChatImageAttachmentSelection(${attachmentId}, this.checked)"></label>`
+        : '';
+    const suspendBtn = suspended
+        ? `<button type="button" class="btn btn-sm btn-account-unsuspend" onclick="event.stopPropagation();unsuspendSender(${senderId})">Unsuspend</button>`
+        : `<button type="button" class="btn btn-sm btn-account-suspend" onclick="event.stopPropagation();suspendSender(${senderId})">Suspend</button>`;
+    return `
+            <article class="chat-image-list-row" role="listitem" tabindex="0" data-index="${idx}"
+                onkeydown="if(event.key==='Enter'||event.key===' '){if(event.target.closest('.chat-image-list-actions')||event.target.closest('.card-cb-overlay'))return;event.preventDefault();openChatImageDetail(${idx});}">
+                <div class="chat-image-list-visual">
+                    ${checkOverlay}
+                    <div class="card-thumb-wrap" onclick="openChatImageDetail(${idx})">
+                        <img class="card-thumb" src="${escapeHtml(previewSrc)}" alt="" loading="lazy"
+                            onerror="this.style.opacity=0.35;this.alt='(missing)'">
+                    </div>
+                </div>
+                <div class="chat-image-list-right">
+                    <div class="chat-image-list-meta" onclick="openChatImageDetail(${idx})">
+                        <span class="card-msg-id">Message ${row.message_id}</span>
+                        <span class="sender-badge ${suspended ? 'suspended' : ''}" style="margin-left:6px;">${suspended ? 'Suspended' : 'Active'}</span>
+                        <div class="card-users-line" style="margin-top:6px;">${escapeHtml(sName)}:id ${row.sender_id} → ${escapeHtml(rName)}:id ${row.receiver_id}</div>
+                        <div class="card-hint">${escapeHtml(when)}</div>
+                    </div>
+                    <div class="chat-image-list-actions" onclick="event.stopPropagation()">
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="openChatImageDetail(${idx})">Open</button>
+                        <button type="button" class="btn btn-sm btn-info" onclick="removeChatImage(${attachmentId})">Remove</button>
+                        ${suspendBtn}
+                        <button type="button" class="btn btn-sm btn-account-delete" onclick="deleteSenderAccount(${senderId})">Delete account</button>
+                        <button type="button" class="btn btn-sm btn-account-delete-blacklist" onclick="blacklistSender(${senderId})">Delete+Blacklist</button>
+                    </div>
+                </div>
+            </article>
+        `;
+}
+
 function renderImageGrid(images) {
     const grid = document.getElementById('chatImagesGrid');
     syncChatImagesGridClasses();
     const multi = getChatImageSelectionMode() === 'multiple';
-    const compact = getChatImageViewMode() === 'compact';
+    const listMode = getChatImageViewMode() === 'list';
 
     if (!images.length) {
-        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:#64748b;">No chat images found.</div>';
+        grid.innerHTML = '<div class="chat-images-status-msg" style="width:100%;text-align:center;padding:32px;color:#64748b;">No chat images found.</div>';
         updateChatImageSelectAllState();
         return;
     }
-    grid.innerHTML = images.map((row, idx) => {
-        const previewSrc = compact
-            ? resolveMediaUrl(row.thumbnail_path || row.file_path)
-            : resolveMediaUrl(row.file_path || row.thumbnail_path);
-        const suspended = chatImageSenderSuspended(row);
-        const when = formatWhen(row.uploaded_at || row.message_timestamp);
-        const sName = row.sender_username || 'User';
-        const rName = row.receiver_username || 'User';
-        const attachmentId = row.attachment_id;
-        const checkOverlay = multi
-            ? `<label class="card-cb-overlay" onclick="event.stopPropagation()"><input type="checkbox" class="chat-image-checkbox" data-attachment-id="${attachmentId}" ${selectedAttachmentIds.has(attachmentId) ? 'checked' : ''} onchange="toggleChatImageAttachmentSelection(${attachmentId}, this.checked)"></label>`
-            : '';
-        const cardTitle = `Message ${row.message_id} · ${sName} (id ${row.sender_id}) → ${rName} (id ${row.receiver_id}) · ${when}`;
-        const titleAttr = compact ? ` title="${escapeHtml(cardTitle)}"` : '';
-        return `
-            <article class="chat-image-card" role="listitem" tabindex="0" data-index="${idx}"${titleAttr}
+    if (listMode) {
+        grid.innerHTML = images.map((row, idx) => buildChatImageListRowHtml(row, idx, multi)).join('');
+    } else {
+        grid.innerHTML = images.map((row, idx) => {
+            const previewSrc = resolveMediaUrl(row.file_path || row.thumbnail_path);
+            const suspended = chatImageSenderSuspended(row);
+            const when = formatWhen(row.uploaded_at || row.message_timestamp);
+            const sName = row.sender_username || 'User';
+            const rName = row.receiver_username || 'User';
+            const attachmentId = row.attachment_id;
+            const checkOverlay = multi
+                ? `<label class="card-cb-overlay" onclick="event.stopPropagation()"><input type="checkbox" class="chat-image-checkbox" data-attachment-id="${attachmentId}" ${selectedAttachmentIds.has(attachmentId) ? 'checked' : ''} onchange="toggleChatImageAttachmentSelection(${attachmentId}, this.checked)"></label>`
+                : '';
+            return `
+            <article class="chat-image-card" role="listitem" tabindex="0" data-index="${idx}"
                 onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChatImageDetail(${idx});}">
                 ${checkOverlay}
                 <div class="card-thumb-wrap" onclick="openChatImageDetail(${idx})">
@@ -364,7 +406,8 @@ function renderImageGrid(images) {
                 </div>
             </article>
         `;
-    }).join('');
+        }).join('');
+    }
     updateChatImageSelectAllState();
     updateChatImageBulkPanel();
 }

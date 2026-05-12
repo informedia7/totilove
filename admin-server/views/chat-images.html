@@ -38,15 +38,16 @@
         .chat-images-grid-wrap {
             margin-top: 20px;
         }
-        /* Grid: larger tiles, full-size preview in card */
+        /* Grid: tile min was 240px; reduce image area ~30% → min column 168px (240×0.7) */
         .chat-images-grid.view-mode-grid {
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 18px;
+            grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+            gap: 12px;
         }
-        /* Compact: min cell ≈ 25% of old 168px width (~75% smaller); thumbnail only (footer hidden in CSS) */
-        .chat-images-grid.view-mode-compact {
-            grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
-            gap: 4px;
+        /* List: one row per image — preview left, meta + actions right (preview ≈30% larger than grid cell: 168×1.3) */
+        .chat-images-grid.view-mode-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
         .chat-images-grid {
             display: grid;
@@ -82,21 +83,72 @@
         .chat-images-grid.view-mode-grid .chat-image-card .card-thumb {
             object-fit: contain;
         }
-        .chat-images-grid.view-mode-compact .chat-image-card {
-            border-radius: 6px;
+        .chat-image-list-row {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            gap: 16px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 14px;
+            transition: box-shadow 0.2s ease, border-color 0.2s ease;
         }
-        .chat-images-grid.view-mode-compact .chat-image-card .card-foot {
-            display: none;
+        .chat-image-list-row:hover {
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.1);
+            border-color: #c7d2fe;
         }
-        .chat-images-grid.view-mode-compact .chat-image-card .card-cb-overlay {
-            top: 2px;
-            left: 2px;
-            width: 18px;
-            height: 18px;
+        .chat-image-list-row:focus-visible {
+            outline: 2px solid #6366f1;
+            outline-offset: 2px;
         }
-        .chat-images-grid.view-mode-compact .chat-image-card .card-cb-overlay input {
-            width: 11px;
-            height: 11px;
+        .chat-image-list-visual {
+            position: relative;
+            flex-shrink: 0;
+            width: 218px;
+            max-width: 36vw;
+            aspect-ratio: 1;
+            background: #f1f5f9;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .chat-image-list-visual .card-thumb-wrap {
+            width: 100%;
+            height: 100%;
+            aspect-ratio: 1;
+            cursor: pointer;
+        }
+        .chat-image-list-visual .card-thumb {
+            object-fit: contain;
+        }
+        .chat-image-list-right {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .chat-image-list-meta {
+            flex: 1 1 220px;
+            min-width: 0;
+            font-size: 13px;
+            color: #334155;
+            line-height: 1.45;
+            cursor: pointer;
+        }
+        .chat-image-list-meta .card-msg-id {
+            font-size: 15px;
+        }
+        .chat-image-list-actions {
+            flex: 0 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
+            align-items: center;
         }
         .chat-image-card .card-foot {
             padding: 10px 12px 12px;
@@ -175,7 +227,8 @@
             height: 16px;
             cursor: pointer;
         }
-        .chat-images-grid.selection-mode-multiple .chat-image-card {
+        .chat-images-grid.selection-mode-multiple .chat-image-card,
+        .chat-images-grid.selection-mode-multiple .chat-image-list-visual {
             position: relative;
         }
         .chat-image-card .card-cb-overlay {
@@ -193,7 +246,8 @@
             box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
             cursor: pointer;
         }
-        .chat-images-grid.selection-mode-multiple .chat-image-card .card-cb-overlay {
+        .chat-images-grid.selection-mode-multiple .chat-image-card .card-cb-overlay,
+        .chat-images-grid.selection-mode-multiple .chat-image-list-visual .card-cb-overlay {
             display: flex;
         }
         .chat-image-card .card-cb-overlay input {
@@ -343,7 +397,7 @@
                 </form>
             </div>
             <h1>🖼️ Chat Images Monitor</h1>
-            <p>Use Layout for grid (large previews) or compact thumbnails; click a card for full size and Remove, then account actions: Suspend, Delete account, Delete+Blacklist. Image selection enables bulk remove.</p>
+            <p>Layout: Grid (smaller tiles, full image in card) or List (rows with larger preview and actions on the right). Open a row for the full detail modal. Image selection enables bulk remove.</p>
         </div>
 
         <div class="content">
@@ -400,9 +454,9 @@
             <div class="chat-images-selection-bar">
                 <div class="filter-group">
                     <label for="chatImageViewMode">Layout</label>
-                    <select id="chatImageViewMode" aria-label="Grid or compact thumbnail layout">
-                        <option value="grid" selected>Grid — large previews (full image)</option>
-                        <option value="compact">Compact — thumbnails (~75% smaller tiles)</option>
+                    <select id="chatImageViewMode" aria-label="Grid or list layout">
+                        <option value="grid" selected>Grid</option>
+                        <option value="list">List</option>
                     </select>
                 </div>
                 <div class="filter-group">
@@ -426,7 +480,7 @@
 
             <div class="chat-images-grid-wrap">
                 <div id="chatImagesGrid" class="chat-images-grid view-mode-grid" role="list">
-                    <div class="loading" style="grid-column: 1 / -1; text-align: center; padding: 40px;">Loading…</div>
+                    <div class="loading chat-images-status-msg" style="grid-column: 1 / -1; width: 100%; text-align: center; padding: 40px;">Loading…</div>
                 </div>
             </div>
 
