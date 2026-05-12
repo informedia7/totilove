@@ -1,6 +1,62 @@
 let allMessages = [];
 let currentPage = 1;
 let totalPages = 1;
+/** @type {Set<number>} */
+let selectedIds = new Set();
+
+const TABLE_COLSPAN = 11;
+
+function getSelectionMode() {
+    const el = document.getElementById('selectionModeSelect');
+    return el && el.value === 'multiple' ? 'multiple' : 'single';
+}
+
+function updateSelectedCountLabel() {
+    const label = document.getElementById('selectedCountLabel');
+    if (label) {
+        const n = selectedIds.size;
+        label.textContent = n === 1 ? '1 selected' : `${n} selected`;
+    }
+}
+
+function updateSelectAllCheckboxState() {
+    const el = document.getElementById('selectAllMessages');
+    if (!el || getSelectionMode() !== 'multiple') {
+        return;
+    }
+    const ids = allMessages.map((m) => m.id);
+    if (ids.length === 0) {
+        el.checked = false;
+        el.indeterminate = false;
+        return;
+    }
+    const nSel = ids.filter((id) => selectedIds.has(id)).length;
+    el.checked = nSel === ids.length;
+    el.indeterminate = nSel > 0 && nSel < ids.length;
+}
+
+function applySelectionModeUI() {
+    const mode = getSelectionMode();
+    const table = document.getElementById('messagesTable');
+    const bulk = document.getElementById('bulkActionsPanel');
+    if (table) {
+        table.classList.toggle('selection-mode-single', mode === 'single');
+        table.classList.toggle('selection-mode-multiple', mode === 'multiple');
+    }
+    if (bulk) {
+        bulk.style.display = mode === 'multiple' ? 'flex' : 'none';
+    }
+    if (mode === 'single') {
+        selectedIds.clear();
+        const selAll = document.getElementById('selectAllMessages');
+        if (selAll) {
+            selAll.checked = false;
+            selAll.indeterminate = false;
+        }
+    }
+    updateSelectedCountLabel();
+    displayMessages(allMessages);
+}
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
@@ -19,6 +75,29 @@ function setupEventListeners() {
     document.getElementById('clearFilters')?.addEventListener('click', clearFilters);
     document.getElementById('addMessageBtn')?.addEventListener('click', showAddModal);
     document.getElementById('exportCSVBtn')?.addEventListener('click', exportToCSV);
+
+    document.getElementById('selectionModeSelect')?.addEventListener('change', applySelectionModeUI);
+    document.getElementById('bulkDeleteBtn')?.addEventListener('click', bulkDeleteSelected);
+    document.getElementById('clearSelectionBtn')?.addEventListener('click', clearMessageSelection);
+    document.getElementById('selectAllMessages')?.addEventListener('change', onSelectAllMessagesChange);
+
+    document.getElementById('messagesTableBody')?.addEventListener('change', (e) => {
+        const t = e.target;
+        if (!t.classList || !t.classList.contains('msg-row-checkbox')) {
+            return;
+        }
+        const id = parseInt(t.getAttribute('data-msg-id'), 10);
+        if (Number.isNaN(id)) {
+            return;
+        }
+        if (t.checked) {
+            selectedIds.add(id);
+        } else {
+            selectedIds.delete(id);
+        }
+        updateSelectedCountLabel();
+        updateSelectAllCheckboxState();
+    });
     
     // Search input with debounce
     let searchTimeout;
@@ -89,8 +168,8 @@ async function loadMessages() {
         }
     } catch (error) {
         console.error('Error loading messages:', error);
-        document.getElementById('messagesTableBody').innerHTML = 
-            `<tr><td colspan="10" style="text-align: center; padding: 20px; color: red;">Error: ${error.message}</td></tr>`;
+        document.getElementById('messagesTableBody').innerHTML =
+            `<tr><td colspan="${TABLE_COLSPAN}" style="text-align: center; padding: 20px; color: red;">Error: ${error.message}</td></tr>`;
     }
 }
 
@@ -114,16 +193,23 @@ function displayMessages(messages) {
     const tbody = document.getElementById('messagesTableBody');
 
     if (messages.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px;">No messages found</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="${TABLE_COLSPAN}" style="text-align: center; padding: 40px;">No messages found</td></tr>`;
+        updateSelectAllCheckboxState();
         return;
     }
+
+    const multi = getSelectionMode() === 'multiple';
 
     tbody.innerHTML = messages.map(msg => {
         const recallBadgeClass = `badge-recall-${msg.recall_type || 'none'}`;
         const statusBadgeClass = `badge-${msg.status || 'sent'}`;
-        
+        const selectCell = multi
+            ? `<td class="col-select"><input type="checkbox" class="msg-row-checkbox" data-msg-id="${msg.id}" ${selectedIds.has(msg.id) ? 'checked' : ''}></td>`
+            : '<td class="col-select"></td>';
+
         return `
             <tr>
+                ${selectCell}
                 <td><strong>${msg.id || '-'}</strong></td>
                 <td>
                     <div>ID: ${msg.sender_id || '-'}</div>
@@ -155,6 +241,8 @@ function displayMessages(messages) {
             </tr>
         `;
     }).join('');
+
+    updateSelectAllCheckboxState();
 }
 
 function updatePagination(pagination) {
@@ -181,6 +269,33 @@ function updatePagination(pagination) {
     paginationDiv.innerHTML = html;
 }
 
+function clearMessageSelection() {
+    selectedIds.clear();
+    const selAll = document.getElementById('selectAllMessages');
+    if (selAll) {
+        selAll.checked = false;
+        selAll.indeterminate = false;
+    }
+    updateSelectedCountLabel();
+    displayMessages(allMessages);
+}
+
+function onSelectAllMessagesChange(e) {
+    if (getSelectionMode() !== 'multiple') {
+        return;
+    }
+    const checked = e.target.checked;
+    allMessages.forEach((m) => {
+        if (checked) {
+            selectedIds.add(m.id);
+        } else {
+            selectedIds.delete(m.id);
+        }
+    });
+    updateSelectedCountLabel();
+    displayMessages(allMessages);
+}
+
 function changePage(page) {
     currentPage = page;
     loadMessages();
@@ -193,6 +308,13 @@ function clearFilters() {
     document.getElementById('senderFilter').value = '';
     document.getElementById('receiverFilter').value = '';
     document.getElementById('statusFilter').value = '';
+    selectedIds.clear();
+    const selAll = document.getElementById('selectAllMessages');
+    if (selAll) {
+        selAll.checked = false;
+        selAll.indeterminate = false;
+    }
+    updateSelectedCountLabel();
     currentPage = 1;
     loadMessages();
 }
@@ -300,6 +422,62 @@ async function handleAddSubmit(e) {
     }
 }
 
+async function deleteMessageById(messageId) {
+    const response = await fetch(`/api/messages/${messageId}`, {
+        method: 'DELETE'
+    });
+    const data = await response.json();
+    if (!data.success) {
+        throw new Error(data.error || 'Failed to delete message');
+    }
+}
+
+async function bulkDeleteSelected() {
+    if (getSelectionMode() !== 'multiple') {
+        return;
+    }
+    if (selectedIds.size === 0) {
+        showWarning('No messages selected');
+        return;
+    }
+    const n = selectedIds.size;
+    const confirmed = await showConfirm(
+        `Delete ${n} selected message(s)? This action cannot be undone.`,
+        'Delete messages',
+        'Delete',
+        'Cancel',
+        'danger'
+    );
+    if (!confirmed) {
+        return;
+    }
+
+    const ids = [...selectedIds];
+    let ok = 0;
+    let fail = 0;
+    for (const id of ids) {
+        try {
+            await deleteMessageById(id);
+            ok++;
+            selectedIds.delete(id);
+        } catch (err) {
+            fail++;
+            console.error('Bulk delete failed for id', id, err);
+        }
+    }
+
+    if (ok > 0) {
+        showSuccess(`Deleted ${ok} message(s).`);
+    }
+    if (fail > 0) {
+        showError(`Failed to delete ${fail} message(s).`);
+    }
+    await loadMessages();
+    await loadStats();
+    updateSelectedCountLabel();
+    updateSelectAllCheckboxState();
+}
+
 async function confirmDelete(messageId) {
     const confirmed = await showConfirm('Are you sure you want to delete this message? This action cannot be undone.', 'Delete Message', 'Delete', 'Cancel', 'danger');
     if (!confirmed) {
@@ -307,19 +485,11 @@ async function confirmDelete(messageId) {
     }
 
     try {
-        const response = await fetch(`/api/messages/${messageId}`, {
-            method: 'DELETE'
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            showSuccess('Message deleted successfully!');
-            loadMessages();
-            loadStats();
-        } else {
-            throw new Error(data.error || 'Failed to delete message');
-        }
+        await deleteMessageById(messageId);
+        selectedIds.delete(messageId);
+        showSuccess('Message deleted successfully!');
+        loadMessages();
+        loadStats();
     } catch (error) {
         console.error('Error deleting message:', error);
         showError(`Error: ${error.message}`);
