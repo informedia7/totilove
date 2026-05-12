@@ -131,8 +131,25 @@ const sanitizeResponse = (data) => {
     };
 };
 
+/**
+ * Record an admin action for routes that do not mount the auditLog middleware
+ * (e.g. message management). Swallows DB errors so responses still succeed.
+ */
+const recordAdminAction = async (adminId, actionType, details = {}) => {
+    try {
+        await query(
+            `INSERT INTO admin_actions (admin_id, action_type, target_user_id, details, created_at)
+             VALUES ($1, $2, $3, $4, NOW())`,
+            [adminId, actionType, null, JSON.stringify(details)]
+        );
+    } catch (error) {
+        logger.error('Error recording admin action:', error);
+    }
+};
+
 module.exports = {
-    auditLog
+    auditLog,
+    recordAdminAction
 };
 
 

@@ -14,6 +14,7 @@ const serverConfig = require('./config/server');
 const { healthCheck } = require('./config/database');
 const redis = require('./config/redis');
 const logger = require('./utils/logger');
+const { isApiRequest } = require('./utils/isApiRequest');
 const {
     trimTotiloveBase,
     resolveTotilovePushBase,
@@ -295,7 +296,7 @@ app.use('/', routes);
 
 // 404 handler
 app.use((req, res) => {
-    if (req.path.startsWith('/api/')) {
+    if (isApiRequest(req)) {
         return res.status(404).json({
             success: false,
             error: 'Endpoint not found'
@@ -308,7 +309,7 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
     logger.error('Unhandled error:', err);
     
-    if (req.path.startsWith('/api/')) {
+    if (isApiRequest(req)) {
         return res.status(err.status || 500).json({
             success: false,
             error: serverConfig.environment === 'production' 

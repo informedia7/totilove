@@ -1,5 +1,6 @@
 const { query } = require('../config/database');
 const logger = require('../utils/logger');
+const { isApiRequest } = require('../utils/isApiRequest');
 
 /**
  * Middleware to check if user is authenticated (has active session)
@@ -7,7 +8,7 @@ const logger = require('../utils/logger');
 const requireAuth = async (req, res, next) => {
     try {
         if (!req.session || !req.session.adminId) {
-            if (req.path.startsWith('/api/')) {
+            if (isApiRequest(req)) {
                 return res.status(401).json({
                     success: false,
                     error: 'Authentication required'
@@ -24,7 +25,7 @@ const requireAuth = async (req, res, next) => {
 
         if (result.rows.length === 0) {
             req.session.destroy();
-            if (req.path.startsWith('/api/')) {
+            if (isApiRequest(req)) {
                 return res.status(401).json({
                     success: false,
                     error: 'Admin account not found or inactive'
@@ -38,7 +39,7 @@ const requireAuth = async (req, res, next) => {
         next();
     } catch (error) {
         logger.error('Auth middleware error:', error);
-        if (req.path.startsWith('/api/')) {
+        if (isApiRequest(req)) {
             return res.status(500).json({
                 success: false,
                 error: 'Authentication error'

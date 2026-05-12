@@ -1,5 +1,5 @@
 const messageManagementService = require('../services/messageManagementService');
-const { auditLog } = require('../middleware/audit');
+const { recordAdminAction } = require('../middleware/audit');
 const logger = require('../utils/logger');
 
 class MessageController {
@@ -88,8 +88,7 @@ class MessageController {
                 return res.status(404).json(result);
             }
 
-            // Audit log
-            auditLog(req.admin.id, 'update_message', messageId, {
+            await recordAdminAction(req.admin.id, 'update_message', {
                 message_id: messageId,
                 changes: updateData
             });
@@ -122,8 +121,7 @@ class MessageController {
                 return res.status(404).json(result);
             }
 
-            // Audit log
-            auditLog(req.admin.id, 'delete_message', messageId, {
+            await recordAdminAction(req.admin.id, 'delete_message', {
                 message_id: messageId
             });
 
@@ -154,8 +152,8 @@ class MessageController {
                 return res.status(400).json(result);
             }
 
-            // Audit log
-            auditLog(req.admin.id, 'add_message', result.messageId, {
+            await recordAdminAction(req.admin.id, 'add_message', {
+                message_id: result.messageId,
                 sender_id: messageData.sender_id,
                 receiver_id: messageData.receiver_id
             });
@@ -188,8 +186,7 @@ class MessageController {
                 return res.status(404).json(result);
             }
 
-            // Audit log
-            auditLog(req.admin.id, 'toggle_recall', messageId, {
+            await recordAdminAction(req.admin.id, 'toggle_recall', {
                 message_id: messageId,
                 recall_type: result.recall_type
             });
