@@ -63,6 +63,7 @@
             position: relative;
             background: #f1f5f9;
             aspect-ratio: 1;
+            cursor: pointer;
         }
         .chat-image-card .card-thumb {
             width: 100%;
@@ -75,6 +76,7 @@
             font-size: 12px;
             color: #475569;
             line-height: 1.35;
+            cursor: pointer;
         }
         .chat-image-card .card-msg-id {
             font-weight: 700;
@@ -104,6 +106,74 @@
         .sender-badge.suspended {
             background: #fee2e2;
             color: #991b1b;
+        }
+
+        .chat-images-selection-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 16px;
+            margin: 16px 0 14px;
+            padding: 12px 14px;
+            background: #f8f9fb;
+            border: 1px solid #e2e6ea;
+            border-radius: 8px;
+        }
+        .chat-images-selection-bar .filter-group {
+            margin: 0;
+        }
+        .chat-images-selection-bar label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 4px;
+        }
+        .chat-images-selection-bar select {
+            min-width: 220px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        #chatImageSelectAllRow {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #334155;
+        }
+        #chatImageSelectAllRow input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .chat-images-grid.selection-mode-multiple .chat-image-card {
+            position: relative;
+        }
+        .chat-image-card .card-cb-overlay {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            z-index: 3;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 6px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+            cursor: pointer;
+        }
+        .chat-images-grid.selection-mode-multiple .chat-image-card .card-cb-overlay {
+            display: flex;
+        }
+        .chat-image-card .card-cb-overlay input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            margin: 0;
         }
 
         /* Detail modal: large image + controls */
@@ -246,7 +316,7 @@
                 </form>
             </div>
             <h1>🖼️ Chat Images Monitor</h1>
-            <p>Click an image to view it full size and use Remove, then account actions in order of severity: Suspend, Delete account, Delete+Blacklist.</p>
+            <p>Click an image to view it full size and use Remove, then account actions in order of severity: Suspend, Delete account, Delete+Blacklist. Use Image selection below for single (default) or multiple mode with bulk remove.</p>
         </div>
 
         <div class="content">
@@ -298,6 +368,26 @@
                     <button type="button" id="applyFilters" class="btn btn-primary">Search</button>
                     <button type="button" id="clearFilters" class="btn btn-secondary">Clear</button>
                 </div>
+            </div>
+
+            <div class="chat-images-selection-bar">
+                <div class="filter-group">
+                    <label for="chatImageSelectionMode">Image selection</label>
+                    <select id="chatImageSelectionMode" aria-label="Single or multiple image selection">
+                        <option value="single">Single — click a card to view or remove</option>
+                        <option value="multiple">Multiple — checkboxes &amp; bulk remove</option>
+                    </select>
+                </div>
+                <div id="chatImageBulkPanel" style="display: none; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span id="chatImageSelectedCountLabel" style="font-size: 14px; color: #444;">0 selected</span>
+                    <button type="button" id="chatImageBulkRemoveBtn" class="btn btn-danger">Remove selected</button>
+                    <button type="button" id="chatImageClearSelectionBtn" class="btn btn-secondary">Clear selection</button>
+                </div>
+            </div>
+
+            <div id="chatImageSelectAllRow">
+                <input type="checkbox" id="chatImageSelectAll" title="Select all on this page" aria-label="Select all images on this page">
+                <label for="chatImageSelectAll" style="cursor: pointer; margin: 0;">Select all on this page</label>
             </div>
 
             <div class="chat-images-grid-wrap">

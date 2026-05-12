@@ -5,6 +5,84 @@ let totalPages = 1;
 let limit = 30;
 /** @type {Array<object>} */
 let lastLoadedImages = [];
+/** @type {Set<number>} */
+let selectedAttachmentIds = new Set();
+
+function getChatImageSelectionMode() {
+    const el = document.getElementById('chatImageSelectionMode');
+    return el && el.value === 'multiple' ? 'multiple' : 'single';
+}
+
+function updateChatImageBulkPanel() {
+    const panel = document.getElementById('chatImageBulkPanel');
+    const label = document.getElementById('chatImageSelectedCountLabel');
+    if (!panel || !label) {
+        return;
+    }
+    if (getChatImageSelectionMode() !== 'multiple') {
+        panel.style.display = 'none';
+        return;
+    }
+    const n = selectedAttachmentIds.size;
+    if (n > 0) {
+        panel.style.display = 'flex';
+        label.textContent = n === 1 ? '1 selected' : `${n} selected`;
+    } else {
+        panel.style.display = 'none';
+    }
+}
+
+function updateChatImageSelectAllState() {
+    const el = document.getElementById('chatImageSelectAll');
+    if (!el || getChatImageSelectionMode() !== 'multiple') {
+        return;
+    }
+    const ids = lastLoadedImages.map((r) => r.attachment_id).filter((id) => id != null);
+    if (ids.length === 0) {
+        el.checked = false;
+        el.indeterminate = false;
+        return;
+    }
+    const nSel = ids.filter((id) => selectedAttachmentIds.has(id)).length;
+    el.checked = nSel === ids.length;
+    el.indeterminate = nSel > 0 && nSel < ids.length;
+}
+
+function applyChatImageSelectionModeUI() {
+    const mode = getChatImageSelectionMode();
+    const grid = document.getElementById('chatImagesGrid');
+    const selectAllRow = document.getElementById('chatImageSelectAllRow');
+    if (grid) {
+        grid.classList.toggle('selection-mode-multiple', mode === 'multiple');
+    }
+    if (selectAllRow) {
+        selectAllRow.style.display = mode === 'multiple' ? 'flex' : 'none';
+    }
+    if (mode === 'single') {
+        selectedAttachmentIds.clear();
+        const sa = document.getElementById('chatImageSelectAll');
+        if (sa) {
+            sa.checked = false;
+            sa.indeterminate = false;
+        }
+    }
+    updateChatImageBulkPanel();
+    renderImageGrid(lastLoadedImages);
+}
+
+function toggleChatImageAttachmentSelection(attachmentId, checked) {
+    if (checked) {
+        selectedAttachmentIds.add(attachmentId);
+    } else {
+        selectedAttachmentIds.delete(attachmentId);
+        const sa = document.getElementById('chatImageSelectAll');
+        if (sa) {
+            sa.checked = false;
+        }
+    }
+    updateChatImageBulkPanel();
+    updateChatImageSelectAllState();
+}
 
 function escapeHtml(text) {
     const div = document.createElement('div');
@@ -110,6 +188,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 450);
     });
 
+    document.getElementById('chatImageSelectionMode')?.addEventListener('change', applyChatImageSelectionModeUI);
+    document.getElementById('chatImageBulkRemoveBtn')?.addEventListener('click', bulkRemoveSelectedChatImages);
+    document.getElementById('chatImageClearSelectionBtn')?.addEventListener('click', clearChatImageSelection);
+    document.getElementById('chatImageSelectAll')?.addEventListener('change', (e) => {
+        if (getChatImageSelectionMode() !== 'multiple') {
+            return;
+        }
+        const checked = e.target.checked;
+        lastLoadedImages.forEach((row) => {
+            const id = row.attachment_id;
+            if (id == null) {
+                return;
+            }
+            if (checked) {
+                selectedAttachmentIds.add(id);
+            } else {
+                selectedAttachmentIds.delete(id);
+            }
+        });
+        updateChatImageBulkPanel();
+        renderImageGrid(lastLoadedImages);
+    });
+
     const detailModal = document.getElementById('chatImageDetailModal');
     document.getElementById('chatImageDetailClose').addEventListener('click', closeChatImageDetailModal);
     detailModal.addEventListener('click', () => closeChatImageDetailModal());
@@ -126,8 +227,30 @@ function clearFilters() {
     document.getElementById('messageIdFilter').value = '';
     document.getElementById('senderFilter').value = '';
     document.getElementById('receiverFilter').value = '';
+    selectedAttachmentIds.clear();
+    const sa = document.getElementById('chatImageSelectAll');
+    if (sa) {
+        sa.checked = false;
+        sa.indeterminate = false;
+    }
+    updateChatImageBulkPanel();
     currentPage = 1;
     loadImages();
+}
+
+function clearChatImageSelection() {
+    selectedAttachmentIds.clear();
+    document.querySelectorAll('.chat-image-checkbox').forEach((cb) => {
+        cb.checked = false;
+    });
+    const sa = document.getElementById('chatImageSelectAll');
+    if (sa) {
+        sa.checked = false;
+        sa.indeterminate = false;
+    }
+    updateChatImageBulkPanel();
+    updateChatImageSelectAllState();
+    renderImageGrid(lastLoadedImages);
 }
 
 async function loadStats() {
@@ -185,8 +308,12 @@ function chatImageSenderSuspended(row) {
 
 function renderImageGrid(images) {
     const grid = document.getElementById('chatImagesGrid');
+    const multi = getChatImageSelectionMode() === 'multiple';
+    grid.classList.toggle('selection-mode-multiple', multi);
+
     if (!images.length) {
         grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:#64748b;">No chat images found.</div>';
+        updateChatImageSelectAllState();
         return;
     }
     grid.innerHTML = images.map((row, idx) => {
@@ -195,15 +322,19 @@ function renderImageGrid(images) {
         const when = formatWhen(row.uploaded_at || row.message_timestamp);
         const sName = row.sender_username || 'User';
         const rName = row.receiver_username || 'User';
+        const attachmentId = row.attachment_id;
+        const checkOverlay = multi
+            ? `<label class="card-cb-overlay" onclick="event.stopPropagation()"><input type="checkbox" class="chat-image-checkbox" data-attachment-id="${attachmentId}" ${selectedAttachmentIds.has(attachmentId) ? 'checked' : ''} onchange="toggleChatImageAttachmentSelection(${attachmentId}, this.checked)"></label>`
+            : '';
         return `
             <article class="chat-image-card" role="listitem" tabindex="0" data-index="${idx}"
-                onclick="openChatImageDetail(${idx})"
                 onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChatImageDetail(${idx});}">
-                <div class="card-thumb-wrap">
+                ${checkOverlay}
+                <div class="card-thumb-wrap" onclick="openChatImageDetail(${idx})">
                     <img class="card-thumb" src="${escapeHtml(thumbSrc)}" alt="" loading="lazy"
                         onerror="this.style.opacity=0.35;this.alt='(missing)'">
                 </div>
-                <div class="card-foot">
+                <div class="card-foot" onclick="openChatImageDetail(${idx})">
                     <span class="card-msg-id">Message ${row.message_id}</span>
                     <span class="sender-badge ${suspended ? 'suspended' : ''}" style="margin-left:6px;">${suspended ? 'Suspended' : 'Active'}</span>
                     <div class="card-users-line">${escapeHtml(sName)}:id ${row.sender_id} → ${escapeHtml(rName)}:id ${row.receiver_id}</div>
@@ -212,6 +343,8 @@ function renderImageGrid(images) {
             </article>
         `;
     }).join('');
+    updateChatImageSelectAllState();
+    updateChatImageBulkPanel();
 }
 
 function openChatImageDetail(index) {
@@ -320,6 +453,17 @@ function goPage(p) {
     loadImages();
 }
 
+async function removeChatImageById(attachmentId) {
+    const response = await fetch(`/api/chat-images/${attachmentId}/reject`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await response.json();
+    if (!data.success) {
+        throw new Error(data.error || 'Failed to remove chat image');
+    }
+}
+
 async function removeChatImage(attachmentId) {
     const confirmed = await showConfirm(
         'Remove this chat image permanently? The attachment row will be deleted and the image files removed from disk.',
@@ -331,21 +475,61 @@ async function removeChatImage(attachmentId) {
     if (!confirmed) return;
 
     try {
-        const response = await fetch(`/api/chat-images/${attachmentId}/reject`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        const data = await response.json();
-        if (!data.success) {
-            throw new Error(data.error || 'Failed to remove chat image');
-        }
+        await removeChatImageById(attachmentId);
         showSuccess('Chat image removed successfully');
+        selectedAttachmentIds.delete(attachmentId);
+        updateChatImageBulkPanel();
         closeChatImageDetailModal();
         loadImages();
     } catch (error) {
         console.error('Error removing chat image:', error);
         showError('Failed to remove chat image: ' + error.message);
     }
+}
+
+async function bulkRemoveSelectedChatImages() {
+    if (getChatImageSelectionMode() !== 'multiple') {
+        return;
+    }
+    if (selectedAttachmentIds.size === 0) {
+        showWarning('No images selected');
+        return;
+    }
+    const n = selectedAttachmentIds.size;
+    const confirmed = await showConfirm(
+        `Remove ${n} selected chat image(s) permanently? Attachment rows will be deleted and files removed from disk.`,
+        'Remove chat images',
+        'Remove',
+        'Cancel',
+        'warning'
+    );
+    if (!confirmed) {
+        return;
+    }
+
+    const ids = [...selectedAttachmentIds];
+    let ok = 0;
+    let fail = 0;
+    for (const id of ids) {
+        try {
+            await removeChatImageById(id);
+            ok++;
+            selectedAttachmentIds.delete(id);
+        } catch (err) {
+            fail++;
+            console.error('Bulk remove failed for attachment', id, err);
+        }
+    }
+    if (ok > 0) {
+        showSuccess(`Removed ${ok} image(s).`);
+    }
+    if (fail > 0) {
+        showError(`Failed to remove ${fail} image(s).`);
+    }
+    closeChatImageDetailModal();
+    await loadImages();
+    updateChatImageSelectAllState();
+    updateChatImageBulkPanel();
 }
 
 async function suspendSender(userId) {
