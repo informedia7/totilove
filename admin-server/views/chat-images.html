@@ -38,10 +38,18 @@
         .chat-images-grid-wrap {
             margin-top: 20px;
         }
+        /* Grid: larger tiles, full-size preview in card */
+        .chat-images-grid.view-mode-grid {
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 18px;
+        }
+        /* Compact: min cell ≈ 25% of old 168px width (~75% smaller); thumbnail only (footer hidden in CSS) */
+        .chat-images-grid.view-mode-compact {
+            grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+            gap: 4px;
+        }
         .chat-images-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
-            gap: 16px;
         }
         .chat-image-card {
             background: #fff;
@@ -70,6 +78,25 @@
             height: 100%;
             object-fit: cover;
             display: block;
+        }
+        .chat-images-grid.view-mode-grid .chat-image-card .card-thumb {
+            object-fit: contain;
+        }
+        .chat-images-grid.view-mode-compact .chat-image-card {
+            border-radius: 6px;
+        }
+        .chat-images-grid.view-mode-compact .chat-image-card .card-foot {
+            display: none;
+        }
+        .chat-images-grid.view-mode-compact .chat-image-card .card-cb-overlay {
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+        }
+        .chat-images-grid.view-mode-compact .chat-image-card .card-cb-overlay input {
+            width: 11px;
+            height: 11px;
         }
         .chat-image-card .card-foot {
             padding: 10px 12px 12px;
@@ -316,7 +343,7 @@
                 </form>
             </div>
             <h1>🖼️ Chat Images Monitor</h1>
-            <p>Click an image to view it full size and use Remove, then account actions in order of severity: Suspend, Delete account, Delete+Blacklist. Use Image selection below for single (default) or multiple mode with bulk remove.</p>
+            <p>Use Layout for grid (large previews) or compact thumbnails; click a card for full size and Remove, then account actions: Suspend, Delete account, Delete+Blacklist. Image selection enables bulk remove.</p>
         </div>
 
         <div class="content">
@@ -372,6 +399,13 @@
 
             <div class="chat-images-selection-bar">
                 <div class="filter-group">
+                    <label for="chatImageViewMode">Layout</label>
+                    <select id="chatImageViewMode" aria-label="Grid or compact thumbnail layout">
+                        <option value="grid" selected>Grid — large previews (full image)</option>
+                        <option value="compact">Compact — thumbnails (~75% smaller tiles)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
                     <label for="chatImageSelectionMode">Image selection</label>
                     <select id="chatImageSelectionMode" aria-label="Single or multiple image selection">
                         <option value="single">Single — click a card to view or remove</option>
@@ -391,7 +425,7 @@
             </div>
 
             <div class="chat-images-grid-wrap">
-                <div id="chatImagesGrid" class="chat-images-grid" role="list">
+                <div id="chatImagesGrid" class="chat-images-grid view-mode-grid" role="list">
                     <div class="loading" style="grid-column: 1 / -1; text-align: center; padding: 40px;">Loading…</div>
                 </div>
             </div>

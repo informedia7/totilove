@@ -13,6 +13,21 @@ function getChatImageSelectionMode() {
     return el && el.value === 'multiple' ? 'multiple' : 'single';
 }
 
+function getChatImageViewMode() {
+    const el = document.getElementById('chatImageViewMode');
+    return el && el.value === 'compact' ? 'compact' : 'grid';
+}
+
+function syncChatImagesGridClasses() {
+    const grid = document.getElementById('chatImagesGrid');
+    if (!grid) {
+        return;
+    }
+    const view = getChatImageViewMode();
+    const multi = getChatImageSelectionMode() === 'multiple';
+    grid.className = `chat-images-grid view-mode-${view}${multi ? ' selection-mode-multiple' : ''}`;
+}
+
 function updateChatImageBulkPanel() {
     const panel = document.getElementById('chatImageBulkPanel');
     const label = document.getElementById('chatImageSelectedCountLabel');
@@ -50,11 +65,8 @@ function updateChatImageSelectAllState() {
 
 function applyChatImageSelectionModeUI() {
     const mode = getChatImageSelectionMode();
-    const grid = document.getElementById('chatImagesGrid');
     const selectAllRow = document.getElementById('chatImageSelectAllRow');
-    if (grid) {
-        grid.classList.toggle('selection-mode-multiple', mode === 'multiple');
-    }
+    syncChatImagesGridClasses();
     if (selectAllRow) {
         selectAllRow.style.display = mode === 'multiple' ? 'flex' : 'none';
     }
@@ -189,6 +201,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('chatImageSelectionMode')?.addEventListener('change', applyChatImageSelectionModeUI);
+    document.getElementById('chatImageViewMode')?.addEventListener('change', () => {
+        syncChatImagesGridClasses();
+        renderImageGrid(lastLoadedImages);
+    });
     document.getElementById('chatImageBulkRemoveBtn')?.addEventListener('click', bulkRemoveSelectedChatImages);
     document.getElementById('chatImageClearSelectionBtn')?.addEventListener('click', clearChatImageSelection);
     document.getElementById('chatImageSelectAll')?.addEventListener('change', (e) => {
@@ -285,6 +301,7 @@ function buildQuery() {
 
 async function loadImages() {
     const grid = document.getElementById('chatImagesGrid');
+    syncChatImagesGridClasses();
     grid.innerHTML = '<div class="loading" style="grid-column:1/-1;text-align:center;padding:40px;">Loading…</div>';
     try {
         const res = await fetch(`/api/chat-images?${buildQuery()}`);
@@ -308,8 +325,9 @@ function chatImageSenderSuspended(row) {
 
 function renderImageGrid(images) {
     const grid = document.getElementById('chatImagesGrid');
+    syncChatImagesGridClasses();
     const multi = getChatImageSelectionMode() === 'multiple';
-    grid.classList.toggle('selection-mode-multiple', multi);
+    const compact = getChatImageViewMode() === 'compact';
 
     if (!images.length) {
         grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:#64748b;">No chat images found.</div>';
@@ -317,7 +335,9 @@ function renderImageGrid(images) {
         return;
     }
     grid.innerHTML = images.map((row, idx) => {
-        const thumbSrc = resolveMediaUrl(row.thumbnail_path || row.file_path);
+        const previewSrc = compact
+            ? resolveMediaUrl(row.thumbnail_path || row.file_path)
+            : resolveMediaUrl(row.file_path || row.thumbnail_path);
         const suspended = chatImageSenderSuspended(row);
         const when = formatWhen(row.uploaded_at || row.message_timestamp);
         const sName = row.sender_username || 'User';
@@ -326,12 +346,14 @@ function renderImageGrid(images) {
         const checkOverlay = multi
             ? `<label class="card-cb-overlay" onclick="event.stopPropagation()"><input type="checkbox" class="chat-image-checkbox" data-attachment-id="${attachmentId}" ${selectedAttachmentIds.has(attachmentId) ? 'checked' : ''} onchange="toggleChatImageAttachmentSelection(${attachmentId}, this.checked)"></label>`
             : '';
+        const cardTitle = `Message ${row.message_id} · ${sName} (id ${row.sender_id}) → ${rName} (id ${row.receiver_id}) · ${when}`;
+        const titleAttr = compact ? ` title="${escapeHtml(cardTitle)}"` : '';
         return `
-            <article class="chat-image-card" role="listitem" tabindex="0" data-index="${idx}"
+            <article class="chat-image-card" role="listitem" tabindex="0" data-index="${idx}"${titleAttr}
                 onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChatImageDetail(${idx});}">
                 ${checkOverlay}
                 <div class="card-thumb-wrap" onclick="openChatImageDetail(${idx})">
-                    <img class="card-thumb" src="${escapeHtml(thumbSrc)}" alt="" loading="lazy"
+                    <img class="card-thumb" src="${escapeHtml(previewSrc)}" alt="" loading="lazy"
                         onerror="this.style.opacity=0.35;this.alt='(missing)'">
                 </div>
                 <div class="card-foot" onclick="openChatImageDetail(${idx})">
