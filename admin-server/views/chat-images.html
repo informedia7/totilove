@@ -201,7 +201,8 @@
         .chat-images-selection-bar .filter-group {
             margin: 0;
         }
-        .chat-images-selection-bar label {
+        .chat-images-selection-bar label,
+        .chat-images-selection-bar .chat-image-layout-label {
             display: block;
             font-size: 12px;
             font-weight: 600;
@@ -213,6 +214,41 @@
             padding: 8px 10px;
             border-radius: 6px;
             border: 1px solid #ccc;
+        }
+        .chat-image-layout-toggle {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .chat-layout-icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 40px;
+            padding: 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fff;
+            color: #64748b;
+            cursor: pointer;
+            transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .chat-layout-icon-btn:hover {
+            background: #f8fafc;
+            color: #334155;
+            border-color: #cbd5e1;
+        }
+        .chat-layout-icon-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border-color: #5a67d8;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.35);
+        }
+        .chat-layout-icon-btn svg {
+            display: block;
+            width: 22px;
+            height: 22px;
         }
         #chatImageSelectAllRow {
             display: none;
@@ -453,11 +489,27 @@
 
             <div class="chat-images-selection-bar">
                 <div class="filter-group">
-                    <label for="chatImageViewMode">Layout</label>
-                    <select id="chatImageViewMode" aria-label="Grid or list layout">
-                        <option value="grid" selected>Grid</option>
-                        <option value="list">List</option>
-                    </select>
+                    <span id="chatImageLayoutLabel" class="chat-image-layout-label">Layout</span>
+                    <input type="hidden" id="chatImageViewMode" value="grid">
+                    <div class="chat-image-layout-toggle" role="group" aria-labelledby="chatImageLayoutLabel">
+                        <button type="button" class="chat-layout-icon-btn active" id="chatLayoutGridBtn" data-layout="grid"
+                            aria-pressed="true" aria-label="Grid layout" title="Grid layout">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="3" y="3" width="7" height="7" rx="1"/>
+                                <rect x="14" y="3" width="7" height="7" rx="1"/>
+                                <rect x="3" y="14" width="7" height="7" rx="1"/>
+                                <rect x="14" y="14" width="7" height="7" rx="1"/>
+                            </svg>
+                        </button>
+                        <button type="button" class="chat-layout-icon-btn" id="chatLayoutListBtn" data-layout="list"
+                            aria-pressed="false" aria-label="List layout" title="List layout">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                                <line x1="4" y1="6" x2="20" y2="6"/>
+                                <line x1="4" y1="12" x2="20" y2="12"/>
+                                <line x1="4" y1="18" x2="20" y2="18"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="filter-group">
                     <label for="chatImageSelectionMode">Image selection</label>

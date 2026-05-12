@@ -18,6 +18,23 @@ function getChatImageViewMode() {
     return el && el.value === 'list' ? 'list' : 'grid';
 }
 
+function setChatImageViewMode(mode) {
+    const hidden = document.getElementById('chatImageViewMode');
+    const gridBtn = document.getElementById('chatLayoutGridBtn');
+    const listBtn = document.getElementById('chatLayoutListBtn');
+    if (!hidden || !gridBtn || !listBtn) {
+        return;
+    }
+    const isList = mode === 'list';
+    hidden.value = isList ? 'list' : 'grid';
+    gridBtn.classList.toggle('active', !isList);
+    listBtn.classList.toggle('active', isList);
+    gridBtn.setAttribute('aria-pressed', isList ? 'false' : 'true');
+    listBtn.setAttribute('aria-pressed', isList ? 'true' : 'false');
+    syncChatImagesGridClasses();
+    renderImageGrid(lastLoadedImages);
+}
+
 function syncChatImagesGridClasses() {
     const grid = document.getElementById('chatImagesGrid');
     if (!grid) {
@@ -201,10 +218,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('chatImageSelectionMode')?.addEventListener('change', applyChatImageSelectionModeUI);
-    document.getElementById('chatImageViewMode')?.addEventListener('change', () => {
-        syncChatImagesGridClasses();
-        renderImageGrid(lastLoadedImages);
-    });
+    document.getElementById('chatLayoutGridBtn')?.addEventListener('click', () => setChatImageViewMode('grid'));
+    document.getElementById('chatLayoutListBtn')?.addEventListener('click', () => setChatImageViewMode('list'));
     document.getElementById('chatImageBulkRemoveBtn')?.addEventListener('click', bulkRemoveSelectedChatImages);
     document.getElementById('chatImageClearSelectionBtn')?.addEventListener('click', clearChatImageSelection);
     document.getElementById('chatImageSelectAll')?.addEventListener('change', (e) => {
