@@ -38,12 +38,12 @@
         .chat-images-grid-wrap {
             margin-top: 20px;
         }
-        /* Grid: tile min was 240px; reduce image area ~30% → min column 168px (240×0.7) */
+        /* Grid: min column 210px (168×1.25) */
         .chat-images-grid.view-mode-grid {
-            grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 15px;
         }
-        /* List: compact rows; preview 109px (50% of prior 218px), full image letterboxed via contain */
+        /* List: compact rows; preview ~125px (109×1.15) */
         .chat-images-grid.view-mode-list {
             display: flex;
             flex-direction: column;
@@ -105,10 +105,9 @@
         .chat-image-list-visual {
             position: relative;
             flex-shrink: 0;
-            width: 109px;
-            height: 109px;
-            max-width: min(109px, 28vw);
+            width: min(125px, 34vw);
             aspect-ratio: 1;
+            height: auto;
             background: #f1f5f9;
             border-radius: 6px;
             overflow: hidden;
