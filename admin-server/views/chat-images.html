@@ -43,11 +43,11 @@
             grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
             gap: 12px;
         }
-        /* List: one row per image — preview left, meta + actions right (preview ≈30% larger than grid cell: 168×1.3) */
+        /* List: compact rows; preview 109px (50% of prior 218px), full image letterboxed via contain */
         .chat-images-grid.view-mode-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 6px;
         }
         .chat-images-grid {
             display: grid;
@@ -86,12 +86,12 @@
         .chat-image-list-row {
             display: flex;
             flex-direction: row;
-            align-items: stretch;
-            gap: 16px;
+            align-items: center;
+            gap: 8px;
             background: #fff;
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 12px 14px;
+            border-radius: 10px;
+            padding: 6px 8px;
             transition: box-shadow 0.2s ease, border-color 0.2s ease;
         }
         .chat-image-list-row:hover {
@@ -105,21 +105,32 @@
         .chat-image-list-visual {
             position: relative;
             flex-shrink: 0;
-            width: 218px;
-            max-width: 36vw;
+            width: 109px;
+            height: 109px;
+            max-width: min(109px, 28vw);
             aspect-ratio: 1;
             background: #f1f5f9;
-            border-radius: 10px;
+            border-radius: 6px;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .chat-image-list-visual .card-thumb-wrap {
             width: 100%;
             height: 100%;
-            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
         }
         .chat-image-list-visual .card-thumb {
             object-fit: contain;
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            display: block;
         }
         .chat-image-list-right {
             flex: 1;
@@ -128,27 +139,49 @@
             flex-direction: row;
             align-items: center;
             justify-content: space-between;
-            gap: 14px;
+            gap: 8px;
             flex-wrap: wrap;
         }
         .chat-image-list-meta {
-            flex: 1 1 220px;
+            flex: 1 1 160px;
             min-width: 0;
-            font-size: 13px;
+            font-size: 11px;
             color: #334155;
-            line-height: 1.45;
+            line-height: 1.35;
             cursor: pointer;
         }
         .chat-image-list-meta .card-msg-id {
-            font-size: 15px;
+            font-size: 13px;
+        }
+        .chat-image-list-meta .card-users-line {
+            font-size: 10px;
+            margin-top: 3px;
+        }
+        .chat-image-list-meta .card-hint {
+            font-size: 10px;
+            margin-top: 2px;
+        }
+        .chat-image-list-meta .sender-badge {
+            font-size: 9px;
+            padding: 1px 5px;
         }
         .chat-image-list-actions {
             flex: 0 0 auto;
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 5px;
             justify-content: flex-end;
             align-items: center;
+        }
+        .chat-images-grid.view-mode-list .chat-image-list-visual .card-cb-overlay {
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+        }
+        .chat-images-grid.view-mode-list .chat-image-list-visual .card-cb-overlay input {
+            width: 12px;
+            height: 12px;
         }
         .chat-image-card .card-foot {
             padding: 10px 12px 12px;
