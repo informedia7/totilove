@@ -6,22 +6,23 @@ let selectedIds = new Set();
 
 const TABLE_COLSPAN = 11;
 
-function getSelectionMode() {
-    const el = document.getElementById('selectionModeSelect');
-    return el && el.value === 'multiple' ? 'multiple' : 'single';
-}
-
-function updateSelectedCountLabel() {
-    const label = document.getElementById('selectedCountLabel');
-    if (label) {
-        const n = selectedIds.size;
-        label.textContent = n === 1 ? '1 selected' : `${n} selected`;
+function updateBulkActions() {
+    const bulkActions = document.getElementById('bulkActions');
+    const selectedCount = document.getElementById('selectedCount');
+    if (!bulkActions || !selectedCount) {
+        return;
+    }
+    if (selectedIds.size > 0) {
+        bulkActions.style.display = 'flex';
+        selectedCount.textContent = String(selectedIds.size);
+    } else {
+        bulkActions.style.display = 'none';
     }
 }
 
 function updateSelectAllCheckboxState() {
-    const el = document.getElementById('selectAllMessages');
-    if (!el || getSelectionMode() !== 'multiple') {
+    const el = document.getElementById('selectAll');
+    if (!el) {
         return;
     }
     const ids = allMessages.map((m) => m.id);
@@ -35,27 +36,18 @@ function updateSelectAllCheckboxState() {
     el.indeterminate = nSel > 0 && nSel < ids.length;
 }
 
-function applySelectionModeUI() {
-    const mode = getSelectionMode();
-    const table = document.getElementById('messagesTable');
-    const bulk = document.getElementById('bulkActionsPanel');
-    if (table) {
-        table.classList.toggle('selection-mode-single', mode === 'single');
-        table.classList.toggle('selection-mode-multiple', mode === 'multiple');
-    }
-    if (bulk) {
-        bulk.style.display = mode === 'multiple' ? 'flex' : 'none';
-    }
-    if (mode === 'single') {
-        selectedIds.clear();
-        const selAll = document.getElementById('selectAllMessages');
-        if (selAll) {
-            selAll.checked = false;
-            selAll.indeterminate = false;
+function toggleMessageSelection(messageId, checked) {
+    if (checked) {
+        selectedIds.add(messageId);
+    } else {
+        selectedIds.delete(messageId);
+        const sa = document.getElementById('selectAll');
+        if (sa) {
+            sa.checked = false;
         }
     }
-    updateSelectedCountLabel();
-    displayMessages(allMessages);
+    updateBulkActions();
+    updateSelectAllCheckboxState();
 }
 
 // Initialize on page load
@@ -76,28 +68,30 @@ function setupEventListeners() {
     document.getElementById('addMessageBtn')?.addEventListener('click', showAddModal);
     document.getElementById('exportCSVBtn')?.addEventListener('click', exportToCSV);
 
-    document.getElementById('selectionModeSelect')?.addEventListener('change', applySelectionModeUI);
-    document.getElementById('bulkDeleteBtn')?.addEventListener('click', bulkDeleteSelected);
-    document.getElementById('clearSelectionBtn')?.addEventListener('click', clearMessageSelection);
-    document.getElementById('selectAllMessages')?.addEventListener('change', onSelectAllMessagesChange);
+    const messagesTable = document.querySelector('.messages-table');
+    if (messagesTable && !messagesTable.dataset.chromeWired) {
+        messagesTable.dataset.chromeWired = '1';
+        messagesTable.addEventListener('change', (e) => {
+            if (e.target.id !== 'selectAll') {
+                return;
+            }
+            const checkboxes = document.querySelectorAll('.message-checkbox');
+            checkboxes.forEach((cb) => {
+                cb.checked = e.target.checked;
+                const id = parseInt(cb.value, 10);
+                if (e.target.checked) {
+                    selectedIds.add(id);
+                } else {
+                    selectedIds.delete(id);
+                }
+            });
+            updateBulkActions();
+            updateSelectAllCheckboxState();
+        });
+    }
 
-    document.getElementById('messagesTableBody')?.addEventListener('change', (e) => {
-        const t = e.target;
-        if (!t.classList || !t.classList.contains('msg-row-checkbox')) {
-            return;
-        }
-        const id = parseInt(t.getAttribute('data-msg-id'), 10);
-        if (Number.isNaN(id)) {
-            return;
-        }
-        if (t.checked) {
-            selectedIds.add(id);
-        } else {
-            selectedIds.delete(id);
-        }
-        updateSelectedCountLabel();
-        updateSelectAllCheckboxState();
-    });
+    document.getElementById('executeBulk')?.addEventListener('click', executeBulkMessages);
+    document.getElementById('clearSelection')?.addEventListener('click', clearMessageSelection);
     
     // Search input with debounce
     let searchTimeout;
@@ -195,17 +189,14 @@ function displayMessages(messages) {
     if (messages.length === 0) {
         tbody.innerHTML = `<tr><td colspan="${TABLE_COLSPAN}" style="text-align: center; padding: 40px;">No messages found</td></tr>`;
         updateSelectAllCheckboxState();
+        updateBulkActions();
         return;
     }
-
-    const multi = getSelectionMode() === 'multiple';
 
     tbody.innerHTML = messages.map(msg => {
         const recallBadgeClass = `badge-recall-${msg.recall_type || 'none'}`;
         const statusBadgeClass = `badge-${msg.status || 'sent'}`;
-        const selectCell = multi
-            ? `<td class="col-select"><input type="checkbox" class="msg-row-checkbox" data-msg-id="${msg.id}" ${selectedIds.has(msg.id) ? 'checked' : ''}></td>`
-            : '<td class="col-select"></td>';
+        const selectCell = `<td onclick="event.stopPropagation()"><input type="checkbox" class="message-checkbox" value="${msg.id}" onchange="toggleMessageSelection(${msg.id}, this.checked)" ${selectedIds.has(msg.id) ? 'checked' : ''}></td>`;
 
         return `
             <tr>
@@ -243,6 +234,7 @@ function displayMessages(messages) {
     }).join('');
 
     updateSelectAllCheckboxState();
+    updateBulkActions();
 }
 
 function updatePagination(pagination) {
@@ -271,29 +263,39 @@ function updatePagination(pagination) {
 
 function clearMessageSelection() {
     selectedIds.clear();
-    const selAll = document.getElementById('selectAllMessages');
-    if (selAll) {
-        selAll.checked = false;
-        selAll.indeterminate = false;
+    document.querySelectorAll('.message-checkbox').forEach((cb) => {
+        cb.checked = false;
+    });
+    const sa = document.getElementById('selectAll');
+    if (sa) {
+        sa.checked = false;
+        sa.indeterminate = false;
     }
-    updateSelectedCountLabel();
-    displayMessages(allMessages);
+    const bulkOp = document.getElementById('bulkOperation');
+    if (bulkOp) {
+        bulkOp.value = '';
+    }
+    updateBulkActions();
+    updateSelectAllCheckboxState();
 }
 
-function onSelectAllMessagesChange(e) {
-    if (getSelectionMode() !== 'multiple') {
+async function executeBulkMessages() {
+    const operation = document.getElementById('bulkOperation')?.value;
+    if (!operation) {
+        showWarning('Please select an operation');
         return;
     }
-    const checked = e.target.checked;
-    allMessages.forEach((m) => {
-        if (checked) {
-            selectedIds.add(m.id);
-        } else {
-            selectedIds.delete(m.id);
+    if (selectedIds.size === 0) {
+        showWarning('Please select at least one message');
+        return;
+    }
+    if (operation === 'delete') {
+        await bulkDeleteSelected();
+        const bulkOp = document.getElementById('bulkOperation');
+        if (bulkOp) {
+            bulkOp.value = '';
         }
-    });
-    updateSelectedCountLabel();
-    displayMessages(allMessages);
+    }
 }
 
 function changePage(page) {
@@ -309,12 +311,19 @@ function clearFilters() {
     document.getElementById('receiverFilter').value = '';
     document.getElementById('statusFilter').value = '';
     selectedIds.clear();
-    const selAll = document.getElementById('selectAllMessages');
+    document.querySelectorAll('.message-checkbox').forEach((cb) => {
+        cb.checked = false;
+    });
+    const selAll = document.getElementById('selectAll');
     if (selAll) {
         selAll.checked = false;
         selAll.indeterminate = false;
     }
-    updateSelectedCountLabel();
+    const bulkOp = document.getElementById('bulkOperation');
+    if (bulkOp) {
+        bulkOp.value = '';
+    }
+    updateBulkActions();
     currentPage = 1;
     loadMessages();
 }
@@ -433,9 +442,6 @@ async function deleteMessageById(messageId) {
 }
 
 async function bulkDeleteSelected() {
-    if (getSelectionMode() !== 'multiple') {
-        return;
-    }
     if (selectedIds.size === 0) {
         showWarning('No messages selected');
         return;
@@ -474,7 +480,7 @@ async function bulkDeleteSelected() {
     }
     await loadMessages();
     await loadStats();
-    updateSelectedCountLabel();
+    updateBulkActions();
     updateSelectAllCheckboxState();
 }
 
@@ -488,6 +494,7 @@ async function confirmDelete(messageId) {
         await deleteMessageById(messageId);
         selectedIds.delete(messageId);
         showSuccess('Message deleted successfully!');
+        updateBulkActions();
         loadMessages();
         loadStats();
     } catch (error) {

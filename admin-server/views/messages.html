@@ -21,47 +21,6 @@
             z-index: 1000;
             max-width: 300px;
         }
-        .messages-selection-bar {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: flex-end;
-            gap: 16px;
-            margin-bottom: 14px;
-            padding: 12px 14px;
-            background: #f8f9fb;
-            border: 1px solid #e2e6ea;
-            border-radius: 8px;
-        }
-        .messages-selection-bar .filter-group {
-            margin: 0;
-        }
-        .messages-selection-bar label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: #555;
-            margin-bottom: 4px;
-        }
-        .messages-selection-bar select {
-            min-width: 200px;
-            padding: 8px 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-        }
-        .messages-table th.col-select,
-        .messages-table td.col-select {
-            display: none;
-            width: 40px;
-            text-align: center;
-            vertical-align: middle;
-        }
-        .messages-table.selection-mode-multiple th.col-select,
-        .messages-table.selection-mode-multiple td.col-select {
-            display: table-cell;
-        }
-        .messages-table.selection-mode-multiple .col-select input[type="checkbox"] {
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -141,28 +100,22 @@
                     </div>
                 </div>
 
-                <!-- Messages Table -->
-                <div class="messages-selection-bar">
-                    <div class="filter-group">
-                        <label for="selectionModeSelect">Message selection</label>
-                        <select id="selectionModeSelect" aria-label="Single or multiple message selection">
-                            <option value="single">Single — use row actions</option>
-                            <option value="multiple">Multiple — checkboxes &amp; bulk delete</option>
-                        </select>
-                    </div>
-                    <div id="bulkActionsPanel" style="display: none; align-items: center; gap: 10px; flex-wrap: wrap;">
-                        <span id="selectedCountLabel" style="font-size: 14px; color: #444;">0 selected</span>
-                        <button type="button" id="bulkDeleteBtn" class="btn btn-danger">🗑️ Delete selected</button>
-                        <button type="button" id="clearSelectionBtn" class="btn btn-secondary">Clear selection</button>
-                    </div>
+                <!-- Bulk Actions (same markup/classes as Users page) -->
+                <div class="bulk-actions" id="bulkActions" style="display: none;">
+                    <span id="selectedCount">0</span> messages selected
+                    <select id="bulkOperation">
+                        <option value="">Select action...</option>
+                        <option value="delete">Delete selected messages</option>
+                    </select>
+                    <button type="button" id="executeBulk" class="btn btn-primary">Execute</button>
+                    <button type="button" id="clearSelection" class="btn btn-secondary">Clear Selection</button>
                 </div>
+
                 <div class="messages-table-container">
-                    <table class="messages-table selection-mode-single" id="messagesTable">
+                    <table class="messages-table">
                         <thead>
                             <tr>
-                                <th class="col-select">
-                                    <input type="checkbox" id="selectAllMessages" title="Select all on this page" aria-label="Select all messages on this page">
-                                </th>
+                                <th><input type="checkbox" id="selectAll" title="Select all on this page" aria-label="Select all messages on this page"></th>
                                 <th>ID</th>
                                 <th>From</th>
                                 <th>To</th>
@@ -186,7 +139,7 @@
                 <!-- Pagination -->
                 <div class="pagination" id="pagination"></div>
             </div>
-        </main>
+        </div>
     </div>
 
     <!-- Edit Message Modal -->

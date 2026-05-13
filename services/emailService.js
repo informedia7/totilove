@@ -276,7 +276,7 @@ class EmailService {
                             <p style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">If you didn't create an account with Totilove1, please ignore this email.</p>
                         </div>
                         <div class="footer" style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
-                            <p style="margin: 0;">&copy; ${new Date().getFullYear()} Totilove1. All rights reserved.</p>
+                            <p style="margin: 0;">&copy; ${new Date().getFullYear()} Totilove. All rights reserved. Made with ❤️ for love without borders. *Totilove is for adults 18+ only*</p>
                         </div>
                     </div>
                 </body>
@@ -372,7 +372,7 @@ class EmailService {
                             <p>If you didn't request a password reset, please ignore this email.</p>
                         </div>
                         <div class="footer">
-                            <p>&copy; ${new Date().getFullYear()} Totilove1. All rights reserved.</p>
+                            <p>&copy; ${new Date().getFullYear()} Totilove. All rights reserved. Made with ❤️ for love without borders. *Totilove is for adults 18+ only*</p>
                         </div>
                     </div>
                 </body>

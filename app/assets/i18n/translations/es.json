@@ -178,5 +178,26 @@
     "profile_updated": "¡Perfil actualizado exitosamente!",
     "language_added": "¡Idioma agregado a tu perfil!",
     "message_sent": "¡Mensaje enviado exitosamente!"
+  },
+  "footer": {
+    "description": "Conectando corazones a través de culturas y continentes, y un amor que trasciende fronteras.",
+    "features": "Características",
+    "support": "Soporte",
+    "legal": "Legal",
+    "copyright": "Todos los derechos reservados. Hecho con ❤️ para el amor sin fronteras. *Totilove es solo para mayores de 18 años*",
+    "stayConnected": "Mantente conectado",
+    "stayConnectedText": "Recibe consejos de citas, historias de éxito y ofertas exclusivas.",
+    "secure": "Plataforma segura y verificada",
+    "helpCenter": "Centro de ayuda",
+    "safetyTips": "Consejos de seguridad",
+    "contactUs": "Contáctanos",
+    "communityGuidelines": "Normas de la comunidad",
+    "privacyPolicy": "Política de privacidad",
+    "termsOfService": "Términos del servicio",
+    "cookiePolicy": "Política de cookies",
+    "gdpr": "Cumplimiento del RGPD",
+    "accessibility": "Accesibilidad",
+    "sitemap": "Mapa del sitio",
+    "cookiePreferences": "Preferencias de cookies"
   }
 }

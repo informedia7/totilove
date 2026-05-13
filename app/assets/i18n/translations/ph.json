@@ -174,5 +174,26 @@
     "profile_updated": "Matagumpay na na-update ang profile!",
     "language_added": "Naidagdag ang wika sa iyong profile!",
     "message_sent": "Matagumpay na naipadala ang mensahe!"
+  },
+  "footer": {
+    "description": "Nag-uugnay ng mga puso sa iba't ibang kultura at kontinente, at pag-ibig na lampas sa hangganan.",
+    "features": "Mga Tampok",
+    "support": "Suporta",
+    "legal": "Legal",
+    "copyright": "Lahat ng karapatan ay nakalaan. Ginawa nang may ❤️ para sa pag-ibig na walang hangganan. *Ang Totilove ay para lamang sa mga may edad na 18+*",
+    "stayConnected": "Manatiling konektado",
+    "stayConnectedText": "Kumuha ng mga tip sa pakikipag-date, kuwento ng tagumpay, at eksklusibong alok.",
+    "secure": "Ligtas at beripikadong platform",
+    "helpCenter": "Help Center",
+    "safetyTips": "Mga tip sa kaligtasan",
+    "contactUs": "Makipag-ugnayan sa amin",
+    "communityGuidelines": "Mga alituntunin ng komunidad",
+    "privacyPolicy": "Patakaran sa privacy",
+    "termsOfService": "Mga tuntunin ng serbisyo",
+    "cookiePolicy": "Patakaran sa cookie",
+    "gdpr": "Pagsunod sa GDPR",
+    "accessibility": "Accessibility",
+    "sitemap": "Mapa ng site",
+    "cookiePreferences": "Mga kagustuhan sa cookie"
   }
-} 
+}
