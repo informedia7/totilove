@@ -537,6 +537,71 @@ async function deleteStoredUploadFamilyFiles(storedPath, subdirName, candidateDi
     return { deleted, hadError };
 }
 
+/**
+ * After per-row deletes, remove any profile files still on disk for this user
+ * (missed paths, failed unlinks, or files never listed in user_images).
+ */
+async function sweepRemainingProfileFilesForUser(userId, profileImageDirectories) {
+    const uid = Number(userId);
+    if (!Number.isFinite(uid) || uid < 1) {
+        return { deleted: 0, hadError: false };
+    }
+
+    const prefix = `user_${uid}_`.toLowerCase();
+    let deleted = 0;
+    let hadError = false;
+
+    async function walkFilesRecursive(currentDir, files = []) {
+        const entries = await fs.readdir(currentDir, { withFileTypes: true });
+        for (const entry of entries) {
+            const fullPath = path.join(currentDir, entry.name);
+            if (entry.isDirectory()) {
+                await walkFilesRecursive(fullPath, files);
+            } else if (entry.isFile()) {
+                files.push(fullPath);
+            }
+        }
+        return files;
+    }
+
+    for (const directory of profileImageDirectories) {
+        let files = [];
+        try {
+            files = await walkFilesRecursive(directory);
+        } catch (error) {
+            hadError = true;
+            logger.warn(`⚠️ Could not read profile_images directory for sweep ${directory}: ${error.message}`);
+            continue;
+        }
+
+        for (const filePath of files) {
+            const base = path.basename(filePath).toLowerCase();
+            if (!base.startsWith(prefix)) {
+                continue;
+            }
+
+            const relativePath = path.relative(directory, filePath);
+            const safePath = safeJoin(directory, relativePath);
+            if (!safePath) {
+                continue;
+            }
+
+            try {
+                await fs.unlink(safePath);
+                deleted += 1;
+                logger.info(`🗑️ Swept leftover profile file for user ${uid}: ${safePath}`);
+            } catch (error) {
+                if (error.code !== 'ENOENT') {
+                    hadError = true;
+                    logger.warn(`⚠️ Could not sweep profile file at ${safePath}: ${error.message}`);
+                }
+            }
+        }
+    }
+
+    return { deleted, hadError };
+}
+
 class UserManagementService {
     constructor() {
         this.cacheExpiry = 300; // 5 minutes
@@ -1703,7 +1768,17 @@ class UserManagementService {
             if (userImagesResult.rows.length > 0) {
                 logger.info(`📊 Profile image deletion summary for user ${userId}: ${deletedCount} files deleted, ${errorCount} errors`);
             }
-            
+
+            const sweepResult = await sweepRemainingProfileFilesForUser(userId, profileImageDirectories);
+            if (sweepResult.deleted > 0) {
+                logger.info(
+                    `📊 Profile image sweep for user ${userId}: removed ${sweepResult.deleted} leftover file(s) matching user_${userId}_*`
+                );
+            }
+            if (sweepResult.hadError) {
+                logger.warn(`⚠️ Profile image sweep for user ${userId} completed with one or more read/delete errors`);
+            }
+
             // Now delete user profile images from database
             await runOptionalQuery('DELETE FROM user_images WHERE user_id = $1', [userId]);
             logger.info(`🗑️ Deleted ${userImagesResult.rows.length} profile image record(s) from database for user ${userId}`);
