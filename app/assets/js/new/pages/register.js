@@ -829,7 +829,7 @@ function validateForm() {
 
     const agreeTermsInput = document.getElementById('agree-terms');
     if (agreeTermsInput && !agreeTermsInput.checked) {
-        showError('agree-terms', 'Please agree to the Terms of Service and Privacy Policy.');
+        showError('agree-terms', 'Please confirm that you are 18+ and agree to the Terms of Service and Privacy Policy.');
         isValid = false;
     }
 

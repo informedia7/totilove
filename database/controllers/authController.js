@@ -480,7 +480,7 @@ class AuthController {
             if (!agreeTermsAccepted) {
                 return res.status(400).json({
                     success: false,
-                    error: 'You must agree to the Terms of Service and Privacy Policy.'
+                    error: 'You must confirm that you are 18+ and agree to the Terms of Service and Privacy Policy.'
                 });
             }
             
