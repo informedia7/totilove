@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <meta name="description" content="Totilove Cookie Policy — how we use cookies and tracking technologies.">
+    <meta name="description" content="Totilove Cookie Policy — how we use cookies and how you can manage your preferences.">
     <title>Cookie Policy — Totilove</title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#764ba2">
@@ -17,58 +17,142 @@
 </head>
 <body>
 <div class="fp-page">
-    <!-- Hero -->
     <div class="fp-hero">
         <div class="fp-hero-inner">
             <h1><i class="fas fa-cookie-bite"></i> Cookie Policy</h1>
-            <p>Last updated: April 2026. Learn how and why we use cookies on Totilove.</p>
+            <p>Last updated: April 2026. How we use cookies and how you can control them on this page.</p>
         </div>
     </div>
 
-    <!-- Content -->
     <main class="fp-main">
         <div class="fp-card">
             <a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> Back to Home</a>
+
             <h2><i class="fas fa-info-circle"></i> What Are Cookies?</h2>
             <p>Cookies are small text files stored on your device when you visit a website. They allow the site to remember your preferences and recognise you between visits. They do not contain executable code and cannot access files on your device.</p>
 
             <hr class="fp-divider">
 
             <h2><i class="fas fa-list"></i> Types of Cookies We Use</h2>
-            <p><strong>Essential Cookies</strong> — Required for the platform to function. These include session cookies that keep you logged in and security tokens. They cannot be disabled.</p>
-            <p><strong>Preference Cookies</strong> — Remember your language, theme, and display settings so you don't have to re-set them every visit.</p>
-            <p><strong>Analytics Cookies</strong> — Help us understand how visitors use Totilove (e.g. which pages are most visited). Data is aggregated and anonymous. We use these to improve the service.</p>
-            <p><strong>Marketing Cookies</strong> — Only used if you explicitly opt in. These may be used to show relevant promotions.</p>
+            <p><strong>Essential Cookies</strong> &mdash; Required for the platform to function. These include session cookies that keep you logged in and security tokens. They cannot be disabled.</p>
+            <p><strong>Preference Cookies</strong> &mdash; Remember your language, theme, and display settings so you don&rsquo;t have to re-set them every visit.</p>
+            <p><strong>Analytics Cookies</strong> &mdash; Help us understand how visitors use Totilove (e.g. which pages are most visited). Data is aggregated and anonymous. We use these to improve the service.</p>
+            <p><strong>Marketing Cookies</strong> &mdash; Only used if you explicitly opt in. These may be used to show relevant promotions.</p>
 
             <hr class="fp-divider">
 
             <h2><i class="fas fa-calendar-alt"></i> Cookie Lifespan</h2>
             <ul>
-                <li><strong>Session cookies</strong> — deleted when you close your browser.</li>
-                <li><strong>Persistent cookies</strong> — stored for up to 12 months unless you clear them sooner.</li>
+                <li><strong>Session cookies</strong> &mdash; deleted when you close your browser.</li>
+                <li><strong>Persistent cookies</strong> &mdash; stored for up to 12 months unless you clear them sooner.</li>
             </ul>
 
             <hr class="fp-divider">
 
             <h2><i class="fas fa-sliders-h"></i> Managing Your Preferences</h2>
-            <p>You can update your cookie preferences at any time from our <a href="/pages/footer/preferences.html">Cookie Preferences</a> page. You can also control cookies through your browser settings — note that disabling essential cookies may affect how the site works.</p>
+            <p>You can update your cookie preferences at any time using the controls <a href="#manage-cookie-preferences">below</a>. You can also control cookies through your browser settings &mdash; note that disabling essential cookies may affect how the site works.</p>
 
             <hr class="fp-divider">
 
             <h2><i class="fas fa-envelope"></i> Questions?</h2>
             <p>If you have questions about our use of cookies, please <a href="/pages/footer/contact.html">contact us</a>.</p>
+
+            <hr class="fp-divider">
+
+            <h2 id="manage-cookie-preferences"><i class="fas fa-cog"></i> Manage preferences</h2>
+            <p>Control which cookies Totilove can use. Essential cookies are always required.</p>
+
+            <div class="fp-pref-row">
+                <div class="fp-pref-info">
+                    <h3><i class="fas fa-lock" style="color:#764ba2;font-size:0.85rem;margin-right:0.3rem;"></i> Essential Cookies</h3>
+                    <p>Required for login sessions and security. Cannot be disabled.</p>
+                </div>
+                <label class="fp-switch fp-switch-disabled" aria-label="Essential cookies — always on">
+                    <input type="checkbox" checked disabled>
+                    <span class="fp-switch-track"></span>
+                    <span class="fp-switch-thumb"></span>
+                </label>
+            </div>
+
+            <div class="fp-pref-row">
+                <div class="fp-pref-info">
+                    <h3><i class="fas fa-palette" style="color:#764ba2;font-size:0.85rem;margin-right:0.3rem;"></i> Preference Cookies</h3>
+                    <p>Remember your language, theme, and display settings.</p>
+                </div>
+                <label class="fp-switch" aria-label="Toggle preference cookies">
+                    <input type="checkbox" id="pref-preferences" checked>
+                    <span class="fp-switch-track"></span>
+                    <span class="fp-switch-thumb"></span>
+                </label>
+            </div>
+
+            <div class="fp-pref-row">
+                <div class="fp-pref-info">
+                    <h3><i class="fas fa-chart-bar" style="color:#764ba2;font-size:0.85rem;margin-right:0.3rem;"></i> Analytics Cookies</h3>
+                    <p>Help us understand how you use Totilove so we can improve it. Data is anonymous.</p>
+                </div>
+                <label class="fp-switch" aria-label="Toggle analytics cookies">
+                    <input type="checkbox" id="pref-analytics">
+                    <span class="fp-switch-track"></span>
+                    <span class="fp-switch-thumb"></span>
+                </label>
+            </div>
+
+            <div class="fp-pref-row">
+                <div class="fp-pref-info">
+                    <h3><i class="fas fa-bullhorn" style="color:#764ba2;font-size:0.85rem;margin-right:0.3rem;"></i> Marketing Cookies</h3>
+                    <p>Allow us to show you relevant promotions and offers.</p>
+                </div>
+                <label class="fp-switch" aria-label="Toggle marketing cookies">
+                    <input type="checkbox" id="pref-marketing">
+                    <span class="fp-switch-track"></span>
+                    <span class="fp-switch-thumb"></span>
+                </label>
+            </div>
+
+            <div style="margin-top:1.5rem;">
+                <button class="fp-btn" id="save-prefs" type="button">
+                    <i class="fas fa-save"></i> Save Preferences
+                </button>
+                <div id="pref-saved" style="display:none;margin-top:0.75rem;font-size:0.88rem;color:#764ba2;font-weight:600;">
+                    <i class="fas fa-check-circle"></i> Preferences saved.
+                </div>
+            </div>
+
+            <hr class="fp-divider">
+
+            <p>For broader data practices, see our <a href="/pages/footer/privacy.html">Privacy Policy</a>.</p>
         </div>
     </main>
 
     <footer class="fp-footer">
-        &copy; <span id="fp-year"></span> Totilove. All rights reserved. Made with ❤️ for love without borders. *Totilove is for adults 18+ only*<br>
+        &copy; <span id="fp-year"></span> Totilove &mdash;
         <a href="/pages/footer/privacy.html">Privacy</a> &bull;
         <a href="/pages/footer/terms.html">Terms</a> &bull;
-        <a href="/pages/footer/preferences.html">Cookie Preferences</a>
+        <a href="/pages/footer/contact.html">Contact</a>
     </footer>
 </div>
 
 <script src="/assets/i18n/simple-i18n.js"></script>
-<script>document.getElementById('fp-year').textContent = new Date().getFullYear();</script>
+<script>
+    document.getElementById('fp-year').textContent = new Date().getFullYear();
+
+    var prefs = JSON.parse(localStorage.getItem('tl_cookie_prefs') || '{}');
+    if (prefs.preferences !== false) document.getElementById('pref-preferences').checked = true;
+    if (prefs.analytics)  document.getElementById('pref-analytics').checked  = true;
+    if (prefs.marketing)  document.getElementById('pref-marketing').checked  = true;
+
+    document.getElementById('save-prefs').addEventListener('click', function() {
+        var saved = {
+            preferences: document.getElementById('pref-preferences').checked,
+            analytics:   document.getElementById('pref-analytics').checked,
+            marketing:   document.getElementById('pref-marketing').checked
+        };
+        localStorage.setItem('tl_cookie_prefs', JSON.stringify(saved));
+        var msg = document.getElementById('pref-saved');
+        msg.style.display = 'block';
+        setTimeout(function() { msg.style.display = 'none'; }, 3000);
+    });
+</script>
 </body>
 </html>
