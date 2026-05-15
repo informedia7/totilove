@@ -30,16 +30,18 @@ document.addEventListener('DOMContentLoaded', async function() {
             await window.simpleI18n.init();
         }
         
-        // Initialize navbar
-        if (typeof GlobalNavbar !== 'undefined') {
+        // Initialize navbar once (global-navbar.js may already have created it)
+        if (typeof GlobalNavbar !== 'undefined' && !window.globalNavbar) {
             window.globalNavbar = new GlobalNavbar();
-            // Hide buttons after navbar checks auth
-            setTimeout(() => {
-                if (window.globalNavbar?.isAuthenticated || window.currentUser?.id) {
-                    document.querySelectorAll('a.btn-primary[href*="register"]').forEach(btn => btn.style.display = 'none');
-                }
-            }, 500);
+        } else if (window.globalNavbar && typeof window.globalNavbar.syncLanguageSwitcherToI18n === 'function') {
+            window.globalNavbar.syncLanguageSwitcherToI18n();
         }
+
+        setTimeout(() => {
+            if (window.globalNavbar?.isAuthenticated || window.currentUser?.id) {
+                document.querySelectorAll('a.btn-primary[href*="register"]').forEach(btn => btn.style.display = 'none');
+            }
+        }, 500);
         
         // Initialize scroll animations
         initScrollAnimations();

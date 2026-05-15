@@ -213,10 +213,7 @@ class GlobalNavbar {
         // Setup language switcher functions first
         this.setupLanguageSwitcher();
 
-        // Attach event listeners after a short delay to ensure DOM is ready
-        setTimeout(() => {
-            this.attachLanguageSwitcherListeners();
-        }, 100);
+        this.attachLanguageSwitcherListeners();
     }
 
     renderNavItems() {
@@ -249,12 +246,47 @@ class GlobalNavbar {
     renderUserSection() {
         // Rendering user section
 
+        const langLabels = {
+            en: '<span class="flag-icon flag-us"></span> English',
+            es: '<span class="flag-icon flag-es"></span> Español',
+            fr: '<span class="flag-icon flag-fr"></span> Français',
+            de: '<span class="flag-icon flag-de"></span> Deutsch',
+            it: '<span class="flag-icon flag-it"></span> Italiano',
+            ru: '<span class="flag-icon flag-ru"></span> Русский',
+            zh: '<span class="flag-icon flag-cn"></span> 中文',
+            vi: '<span class="flag-icon flag-vn"></span> Tiếng Việt',
+            th: '<span class="flag-icon flag-th"></span> ไทย',
+            ph: '<span class="flag-icon flag-ph"></span> Filipino'
+        };
+        const supported = Object.keys(langLabels);
+        let uiLang = 'en';
+        try {
+            const ls = localStorage.getItem('totilove_ui_lang');
+            if (ls && supported.includes(ls)) {
+                uiLang = ls;
+            } else {
+                const cookieLang = this.getCookie('totilove_ui_lang');
+                if (cookieLang && supported.includes(cookieLang)) {
+                    uiLang = cookieLang;
+                } else if (
+                    window.simpleI18n &&
+                    window.simpleI18n.currentLanguage &&
+                    supported.includes(window.simpleI18n.currentLanguage)
+                ) {
+                    uiLang = window.simpleI18n.currentLanguage;
+                }
+            }
+        } catch (e) {
+            // ignore
+        }
+        const selectedLangHtml = langLabels[uiLang] || langLabels.en;
+
         // Language switcher HTML - only for homepage
         const languageSwitcherHTML = `
             <div class="language-switcher">
                 <div class="custom-select" id="languageSelectWrapper">
                     <div class="select-selected" id="selectedLanguage" data-action="toggleLanguage">
-                        <span class="flag-icon flag-us"></span> English
+                        ${selectedLangHtml}
                     </div>
                     <div class="select-items select-hide" id="languageOptions">
                         <div data-lang="en"><span class="flag-icon flag-us"></span> English</div>
@@ -502,12 +534,17 @@ class GlobalNavbar {
             const ls = localStorage.getItem('totilove_ui_lang');
             if (ls && supported.includes(ls)) {
                 lang = ls;
-            } else if (
-                window.simpleI18n &&
-                window.simpleI18n.currentLanguage &&
-                supported.includes(window.simpleI18n.currentLanguage)
-            ) {
-                lang = window.simpleI18n.currentLanguage;
+            } else {
+                const cookieLang = this.getCookie('totilove_ui_lang');
+                if (cookieLang && supported.includes(cookieLang)) {
+                    lang = cookieLang;
+                } else if (
+                    window.simpleI18n &&
+                    window.simpleI18n.currentLanguage &&
+                    supported.includes(window.simpleI18n.currentLanguage)
+                ) {
+                    lang = window.simpleI18n.currentLanguage;
+                }
             }
         } catch (e) {
             // ignore
@@ -597,10 +634,7 @@ class GlobalNavbar {
             // Setup language switcher functions before attaching listeners
             this.setupLanguageSwitcher();
 
-            // Attach language dropdown listeners after a short delay
-            setTimeout(() => {
-                this.attachLanguageSwitcherListeners();
-            }, 50);
+            this.attachLanguageSwitcherListeners();
 
             // Restore scroll position
             window.scrollTo(0, scrollY);
@@ -612,10 +646,7 @@ class GlobalNavbar {
             // Setup language switcher functions before attaching listeners
             this.setupLanguageSwitcher();
 
-            // Attach language dropdown listeners after a short delay
-            setTimeout(() => {
-                this.attachLanguageSwitcherListeners();
-            }, 50);
+            this.attachLanguageSwitcherListeners();
         }
 
         // Reattach event listeners without full re-render
