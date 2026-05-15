@@ -30,7 +30,7 @@ body {
     min-height: 100vh;
 }
 
-/* -- Page wrapper -- */
+html.i18n-pending .fp-page { visibility: hidden; }
 .fp-page {
     min-height: 100vh;
     display: flex;

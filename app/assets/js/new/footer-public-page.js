@@ -14,9 +14,7 @@
             if (window.simpleI18n && typeof window.simpleI18n.init === 'function') {
                 await window.simpleI18n.init();
             }
-        } catch (e) {
-            // i18n init failed — page keeps default HTML
-        }
+        } catch (e) { document.documentElement.classList.remove('i18n-pending'); }
         var y = document.getElementById('fp-year');
         if (y) {
             y.textContent = new Date().getFullYear();

@@ -11,18 +11,10 @@ class SimpleI18n {
     }
 
     async init() {
-        // Detect user's preferred language
         this.currentLanguage = this.detectLanguage();
-
-        // Load all translations
         await this.loadAllTranslations();
-
-        // Apply initial translations
         this.translatePage();
-
-        await this.retryFooterBundleIfNeeded();
-
-        // Navbar shows a hardcoded default until we sync it to the same locale as translations
+        document.documentElement.classList.remove('i18n-pending');
         try {
             if (window.globalNavbar && typeof window.globalNavbar.syncLanguageSwitcherToI18n === 'function') {
                 window.globalNavbar.syncLanguageSwitcherToI18n();
@@ -30,21 +22,6 @@ class SimpleI18n {
         } catch (e) {
             // ignore
         }
-
-        // I18n initialized with language
-    }
-
-    /** Re-fetch footer-pages.json when bundle merge failed but locale is not English. */
-    async retryFooterBundleIfNeeded() {
-        if (this.currentLanguage === 'en') {
-            return;
-        }
-        const probe = this.getTranslation('footerPage.terms.heroTitleHtml');
-        if (probe && probe !== 'footerPage.terms.heroTitleHtml') {
-            return;
-        }
-        await this.mergeFooterPageBundle(this.translations);
-        this.translatePage();
     }
 
     detectLanguage() {

@@ -6,8 +6,7 @@
  */
 
 (function() {
-    'use strict';
-    
+    'use strict'; try { var p = location.pathname || '', l = localStorage.getItem('totilove_ui_lang'); if (l && l !== 'en' && (p.indexOf('/pages/footer/') !== -1 || p === '/' || p === '/index.html')) { document.documentElement.classList.add('i18n-pending'); document.documentElement.setAttribute('lang', l); } } catch (e) {}
     // Check if service workers are supported
     if ('serviceWorker' in navigator) {
         // Register service worker
