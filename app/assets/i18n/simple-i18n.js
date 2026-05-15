@@ -92,7 +92,7 @@ class SimpleI18n {
     getFooterPagesBundleUrl() {
         const prefix = this.getAssetsPathPrefix();
         // Query bypasses older service-worker cache entries keyed on the bare URL.
-        return `${prefix}/assets/i18n/footer-pages.json?v=sw24`;
+        return `${prefix}/assets/i18n/footer-pages.json?v=sw25`;
     }
 
     setLanguagePreference(languageCode) {
@@ -1150,21 +1150,30 @@ class SimpleI18n {
     }
 
     async mergeFooterPageBundle(translations) {
-        try {
-            const res = await fetch(this.getFooterPagesBundleUrl(), { cache: 'no-cache' });
-            if (!res.ok) return;
-            const bundle = await res.json();
-            if (!bundle.en || typeof bundle.en !== 'object') return;
-            const baseEn = JSON.parse(JSON.stringify(bundle.en));
-            translations.en.footerPage = bundle.en;
-            for (const lang of this.supportedLanguages) {
-                if (lang === 'en') continue;
-                const overlay =
-                    bundle[lang] && typeof bundle[lang] === 'object' ? bundle[lang] : {};
-                translations[lang].footerPage = this.deepMergeFooter(baseEn, overlay);
+        const baseUrl = this.getFooterPagesBundleUrl();
+        for (let attempt = 0; attempt < 2; attempt++) {
+            try {
+                const url = attempt === 0 ? baseUrl : `${baseUrl}&_=${Date.now()}`;
+                const res = await fetch(url, { cache: 'no-store' });
+                if (!res.ok) {
+                    continue;
+                }
+                const bundle = await res.json();
+                if (!bundle.en || typeof bundle.en !== 'object') {
+                    continue;
+                }
+                const baseEn = JSON.parse(JSON.stringify(bundle.en));
+                translations.en.footerPage = bundle.en;
+                for (const lang of this.supportedLanguages) {
+                    if (lang === 'en') continue;
+                    const overlay =
+                        bundle[lang] && typeof bundle[lang] === 'object' ? bundle[lang] : {};
+                    translations[lang].footerPage = this.deepMergeFooter(baseEn, overlay);
+                }
+                return;
+            } catch (e) {
+                // file://, offline, invalid JSON, or blocked fetch — retry once then keep default HTML
             }
-        } catch (e) {
-            // file://, offline, invalid JSON, or blocked fetch — footer stays default HTML until retry
         }
     }
 
