@@ -1,8 +1,26 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
+    <script>
+    (function () {
+        try {
+            var lang = localStorage.getItem('totilove_ui_lang');
+            if (lang && lang !== 'en') {
+                document.documentElement.classList.add('i18n-pending');
+                document.documentElement.setAttribute('lang', lang);
+                var preload = document.createElement('link');
+                preload.rel = 'preload';
+                preload.as = 'fetch';
+                preload.href = '/assets/i18n/footer-pages.json?v=sw24';
+                preload.crossOrigin = 'anonymous';
+                document.head.appendChild(preload);
+            }
+        } catch (e) { /* ignore */ }
+    })();
+    </script>
+    <style>html.i18n-pending{visibility:hidden!important}</style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <meta name="description" content="Totilove Help Center — find answers to your questions." data-i18n="footerPage.help.metaDescription">
     <title data-i18n="footerPage.help.documentTitle">Help Center — Totilove</title>
@@ -16,6 +34,8 @@
     <link rel="stylesheet" href="/assets/css/new/05-pages/_footer-pages.css">
     <link rel="icon" href="/favicon.ico" sizes="any">
     <script src="/assets/js/new/pwa-init.js"></script>
+    <script defer src="/assets/i18n/simple-i18n.js"></script>
+    <script defer src="/assets/js/new/footer-public-page.js"></script>
 </head>
 
 <body>
@@ -79,8 +99,6 @@
         </footer>
     </div>
 
-    <script src="/assets/i18n/simple-i18n.js"></script>
-    <script src="/assets/js/new/footer-public-page.js"></script>
-</body>
+    </body>
 
 </html>

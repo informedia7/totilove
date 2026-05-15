@@ -36,9 +36,9 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-/* Hide homepage until simple-i18n applies the stored locale (avoids EN flash on refresh). */
-html.i18n-pending body.homepage {
-    visibility: hidden;
+/* Hide entire document until simple-i18n applies the stored locale (avoids EN flash on refresh). */
+html.i18n-pending {
+    visibility: hidden !important;
 }
 
 body {

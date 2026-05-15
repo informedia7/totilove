@@ -2,7 +2,7 @@
  * Public footer/legal pages: run i18n init (uses same language as global navbar via localStorage).
  * Syncs copyright year.
  *
- * Runs on DOMContentLoaded or immediately if the document is already past that (scripts at end of body).
+ * Runs on DOMContentLoaded or immediately if the document is already past that (defer scripts in head).
  */
 (function () {
     async function startFooterI18n() {

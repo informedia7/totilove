@@ -20,9 +20,9 @@
     --shadow: 0 4px 24px rgba(102, 126, 234, 0.15);
 }
 
-/* Hide footer chrome until simple-i18n applies the stored locale (avoids EN flash on refresh). */
-html.i18n-pending .fp-page {
-    visibility: hidden;
+/* Hide entire document until simple-i18n applies the stored locale (avoids EN flash on refresh). */
+html.i18n-pending {
+    visibility: hidden !important;
 }
 
 html,

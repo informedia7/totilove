@@ -5,21 +5,6 @@
  * Migration Phase 3: Week 11
  */
 
-(function markFooterI18nPending() {
-    try {
-        if ((window.location.pathname || '').indexOf('/pages/footer/') === -1) {
-            return;
-        }
-        var lang = localStorage.getItem('totilove_ui_lang');
-        if (lang && lang !== 'en') {
-            document.documentElement.classList.add('i18n-pending');
-            document.documentElement.setAttribute('lang', lang);
-        }
-    } catch (e) {
-        // ignore
-    }
-})();
-
 (function() {
     'use strict';
     
