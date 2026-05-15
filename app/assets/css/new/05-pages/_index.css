@@ -45,7 +45,7 @@ body {
     padding: 0;
 }
 
-html.i18n-pending { visibility: hidden; }
+/* Container */
 .container {
     max-width: 1200px;
     margin: 0 auto;

@@ -161,7 +161,6 @@ function createSessionExpiryRedirect(authMiddleware) {
     const ignoredPrefixes = [
         '/api',
         '/assets',
-        '/pages/footer',
         '/uploads',
         '/js',
         '/components',

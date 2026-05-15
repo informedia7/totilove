@@ -11,10 +11,16 @@ class SimpleI18n {
     }
 
     async init() {
+        // Detect user's preferred language
         this.currentLanguage = this.detectLanguage();
+
+        // Load all translations
         await this.loadAllTranslations();
+
+        // Apply initial translations
         this.translatePage();
-        document.documentElement.classList.remove('i18n-pending');
+
+        // Navbar shows a hardcoded default until we sync it to the same locale as translations
         try {
             if (window.globalNavbar && typeof window.globalNavbar.syncLanguageSwitcherToI18n === 'function') {
                 window.globalNavbar.syncLanguageSwitcherToI18n();
@@ -22,6 +28,8 @@ class SimpleI18n {
         } catch (e) {
             // ignore
         }
+
+        // I18n initialized with language
     }
 
     detectLanguage() {
@@ -84,7 +92,7 @@ class SimpleI18n {
     getFooterPagesBundleUrl() {
         const prefix = this.getAssetsPathPrefix();
         // Query bypasses older service-worker cache entries keyed on the bare URL.
-        return `${prefix}/assets/i18n/footer-pages.json?v=sw25`;
+        return `${prefix}/assets/i18n/footer-pages.json?v=sw24`;
     }
 
     setLanguagePreference(languageCode) {
