@@ -92,7 +92,7 @@ class SimpleI18n {
     getFooterPagesBundleUrl() {
         const prefix = this.getAssetsPathPrefix();
         // Query bypasses older service-worker cache entries keyed on the bare URL.
-        return `${prefix}/assets/i18n/footer-pages.json?v=sw24`;
+        return `${prefix}/assets/i18n/footer-pages.json?v=sw25`;
     }
 
     setLanguagePreference(languageCode) {

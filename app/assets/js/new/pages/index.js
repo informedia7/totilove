@@ -30,8 +30,8 @@ document.addEventListener('DOMContentLoaded', async function() {
             await window.simpleI18n.init();
         }
         
-        // Initialize navbar
-        if (typeof GlobalNavbar !== 'undefined') {
+        // Navbar auto-inits from global-navbar.js; only create if missing
+        if (typeof GlobalNavbar !== 'undefined' && !window.globalNavbar) {
             window.globalNavbar = new GlobalNavbar();
             // Hide buttons after navbar checks auth
             setTimeout(() => {
