@@ -2,18 +2,6 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <script>
-    (function () {
-        try {
-            var lang = localStorage.getItem('totilove_ui_lang');
-            if (lang && lang !== 'en') {
-                document.documentElement.classList.add('i18n-pending');
-                document.documentElement.setAttribute('lang', lang);
-            }
-        } catch (e) { /* ignore */ }
-    })();
-    </script>
-    <style>html.i18n-pending{visibility:hidden!important}</style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <meta name="description" content="Totilove - Find meaningful connections and meet compatible partners worldwide.">
     <title data-i18n="app.name">Totilove</title>

@@ -5,8 +5,8 @@
  * Migration Phase 3: Week 11
  */
 
-const CACHE_NAME = 'totilove-v5';
-const RUNTIME_CACHE = 'totilove-runtime-v5';
+const CACHE_NAME = 'totilove-v6';
+const RUNTIME_CACHE = 'totilove-runtime-v6';
 
 // Assets to cache immediately
 const PRECACHE_ASSETS = [
@@ -66,7 +66,14 @@ self.addEventListener('fetch', (event) => {
   }
   
   const requestUrl = new URL(event.request.url);
-  // Network-first for CSS, JS, and i18n (simple-i18n.js, footer-pages.json, etc.).
+
+  // Never cache footer translation bundle (stale cache breaks vi and other locales).
+  if (requestUrl.pathname.includes('/assets/i18n/footer-pages.json')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // Network-first for CSS, JS, and i18n (simple-i18n.js, etc.).
   // Cache-first was serving stale /assets/i18n/* forever, breaking footer translations.
   const isNetworkFirstAssets =
     requestUrl.pathname.startsWith('/assets/css/') ||

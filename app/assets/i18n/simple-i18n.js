@@ -20,6 +20,8 @@ class SimpleI18n {
         // Apply initial translations
         this.translatePage();
 
+        await this.retryFooterBundleIfNeeded();
+
         // Navbar shows a hardcoded default until we sync it to the same locale as translations
         try {
             if (window.globalNavbar && typeof window.globalNavbar.syncLanguageSwitcherToI18n === 'function') {
@@ -27,11 +29,22 @@ class SimpleI18n {
             }
         } catch (e) {
             // ignore
-        } finally {
-            document.documentElement.classList.remove('i18n-pending');
         }
 
         // I18n initialized with language
+    }
+
+    /** Re-fetch footer-pages.json when bundle merge failed but locale is not English. */
+    async retryFooterBundleIfNeeded() {
+        if (this.currentLanguage === 'en') {
+            return;
+        }
+        const probe = this.getTranslation('footerPage.terms.heroTitleHtml');
+        if (probe && probe !== 'footerPage.terms.heroTitleHtml') {
+            return;
+        }
+        await this.mergeFooterPageBundle(this.translations);
+        this.translatePage();
     }
 
     detectLanguage() {
@@ -94,7 +107,7 @@ class SimpleI18n {
     getFooterPagesBundleUrl() {
         const prefix = this.getAssetsPathPrefix();
         // Query bypasses older service-worker cache entries keyed on the bare URL.
-        return `${prefix}/assets/i18n/footer-pages.json?v=sw24`;
+        return `${prefix}/assets/i18n/footer-pages.json?v=sw25`;
     }
 
     setLanguagePreference(languageCode) {
