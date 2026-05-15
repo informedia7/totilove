@@ -1,0 +1,63 @@
+﻿<h2 id="manage-cookie-preferences"><i class="fas fa-cog"></i> Gestionar preferencias</h2>
+<p>Controle qué cookies puede usar C:\Totilove. Las cookies esenciales siempre son obligatorias.</p>
+
+<div class="fp-pref-row">
+    <div class="fp-pref-info">
+        <h3><i class="fas fa-lock" style="color:#764ba2;font-size:0.85rem;margin-right:0.3rem;"></i> Cookies esenciales</h3>
+        <p>Necesarias para sesiones de inicio de sesión y seguridad. No se pueden desactivar.</p>
+    </div>
+    <label class="fp-switch fp-switch-disabled" aria-label="Cookies esenciales — siempre activas">
+        <input type="checkbox" checked disabled>
+        <span class="fp-switch-track"></span>
+        <span class="fp-switch-thumb"></span>
+    </label>
+</div>
+
+<div class="fp-pref-row">
+    <div class="fp-pref-info">
+        <h3><i class="fas fa-palette" style="color:#764ba2;font-size:0.85rem;margin-right:0.3rem;"></i> Cookies de preferencias</h3>
+        <p>Recuerdan su idioma, tema y configuraciones de visualización.</p>
+    </div>
+    <label class="fp-switch" aria-label="Activar o desactivar cookies de preferencias">
+        <input type="checkbox" id="pref-preferences" checked>
+        <span class="fp-switch-track"></span>
+        <span class="fp-switch-thumb"></span>
+    </label>
+</div>
+
+<div class="fp-pref-row">
+    <div class="fp-pref-info">
+        <h3><i class="fas fa-chart-bar" style="color:#764ba2;font-size:0.85rem;margin-right:0.3rem;"></i> Cookies analíticas</h3>
+        <p>Nos ayudan a entender cómo usa C:\Totilove para poder mejorarlo. Los datos son anónimos.</p>
+    </div>
+    <label class="fp-switch" aria-label="Activar o desactivar cookies analíticas">
+        <input type="checkbox" id="pref-analytics">
+        <span class="fp-switch-track"></span>
+        <span class="fp-switch-thumb"></span>
+    </label>
+</div>
+
+<div class="fp-pref-row">
+    <div class="fp-pref-info">
+        <h3><i class="fas fa-bullhorn" style="color:#764ba2;font-size:0.85rem;margin-right:0.3rem;"></i> Cookies de marketing</h3>
+        <p>Nos permiten mostrarle promociones y ofertas relevantes.</p>
+    </div>
+    <label class="fp-switch" aria-label="Activar o desactivar cookies de marketing">
+        <input type="checkbox" id="pref-marketing">
+        <span class="fp-switch-track"></span>
+        <span class="fp-switch-thumb"></span>
+    </label>
+</div>
+
+<div style="margin-top:1.5rem;">
+    <button class="fp-btn" id="save-prefs" type="button">
+        <i class="fas fa-save"></i> Guardar preferencias
+    </button>
+    <div id="pref-saved" style="display:none;margin-top:0.75rem;font-size:0.88rem;color:#764ba2;font-weight:600;">
+        <i class="fas fa-check-circle"></i> Preferencias guardadas.
+    </div>
+</div>
+
+<hr class="fp-divider">
+
+<p>Para prácticas de datos más amplias, consulte nuestra <a href="/pages/footer/privacy.html">Política de Privacidad</a>.</p>

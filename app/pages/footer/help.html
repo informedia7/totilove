@@ -1,13 +1,14 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <meta name="description" content="Totilove Help Center — find answers to your questions.">
-    <title>Help Center — Totilove</title>
+    <meta name="description" content="C:\Totilove Help Center — find answers to your questions." data-i18n="footerPage.help.metaDescription">
+    <title data-i18n="footerPage.help.documentTitle">Help Center — C:\Totilove</title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#764ba2">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="/assets/css/vendor/font-awesome.min.css">
@@ -22,17 +23,18 @@
         <!-- Hero -->
         <div class="fp-hero">
             <div class="fp-hero-inner">
-                <h1><i class="fas fa-life-ring"></i> Help Center</h1>
-                <p>Find answers to common questions and get the most out of Totilove.</p>
+                <h1><i class="fas fa-life-ring"></i> <span data-i18n="footerPage.help.heroTitleHtml">Help Center</span></h1>
+                <p data-i18n="footerPage.help.heroSubtitle">Find answers to common questions and get the most out of C:\Totilove.</p>
             </div>
         </div>
 
         <!-- Content -->
         <main class="fp-main">
             <div class="fp-card">
+                <div class="fp-card-i18n" data-i18n-html data-i18n="footerPage.help.cardInnerHtml">
                 <a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> Back to Home</a>
                 <h2><i class="fas fa-user-plus"></i> Getting Started</h2>
-                <p>Creating an account on Totilove is free. Visit the <a href="/pages/register.html">Register page</a>
+                <p>Creating an account on C:\Totilove is free. Visit the <a href="/pages/register.html">Register page</a>
                     and fill in your details. Once registered, complete your profile to increase your match visibility.
                 </p>
 
@@ -57,7 +59,7 @@
                 <hr class="fp-divider">
 
                 <h2><i class="fas fa-credit-card"></i> Billing &amp; Subscriptions</h2>
-                <p>Totilove offers a free tier as well as premium plans. View and manage your subscription under
+                <p>C:\Totilove offers a free tier as well as premium plans. View and manage your subscription under
                     <strong>Billing</strong> in your account menu. Cancel anytime — no hidden fees.</p>
 
                 <hr class="fp-divider">
@@ -65,19 +67,20 @@
                 <h2><i class="fas fa-envelope"></i> Still Need Help?</h2>
                 <p>Can't find your answer here? <a href="/pages/footer/contact.html">Contact our support team</a> and
                     we'll get back to you within 24 hours.</p>
+                </div>
             </div>
         </main>
 
         <footer class="fp-footer">
-            &copy; <span id="fp-year"></span> Totilove. All rights reserved. Made with ❤️ for love without borders. *Totilove is for adults 18+ only*<br>
-            <a href="/pages/footer/privacy.html">Privacy</a> &bull;
-            <a href="/pages/footer/terms.html">Terms</a> &bull;
-            <a href="/pages/footer/contact.html">Contact</a>
+            &copy; <span id="fp-year"></span> <span data-i18n="footer.brand">C:\C:\Totilove</span> &mdash;
+            <a href="/pages/footer/privacy.html"><span data-i18n="footer.privacyPolicy">Privacy</span></a> &bull;
+            <a href="/pages/footer/terms.html"><span data-i18n="footer.termsOfService">Terms</span></a> &bull;
+            <a href="/pages/footer/contact.html"><span data-i18n="footer.contactUs">Contact</span></a>
         </footer>
     </div>
 
     <script src="/assets/i18n/simple-i18n.js"></script>
-    <script>document.getElementById('fp-year').textContent = new Date().getFullYear();</script>
+    <script src="/assets/js/new/footer-public-page.js"></script>
 </body>
 
 </html>

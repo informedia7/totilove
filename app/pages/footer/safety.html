@@ -1,12 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <meta name="description" content="Totilove Safety Tips — stay safe while dating online.">
-    <title>Safety Tips — Totilove</title>
+    <meta name="description" content="C:\Totilove Safety Tips — stay safe while dating online." data-i18n="footerPage.safety.metaDescription">
+    <title data-i18n="footerPage.safety.documentTitle">Safety Tips — C:\Totilove</title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#764ba2">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="/assets/css/vendor/font-awesome.min.css">
@@ -19,13 +20,14 @@
 <div class="fp-page">
     <div class="fp-hero">
         <div class="fp-hero-inner">
-            <h1><i class="fas fa-shield-alt"></i> Safety Tips</h1>
-            <p>Your safety is our top priority. Please follow these guidelines to stay safe when interacting online and meeting in person.</p>
+            <h1><i class="fas fa-shield-alt"></i> <span data-i18n="footerPage.safety.heroTitleHtml">Safety Tips</span></h1>
+            <p data-i18n="footerPage.safety.heroSubtitle">Your safety is our top priority. Please follow these guidelines to stay safe when interacting online and meeting in person.</p>
         </div>
     </div>
 
     <main class="fp-main">
         <div class="fp-card">
+            <div class="fp-card-i18n" data-i18n-html data-i18n="footerPage.safety.cardInnerHtml">
             <a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> Back to Home</a>
 
             <h2><i class="fas fa-lock"></i> Protect Your Personal Information</h2>
@@ -95,19 +97,20 @@
                 <li><a href="https://www.stopncii.org" target="_blank" rel="noopener noreferrer">StopNCII.org</a></li>
                 <li><a href="https://www.cybersmile.org" target="_blank" rel="noopener noreferrer">Cybersmile Foundation</a></li>
             </ul>
+            </div>
         </div>
     </main>
 
     <footer class="fp-footer">
-        &copy; <span id="fp-year"></span> Totilove &mdash;
-        <a href="/pages/footer/privacy.html">Privacy</a> &bull;
-        <a href="/pages/footer/terms.html">Terms</a> &bull;
-        <a href="/pages/footer/cookies.html">Cookies</a> &bull;
-        <a href="/pages/footer/contact.html">Contact</a>
+        &copy; <span id="fp-year"></span> <span data-i18n="footer.brand">C:\C:\Totilove</span> &mdash;
+        <a href="/pages/footer/privacy.html"><span data-i18n="footer.privacyPolicy">Privacy</span></a> &bull;
+        <a href="/pages/footer/terms.html"><span data-i18n="footer.termsOfService">Terms</span></a> &bull;
+        <a href="/pages/footer/cookies.html"><span data-i18n="footer.cookiePolicy">Cookies</span></a> &bull;
+        <a href="/pages/footer/contact.html"><span data-i18n="footer.contactUs">Contact</span></a>
     </footer>
 </div>
 
 <script src="/assets/i18n/simple-i18n.js"></script>
-<script>document.getElementById('fp-year').textContent = new Date().getFullYear();</script>
+<script src="/assets/js/new/footer-public-page.js"></script>
 </body>
 </html>

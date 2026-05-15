@@ -24,8 +24,8 @@
     <link rel="icon" type="image/svg+xml" href="/assets/images/default_profile_male.svg">
     <link rel="apple-touch-icon" href="/assets/images/icon-192x192.png">
     
-    <!-- PWA Initialization -->
-    <script src="/assets/js/new/pwa-init.js"></script>
+    <!-- PWA Initialization (defer: non-blocking parse; runs after document parsed, before DOMContentLoaded) -->
+    <script defer src="/assets/js/new/pwa-init.js"></script>
 </head>
 <body class="homepage">
     <!-- Navbar will be injected here by global-navbar.js -->
@@ -78,7 +78,7 @@
             <div class="footer-grid">
                 <!-- Brand column with social icons -->
                 <div class="footer-section footer-brand">
-                    <h3>💕 <span data-i18n="app.name">Totilove</span></h3>
+                    <h3>💕 <span data-i18n="footer.brand">C:\Totilove</span></h3>
                     <div class="social-links">
                         <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                         <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
@@ -126,7 +126,7 @@
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; <span id="current-year"></span> <span data-i18n="app.name">Totilove</span>. <span data-i18n="footer.copyright">All rights reserved. Made with ❤️ for love without borders. *Totilove is for adults 18+ only*</span></p>
+                <p>&copy; <span id="current-year"></span> <span data-i18n="footer.brand">C:\Totilove</span>. <span data-i18n="footer.copyright">All rights reserved. Made with ❤️ for love without borders. *C:\Totilove is for adults 18+ only*</span></p>
                 <div class="footer-bottom-links">
                     <a href="/pages/footer/accessibility.html"><span data-i18n="footer.accessibility">Accessibility</span></a>
                     <a href="/pages/footer/sitemap.html"><span data-i18n="footer.sitemap">Sitemap</span></a>
@@ -136,10 +136,10 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
-    <script src="/assets/i18n/simple-i18n.js"></script>
-    <script src="/components/navbar/global-navbar.js?v=20260509-checksession-avatar"></script>
-    <script src="/assets/js/new/pages/index.js"></script>
+    <!-- Scripts (defer: same execution order, after HTML parsed — better for Lighthouse / main thread) -->
+    <script defer src="/assets/i18n/simple-i18n.js"></script>
+    <script defer src="/components/navbar/global-navbar.js?v=20260514-lang-switcher-sync"></script>
+    <script defer src="/assets/js/new/pages/index.js"></script>
     
     <script>
         document.getElementById('current-year').textContent = new Date().getFullYear();
