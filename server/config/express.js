@@ -79,7 +79,10 @@ function configureExpress(app) {
     
     // Ensure chat images are served from the correct path
     app.use('/uploads/chat_images', express.static(path.join(resolveUploadsRoot(), 'chat_images')));
-    
+
+    const { footerPageLocaleMiddleware } = require('../middleware/footerPageLocale');
+    app.use(footerPageLocaleMiddleware);
+
     // Catch-all static file serving - MUST be before routes
     app.use('/', express.static(path.join(__dirname, '../../app')));
     

@@ -13,6 +13,7 @@ class SimpleI18n {
     async init() {
         // Detect user's preferred language
         this.currentLanguage = this.detectLanguage();
+        this.setLanguagePreference(this.currentLanguage);
 
         // Load all translations
         await this.loadAllTranslations();
@@ -32,6 +33,16 @@ class SimpleI18n {
         // I18n initialized with language
     }
 
+    getLanguageFromCookie() {
+        try {
+            const m = document.cookie.match(/(?:^|;\s*)totilove_ui_lang=([a-z]{2})/);
+            const code = m ? m[1] : null;
+            return code && this.supportedLanguages.includes(code) ? code : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
     detectLanguage() {
         try {
             const ls = localStorage.getItem('totilove_ui_lang');
@@ -40,6 +51,11 @@ class SimpleI18n {
             }
         } catch (e) {
             // ignore
+        }
+
+        const fromCookie = this.getLanguageFromCookie();
+        if (fromCookie) {
+            return fromCookie;
         }
 
         const stored = this.getLanguagePreference();
@@ -98,6 +114,11 @@ class SimpleI18n {
     setLanguagePreference(languageCode) {
         try {
             localStorage.setItem('totilove_ui_lang', languageCode);
+        } catch (e) {
+            // ignore
+        }
+        try {
+            document.cookie = `totilove_ui_lang=${languageCode};path=/;max-age=31536000;SameSite=Lax`;
         } catch (e) {
             // ignore
         }
