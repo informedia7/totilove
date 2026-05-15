@@ -29,41 +29,7 @@ class SimpleI18n {
             // ignore
         }
 
-        await this.retryFooterBundleIfNeeded();
-
         // I18n initialized with language
-    }
-
-    /** Re-fetch footer-pages.json when bundle merge failed but locale is not English. */
-    async retryFooterBundleIfNeeded() {
-        if (this.currentLanguage === 'en') {
-            return;
-        }
-        const probe = this.getTranslation('footerPage.terms.heroTitleHtml');
-        if (probe && probe !== 'footerPage.terms.heroTitleHtml') {
-            return;
-        }
-        await this.mergeFooterPageBundle(this.translations);
-        this.translatePage();
-    }
-
-    getLanguageFromCookie() {
-        try {
-            const match = document.cookie.match(/(?:^|;\s*)totilove_ui_lang=([a-z]{2})/);
-            const code = match ? match[1] : null;
-            return code && this.supportedLanguages.includes(code) ? code : null;
-        } catch (e) {
-            return null;
-        }
-    }
-
-    getLanguageFromQuery() {
-        try {
-            const q = new URLSearchParams(window.location.search).get('lang');
-            return q && this.supportedLanguages.includes(q) ? q : null;
-        } catch (e) {
-            return null;
-        }
     }
 
     detectLanguage() {
@@ -74,17 +40,6 @@ class SimpleI18n {
             }
         } catch (e) {
             // ignore
-        }
-
-        const fromQuery = this.getLanguageFromQuery();
-        if (fromQuery) {
-            this.setLanguagePreference(fromQuery);
-            return fromQuery;
-        }
-
-        const fromCookie = this.getLanguageFromCookie();
-        if (fromCookie) {
-            return fromCookie;
         }
 
         const stored = this.getLanguagePreference();
@@ -137,17 +92,12 @@ class SimpleI18n {
     getFooterPagesBundleUrl() {
         const prefix = this.getAssetsPathPrefix();
         // Query bypasses older service-worker cache entries keyed on the bare URL.
-        return `${prefix}/assets/i18n/footer-pages.json?v=sw27`;
+        return `${prefix}/assets/i18n/footer-pages.json?v=sw24`;
     }
 
     setLanguagePreference(languageCode) {
         try {
             localStorage.setItem('totilove_ui_lang', languageCode);
-        } catch (e) {
-            // ignore
-        }
-        try {
-            document.cookie = `totilove_ui_lang=${languageCode};path=/;max-age=31536000;SameSite=Lax`;
         } catch (e) {
             // ignore
         }
@@ -1200,30 +1150,21 @@ class SimpleI18n {
     }
 
     async mergeFooterPageBundle(translations) {
-        const baseUrl = this.getFooterPagesBundleUrl();
-        for (let attempt = 0; attempt < 2; attempt++) {
-            try {
-                const url = attempt === 0 ? baseUrl : `${baseUrl}&_=${Date.now()}`;
-                const res = await fetch(url, { cache: 'no-store' });
-                if (!res.ok) {
-                    continue;
-                }
-                const bundle = await res.json();
-                if (!bundle.en || typeof bundle.en !== 'object') {
-                    continue;
-                }
-                const baseEn = JSON.parse(JSON.stringify(bundle.en));
-                translations.en.footerPage = bundle.en;
-                for (const lang of this.supportedLanguages) {
-                    if (lang === 'en') continue;
-                    const overlay =
-                        bundle[lang] && typeof bundle[lang] === 'object' ? bundle[lang] : {};
-                    translations[lang].footerPage = this.deepMergeFooter(baseEn, overlay);
-                }
-                return;
-            } catch (e) {
-                // file://, offline, invalid JSON, or blocked fetch
+        try {
+            const res = await fetch(this.getFooterPagesBundleUrl(), { cache: 'no-cache' });
+            if (!res.ok) return;
+            const bundle = await res.json();
+            if (!bundle.en || typeof bundle.en !== 'object') return;
+            const baseEn = JSON.parse(JSON.stringify(bundle.en));
+            translations.en.footerPage = bundle.en;
+            for (const lang of this.supportedLanguages) {
+                if (lang === 'en') continue;
+                const overlay =
+                    bundle[lang] && typeof bundle[lang] === 'object' ? bundle[lang] : {};
+                translations[lang].footerPage = this.deepMergeFooter(baseEn, overlay);
             }
+        } catch (e) {
+            // file://, offline, invalid JSON, or blocked fetch — footer stays default HTML until retry
         }
     }
 
