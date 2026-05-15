@@ -1,5 +1,5 @@
 /**
- * Serves footer/legal HTML already translated for the user's locale (cookie).
+ * Serves footer/legal and homepage HTML already translated for the user's locale (cookie).
  * Avoids English flash on refresh — better than client-only hide-until-i18n.
  */
 
@@ -9,20 +9,59 @@ const { JSDOM } = require('jsdom');
 
 const SUPPORTED = new Set(['en', 'vi', 'th', 'zh', 'fr', 'de', 'it', 'es', 'ru', 'ph']);
 const FOOTER_HTML_RE = /^\/pages\/footer\/([a-z]+)\.html$/i;
+const HOMEPAGE_PATHS = new Set(['/', '/pages/index.html']);
 const APP_ROOT = path.join(__dirname, '../../app');
-const BUNDLE_PATH = path.join(APP_ROOT, 'assets/i18n/footer-pages.json');
+const FOOTER_BUNDLE_PATH = path.join(APP_ROOT, 'assets/i18n/footer-pages.json');
+const HOMEPAGE_BUNDLE_PATH = path.join(APP_ROOT, 'assets/i18n/homepage-i18n.json');
+const HOMEPAGE_HTML_PATH = path.join(APP_ROOT, 'pages/index.html');
 
-let bundleCache = null;
-let bundleMtime = 0;
+let footerBundleCache = null;
+let footerBundleMtime = 0;
+let homepageBundleCache = null;
+let homepageBundleMtime = 0;
 
-function loadBundle() {
-    const stat = fs.statSync(BUNDLE_PATH);
-    if (bundleCache && stat.mtimeMs === bundleMtime) {
-        return bundleCache;
+function loadFooterBundle() {
+    const stat = fs.statSync(FOOTER_BUNDLE_PATH);
+    if (footerBundleCache && stat.mtimeMs === footerBundleMtime) {
+        return footerBundleCache;
     }
-    bundleMtime = stat.mtimeMs;
-    bundleCache = JSON.parse(fs.readFileSync(BUNDLE_PATH, 'utf8'));
-    return bundleCache;
+    footerBundleMtime = stat.mtimeMs;
+    footerBundleCache = JSON.parse(fs.readFileSync(FOOTER_BUNDLE_PATH, 'utf8'));
+    return footerBundleCache;
+}
+
+function loadHomepageBundle() {
+    const stat = fs.statSync(HOMEPAGE_BUNDLE_PATH);
+    if (homepageBundleCache && stat.mtimeMs === homepageBundleMtime) {
+        return homepageBundleCache;
+    }
+    homepageBundleMtime = stat.mtimeMs;
+    homepageBundleCache = JSON.parse(fs.readFileSync(HOMEPAGE_BUNDLE_PATH, 'utf8'));
+    return homepageBundleCache;
+}
+
+function resolveDotPath(bundle, lang, key) {
+    if (!key) {
+        return null;
+    }
+    const parts = key.split('.');
+    for (const locale of [lang, 'en']) {
+        let node = bundle[locale];
+        if (!node) {
+            continue;
+        }
+        for (const part of parts) {
+            if (!node || typeof node !== 'object') {
+                node = null;
+                break;
+            }
+            node = node[part];
+        }
+        if (typeof node === 'string' && node.length) {
+            return node;
+        }
+    }
+    return null;
 }
 
 function resolveFooterString(bundle, lang, key) {
@@ -30,10 +69,11 @@ function resolveFooterString(bundle, lang, key) {
         return null;
     }
     const parts = key.split('.');
-    const locales = [lang, 'en'];
-    for (const locale of locales) {
+    for (const locale of [lang, 'en']) {
         let node = bundle[locale];
-        if (!node) continue;
+        if (!node) {
+            continue;
+        }
         for (let i = 1; i < parts.length; i++) {
             if (!node || typeof node !== 'object') {
                 node = null;
@@ -48,8 +88,7 @@ function resolveFooterString(bundle, lang, key) {
     return null;
 }
 
-function applyFooterLocale(html, lang) {
-    const bundle = loadBundle();
+function applyDataI18n(html, lang, resolveString) {
     const dom = new JSDOM(html);
     const doc = dom.window.document;
 
@@ -58,7 +97,7 @@ function applyFooterLocale(html, lang) {
 
     doc.querySelectorAll('[data-i18n]').forEach((el) => {
         const key = el.getAttribute('data-i18n');
-        const text = resolveFooterString(bundle, lang, key);
+        const text = resolveString(key);
         if (!text || text === key) {
             return;
         }
@@ -90,8 +129,17 @@ function applyFooterLocale(html, lang) {
     return dom.serialize();
 }
 
-function readFooterHtml(pageName) {
-    const filePath = path.join(APP_ROOT, 'pages/footer', `${pageName}.html`);
+function applyFooterLocale(html, lang) {
+    const bundle = loadFooterBundle();
+    return applyDataI18n(html, lang, (key) => resolveFooterString(bundle, lang, key));
+}
+
+function applyHomepageLocale(html, lang) {
+    const bundle = loadHomepageBundle();
+    return applyDataI18n(html, lang, (key) => resolveDotPath(bundle, lang, key));
+}
+
+function readUtf8File(filePath) {
     if (!fs.existsSync(filePath)) {
         return null;
     }
@@ -102,18 +150,60 @@ function readFooterHtml(pageName) {
     return raw;
 }
 
-function footerPageLocaleMiddleware(req, res, next) {
+function readFooterHtml(pageName) {
+    return readUtf8File(path.join(APP_ROOT, 'pages/footer', `${pageName}.html`));
+}
+
+function readHomepageHtml() {
+    return readUtf8File(HOMEPAGE_HTML_PATH);
+}
+
+function sendLocalizedHtml(req, res, html, applyLocale) {
+    const lang = (req.cookies && req.cookies.totilove_ui_lang) || '';
+    if (!lang || lang === 'en' || !SUPPORTED.has(lang)) {
+        return false;
+    }
+
+    try {
+        const out = applyLocale(html, lang);
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.setHeader('Cache-Control', 'private, no-cache');
+        res.setHeader('Vary', 'Cookie');
+        if (req.method === 'HEAD') {
+            res.end();
+        } else {
+            res.send(out);
+        }
+        return true;
+    } catch (err) {
+        console.error('[pageLocale]', req.path, err);
+        return false;
+    }
+}
+
+function pageLocaleMiddleware(req, res, next) {
     if (req.method !== 'GET' && req.method !== 'HEAD') {
         return next();
     }
 
-    const match = FOOTER_HTML_RE.exec(req.path || '');
-    if (!match) {
+    const reqPath = req.path || '';
+
+    if (HOMEPAGE_PATHS.has(reqPath)) {
+        if (!fs.existsSync(HOMEPAGE_BUNDLE_PATH)) {
+            return next();
+        }
+        const html = readHomepageHtml();
+        if (!html) {
+            return next();
+        }
+        if (sendLocalizedHtml(req, res, html, applyHomepageLocale)) {
+            return undefined;
+        }
         return next();
     }
 
-    const lang = (req.cookies && req.cookies.totilove_ui_lang) || '';
-    if (!lang || lang === 'en' || !SUPPORTED.has(lang)) {
+    const match = FOOTER_HTML_RE.exec(reqPath);
+    if (!match) {
         return next();
     }
 
@@ -123,19 +213,16 @@ function footerPageLocaleMiddleware(req, res, next) {
         return next();
     }
 
-    try {
-        const out = applyFooterLocale(html, lang);
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        res.setHeader('Cache-Control', 'private, no-cache');
-        res.setHeader('Vary', 'Cookie');
-        if (req.method === 'HEAD') {
-            return res.end();
-        }
-        return res.send(out);
-    } catch (err) {
-        console.error('[footerPageLocale]', req.path, err);
-        return next();
+    if (sendLocalizedHtml(req, res, html, applyFooterLocale)) {
+        return undefined;
     }
+    return next();
 }
 
-module.exports = { footerPageLocaleMiddleware, loadBundle, applyFooterLocale };
+module.exports = {
+    pageLocaleMiddleware,
+    footerPageLocaleMiddleware: pageLocaleMiddleware,
+    loadBundle: loadFooterBundle,
+    applyFooterLocale,
+    applyHomepageLocale
+};

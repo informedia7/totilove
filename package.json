@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "build": "node scripts/build-footer-pages-json.mjs",
+    "build": "node scripts/build-footer-pages-json.mjs && node scripts/build-homepage-i18n-json.mjs",
     "build:frontend": "vite build",
     "build:dev": "vite build --mode development",
     "build:watch": "vite build --watch",

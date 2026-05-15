@@ -1,0 +1,472 @@
+{
+  "en": {
+    "app": {
+      "name": "Totilove"
+    },
+    "hero": {
+      "title": "Find Love with Totilove",
+      "subtitle": "Connect with people worldwide through our intelligent matching system. Multilingual support, cultural preferences, and your preferred measurement system.",
+      "features": {
+        "languages": "Multilingual Support",
+        "matching": "Smart Matching",
+        "security": "Safe & Secure",
+        "mobile": "Mobile Ready"
+      },
+      "cta": {
+        "primary": "Join Free Today",
+        "secondary": "Learn More"
+      }
+    },
+    "footer": {
+      "description": "Connecting hearts across cultures and continents. Find love that transcends borders.",
+      "brand": "Totilove",
+      "features": "Features",
+      "support": "Support",
+      "legal": "Legal",
+      "copyright": "All rights reserved. Made with ❤️ for love without borders. *Totilove is for adults 18+ only*",
+      "stayConnected": "Stay Connected",
+      "stayConnectedText": "Get dating tips, success stories & exclusive offers.",
+      "secure": "Secure & Verified Platform",
+      "helpCenter": "Help Center",
+      "safetyTips": "Safety Tips",
+      "contactUs": "Contact Us",
+      "communityGuidelines": "Community Guidelines",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "cookiePolicy": "Cookie Policy",
+      "gdpr": "GDPR Compliance",
+      "accessibility": "Accessibility",
+      "sitemap": "Sitemap",
+      "cookiePreferences": "Cookie Preferences"
+    },
+    "cta": {
+      "title": "Ready to Find Your Perfect Match?",
+      "description": "Join thousands of people worldwide who have found love through our intelligent, culturally-aware matching system.",
+      "primary": "Start Your Journey",
+      "secondary": "Sign In"
+    }
+  },
+  "vi": {
+    "app": {
+      "name": "Totilove"
+    },
+    "hero": {
+      "title": "Tìm Kiếm Tình Yêu với Totilove",
+      "subtitle": "Kết nối với mọi người trên thế giới thông qua hệ thống ghép đôi thông minh. Hỗ trợ đa ngôn ngữ, sở thích văn hóa và hệ thống đo lường ưa thích của bạn.",
+      "features": {
+        "languages": "Hỗ Trợ Đa Ngôn Ngữ",
+        "matching": "Ghép Đôi Thông Minh",
+        "security": "An Toàn & Bảo Mật",
+        "mobile": "Tối Ưu Di Động"
+      },
+      "cta": {
+        "primary": "Tham Gia Miễn Phí",
+        "secondary": "Tìm Hiểu Thêm"
+      }
+    },
+    "footer": {
+      "description": "Kết nối trái tim qua các nền văn hóa và lục địa. Tìm tình yêu vượt qua biên giới.",
+      "brand": "Totilove",
+      "features": "Tính Năng",
+      "support": "Hỗ Trợ",
+      "legal": "Pháp Lý",
+      "copyright": "Bản quyền được bảo vệ. Được tạo với ❤️ cho tình yêu không biên giới. *Totilove chỉ dành cho người từ 18 tuổi trở lên*",
+      "stayConnected": "Luôn Kết Nối",
+      "stayConnectedText": "Nhận mẹo hẹn hò, câu chuyện thành công & ưu đãi độc quyền.",
+      "secure": "Nền Tảng An Toàn & Được Xác Minh",
+      "helpCenter": "Trung Tâm Trợ Giúp",
+      "safetyTips": "Mẹo An Toàn",
+      "contactUs": "Liên Hệ Chúng Tôi",
+      "communityGuidelines": "Nguyên Tắc Cộng Đồng",
+      "privacyPolicy": "Chính Sách Quyền Riêng Tư",
+      "termsOfService": "Điều Khoản Dịch Vụ",
+      "cookiePolicy": "Chính Sách Cookie",
+      "gdpr": "Tuân Thủ GDPR",
+      "accessibility": "Khả Năng Tiếp Cận",
+      "sitemap": "Sơ Đồ Trang",
+      "cookiePreferences": "Tùy Chọn Cookie"
+    },
+    "cta": {
+      "title": "Sẵn Sàng Tìm Người Phù Hợp Hoàn Hảo?",
+      "description": "Tham gia cùng hàng nghìn người trên thế giới đã tìm thấy tình yêu thông qua hệ thống ghép đôi thông minh, có ý thức văn hóa của chúng tôi.",
+      "primary": "Bắt Đầu Hành Trình",
+      "secondary": "Đăng Nhập"
+    }
+  },
+  "th": {
+    "app": {
+      "name": "Totilove"
+    },
+    "hero": {
+      "title": "ค้นหาความรักกับ Totilove",
+      "subtitle": "เชื่อมต่อกับผู้คนทั่วโลกผ่านระบบจับคู่อัจฉริยะของเรา รองรับหลายภาษา ความชอบทางวัฒนธรรม และระบบการวัดที่คุณต้องการ",
+      "features": {
+        "languages": "รองรับหลายภาษา",
+        "matching": "การจับคู่อัจฉริยะ",
+        "security": "ปลอดภัย & มั่นคง",
+        "mobile": "พร้อมใช้งานมือถือ"
+      },
+      "cta": {
+        "primary": "เข้าร่วมฟรีวันนี้",
+        "secondary": "เรียนรู้เพิ่มเติม"
+      }
+    },
+    "footer": {
+      "description": "เชื่อมต่อหัวใจข้ามวัฒนธรรมและทวีป ค้นหาความรักที่ข้ามขอบเขต",
+      "brand": "Totilove",
+      "features": "คุณสมบัติ",
+      "support": "การสนับสนุน",
+      "legal": "กฎหมาย",
+      "copyright": "สงวนลิขสิทธิ์ทั้งหมด สร้างด้วย ❤️ เพื่อความรักไร้พรมแดน *Totilove สำหรับผู้มีอายุ 18 ปีขึ้นไปเท่านั้น*",
+      "stayConnected": "ติดตามเรา",
+      "stayConnectedText": "รับเคล็ดลับการออกเดท เรื่องราวความสำเร็จ & ข้อเสนอพิเศษ",
+      "secure": "แพลตฟอร์มที่ปลอดภัย & ได้รับการยืนยัน",
+      "helpCenter": "ศูนย์ช่วยเหลือ",
+      "safetyTips": "เคล็ดลับความปลอดภัย",
+      "contactUs": "ติดต่อเรา",
+      "communityGuidelines": "หลักเกณฑ์ชุมชน",
+      "privacyPolicy": "นโยบายความเป็นส่วนตัว",
+      "termsOfService": "ข้อกำหนดการใช้บริการ",
+      "cookiePolicy": "นโยบาย Cookie",
+      "gdpr": "การปฏิบัติตาม GDPR",
+      "accessibility": "การเข้าถึง",
+      "sitemap": "แผนผังเว็บไซต์",
+      "cookiePreferences": "การตั้งค่า Cookie"
+    },
+    "cta": {
+      "title": "พร้อมที่จะหาคู่ที่สมบูรณ์แบบของคุณหรือยัง?",
+      "description": "เข้าร่วมกับผู้คนหลายพันคนทั่วโลกที่ได้พบความรักผ่านระบบการจับคู่ที่ชาญฉลาดและตระหนักถึงวัฒนธรรมของเรา",
+      "primary": "เริ่มต้นการเดินทางของคุณ",
+      "secondary": "เข้าสู่ระบบ"
+    }
+  },
+  "zh": {
+    "app": {
+      "name": "Totilove"
+    },
+    "hero": {
+      "title": "在 Totilove 寻找爱情",
+      "subtitle": "通过我们的智能匹配系统与世界各地的人们建立联系。支持多种语言、文化偏好和您偏爱的测量系统。",
+      "features": {
+        "languages": "多语言支持",
+        "matching": "智能匹配",
+        "security": "安全可靠",
+        "mobile": "移动就绪"
+      },
+      "cta": {
+        "primary": "今天免费加入",
+        "secondary": "了解更多"
+      }
+    },
+    "footer": {
+      "description": "连接跨越文化和大陆的心灵。找到超越边界的爱情。",
+      "brand": "Totilove",
+      "features": "功能",
+      "support": "支持",
+      "legal": "法律",
+      "copyright": "版权所有。用❤️为无边界的爱情而制作。*Totilove 仅限年满 18 周岁的成人*",
+      "stayConnected": "保持联系",
+      "stayConnectedText": "获取约会技巧、成功故事和独家优惠。",
+      "secure": "安全认证平台",
+      "helpCenter": "帮助中心",
+      "safetyTips": "安全提示",
+      "contactUs": "联系我们",
+      "communityGuidelines": "社区准则",
+      "privacyPolicy": "隐私政策",
+      "termsOfService": "服务条款",
+      "cookiePolicy": "Cookie政策",
+      "gdpr": "GDPR合规",
+      "accessibility": "无障碍访问",
+      "sitemap": "网站地图",
+      "cookiePreferences": "Cookie偏好"
+    },
+    "cta": {
+      "title": "准备找到您的完美伴侣了吗？",
+      "description": "加入全球数千人，他们通过我们智能的、具有文化意识的匹配系统找到了爱情。",
+      "primary": "开始您的旅程",
+      "secondary": "登录"
+    }
+  },
+  "fr": {
+    "app": {
+      "name": "Totilove"
+    },
+    "hero": {
+      "title": "Trouvez l'Amour avec Totilove",
+      "subtitle": "Connectez-vous avec des personnes du monde entier grâce à notre système de correspondance intelligent. Support multilingue, préférences culturelles et votre système de mesure préféré.",
+      "features": {
+        "languages": "Support Multilingue",
+        "matching": "Correspondance Intelligente",
+        "security": "Sûr et Sécurisé",
+        "mobile": "Optimisé Mobile"
+      },
+      "cta": {
+        "primary": "Rejoignez Gratuitement",
+        "secondary": "En Savoir Plus"
+      }
+    },
+    "footer": {
+      "description": "Connecter les cœurs à travers les cultures et les continents. Trouvez l'amour qui transcende les frontières.",
+      "brand": "Totilove",
+      "features": "Fonctionnalités",
+      "support": "Support",
+      "legal": "Légal",
+      "copyright": "Tous droits réservés. Fait avec ❤️ pour l'amour sans frontières. *Totilove est réservé aux adultes de 18 ans et plus*",
+      "stayConnected": "Restez Connecté",
+      "stayConnectedText": "Recevez des conseils de rencontres, des histoires de succès & des offres exclusives.",
+      "secure": "Plateforme Sécurisée & Vérifiée",
+      "helpCenter": "Centre d'Aide",
+      "safetyTips": "Conseils de Sécurité",
+      "contactUs": "Contactez-Nous",
+      "communityGuidelines": "Règles de la Communauté",
+      "privacyPolicy": "Politique de Confidentialité",
+      "termsOfService": "Conditions d'Utilisation",
+      "cookiePolicy": "Politique des Cookies",
+      "gdpr": "Conformité RGPD",
+      "accessibility": "Accessibilité",
+      "sitemap": "Plan du Site",
+      "cookiePreferences": "Préférences Cookies"
+    },
+    "cta": {
+      "title": "Prêt à Trouver Votre Partenaire Parfait ?",
+      "description": "Rejoignez des milliers de personnes dans le monde qui ont trouvé l'amour grâce à notre système de correspondance intelligent et culturellement conscient.",
+      "primary": "Commencez Votre Voyage",
+      "secondary": "Se Connecter"
+    }
+  },
+  "de": {
+    "app": {
+      "name": "Totilove"
+    },
+    "hero": {
+      "title": "Finde Liebe mit Totilove",
+      "subtitle": "Verbinde dich mit Menschen weltweit durch unser intelligentes Matching-System. Mehrsprachige Unterstützung, kulturelle Präferenzen und dein bevorzugtes Maßsystem.",
+      "features": {
+        "languages": "Mehrsprachige Unterstützung",
+        "matching": "Intelligentes Matching",
+        "security": "Sicher & Geschützt",
+        "mobile": "Mobil Optimiert"
+      },
+      "cta": {
+        "primary": "Heute Kostenlos Beitreten",
+        "secondary": "Mehr Erfahren"
+      }
+    },
+    "footer": {
+      "description": "Herzen über Kulturen und Kontinente hinweg verbinden. Finde Liebe, die Grenzen überschreitet.",
+      "brand": "Totilove",
+      "features": "Funktionen",
+      "support": "Support",
+      "legal": "Rechtliches",
+      "copyright": "Alle Rechte vorbehalten. Mit ❤️ für grenzenlose Liebe gemacht. *Totilove ist nur für Erwachsene ab 18 Jahren*",
+      "stayConnected": "Verbunden Bleiben",
+      "stayConnectedText": "Tipps fürs Dating, Erfolgsgeschichten & exklusive Angebote erhalten.",
+      "secure": "Sichere & Verifizierte Plattform",
+      "helpCenter": "Hilfezentrum",
+      "safetyTips": "Sicherheitstipps",
+      "contactUs": "Kontaktiere Uns",
+      "communityGuidelines": "Community-Richtlinien",
+      "privacyPolicy": "Datenschutzrichtlinie",
+      "termsOfService": "Nutzungsbedingungen",
+      "cookiePolicy": "Cookie-Richtlinie",
+      "gdpr": "DSGVO-Konformität",
+      "accessibility": "Barrierefreiheit",
+      "sitemap": "Seitenübersicht",
+      "cookiePreferences": "Cookie-Einstellungen"
+    },
+    "cta": {
+      "title": "Bereit, Deinen Perfekten Partner zu Finden?",
+      "description": "Tritt Tausenden von Menschen weltweit bei, die durch unser intelligentes, kulturbewusstes Matching-System Liebe gefunden haben.",
+      "primary": "Beginne Deine Reise",
+      "secondary": "Anmelden"
+    }
+  },
+  "it": {
+    "app": {
+      "name": "Totilove"
+    },
+    "hero": {
+      "title": "Trova l'Amore con Totilove",
+      "subtitle": "Connettiti con persone di tutto il mondo attraverso il nostro sistema di matching intelligente. Supporto multilingue, preferenze culturali e il tuo sistema di misurazione preferito.",
+      "features": {
+        "languages": "Supporto Multilingue",
+        "matching": "Matching Intelligente",
+        "security": "Sicuro e Protetto",
+        "mobile": "Ottimizzato Mobile"
+      },
+      "cta": {
+        "primary": "Unisciti Gratis Oggi",
+        "secondary": "Scopri di Più"
+      }
+    },
+    "footer": {
+      "description": "Connettere cuori attraverso culture e continenti. Trova l'amore che trascende i confini.",
+      "brand": "Totilove",
+      "features": "Caratteristiche",
+      "support": "Supporto",
+      "legal": "Legale",
+      "copyright": "Tutti i diritti riservati. Fatto con ❤️ per l'amore senza confini. *Totilove è riservato solo agli adulti di 18 anni e oltre*",
+      "stayConnected": "Rimani Connesso",
+      "stayConnectedText": "Ricevi consigli per gli appuntamenti, storie di successo & offerte esclusive.",
+      "secure": "Piattaforma Sicura & Verificata",
+      "helpCenter": "Centro Assistenza",
+      "safetyTips": "Consigli di Sicurezza",
+      "contactUs": "Contattaci",
+      "communityGuidelines": "Linee Guida della Community",
+      "privacyPolicy": "Informativa sulla Privacy",
+      "termsOfService": "Termini di Servizio",
+      "cookiePolicy": "Informativa sui Cookie",
+      "gdpr": "Conformità GDPR",
+      "accessibility": "Accessibilità",
+      "sitemap": "Mappa del Sito",
+      "cookiePreferences": "Preferenze Cookie"
+    },
+    "cta": {
+      "title": "Pronto a Trovare il Tuo Partner Perfetto?",
+      "description": "Unisciti a migliaia di persone in tutto il mondo che hanno trovato l'amore attraverso il nostro sistema di matching intelligente e culturalmente consapevole.",
+      "primary": "Inizia il Tuo Viaggio",
+      "secondary": "Accedi"
+    }
+  },
+  "es": {
+    "app": {
+      "name": "Totilove"
+    },
+    "hero": {
+      "title": "Encuentra el Amor con Totilove",
+      "subtitle": "Conéctate con personas de todo el mundo a través de nuestro sistema de emparejamiento inteligente. Soporte multilingüe, preferencias culturales y tu sistema de medición preferido.",
+      "features": {
+        "languages": "Soporte Multilingüe",
+        "matching": "Emparejamiento Inteligente",
+        "security": "Seguro y Protegido",
+        "mobile": "Optimizado Móvil"
+      },
+      "cta": {
+        "primary": "Únete Gratis Hoy",
+        "secondary": "Aprende Más"
+      }
+    },
+    "footer": {
+      "description": "Conectando corazones a través de culturas y continentes. Encuentra amor que trasciende fronteras.",
+      "brand": "Totilove",
+      "features": "Características",
+      "support": "Soporte",
+      "legal": "Legal",
+      "copyright": "Todos los derechos reservados. Hecho con ❤️ para el amor sin fronteras. *Totilove es solo para mayores de 18 años*",
+      "stayConnected": "Mantente Conectado",
+      "stayConnectedText": "Recibe consejos de citas, historias de éxito & ofertas exclusivas.",
+      "secure": "Plataforma Segura & Verificada",
+      "helpCenter": "Centro de Ayuda",
+      "safetyTips": "Consejos de Seguridad",
+      "contactUs": "Contáctenos",
+      "communityGuidelines": "Normas de la Comunidad",
+      "privacyPolicy": "Política de Privacidad",
+      "termsOfService": "Términos de Servicio",
+      "cookiePolicy": "Política de Cookies",
+      "gdpr": "Cumplimiento GDPR",
+      "accessibility": "Accesibilidad",
+      "sitemap": "Mapa del Sitio",
+      "cookiePreferences": "Preferencias de Cookies"
+    },
+    "cta": {
+      "title": "¿Listo para Encontrar tu Pareja Perfecta?",
+      "description": "Únete a miles de personas en todo el mundo que han encontrado el amor a través de nuestro sistema de emparejamiento inteligente y culturalmente consciente.",
+      "primary": "Comienza tu Viaje",
+      "secondary": "Iniciar Sesión"
+    }
+  },
+  "ru": {
+    "app": {
+      "name": "Totilove"
+    },
+    "hero": {
+      "title": "Найдите Любовь с Totilove",
+      "subtitle": "Связывайтесь с людьми по всему миру через нашу интеллектуальную систему подбора. Многоязычная поддержка, культурные предпочтения и ваша предпочитаемая система измерений.",
+      "features": {
+        "languages": "Многоязычная Поддержка",
+        "matching": "Умный Подбор",
+        "security": "Безопасно и Надёжно",
+        "mobile": "Мобильная Оптимизация"
+      },
+      "cta": {
+        "primary": "Присоединиться Бесплатно",
+        "secondary": "Узнать Больше"
+      }
+    },
+    "footer": {
+      "description": "Соединяя сердца через культуры и континенты. Найдите любовь, которая превосходит границы.",
+      "brand": "Totilove",
+      "features": "Функции",
+      "support": "Поддержка",
+      "legal": "Правовая Информация",
+      "copyright": "Все права защищены. Сделано с ❤️ для любви без границ. *Totilove только для лиц старше 18 лет*",
+      "stayConnected": "Оставайтесь на связи",
+      "stayConnectedText": "Получайте советы по свиданиям, истории успеха и эксклюзивные предложения.",
+      "secure": "Безопасная и верифицированная платформа",
+      "helpCenter": "Центр помощи",
+      "safetyTips": "Советы по безопасности",
+      "contactUs": "Связаться с нами",
+      "communityGuidelines": "Правила сообщества",
+      "privacyPolicy": "Политика конфиденциальности",
+      "termsOfService": "Условия использования",
+      "cookiePolicy": "Политика Cookie",
+      "gdpr": "Соответствие GDPR",
+      "accessibility": "Доступность",
+      "sitemap": "Карта сайта",
+      "cookiePreferences": "Настройки Cookie"
+    },
+    "cta": {
+      "title": "Готовы Найти Своего Идеального Партнёра?",
+      "description": "Присоединяйтесь к тысячам людей по всему миру, которые нашли любовь через нашу интеллектуальную, культурно-осознанную систему подбора.",
+      "primary": "Начать Своё Путешествие",
+      "secondary": "Войти"
+    }
+  },
+  "ph": {
+    "app": {
+      "name": "Totilove"
+    },
+    "hero": {
+      "title": "Humanap ng Pag-ibig sa Totilove",
+      "subtitle": "Makipag-ugnayan sa mga tao sa buong mundo sa pamamagitan ng aming matalinong sistema ng pagpapares. Suporta sa maraming wika, mga kultural na kagustuhan, at iyong ginustong sistema ng pagsukat.",
+      "features": {
+        "languages": "Suporta sa Maraming Wika",
+        "matching": "Matalinong Pagpapares",
+        "security": "Ligtas at Secure",
+        "mobile": "Handa sa Mobile"
+      },
+      "cta": {
+        "primary": "Sumali Libre Ngayon",
+        "secondary": "Matuto Pa"
+      }
+    },
+    "footer": {
+      "description": "Kumokonekta ng mga puso sa buong kultura at kontinente. Maghanap ng pag-ibig na lumalampas sa mga hangganan.",
+      "brand": "Totilove",
+      "features": "Features",
+      "support": "Support",
+      "legal": "Legal",
+      "copyright": "Lahat ng karapatan ay nakalaan. Ginawa nang may ❤️ para sa pag-ibig na walang hangganan. *Ang Totilove ay para lamang sa mga may edad na 18+*",
+      "stayConnected": "Manatiling Konektado",
+      "stayConnectedText": "Kumuha ng mga tip sa pakikipagtipan, mga kwento ng tagumpay & mga eksklusibong alok.",
+      "secure": "Ligtas & Verified na Platform",
+      "helpCenter": "Help Center",
+      "safetyTips": "Mga Tip sa Kaligtasan",
+      "contactUs": "Makipag-ugnayan sa Amin",
+      "communityGuidelines": "Mga Alituntunin ng Komunidad",
+      "privacyPolicy": "Patakaran sa Privacy",
+      "termsOfService": "Mga Tuntunin ng Serbisyo",
+      "cookiePolicy": "Patakaran sa Cookie",
+      "gdpr": "Pagsunod sa GDPR",
+      "accessibility": "Accessibility",
+      "sitemap": "Mapa ng Site",
+      "cookiePreferences": "Mga Kagustuhan sa Cookie"
+    },
+    "cta": {
+      "title": "Handa na ba kayong Maghanap ng Inyong Perfect Match?",
+      "description": "Sumali sa libu-libong tao sa buong mundo na nakahanap ng pag-ibig sa pamamagitan ng aming intelligent, culturally-aware matching system.",
+      "primary": "Simulan ang Inyong Journey",
+      "secondary": "Sign In"
+    }
+  }
+}
