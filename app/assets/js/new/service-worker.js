@@ -5,8 +5,8 @@
  * Migration Phase 3: Week 11
  */
 
-const CACHE_NAME = 'totilove-v7';
-const RUNTIME_CACHE = 'totilove-runtime-v7';
+const CACHE_NAME = 'totilove-v8';
+const RUNTIME_CACHE = 'totilove-runtime-v8';
 
 // Assets to cache immediately
 const PRECACHE_ASSETS = [

@@ -29,7 +29,41 @@ class SimpleI18n {
             // ignore
         }
 
+        await this.retryFooterBundleIfNeeded();
+
         // I18n initialized with language
+    }
+
+    /** Re-fetch footer-pages.json when bundle merge failed but locale is not English. */
+    async retryFooterBundleIfNeeded() {
+        if (this.currentLanguage === 'en') {
+            return;
+        }
+        const probe = this.getTranslation('footerPage.terms.heroTitleHtml');
+        if (probe && probe !== 'footerPage.terms.heroTitleHtml') {
+            return;
+        }
+        await this.mergeFooterPageBundle(this.translations);
+        this.translatePage();
+    }
+
+    getLanguageFromCookie() {
+        try {
+            const match = document.cookie.match(/(?:^|;\s*)totilove_ui_lang=([a-z]{2})/);
+            const code = match ? match[1] : null;
+            return code && this.supportedLanguages.includes(code) ? code : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    getLanguageFromQuery() {
+        try {
+            const q = new URLSearchParams(window.location.search).get('lang');
+            return q && this.supportedLanguages.includes(q) ? q : null;
+        } catch (e) {
+            return null;
+        }
     }
 
     detectLanguage() {
@@ -40,6 +74,17 @@ class SimpleI18n {
             }
         } catch (e) {
             // ignore
+        }
+
+        const fromQuery = this.getLanguageFromQuery();
+        if (fromQuery) {
+            this.setLanguagePreference(fromQuery);
+            return fromQuery;
+        }
+
+        const fromCookie = this.getLanguageFromCookie();
+        if (fromCookie) {
+            return fromCookie;
         }
 
         const stored = this.getLanguagePreference();
@@ -92,12 +137,17 @@ class SimpleI18n {
     getFooterPagesBundleUrl() {
         const prefix = this.getAssetsPathPrefix();
         // Query bypasses older service-worker cache entries keyed on the bare URL.
-        return `${prefix}/assets/i18n/footer-pages.json?v=sw26`;
+        return `${prefix}/assets/i18n/footer-pages.json?v=sw27`;
     }
 
     setLanguagePreference(languageCode) {
         try {
             localStorage.setItem('totilove_ui_lang', languageCode);
+        } catch (e) {
+            // ignore
+        }
+        try {
+            document.cookie = `totilove_ui_lang=${languageCode};path=/;max-age=31536000;SameSite=Lax`;
         } catch (e) {
             // ignore
         }
