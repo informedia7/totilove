@@ -451,7 +451,7 @@ class GlobalNavbar {
                 try {
                     await window.simpleI18n.switchLanguage(lang);
                 } catch (error) {
-                    console.error('❌ Failed to switch language via i18n:', error);
+                    // switchLanguage failed — keep current UI language
                 }
             }
         };

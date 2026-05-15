@@ -15,7 +15,7 @@
                 await window.simpleI18n.init();
             }
         } catch (e) {
-            console.warn('[Totilove] Footer i18n init failed:', e);
+            // i18n init failed — page keeps default HTML
         }
         var y = document.getElementById('fp-year');
         if (y) {

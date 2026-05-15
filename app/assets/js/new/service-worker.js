@@ -19,12 +19,9 @@ const PRECACHE_ASSETS = [
 
 // Install event - cache assets
 self.addEventListener('install', (event) => {
-  console.log('[ServiceWorker] Install event');
-  
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('[ServiceWorker] Caching app shell');
         return cache.addAll(PRECACHE_ASSETS);
       })
       .then(() => {
@@ -35,8 +32,6 @@ self.addEventListener('install', (event) => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('[ServiceWorker] Activate event');
-  
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -44,10 +39,7 @@ self.addEventListener('activate', (event) => {
           .filter((cacheName) => {
             return cacheName !== CACHE_NAME && cacheName !== RUNTIME_CACHE;
           })
-          .map((cacheName) => {
-            console.log('[ServiceWorker] Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          })
+          .map((cacheName) => caches.delete(cacheName))
       );
     })
     .then(() => {
@@ -161,8 +153,6 @@ self.addEventListener('fetch', (event) => {
 
 // Background sync for offline actions
 self.addEventListener('sync', (event) => {
-  console.log('[ServiceWorker] Background sync:', event.tag);
-  
   if (event.tag === 'sync-messages') {
     event.waitUntil(syncMessages());
   }
@@ -170,19 +160,12 @@ self.addEventListener('sync', (event) => {
 
 // Sync messages when back online
 async function syncMessages() {
-  try {
-    // This would sync pending messages
-    // Implementation depends on your message queue system
-    console.log('[ServiceWorker] Syncing messages...');
-  } catch (error) {
-    console.error('[ServiceWorker] Sync failed:', error);
-  }
+  // This would sync pending messages
+  // Implementation depends on your message queue system
 }
 
 // Push notifications (for future use)
 self.addEventListener('push', (event) => {
-  console.log('[ServiceWorker] Push notification received');
-  
   const data = event.data ? event.data.json() : {};
   const title = data.title || 'Totilove';
   const options = {
@@ -201,8 +184,6 @@ self.addEventListener('push', (event) => {
 
 // Notification click handler
 self.addEventListener('notificationclick', (event) => {
-  console.log('[ServiceWorker] Notification click:', event.notification.tag);
-  
   event.notification.close();
   
   event.waitUntil(

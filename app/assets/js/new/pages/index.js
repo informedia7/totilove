@@ -118,13 +118,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Listen for language change events
-document.addEventListener('languageChanged', function(event) {
-    console.log('Language switched to:', event.detail.language);
-    // Refresh page content when language changes
-    window.simpleI18n.translatePage();
-});
-
 // Make showTab available globally for onclick handlers
 window.showTab = showTab;
 

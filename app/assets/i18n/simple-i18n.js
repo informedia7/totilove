@@ -1165,9 +1165,6 @@ class SimpleI18n {
             }
         } catch (e) {
             // file://, offline, invalid JSON, or blocked fetch — footer stays default HTML until retry
-            if (typeof console !== 'undefined' && console.warn) {
-                console.warn('[Totilove i18n] footer-pages.json merge failed:', e && e.message ? e.message : e);
-            }
         }
     }
 
