@@ -5,8 +5,8 @@
  * Migration Phase 3: Week 11
  */
 
-const CACHE_NAME = 'totilove-v6';
-const RUNTIME_CACHE = 'totilove-runtime-v6';
+const CACHE_NAME = 'totilove-v5';
+const RUNTIME_CACHE = 'totilove-runtime-v5';
 
 // Assets to cache immediately
 const PRECACHE_ASSETS = [
@@ -71,8 +71,7 @@ self.addEventListener('fetch', (event) => {
   const isNetworkFirstAssets =
     requestUrl.pathname.startsWith('/assets/css/') ||
     requestUrl.pathname.startsWith('/assets/js/') ||
-    requestUrl.pathname.startsWith('/assets/i18n/') ||
-    requestUrl.pathname.startsWith('/components/');
+    requestUrl.pathname.startsWith('/assets/i18n/');
   const isDocument = event.request.destination === 'document';
 
   if (isNetworkFirstAssets) {
