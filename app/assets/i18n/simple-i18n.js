@@ -27,6 +27,8 @@ class SimpleI18n {
             }
         } catch (e) {
             // ignore
+        } finally {
+            document.documentElement.classList.remove('i18n-pending');
         }
 
         // I18n initialized with language

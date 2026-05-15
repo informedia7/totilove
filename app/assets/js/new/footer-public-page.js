@@ -16,6 +16,8 @@
             }
         } catch (e) {
             // i18n init failed — page keeps default HTML
+        } finally {
+            document.documentElement.classList.remove('i18n-pending');
         }
         var y = document.getElementById('fp-year');
         if (y) {

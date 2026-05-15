@@ -36,6 +36,11 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+/* Hide homepage until simple-i18n applies the stored locale (avoids EN flash on refresh). */
+html.i18n-pending body.homepage {
+    visibility: hidden;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
