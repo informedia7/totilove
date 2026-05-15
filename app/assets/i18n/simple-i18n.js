@@ -92,7 +92,7 @@ class SimpleI18n {
     getFooterPagesBundleUrl() {
         const prefix = this.getAssetsPathPrefix();
         // Query bypasses older service-worker cache entries keyed on the bare URL.
-        return `${prefix}/assets/i18n/footer-pages.json?v=sw25`;
+        return `${prefix}/assets/i18n/footer-pages.json?v=sw26`;
     }
 
     setLanguagePreference(languageCode) {
@@ -1172,7 +1172,7 @@ class SimpleI18n {
                 }
                 return;
             } catch (e) {
-                // file://, offline, invalid JSON, or blocked fetch — retry once then keep default HTML
+                // file://, offline, invalid JSON, or blocked fetch
             }
         }
     }

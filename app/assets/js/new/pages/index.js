@@ -30,9 +30,12 @@ document.addEventListener('DOMContentLoaded', async function() {
             await window.simpleI18n.init();
         }
         
-        // Navbar auto-inits from global-navbar.js; only create if missing
-        if (typeof GlobalNavbar !== 'undefined' && !window.globalNavbar) {
+        // Initialize navbar (re-render). Re-sync dropdown to localStorage after render.
+        if (typeof GlobalNavbar !== 'undefined') {
             window.globalNavbar = new GlobalNavbar();
+            if (typeof window.globalNavbar.syncLanguageSwitcherToI18n === 'function') {
+                window.globalNavbar.syncLanguageSwitcherToI18n();
+            }
             // Hide buttons after navbar checks auth
             setTimeout(() => {
                 if (window.globalNavbar?.isAuthenticated || window.currentUser?.id) {

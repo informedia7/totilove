@@ -5,8 +5,8 @@
  * Migration Phase 3: Week 11
  */
 
-const CACHE_NAME = 'totilove-v6';
-const RUNTIME_CACHE = 'totilove-runtime-v6';
+const CACHE_NAME = 'totilove-v7';
+const RUNTIME_CACHE = 'totilove-runtime-v7';
 
 // Assets to cache immediately
 const PRECACHE_ASSETS = [
@@ -67,7 +67,7 @@ self.addEventListener('fetch', (event) => {
   
   const requestUrl = new URL(event.request.url);
 
-  // Never serve footer-pages.json from cache — stale 404/empty responses broke legal-page translations.
+  // Legal-page translations: never use a cached bundle (stale 404/English-only breaks footer i18n).
   if (requestUrl.pathname.includes('/assets/i18n/footer-pages.json')) {
     event.respondWith(fetch(event.request));
     return;
