@@ -8,23 +8,23 @@ import { readCookieTopHtml, readCookiePrefsHtml } from './cookie-fragments/read-
 export default {
     privacy: {
         metaDescription:
-            'Chính sách quyền riêng tư C:\Totilove — cách chúng tôi thu thập, sử dụng và bảo vệ dữ liệu của bạn.',
-        documentTitle: 'Chính sách quyền riêng tư — C:\Totilove',
+            'Chính sách quyền riêng tư Totilove — cách chúng tôi thu thập, sử dụng và bảo vệ dữ liệu của bạn.',
+        documentTitle: 'Chính sách quyền riêng tư — Totilove',
         heroTitleHtml: 'Chính sách quyền riêng tư',
         heroSubtitle: '',
         cardInnerHtml: readPrivacyHtml('vi'),
     },
     terms: {
-        metaDescription: 'Điều khoản dịch vụ C:\Totilove — quy tắc và điều kiện sử dụng nền tảng.',
-        documentTitle: 'Điều khoản dịch vụ — C:\Totilove',
+        metaDescription: 'Điều khoản dịch vụ Totilove — quy tắc và điều kiện sử dụng nền tảng.',
+        documentTitle: 'Điều khoản dịch vụ — Totilove',
         heroTitleHtml: 'Điều khoản dịch vụ',
         heroSubtitle: '',
         cardInnerHtml: readTermsHtml('vi'),
     },
     cookies: {
         metaDescription:
-            'Chính sách cookie C:\Totilove — các loại, đồng ý và quản lý tùy chọn trên trang này.',
-        documentTitle: 'Cookie — C:\Totilove',
+            'Chính sách cookie Totilove — các loại, đồng ý và quản lý tùy chọn trên trang này.',
+        documentTitle: 'Cookie — Totilove',
         heroTitleHtml: 'Cookie',
         heroSubtitle: 'Tháng 4, 2026.',
         cardTopHtml: readCookieTopHtml('vi'),
@@ -32,15 +32,15 @@ export default {
     },
     refund: {
         metaDescription:
-            'Chính sách hoàn tiền C:\Totilove — gói đăng ký, điều kiện đủ điều kiện và cách yêu cầu hoàn tiền.',
-        documentTitle: 'Chính sách hoàn tiền — C:\Totilove',
+            'Chính sách hoàn tiền Totilove — gói đăng ký, điều kiện đủ điều kiện và cách yêu cầu hoàn tiền.',
+        documentTitle: 'Chính sách hoàn tiền — Totilove',
         heroTitleHtml: 'Chính sách hoàn tiền',
         heroSubtitle: '',
         cardInnerHtml: readRefundHtml('vi'),
     },
     safety: {
-        metaDescription: 'Mẹo an toàn C:\Totilove — giữ an toàn khi hẹn hò trực tuyến và gặp mặt trực tiếp.',
-        documentTitle: 'Mẹo an toàn — C:\Totilove',
+        metaDescription: 'Mẹo an toàn Totilove — giữ an toàn khi hẹn hò trực tuyến và gặp mặt trực tiếp.',
+        documentTitle: 'Mẹo an toàn — Totilove',
         heroTitleHtml: 'Mẹo an toàn',
         heroSubtitle:
             'An toàn của bạn là ưu tiên hàng đầu. Hãy làm theo các hướng dẫn này khi tương tác trực tuyến và khi gặp mặt ngoài đời.',
@@ -104,8 +104,8 @@ export default {
 </ul>`,
     },
     contact: {
-        metaDescription: 'Liên hệ đội hỗ trợ C:\Totilove.',
-        documentTitle: 'Liên hệ — C:\Totilove',
+        metaDescription: 'Liên hệ đội hỗ trợ Totilove.',
+        documentTitle: 'Liên hệ — Totilove',
         heroTitleHtml: 'Liên hệ',
         heroSubtitle: 'Chúng tôi sẵn sàng hỗ trợ. Gửi tin nhắn và chúng tôi phản hồi trong vòng 24 giờ.',
         cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> Quay lại trang chủ</a>
@@ -126,18 +126,18 @@ export default {
     },
     accessibility: {
         metaDescription:
-            'Tuyên bố khả năng tiếp cận C:\Totilove — WCAG 2.1 AA, tính năng hỗ trợ và liên hệ.',
-        documentTitle: 'Khả năng tiếp cận — C:\Totilove',
+            'Tuyên bố khả năng tiếp cận Totilove — WCAG 2.1 AA, tính năng hỗ trợ và liên hệ.',
+        documentTitle: 'Khả năng tiếp cận — Totilove',
         heroTitleHtml: 'Khả năng tiếp cận',
         heroSubtitle:
-            'C:\Totilove cam kết mang tình yêu đến với mọi người, bất kể khả năng của họ như thế nào.',
+            'Totilove cam kết mang tình yêu đến với mọi người, bất kể khả năng của họ như thế nào.',
         cardInnerHtml: readAccessibilityHtml('vi'),
     },
     help: {
-        metaDescription: 'Trung tâm trợ giúp C:\Totilove.',
-        documentTitle: 'Trung tâm trợ giúp — C:\Totilove',
+        metaDescription: 'Trung tâm trợ giúp Totilove.',
+        documentTitle: 'Trung tâm trợ giúp — Totilove',
         heroTitleHtml: 'Trung tâm trợ giúp',
-        heroSubtitle: 'Câu trả lời cho câu hỏi thường gặp và cách tận dụng C:\Totilove.',
+        heroSubtitle: 'Câu trả lời cho câu hỏi thường gặp và cách tận dụng Totilove.',
         cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> Về trang chủ</a>
 <h2><i class="fas fa-user-plus"></i> Bắt đầu</h2>
 <p>Đăng ký miễn phí tại <a href="/pages/register.html">trang Đăng ký</a>. Hoàn thiện hồ sơ để tăng hiển thị ghép đôi.</p>
@@ -158,10 +158,10 @@ export default {
 <p><a href="/pages/footer/contact.html">Liên hệ hỗ trợ</a> — phản hồi trong 24 giờ.</p>`,
     },
     sitemap: {
-        metaDescription: 'Sơ đồ trang C:\Totilove — mọi trang trên nền tảng.',
-        documentTitle: 'Sơ đồ trang — C:\Totilove',
+        metaDescription: 'Sơ đồ trang Totilove — mọi trang trên nền tảng.',
+        documentTitle: 'Sơ đồ trang — Totilove',
         heroTitleHtml: 'Sơ đồ trang',
-        heroSubtitle: 'Tổng quan các trang trên C:\Totilove.',
+        heroSubtitle: 'Tổng quan các trang trên Totilove.',
         cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> Về trang chủ</a>
 <h2><i class="fas fa-globe"></i> Tất cả trang</h2>
 <div class="fp-sitemap-grid">

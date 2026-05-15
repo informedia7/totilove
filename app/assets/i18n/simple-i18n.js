@@ -92,7 +92,7 @@ class SimpleI18n {
     getFooterPagesBundleUrl() {
         const prefix = this.getAssetsPathPrefix();
         // Query bypasses older service-worker cache entries keyed on the bare URL.
-        return `${prefix}/assets/i18n/footer-pages.json?v=sw23`;
+        return `${prefix}/assets/i18n/footer-pages.json?v=sw24`;
     }
 
     setLanguagePreference(languageCode) {
@@ -195,11 +195,11 @@ class SimpleI18n {
                 },
                 "footer": {
                     "description": "Connecting hearts across cultures and continents. Find love that transcends borders.",
-                    "brand": "C:\\Totilove",
+                    "brand": "Totilove",
                     "features": "Features",
                     "support": "Support",
                     "legal": "Legal",
-                    "copyright": "All rights reserved. Made with ❤️ for love without borders. *C:\\Totilove is for adults 18+ only*",
+                    "copyright": "All rights reserved. Made with ❤️ for love without borders. *Totilove is for adults 18+ only*",
                     "stayConnected": "Stay Connected",
                     "stayConnectedText": "Get dating tips, success stories & exclusive offers.",
                     "secure": "Secure & Verified Platform",
@@ -296,11 +296,11 @@ class SimpleI18n {
                 },
                 "footer": {
                     "description": "Kết nối trái tim qua các nền văn hóa và lục địa. Tìm tình yêu vượt qua biên giới.",
-                    "brand": "C:\\Totilove",
+                    "brand": "Totilove",
                     "features": "Tính Năng",
                     "support": "Hỗ Trợ",
                     "legal": "Pháp Lý",
-                    "copyright": "Bản quyền được bảo vệ. Được tạo với ❤️ cho tình yêu không biên giới. *C:\\Totilove chỉ dành cho người từ 18 tuổi trở lên*",
+                    "copyright": "Bản quyền được bảo vệ. Được tạo với ❤️ cho tình yêu không biên giới. *Totilove chỉ dành cho người từ 18 tuổi trở lên*",
                     "stayConnected": "Luôn Kết Nối",
                     "stayConnectedText": "Nhận mẹo hẹn hò, câu chuyện thành công & ưu đãi độc quyền.",
                     "secure": "Nền Tảng An Toàn & Được Xác Minh",
@@ -397,11 +397,11 @@ class SimpleI18n {
                 },
                 "footer": {
                     "description": "เชื่อมต่อหัวใจข้ามวัฒนธรรมและทวีป ค้นหาความรักที่ข้ามขอบเขต",
-                    "brand": "C:\\Totilove",
+                    "brand": "Totilove",
                     "features": "คุณสมบัติ",
                     "support": "การสนับสนุน",
                     "legal": "กฎหมาย",
-                    "copyright": "สงวนลิขสิทธิ์ทั้งหมด สร้างด้วย ❤️ เพื่อความรักไร้พรมแดน *C:\\Totilove สำหรับผู้มีอายุ 18 ปีขึ้นไปเท่านั้น*",
+                    "copyright": "สงวนลิขสิทธิ์ทั้งหมด สร้างด้วย ❤️ เพื่อความรักไร้พรมแดน *Totilove สำหรับผู้มีอายุ 18 ปีขึ้นไปเท่านั้น*",
                     "stayConnected": "ติดตามเรา",
                     "stayConnectedText": "รับเคล็ดลับการออกเดท เรื่องราวความสำเร็จ & ข้อเสนอพิเศษ",
                     "secure": "แพลตฟอร์มที่ปลอดภัย & ได้รับการยืนยัน",
@@ -498,11 +498,11 @@ class SimpleI18n {
                 },
                 "footer": {
                     "description": "连接跨越文化和大陆的心灵。找到超越边界的爱情。",
-                    "brand": "C:\\Totilove",
+                    "brand": "Totilove",
                     "features": "功能",
                     "support": "支持",
                     "legal": "法律",
-                    "copyright": "版权所有。用❤️为无边界的爱情而制作。*C:\\Totilove 仅限年满 18 周岁的成人*",
+                    "copyright": "版权所有。用❤️为无边界的爱情而制作。*Totilove 仅限年满 18 周岁的成人*",
                     "stayConnected": "保持联系",
                     "stayConnectedText": "获取约会技巧、成功故事和独家优惠。",
                     "secure": "安全认证平台",
@@ -599,11 +599,11 @@ class SimpleI18n {
                 },
                 "footer": {
                     "description": "Connecter les cœurs à travers les cultures et les continents. Trouvez l'amour qui transcende les frontières.",
-                    "brand": "C:\\Totilove",
+                    "brand": "Totilove",
                     "features": "Fonctionnalités",
                     "support": "Support",
                     "legal": "Légal",
-                    "copyright": "Tous droits réservés. Fait avec ❤️ pour l'amour sans frontières. *C:\\Totilove est réservé aux adultes de 18 ans et plus*",
+                    "copyright": "Tous droits réservés. Fait avec ❤️ pour l'amour sans frontières. *Totilove est réservé aux adultes de 18 ans et plus*",
                     "stayConnected": "Restez Connecté",
                     "stayConnectedText": "Recevez des conseils de rencontres, des histoires de succès & des offres exclusives.",
                     "secure": "Plateforme Sécurisée & Vérifiée",
@@ -700,11 +700,11 @@ class SimpleI18n {
                 },
                 "footer": {
                     "description": "Herzen über Kulturen und Kontinente hinweg verbinden. Finde Liebe, die Grenzen überschreitet.",
-                    "brand": "C:\\Totilove",
+                    "brand": "Totilove",
                     "features": "Funktionen",
                     "support": "Support",
                     "legal": "Rechtliches",
-                    "copyright": "Alle Rechte vorbehalten. Mit ❤️ für grenzenlose Liebe gemacht. *C:\\Totilove ist nur für Erwachsene ab 18 Jahren*",
+                    "copyright": "Alle Rechte vorbehalten. Mit ❤️ für grenzenlose Liebe gemacht. *Totilove ist nur für Erwachsene ab 18 Jahren*",
                     "stayConnected": "Verbunden Bleiben",
                     "stayConnectedText": "Tipps fürs Dating, Erfolgsgeschichten & exklusive Angebote erhalten.",
                     "secure": "Sichere & Verifizierte Plattform",
@@ -801,11 +801,11 @@ class SimpleI18n {
                 },
                 "footer": {
                     "description": "Connettere cuori attraverso culture e continenti. Trova l'amore che trascende i confini.",
-                    "brand": "C:\\Totilove",
+                    "brand": "Totilove",
                     "features": "Caratteristiche",
                     "support": "Supporto",
                     "legal": "Legale",
-                    "copyright": "Tutti i diritti riservati. Fatto con ❤️ per l'amore senza confini. *C:\\Totilove è riservato solo agli adulti di 18 anni e oltre*",
+                    "copyright": "Tutti i diritti riservati. Fatto con ❤️ per l'amore senza confini. *Totilove è riservato solo agli adulti di 18 anni e oltre*",
                     "stayConnected": "Rimani Connesso",
                     "stayConnectedText": "Ricevi consigli per gli appuntamenti, storie di successo & offerte esclusive.",
                     "secure": "Piattaforma Sicura & Verificata",
@@ -902,11 +902,11 @@ class SimpleI18n {
                 },
                 "footer": {
                     "description": "Conectando corazones a través de culturas y continentes. Encuentra amor que trasciende fronteras.",
-                    "brand": "C:\\Totilove",
+                    "brand": "Totilove",
                     "features": "Características",
                     "support": "Soporte",
                     "legal": "Legal",
-                    "copyright": "Todos los derechos reservados. Hecho con ❤️ para el amor sin fronteras. *C:\\Totilove es solo para mayores de 18 años*",
+                    "copyright": "Todos los derechos reservados. Hecho con ❤️ para el amor sin fronteras. *Totilove es solo para mayores de 18 años*",
                     "stayConnected": "Mantente Conectado",
                     "stayConnectedText": "Recibe consejos de citas, historias de éxito & ofertas exclusivas.",
                     "secure": "Plataforma Segura & Verificada",
@@ -1003,11 +1003,11 @@ class SimpleI18n {
                 },
                 "footer": {
                     "description": "Соединяя сердца через культуры и континенты. Найдите любовь, которая превосходит границы.",
-                    "brand": "C:\\Totilove",
+                    "brand": "Totilove",
                     "features": "Функции",
                     "support": "Поддержка",
                     "legal": "Правовая Информация",
-                    "copyright": "Все права защищены. Сделано с ❤️ для любви без границ. *C:\\Totilove только для лиц старше 18 лет*",
+                    "copyright": "Все права защищены. Сделано с ❤️ для любви без границ. *Totilove только для лиц старше 18 лет*",
                     "stayConnected": "Оставайтесь на связи",
                     "stayConnectedText": "Получайте советы по свиданиям, истории успеха и эксклюзивные предложения.",
                     "secure": "Безопасная и верифицированная платформа",
@@ -1104,11 +1104,11 @@ class SimpleI18n {
                 },
                 "footer": {
                     "description": "Kumokonekta ng mga puso sa buong kultura at kontinente. Maghanap ng pag-ibig na lumalampas sa mga hangganan.",
-                    "brand": "C:\\Totilove",
+                    "brand": "Totilove",
                     "features": "Features",
                     "support": "Support",
                     "legal": "Legal",
-                    "copyright": "Lahat ng karapatan ay nakalaan. Ginawa nang may ❤️ para sa pag-ibig na walang hangganan. *Ang C:\\Totilove ay para lamang sa mga may edad na 18+*",
+                    "copyright": "Lahat ng karapatan ay nakalaan. Ginawa nang may ❤️ para sa pag-ibig na walang hangganan. *Ang Totilove ay para lamang sa mga may edad na 18+*",
                     "stayConnected": "Manatiling Konektado",
                     "stayConnectedText": "Kumuha ng mga tip sa pakikipagtipan, mga kwento ng tagumpay & mga eksklusibong alok.",
                     "secure": "Ligtas & Verified na Platform",

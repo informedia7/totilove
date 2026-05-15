@@ -12,23 +12,23 @@ export default {
     fr: {
         privacy: {
             metaDescription:
-                'Politique de confidentialité C:\Totilove — collecte, utilisation et protection de vos données.',
-            documentTitle: 'Politique de confidentialité — C:\Totilove',
+                'Politique de confidentialité Totilove — collecte, utilisation et protection de vos données.',
+            documentTitle: 'Politique de confidentialité — Totilove',
             heroTitleHtml: 'Politique de confidentialité',
             heroSubtitle: '',
             cardInnerHtml: readPrivacyHtml('fr'),
         },
         terms: {
-            metaDescription: "Conditions d'utilisation C:\Totilove — règles d'utilisation de la plateforme.",
-            documentTitle: "Conditions d'utilisation — C:\Totilove",
+            metaDescription: "Conditions d'utilisation Totilove — règles d'utilisation de la plateforme.",
+            documentTitle: "Conditions d'utilisation — Totilove",
             heroTitleHtml: "Conditions d'utilisation",
             heroSubtitle: '',
             cardInnerHtml: readTermsHtml('fr'),
         },
         cookies: {
             metaDescription:
-                'Politique cookies C:\Totilove — catégories, préférences et gestion sur cette page.',
-            documentTitle: 'Cookies — C:\Totilove',
+                'Politique cookies Totilove — catégories, préférences et gestion sur cette page.',
+            documentTitle: 'Cookies — Totilove',
             heroTitleHtml: 'Cookies',
             heroSubtitle: 'Avril 2026.',
             cardTopHtml: readCookieTopHtml('fr'),
@@ -36,16 +36,16 @@ export default {
         },
         refund: {
             metaDescription:
-                'Politique de remboursement C:\Totilove — abonnements, admissibilité et demandes de remboursement.',
-            documentTitle: 'Politique de remboursement — C:\Totilove',
+                'Politique de remboursement Totilove — abonnements, admissibilité et demandes de remboursement.',
+            documentTitle: 'Politique de remboursement — Totilove',
             heroTitleHtml: 'Politique de remboursement',
             heroSubtitle: '',
             cardInnerHtml: readRefundHtml('fr'),
         },
         safety: {
             metaDescription:
-                'Conseils de sécurité C:\Totilove — restez en sécurité lors de rencontres en ligne et en personne.',
-            documentTitle: 'Conseils de sécurité — C:\Totilove',
+                'Conseils de sécurité Totilove — restez en sécurité lors de rencontres en ligne et en personne.',
+            documentTitle: 'Conseils de sécurité — Totilove',
             heroTitleHtml: 'Conseils de sécurité',
             heroSubtitle:
                 'Votre sécurité est notre priorité absolue. Suivez ces recommandations pour rester en sécurité en ligne et lors de vos rencontres.',
@@ -109,8 +109,8 @@ export default {
 </ul>`,
         },
         contact: {
-            metaDescription: 'Contacter le support C:\Totilove.',
-            documentTitle: 'Contact — C:\Totilove',
+            metaDescription: 'Contacter le support Totilove.',
+            documentTitle: 'Contact — Totilove',
             heroTitleHtml: 'Contact',
             heroSubtitle:
                 'Nous sommes là pour vous aider. Envoyez-nous un message et nous répondrons dans les 24 heures.',
@@ -132,23 +132,23 @@ export default {
         },
         accessibility: {
             metaDescription:
-                "Déclaration d'accessibilité C:\Totilove — engagement WCAG 2.1 AA, fonctionnalités prises en charge et contact.",
-            documentTitle: 'Accessibilité — C:\Totilove',
+                "Déclaration d'accessibilité Totilove — engagement WCAG 2.1 AA, fonctionnalités prises en charge et contact.",
+            documentTitle: 'Accessibilité — Totilove',
             heroTitleHtml: 'Accessibilité',
             heroSubtitle:
-                "C:\Totilove s'engage à rendre l'amour accessible à tous, quelles que soient leurs capacités.",
+                "Totilove s'engage à rendre l'amour accessible à tous, quelles que soient leurs capacités.",
             cardInnerHtml: readAccessibilityHtml('fr'),
         },
         help: {
             metaDescription:
-                "Centre d'aide C:\Totilove — réponses aux questions fréquentes et comment tirer le meilleur parti de la plateforme.",
-            documentTitle: "Centre d'aide — C:\Totilove",
+                "Centre d'aide Totilove — réponses aux questions fréquentes et comment tirer le meilleur parti de la plateforme.",
+            documentTitle: "Centre d'aide — Totilove",
             heroTitleHtml: "Centre d'aide",
             heroSubtitle:
-                'Trouvez des réponses aux questions fréquentes et tirez le meilleur parti de C:\Totilove.',
+                'Trouvez des réponses aux questions fréquentes et tirez le meilleur parti de Totilove.',
             cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> Retour à l'accueil</a>
 <h2><i class="fas fa-user-plus"></i> Premiers pas</h2>
-<p>Créer un compte sur C:\Totilove est gratuit. Rendez-vous sur la <a href="/pages/register.html">page d'inscription</a> et remplissez vos informations. Une fois inscrit, complétez votre profil pour augmenter votre visibilité auprès des matchs.</p>
+<p>Créer un compte sur Totilove est gratuit. Rendez-vous sur la <a href="/pages/register.html">page d'inscription</a> et remplissez vos informations. Une fois inscrit, complétez votre profil pour augmenter votre visibilité auprès des matchs.</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-search-heart"></i> Trouver des matchs</h2>
 <p>Utilisez la fonction de <strong>recherche</strong> pour filtrer par âge, localisation, langue et centres d'intérêt. Notre moteur de matchmaking intelligent suggère également automatiquement des profils compatibles en fonction de vos préférences.</p>
@@ -160,14 +160,14 @@ export default {
 <p>Gérez vos préférences de notification, vos paramètres de confidentialité et votre langue dans <strong>Réglages</strong>. Vous pouvez désactiver ou supprimer votre compte à tout moment depuis la section Compte.</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-credit-card"></i> Facturation et abonnements</h2>
-<p>C:\Totilove propose une version gratuite ainsi que des formules premium. Consultez et gérez votre abonnement dans <strong>Facturation</strong> depuis le menu de votre compte. Annulez à tout moment — aucun frais caché.</p>
+<p>Totilove propose une version gratuite ainsi que des formules premium. Consultez et gérez votre abonnement dans <strong>Facturation</strong> depuis le menu de votre compte. Annulez à tout moment — aucun frais caché.</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-envelope"></i> Besoin d'aide ?</h2>
 <p>Vous n'avez pas trouvé votre réponse ici ? <a href="/pages/footer/contact.html">Contactez notre équipe d'assistance</a> et nous vous répondrons dans les 24 heures.</p>`,
         },
         sitemap: {
-            metaDescription: 'Plan du site C:\Totilove.',
-            documentTitle: 'Plan du site — C:\Totilove',
+            metaDescription: 'Plan du site Totilove.',
+            documentTitle: 'Plan du site — Totilove',
             heroTitleHtml: 'Plan du site',
             heroSubtitle: 'Vue d’ensemble des pages.',
             cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> Retour à l'accueil</a>
@@ -214,24 +214,24 @@ export default {
     de: {
         privacy: {
             metaDescription:
-                'C:\Totilove Datenschutzerklärung — wie wir Daten erheben, nutzen und schützen.',
-            documentTitle: 'Datenschutzerklärung — C:\Totilove',
+                'Totilove Datenschutzerklärung — wie wir Daten erheben, nutzen und schützen.',
+            documentTitle: 'Datenschutzerklärung — Totilove',
             heroTitleHtml: 'Datenschutzerklärung',
             heroSubtitle: '',
             cardInnerHtml: readPrivacyHtml('de'),
         },
         terms: {
             metaDescription:
-                'C:\Totilove Nutzungsbedingungen — Regeln und Bedingungen für die Nutzung der Plattform.',
-            documentTitle: 'Nutzungsbedingungen — C:\Totilove',
+                'Totilove Nutzungsbedingungen — Regeln und Bedingungen für die Nutzung der Plattform.',
+            documentTitle: 'Nutzungsbedingungen — Totilove',
             heroTitleHtml: 'Nutzungsbedingungen',
             heroSubtitle: '',
             cardInnerHtml: readTermsHtml('de'),
         },
         cookies: {
             metaDescription:
-                'C:\Totilove Cookie-Richtlinie — Kategorien, Einwilligung und Verwaltung auf dieser Seite.',
-            documentTitle: 'Cookie — C:\Totilove',
+                'Totilove Cookie-Richtlinie — Kategorien, Einwilligung und Verwaltung auf dieser Seite.',
+            documentTitle: 'Cookie — Totilove',
             heroTitleHtml: 'Cookie',
             heroSubtitle: 'April 2026.',
             cardTopHtml: readCookieTopHtml('de'),
@@ -239,16 +239,16 @@ export default {
         },
         refund: {
             metaDescription:
-                'C:\Totilove Rückerstattungsrichtlinie — Abonnements, Berechtigung und Beantragung von Rückerstattungen.',
-            documentTitle: 'Rückerstattungsrichtlinie — C:\Totilove',
+                'Totilove Rückerstattungsrichtlinie — Abonnements, Berechtigung und Beantragung von Rückerstattungen.',
+            documentTitle: 'Rückerstattungsrichtlinie — Totilove',
             heroTitleHtml: 'Rückerstattungsrichtlinie',
             heroSubtitle: '',
             cardInnerHtml: readRefundHtml('de'),
         },
         safety: {
             metaDescription:
-                'C:\Totilove Sicherheitshinweise — bleiben Sie beim Online-Dating und bei Treffen sicher.',
-            documentTitle: 'Sicherheitshinweise — C:\Totilove',
+                'Totilove Sicherheitshinweise — bleiben Sie beim Online-Dating und bei Treffen sicher.',
+            documentTitle: 'Sicherheitshinweise — Totilove',
             heroTitleHtml: 'Sicherheitshinweise',
             heroSubtitle:
                 'Ihre Sicherheit hat für uns oberste Priorität. Befolgen Sie diese Hinweise für Online-Gespräche und persönliche Treffen.',
@@ -312,8 +312,8 @@ export default {
 </ul>`,
         },
         contact: {
-            metaDescription: 'C:\Totilove Support kontaktieren.',
-            documentTitle: 'Kontakt — C:\Totilove',
+            metaDescription: 'Totilove Support kontaktieren.',
+            documentTitle: 'Kontakt — Totilove',
             heroTitleHtml: 'Kontakt',
             heroSubtitle:
                 'Wir sind für Sie da. Schreiben Sie uns — in der Regel antworten wir innerhalb von 24 Stunden.',
@@ -335,23 +335,23 @@ export default {
         },
         accessibility: {
             metaDescription:
-                'Barrierefreiheitserklärung C:\Totilove — WCAG 2.1 AA, unterstützte Funktionen und Kontakt.',
-            documentTitle: 'Barrierefreiheit — C:\Totilove',
+                'Barrierefreiheitserklärung Totilove — WCAG 2.1 AA, unterstützte Funktionen und Kontakt.',
+            documentTitle: 'Barrierefreiheit — Totilove',
             heroTitleHtml: 'Barrierefreiheit',
             heroSubtitle:
-                'C:\Totilove ist bestrebt, Liebe für alle zugänglich zu machen, unabhängig von ihren Fähigkeiten.',
+                'Totilove ist bestrebt, Liebe für alle zugänglich zu machen, unabhängig von ihren Fähigkeiten.',
             cardInnerHtml: readAccessibilityHtml('de'),
         },
         help: {
             metaDescription:
-                'C:\Totilove Hilfezentrum — Antworten auf häufig gestellte Fragen und wie Sie die Plattform optimal nutzen.',
-            documentTitle: 'Hilfezentrum — C:\Totilove',
+                'Totilove Hilfezentrum — Antworten auf häufig gestellte Fragen und wie Sie die Plattform optimal nutzen.',
+            documentTitle: 'Hilfezentrum — Totilove',
             heroTitleHtml: 'Hilfezentrum',
             heroSubtitle:
-                'Hier finden Sie Antworten auf häufig gestellte Fragen und erfahren, wie Sie C:\Totilove optimal nutzen können.',
+                'Hier finden Sie Antworten auf häufig gestellte Fragen und erfahren, wie Sie Totilove optimal nutzen können.',
             cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> Zurück zur Startseite</a>
 <h2><i class="fas fa-user-plus"></i> Erste Schritte</h2>
-<p>Die Erstellung eines Kontos bei C:\Totilove ist kostenlos. Besuchen Sie die <a href="/pages/register.html">Registrierungsseite</a> und geben Sie Ihre Daten ein. Nach der Registrierung vervollständigen Sie Ihr Profil, um Ihre Sichtbarkeit bei Matches zu erhöhen.</p>
+<p>Die Erstellung eines Kontos bei Totilove ist kostenlos. Besuchen Sie die <a href="/pages/register.html">Registrierungsseite</a> und geben Sie Ihre Daten ein. Nach der Registrierung vervollständigen Sie Ihr Profil, um Ihre Sichtbarkeit bei Matches zu erhöhen.</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-search-heart"></i> Matches finden</h2>
 <p>Nutzen Sie die <strong>Suchfunktion</strong>, um nach Alter, Standort, Sprache und Interessen zu filtern. Unsere intelligente Matchmaking-Engine schlägt Ihnen automatisch kompatible Profile basierend auf Ihren Präferenzen vor.</p>
@@ -363,14 +363,14 @@ export default {
 <p>Verwalten Sie Ihre Benachrichtigungseinstellungen, Datenschutzeinstellungen und Sprache in den <strong>Einstellungen</strong>. Sie können Ihr Konto jederzeit im Bereich Konto deaktivieren oder löschen.</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-credit-card"></i> Abrechnung &amp; Abonnements</h2>
-<p>C:\Totilove bietet eine kostenlose Version sowie Premium-Tarife an. Sehen Sie Ihr Abonnement ein und verwalten Sie es unter <strong>Abrechnung</strong> in Ihrem Kontomenü. Jederzeit kündbar — keine versteckten Gebühren.</p>
+<p>Totilove bietet eine kostenlose Version sowie Premium-Tarife an. Sehen Sie Ihr Abonnement ein und verwalten Sie es unter <strong>Abrechnung</strong> in Ihrem Kontomenü. Jederzeit kündbar — keine versteckten Gebühren.</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-envelope"></i> Brauchen Sie noch Hilfe?</h2>
 <p>Finden Sie hier keine Antwort? <a href="/pages/footer/contact.html">Kontaktieren Sie unser Support-Team</a>, und wir melden uns innerhalb von 24 Stunden bei Ihnen.</p>`,
         },
         sitemap: {
-            metaDescription: 'C:\Totilove Sitemap.',
-            documentTitle: 'Sitemap — C:\Totilove',
+            metaDescription: 'Totilove Sitemap.',
+            documentTitle: 'Sitemap — Totilove',
             heroTitleHtml: 'Sitemap',
             heroSubtitle: 'Übersicht der Seiten.',
             cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> Zur Startseite</a>
@@ -417,24 +417,24 @@ export default {
     es: {
         privacy: {
             metaDescription:
-                'Política de privacidad C:\Totilove — cómo recopilamos, usamos y protegemos sus datos.',
-            documentTitle: 'Política de Privacidad — C:\Totilove',
+                'Política de privacidad Totilove — cómo recopilamos, usamos y protegemos sus datos.',
+            documentTitle: 'Política de Privacidad — Totilove',
             heroTitleHtml: 'Política de Privacidad',
             heroSubtitle: '',
             cardInnerHtml: readPrivacyHtml('es'),
         },
         terms: {
             metaDescription:
-                'Términos de Servicio C:\Totilove — reglas y condiciones para el uso de la plataforma.',
-            documentTitle: 'Términos de Servicio — C:\Totilove',
+                'Términos de Servicio Totilove — reglas y condiciones para el uso de la plataforma.',
+            documentTitle: 'Términos de Servicio — Totilove',
             heroTitleHtml: 'Términos de Servicio',
             heroSubtitle: '',
             cardInnerHtml: readTermsHtml('es'),
         },
         cookies: {
             metaDescription:
-                'Política de cookies C:\Totilove — categorías, consentimiento y gestión en esta página.',
-            documentTitle: 'Cookie — C:\Totilove',
+                'Política de cookies Totilove — categorías, consentimiento y gestión en esta página.',
+            documentTitle: 'Cookie — Totilove',
             heroTitleHtml: 'Cookie',
             heroSubtitle: 'Abril 2026.',
             cardTopHtml: readCookieTopHtml('es'),
@@ -442,15 +442,15 @@ export default {
         },
         refund: {
             metaDescription:
-                'Política de Reembolsos C:\Totilove — suscripciones, elegibilidad y cómo solicitar un reembolso.',
-            documentTitle: 'Política de Reembolsos — C:\Totilove',
+                'Política de Reembolsos Totilove — suscripciones, elegibilidad y cómo solicitar un reembolso.',
+            documentTitle: 'Política de Reembolsos — Totilove',
             heroTitleHtml: 'Política de Reembolsos',
             heroSubtitle: '',
             cardInnerHtml: readRefundHtml('es'),
         },
         safety: {
-            metaDescription: 'Consejos de seguridad C:\Totilove — mantente seguro en las citas en línea.',
-            documentTitle: 'Consejos de seguridad — C:\Totilove',
+            metaDescription: 'Consejos de seguridad Totilove — mantente seguro en las citas en línea.',
+            documentTitle: 'Consejos de seguridad — Totilove',
             heroTitleHtml: 'Consejos de seguridad',
             heroSubtitle:
                 'Tu seguridad es nuestra máxima prioridad. Sigue estas pautas para mantenerte a salvo al interactuar en línea y al conocerte en persona.',
@@ -514,8 +514,8 @@ export default {
 </ul>`,
         },
         contact: {
-            metaDescription: 'Contacto con soporte C:\Totilove.',
-            documentTitle: 'Contacto — C:\Totilove',
+            metaDescription: 'Contacto con soporte Totilove.',
+            documentTitle: 'Contacto — Totilove',
             heroTitleHtml: 'Contacto',
             heroSubtitle:
                 'Estamos aquí para ayudarte. Envíanos un mensaje y responderemos en un plazo de 24 horas.',
@@ -537,23 +537,23 @@ export default {
         },
         accessibility: {
             metaDescription:
-                'Declaración de accesibilidad C:\Totilove — WCAG 2.1 AA, funciones y cómo solicitar asistencia.',
-            documentTitle: 'Accesibilidad — C:\Totilove',
+                'Declaración de accesibilidad Totilove — WCAG 2.1 AA, funciones y cómo solicitar asistencia.',
+            documentTitle: 'Accesibilidad — Totilove',
             heroTitleHtml: 'Accesibilidad',
             heroSubtitle:
-                'C:\Totilove está comprometido a hacer que el amor sea accesible para todos, independientemente de sus capacidades.',
+                'Totilove está comprometido a hacer que el amor sea accesible para todos, independientemente de sus capacidades.',
             cardInnerHtml: readAccessibilityHtml('es'),
         },
         help: {
             metaDescription:
-                'Centro de ayuda C:\Totilove — respuestas a preguntas frecuentes y cómo sacar el máximo provecho de la plataforma.',
-            documentTitle: 'Centro de ayuda — C:\Totilove',
+                'Centro de ayuda Totilove — respuestas a preguntas frecuentes y cómo sacar el máximo provecho de la plataforma.',
+            documentTitle: 'Centro de ayuda — Totilove',
             heroTitleHtml: 'Centro de Ayuda',
             heroSubtitle:
-                'Encuentra respuestas a preguntas frecuentes y saca el máximo provecho de C:\Totilove.',
+                'Encuentra respuestas a preguntas frecuentes y saca el máximo provecho de Totilove.',
             cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> Volver al inicio</a>
 <h2><i class="fas fa-user-plus"></i> Primeros pasos</h2>
-<p>Crear una cuenta en C:\Totilove es gratuito. Visita la <a href="/pages/register.html">página de Registro</a> y completa tus datos. Una vez registrado, completa tu perfil para aumentar tu visibilidad entre los matches.</p>
+<p>Crear una cuenta en Totilove es gratuito. Visita la <a href="/pages/register.html">página de Registro</a> y completa tus datos. Una vez registrado, completa tu perfil para aumentar tu visibilidad entre los matches.</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-search-heart"></i> Cómo encontrar matches (coincidencias)</h2>
 <p>Utiliza la función de <strong>Búsqueda</strong> para filtrar por edad, ubicación, idioma e intereses. Nuestro motor de emparejamiento inteligente también sugiere perfiles compatibles automáticamente según tus preferencias.</p>
@@ -565,14 +565,14 @@ export default {
 <p>Administra tus preferencias de notificaciones, configuraciones de privacidad e idioma en <strong>Ajustes</strong>. Puedes desactivar o eliminar tu cuenta en cualquier momento desde la sección Cuenta.</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-credit-card"></i> Facturación y suscripciones</h2>
-<p>C:\Totilove ofrece un nivel gratuito, así como planes premium. Revisa y administra tu suscripción en <strong>Facturación</strong> dentro del menú de tu cuenta. Cancela cuando quieras, sin cargos ocultos.</p>
+<p>Totilove ofrece un nivel gratuito, así como planes premium. Revisa y administra tu suscripción en <strong>Facturación</strong> dentro del menú de tu cuenta. Cancela cuando quieras, sin cargos ocultos.</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-envelope"></i> ¿Aún necesitas ayuda?</h2>
 <p>¿No encuentras tu respuesta aquí? <a href="/pages/footer/contact.html">Contacta a nuestro equipo de soporte</a> y te responderemos en un plazo de 24 horas.</p>`,
         },
         sitemap: {
-            metaDescription: 'Mapa del sitio C:\Totilove.',
-            documentTitle: 'Mapa — C:\Totilove',
+            metaDescription: 'Mapa del sitio Totilove.',
+            documentTitle: 'Mapa — Totilove',
             heroTitleHtml: 'Mapa del sitio',
             heroSubtitle: 'Páginas principales.',
             cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> Inicio</a>
@@ -619,24 +619,24 @@ export default {
     it: {
         privacy: {
             metaDescription:
-                'Informativa sulla privacy C:\Totilove — come raccogliamo, utilizziamo e proteggiamo i tuoi dati.',
-            documentTitle: 'Informativa sulla privacy — C:\Totilove',
+                'Informativa sulla privacy Totilove — come raccogliamo, utilizziamo e proteggiamo i tuoi dati.',
+            documentTitle: 'Informativa sulla privacy — Totilove',
             heroTitleHtml: 'Informativa sulla privacy',
             heroSubtitle: '',
             cardInnerHtml: readPrivacyHtml('it'),
         },
         terms: {
             metaDescription:
-                'Termini di servizio C:\Totilove — regole e condizioni per l’uso della piattaforma.',
-            documentTitle: 'Termini di servizio — C:\Totilove',
+                'Termini di servizio Totilove — regole e condizioni per l’uso della piattaforma.',
+            documentTitle: 'Termini di servizio — Totilove',
             heroTitleHtml: 'Termini di servizio',
             heroSubtitle: '',
             cardInnerHtml: readTermsHtml('it'),
         },
         cookies: {
             metaDescription:
-                'Informativa sui cookie C:\Totilove — categorie, consenso e gestione su questa pagina.',
-            documentTitle: 'Cookie — C:\Totilove',
+                'Informativa sui cookie Totilove — categorie, consenso e gestione su questa pagina.',
+            documentTitle: 'Cookie — Totilove',
             heroTitleHtml: 'Cookie',
             heroSubtitle: 'Aprile 2026.',
             cardTopHtml: readCookieTopHtml('it'),
@@ -644,16 +644,16 @@ export default {
         },
         refund: {
             metaDescription:
-                'Politica di rimborso C:\Totilove — abbonamenti, idoneità e come richiedere un rimborso.',
-            documentTitle: 'Politica di rimborso — C:\Totilove',
+                'Politica di rimborso Totilove — abbonamenti, idoneità e come richiedere un rimborso.',
+            documentTitle: 'Politica di rimborso — Totilove',
             heroTitleHtml: 'Politica di rimborso',
             heroSubtitle: '',
             cardInnerHtml: readRefundHtml('it'),
         },
         safety: {
             metaDescription:
-                'Suggerimenti di sicurezza C:\Totilove — proteggiti online e negli incontri di persona.',
-            documentTitle: 'Suggerimenti di sicurezza — C:\Totilove',
+                'Suggerimenti di sicurezza Totilove — proteggiti online e negli incontri di persona.',
+            documentTitle: 'Suggerimenti di sicurezza — Totilove',
             heroTitleHtml: 'Suggerimenti di sicurezza',
             heroSubtitle:
                 'La tua sicurezza è la nostra massima priorità. Segui queste linee guida per interagire online e incontrare le persone in sicurezza.',
@@ -717,8 +717,8 @@ export default {
 </ul>`,
         },
         contact: {
-            metaDescription: 'Contatta il supporto C:\Totilove.',
-            documentTitle: 'Contatti — C:\Totilove',
+            metaDescription: 'Contatta il supporto Totilove.',
+            documentTitle: 'Contatti — Totilove',
             heroTitleHtml: 'Contatti',
             heroSubtitle:
                 'Siamo qui per aiutarti. Inviaci un messaggio e ti risponderemo entro 24 ore.',
@@ -740,23 +740,23 @@ export default {
         },
         accessibility: {
             metaDescription:
-                'Dichiarazione di accessibilità C:\Totilove — WCAG 2.1 AA, funzionalità supportate e contatti.',
-            documentTitle: 'Accessibilità — C:\Totilove',
+                'Dichiarazione di accessibilità Totilove — WCAG 2.1 AA, funzionalità supportate e contatti.',
+            documentTitle: 'Accessibilità — Totilove',
             heroTitleHtml: 'Accessibilità',
             heroSubtitle:
-                "C:\Totilove si impegna a rendere l'amore accessibile a tutti, indipendentemente dalle capacità.",
+                "Totilove si impegna a rendere l'amore accessibile a tutti, indipendentemente dalle capacità.",
             cardInnerHtml: readAccessibilityHtml('it'),
         },
         help: {
             metaDescription:
-                'Centro assistenza C:\Totilove — risposte alle domande frequenti e come sfruttare al meglio la piattaforma.',
-            documentTitle: 'Centro assistenza — C:\Totilove',
+                'Centro assistenza Totilove — risposte alle domande frequenti e come sfruttare al meglio la piattaforma.',
+            documentTitle: 'Centro assistenza — Totilove',
             heroTitleHtml: 'Centro assistenza',
             heroSubtitle:
-                'Trova le risposte alle domande frequenti e sfrutta al meglio C:\Totilove.',
+                'Trova le risposte alle domande frequenti e sfrutta al meglio Totilove.',
             cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> Torna alla home</a>
 <h2><i class="fas fa-user-plus"></i> Primi passi</h2>
-<p>Creare un account su C:\Totilove è gratuito. Visita la <a href="/pages/register.html">pagina Registrati</a> e inserisci i tuoi dati. Una volta registrato, completa il tuo profilo per aumentare la visibilità tra i match.</p>
+<p>Creare un account su Totilove è gratuito. Visita la <a href="/pages/register.html">pagina Registrati</a> e inserisci i tuoi dati. Una volta registrato, completa il tuo profilo per aumentare la visibilità tra i match.</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-search-heart"></i> Trovare match</h2>
 <p>Usa la funzione <strong>Cerca</strong> per filtrare per età, posizione, lingua e interessi. Il nostro motore di matchmaking intelligente suggerisce automaticamente profili compatibili in base alle tue preferenze.</p>
@@ -768,14 +768,14 @@ export default {
 <p>Gestisci le preferenze delle notifiche, le impostazioni sulla privacy e la lingua in <strong>Impostazioni</strong>. Puoi disattivare o eliminare il tuo account in qualsiasi momento dalla sezione Account.</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-credit-card"></i> Fatturazione e abbonamenti</h2>
-<p>C:\Totilove offre un livello gratuito e piani premium. Visualizza e gestisci il tuo abbonamento in <strong>Fatturazione</strong> dal menu del tuo account. Cancella quando vuoi — nessun costo nascosto.</p>
+<p>Totilove offre un livello gratuito e piani premium. Visualizza e gestisci il tuo abbonamento in <strong>Fatturazione</strong> dal menu del tuo account. Cancella quando vuoi — nessun costo nascosto.</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-envelope"></i> Hai ancora bisogno di aiuto?</h2>
 <p>Non trovi la risposta che cerchi? <a href="/pages/footer/contact.html">Contatta il nostro team di supporto</a> e ti risponderemo entro 24 ore.</p>`,
         },
         sitemap: {
-            metaDescription: 'Mappa del sito C:\Totilove.',
-            documentTitle: 'Mappa — C:\Totilove',
+            metaDescription: 'Mappa del sito Totilove.',
+            documentTitle: 'Mappa — Totilove',
             heroTitleHtml: 'Mappa del sito',
             heroSubtitle: 'Panoramica delle pagine.',
             cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> Home</a>

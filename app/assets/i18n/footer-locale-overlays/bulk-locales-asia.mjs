@@ -11,24 +11,24 @@ export default {
     ru: {
         privacy: {
             metaDescription:
-                'Политика конфиденциальности C:\Totilove — как мы собираем, используем и защищаем ваши данные.',
-            documentTitle: 'Политика конфиденциальности — C:\Totilove',
+                'Политика конфиденциальности Totilove — как мы собираем, используем и защищаем ваши данные.',
+            documentTitle: 'Политика конфиденциальности — Totilove',
             heroTitleHtml: 'Политика конфиденциальности',
             heroSubtitle: '',
             cardInnerHtml: readPrivacyHtml('ru'),
         },
         terms: {
             metaDescription:
-                'Условия использования C:\Totilove — правила и условия использования платформы.',
-            documentTitle: 'Условия использования — C:\Totilove',
+                'Условия использования Totilove — правила и условия использования платформы.',
+            documentTitle: 'Условия использования — Totilove',
             heroTitleHtml: 'Условия использования',
             heroSubtitle: '',
             cardInnerHtml: readTermsHtml('ru'),
         },
         cookies: {
             metaDescription:
-                'Политика использования cookie C:\Totilove — категории, согласие и управление на этой странице.',
-            documentTitle: 'Файлы cookie — C:\Totilove',
+                'Политика использования cookie Totilove — категории, согласие и управление на этой странице.',
+            documentTitle: 'Файлы cookie — Totilove',
             heroTitleHtml: 'Файлы cookie',
             heroSubtitle: 'Апрель 2026 г.',
             cardTopHtml: readCookieTopHtml('ru'),
@@ -36,16 +36,16 @@ export default {
         },
         refund: {
             metaDescription:
-                'Политика возврата средств C:\Totilove — подписки, основания для возврата и как подать запрос.',
-            documentTitle: 'Политика возврата средств — C:\Totilove',
+                'Политика возврата средств Totilove — подписки, основания для возврата и как подать запрос.',
+            documentTitle: 'Политика возврата средств — Totilove',
             heroTitleHtml: 'Политика возврата средств',
             heroSubtitle: '',
             cardInnerHtml: readRefundHtml('ru'),
         },
         safety: {
             metaDescription:
-                'Советы по безопасности C:\Totilove — оставайтесь в безопасности при онлайн-знакомствах и личных встречах.',
-            documentTitle: 'Советы по безопасности — C:\Totilove',
+                'Советы по безопасности Totilove — оставайтесь в безопасности при онлайн-знакомствах и личных встречах.',
+            documentTitle: 'Советы по безопасности — Totilove',
             heroTitleHtml: 'Советы по безопасности',
             heroSubtitle:
                 'Ваша безопасность для нас на первом месте. Следуйте этим рекомендациям при общении онлайн и при личных встречах.',
@@ -109,8 +109,8 @@ export default {
 </ul>`,
         },
         contact: {
-            metaDescription: 'Связаться со службой поддержки C:\Totilove.',
-            documentTitle: 'Контакты — C:\Totilove',
+            metaDescription: 'Связаться со службой поддержки Totilove.',
+            documentTitle: 'Контакты — Totilove',
             heroTitleHtml: 'Контакты',
             heroSubtitle:
                 'Мы готовы помочь. Напишите нам — обычно отвечаем в течение 24 часов.',
@@ -132,23 +132,23 @@ export default {
         },
         accessibility: {
             metaDescription:
-                'Заявление о доступности C:\Totilove — WCAG 2.1 AA, поддерживаемые функции и обратная связь.',
-            documentTitle: 'Доступность — C:\Totilove',
+                'Заявление о доступности Totilove — WCAG 2.1 AA, поддерживаемые функции и обратная связь.',
+            documentTitle: 'Доступность — Totilove',
             heroTitleHtml: 'Доступность',
             heroSubtitle:
-                'C:\Totilove стремится сделать любовь доступной для всех, независимо от возможностей.',
+                'Totilove стремится сделать любовь доступной для всех, независимо от возможностей.',
             cardInnerHtml: readAccessibilityHtml('ru'),
         },
         help: {
             metaDescription:
-                'Центр помощи C:\Totilove — ответы на частые вопросы и как получить максимум от платформы.',
-            documentTitle: 'Центр помощи — C:\Totilove',
+                'Центр помощи Totilove — ответы на частые вопросы и как получить максимум от платформы.',
+            documentTitle: 'Центр помощи — Totilove',
             heroTitleHtml: 'Центр помощи',
             heroSubtitle:
-                'Найдите ответы на частые вопросы и получите максимум от C:\Totilove.',
+                'Найдите ответы на частые вопросы и получите максимум от Totilove.',
             cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> Назад на главную</a>
 <h2><i class="fas fa-user-plus"></i> Первые шаги</h2>
-<p>Создать аккаунт в C:\Totilove бесплатно. Перейдите на <a href="/pages/register.html">страницу регистрации</a> и заполните свои данные. После регистрации заполните профиль, чтобы повысить свою заметность для совпадений.</p>
+<p>Создать аккаунт в Totilove бесплатно. Перейдите на <a href="/pages/register.html">страницу регистрации</a> и заполните свои данные. После регистрации заполните профиль, чтобы повысить свою заметность для совпадений.</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-search-heart"></i> Поиск совпадений (матчей)</h2>
 <p>Используйте <strong>Поиск</strong>, чтобы фильтровать по возрасту, местоположению, языку и интересам. Наш интеллектуальный алгоритм подбора также автоматически предлагает совместимые профили на основе ваших предпочтений.</p>
@@ -160,14 +160,14 @@ export default {
 <p>Управляйте настройками уведомлений, конфиденциальности и языком в разделе <strong>Настройки</strong>. Вы можете деактивировать или удалить свой аккаунт в любое время в разделе Аккаунт.</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-credit-card"></i> Тарифы и подписки</h2>
-<p>C:\Totilove предлагает бесплатный тариф, а также премиум-планы. Просматривайте и управляйте своей подпиской в разделе <strong>Тарифы</strong> в меню аккаунта. Отмените в любое время — без скрытых комиссий.</p>
+<p>Totilove предлагает бесплатный тариф, а также премиум-планы. Просматривайте и управляйте своей подпиской в разделе <strong>Тарифы</strong> в меню аккаунта. Отмените в любое время — без скрытых комиссий.</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-envelope"></i> Всё ещё нужна помощь?</h2>
 <p>Не нашли ответ здесь? <a href="/pages/footer/contact.html">Свяжитесь с нашей службой поддержки</a>, и мы ответим вам в течение 24 часов.</p>`,
         },
         sitemap: {
-            metaDescription: 'Карта сайта C:\Totilove.',
-            documentTitle: 'Карта сайта — C:\Totilove',
+            metaDescription: 'Карта сайта Totilove.',
+            documentTitle: 'Карта сайта — Totilove',
             heroTitleHtml: 'Карта сайта',
             heroSubtitle: 'Основные разделы.',
             cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> На главную</a>
@@ -213,37 +213,37 @@ export default {
     },
     zh: {
         privacy: {
-            metaDescription: 'C:\Totilove 隐私政策 — 我们如何收集、使用和保护您的数据。',
-            documentTitle: '隐私政策 — C:\Totilove',
+            metaDescription: 'Totilove 隐私政策 — 我们如何收集、使用和保护您的数据。',
+            documentTitle: '隐私政策 — Totilove',
             heroTitleHtml: '隐私政策',
             heroSubtitle: '',
             cardInnerHtml: readPrivacyHtml('zh'),
         },
         terms: {
-            metaDescription: 'C:\Totilove 服务条款 — 使用平台的规则与条件。',
-            documentTitle: '服务条款 — C:\Totilove',
+            metaDescription: 'Totilove 服务条款 — 使用平台的规则与条件。',
+            documentTitle: '服务条款 — Totilove',
             heroTitleHtml: '服务条款',
             heroSubtitle: '',
             cardInnerHtml: readTermsHtml('zh'),
         },
         cookies: {
-            metaDescription: 'C:\Totilove Cookie 政策 — 类别、同意与本页偏好控件。',
-            documentTitle: 'Cookie — C:\Totilove',
+            metaDescription: 'Totilove Cookie 政策 — 类别、同意与本页偏好控件。',
+            documentTitle: 'Cookie — Totilove',
             heroTitleHtml: 'Cookie',
             heroSubtitle: '2026年4月',
             cardTopHtml: readCookieTopHtml('zh'),
             cardPrefsHtml: readCookiePrefsHtml('zh'),
         },
         refund: {
-            metaDescription: 'C:\Totilove 退款政策 — 订阅、退款资格与申请方式。',
-            documentTitle: '退款政策 — C:\Totilove',
+            metaDescription: 'Totilove 退款政策 — 订阅、退款资格与申请方式。',
+            documentTitle: '退款政策 — Totilove',
             heroTitleHtml: '退款政策',
             heroSubtitle: '',
             cardInnerHtml: readRefundHtml('zh'),
         },
         safety: {
-            metaDescription: 'C:\Totilove 安全提示 — 在线约会与线下见面时保护自己。',
-            documentTitle: '安全提示 — C:\Totilove',
+            metaDescription: 'Totilove 安全提示 — 在线约会与线下见面时保护自己。',
+            documentTitle: '安全提示 — Totilove',
             heroTitleHtml: '安全提示',
             heroSubtitle:
                 '您的安全是我们的首要任务。请遵循以下指南，以保障线上互动与线下见面的安全。',
@@ -307,8 +307,8 @@ export default {
 </ul>`,
         },
         contact: {
-            metaDescription: '联系 C:\Totilove 支持团队。',
-            documentTitle: '联系我们 — C:\Totilove',
+            metaDescription: '联系 Totilove 支持团队。',
+            documentTitle: '联系我们 — Totilove',
             heroTitleHtml: '联系我们',
             heroSubtitle: '我们随时为您提供帮助。发送消息，我们将在24小时内回复。',
             cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> 返回首页</a>
@@ -328,20 +328,20 @@ export default {
 <p>如有紧急安全问题，请直接使用相关个人资料上的<strong>举报</strong>按钮。</p>`,
         },
         accessibility: {
-            metaDescription: 'C:\Totilove 无障碍声明 — WCAG 2.1 AA、支持的功能与反馈渠道。',
-            documentTitle: '无障碍访问 — C:\Totilove',
+            metaDescription: 'Totilove 无障碍声明 — WCAG 2.1 AA、支持的功能与反馈渠道。',
+            documentTitle: '无障碍访问 — Totilove',
             heroTitleHtml: '无障碍访问',
-            heroSubtitle: 'C:\Totilove 致力于让所有人都能获得爱情，无论其能力如何。',
+            heroSubtitle: 'Totilove 致力于让所有人都能获得爱情，无论其能力如何。',
             cardInnerHtml: readAccessibilityHtml('zh'),
         },
         help: {
-            metaDescription: 'C:\Totilove 帮助中心 — 常见问题解答与如何充分利用平台。',
-            documentTitle: '帮助中心 — C:\Totilove',
+            metaDescription: 'Totilove 帮助中心 — 常见问题解答与如何充分利用平台。',
+            documentTitle: '帮助中心 — Totilove',
             heroTitleHtml: '帮助中心',
-            heroSubtitle: '查找常见问题的答案，并充分利用 C:\Totilove。',
+            heroSubtitle: '查找常见问题的答案，并充分利用 Totilove。',
             cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> 返回首页</a>
 <h2><i class="fas fa-user-plus"></i> 新手上路</h2>
-<p>在 C:\Totilove 上创建账户是免费的。访问<a href="/pages/register.html">注册页面</a>并填写您的信息。注册完成后，完善您的个人资料以提高匹配可见度。</p>
+<p>在 Totilove 上创建账户是免费的。访问<a href="/pages/register.html">注册页面</a>并填写您的信息。注册完成后，完善您的个人资料以提高匹配可见度。</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-search-heart"></i> 寻找匹配</h2>
 <p>使用<strong>搜索</strong>功能按年龄、位置、语言和兴趣进行筛选。我们的智能匹配引擎还会根据您的偏好自动推荐兼容的个人资料。</p>
@@ -353,14 +353,14 @@ export default {
 <p>在<strong>设置</strong>中管理您的通知偏好、隐私设置和语言。您可以随时在「账户」部分停用或删除您的账户。</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-credit-card"></i> 账单与订阅</h2>
-<p>C:\Totilove 提供免费版本和高级套餐。在账户菜单的<strong>账单</strong>部分查看和管理您的订阅。可随时取消 — 无隐藏费用。</p>
+<p>Totilove 提供免费版本和高级套餐。在账户菜单的<strong>账单</strong>部分查看和管理您的订阅。可随时取消 — 无隐藏费用。</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-envelope"></i> 仍然需要帮助？</h2>
 <p>在这里找不到答案？<a href="/pages/footer/contact.html">请联系我们的支持团队</a>，我们将在 24 小时内回复您。</p>`,
         },
         sitemap: {
-            metaDescription: 'C:\Totilove 网站地图。',
-            documentTitle: '网站地图 — C:\Totilove',
+            metaDescription: 'Totilove 网站地图。',
+            documentTitle: '网站地图 — Totilove',
             heroTitleHtml: '网站地图',
             heroSubtitle: '主要页面一览。',
             cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> 返回首页</a>
@@ -407,24 +407,24 @@ export default {
     th: {
         privacy: {
             metaDescription:
-                'นโยบายความเป็นส่วนตัว C:\Totilove — วิธีที่เรารวบรวม ใช้ และปกป้องข้อมูลของคุณ',
-            documentTitle: 'นโยบายความเป็นส่วนตัว — C:\Totilove',
+                'นโยบายความเป็นส่วนตัว Totilove — วิธีที่เรารวบรวม ใช้ และปกป้องข้อมูลของคุณ',
+            documentTitle: 'นโยบายความเป็นส่วนตัว — Totilove',
             heroTitleHtml: 'นโยบายความเป็นส่วนตัว',
             heroSubtitle: '',
             cardInnerHtml: readPrivacyHtml('th'),
         },
         terms: {
             metaDescription:
-                'ข้อกำหนดในการให้บริการ C:\Totilove — กฎและเงื่อนไขการใช้งานแพลตฟอร์ม',
-            documentTitle: 'ข้อกำหนดในการให้บริการ — C:\Totilove',
+                'ข้อกำหนดในการให้บริการ Totilove — กฎและเงื่อนไขการใช้งานแพลตฟอร์ม',
+            documentTitle: 'ข้อกำหนดในการให้บริการ — Totilove',
             heroTitleHtml: 'ข้อกำหนดในการให้บริการ',
             heroSubtitle: '',
             cardInnerHtml: readTermsHtml('th'),
         },
         cookies: {
             metaDescription:
-                'นโยบายคุกกี้ C:\Totilove — ประเภท ความยินยอม และการจัดการบนหน้านี้',
-            documentTitle: 'คุกกี้ — C:\Totilove',
+                'นโยบายคุกกี้ Totilove — ประเภท ความยินยอม และการจัดการบนหน้านี้',
+            documentTitle: 'คุกกี้ — Totilove',
             heroTitleHtml: 'คุกกี้',
             heroSubtitle: 'เมษายน 2569',
             cardTopHtml: readCookieTopHtml('th'),
@@ -432,16 +432,16 @@ export default {
         },
         refund: {
             metaDescription:
-                'นโยบายการคืนเงิน C:\Totilove — การสมัครสมาชิก สิทธิ์ในการคืนเงิน และวิธีขอคืนเงิน',
-            documentTitle: 'นโยบายการคืนเงิน — C:\Totilove',
+                'นโยบายการคืนเงิน Totilove — การสมัครสมาชิก สิทธิ์ในการคืนเงิน และวิธีขอคืนเงิน',
+            documentTitle: 'นโยบายการคืนเงิน — Totilove',
             heroTitleHtml: 'นโยบายการคืนเงิน',
             heroSubtitle: '',
             cardInnerHtml: readRefundHtml('th'),
         },
         safety: {
             metaDescription:
-                'เคล็ดลับความปลอดภัย C:\Totilove — ปลอดภัยเมื่อเดทออนไลน์และพบปะตัวจริง',
-            documentTitle: 'เคล็ดลับความปลอดภัย — C:\Totilove',
+                'เคล็ดลับความปลอดภัย Totilove — ปลอดภัยเมื่อเดทออนไลน์และพบปะตัวจริง',
+            documentTitle: 'เคล็ดลับความปลอดภัย — Totilove',
             heroTitleHtml: 'เคล็ดลับความปลอดภัย',
             heroSubtitle:
                 'ความปลอดภัยของคุณคือสิ่งสำคัญอันดับแรก โปรดปฏิบัติตามแนวทางเหล่านี้เมื่อพูดคุยออนไลน์และเมื่อนัดพบ',
@@ -505,8 +505,8 @@ export default {
 </ul>`,
         },
         contact: {
-            metaDescription: 'ติดต่อฝ่ายสนับสนุน C:\Totilove',
-            documentTitle: 'ติดต่อ — C:\Totilove',
+            metaDescription: 'ติดต่อฝ่ายสนับสนุน Totilove',
+            documentTitle: 'ติดต่อ — Totilove',
             heroTitleHtml: 'ติดต่อเรา',
             heroSubtitle: 'เราพร้อมช่วยเหลือ ส่งข้อความถึงเรา โดยปกติจะตอบกลับภายใน 24 ชั่วโมง',
             cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> กลับสู่หน้าหลัก</a>
@@ -527,23 +527,23 @@ export default {
         },
         accessibility: {
             metaDescription:
-                'คำชี้แจงการช่วยการเข้าถึง C:\Totilove — WCAG 2.1 AA ฟีเจอร์ที่รองรับและช่องทางติดต่อ',
-            documentTitle: 'การช่วยการเข้าถึง — C:\Totilove',
+                'คำชี้แจงการช่วยการเข้าถึง Totilove — WCAG 2.1 AA ฟีเจอร์ที่รองรับและช่องทางติดต่อ',
+            documentTitle: 'การช่วยการเข้าถึง — Totilove',
             heroTitleHtml: 'การช่วยการเข้าถึง',
             heroSubtitle:
-                'C:\Totilove มุ่งมั่นที่จะทำให้ความรักเข้าถึงได้สำหรับทุกคน โดยไม่คำนึงถึงความสามารถ',
+                'Totilove มุ่งมั่นที่จะทำให้ความรักเข้าถึงได้สำหรับทุกคน โดยไม่คำนึงถึงความสามารถ',
             cardInnerHtml: readAccessibilityHtml('th'),
         },
         help: {
             metaDescription:
-                'ศูนย์ช่วยเหลือ C:\Totilove — คำตอบสำหรับคำถามที่พบบ่อยและการใช้งานให้เกิดประโยชน์สูงสุด',
-            documentTitle: 'ศูนย์ช่วยเหลือ — C:\Totilove',
+                'ศูนย์ช่วยเหลือ Totilove — คำตอบสำหรับคำถามที่พบบ่อยและการใช้งานให้เกิดประโยชน์สูงสุด',
+            documentTitle: 'ศูนย์ช่วยเหลือ — Totilove',
             heroTitleHtml: 'ศูนย์ช่วยเหลือ',
             heroSubtitle:
-                'ค้นหาคำตอบสำหรับคำถามที่พบบ่อยและใช้ C:\Totilove ให้เกิดประโยชน์สูงสุด',
+                'ค้นหาคำตอบสำหรับคำถามที่พบบ่อยและใช้ Totilove ให้เกิดประโยชน์สูงสุด',
             cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> กลับสู่หน้าหลัก</a>
 <h2><i class="fas fa-user-plus"></i> เริ่มต้นใช้งาน</h2>
-<p>การสร้างบัญชีบน C:\Totilove นั้นฟรี ไปที่<a href="/pages/register.html">หน้าลงทะเบียน</a>และกรอกข้อมูลของคุณ เมื่อลงทะเบียนแล้ว กรอกโปรไฟล์ของคุณให้สมบูรณ์เพื่อเพิ่มโอกาสในการถูกแมตช์</p>
+<p>การสร้างบัญชีบน Totilove นั้นฟรี ไปที่<a href="/pages/register.html">หน้าลงทะเบียน</a>และกรอกข้อมูลของคุณ เมื่อลงทะเบียนแล้ว กรอกโปรไฟล์ของคุณให้สมบูรณ์เพื่อเพิ่มโอกาสในการถูกแมตช์</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-search-heart"></i> การค้นหาแมตช์</h2>
 <p>ใช้ฟีเจอร์<strong>ค้นหา</strong>เพื่อกรองตามอายุ สถานที่ ภาษา และความสนใจ ระบบจับคู่อัจฉริยะของเราจะแนะนำโปรไฟล์ที่เหมาะกับคุณโดยอัตโนมัติตามความต้องการของคุณ</p>
@@ -555,14 +555,14 @@ export default {
 <p>จัดการการแจ้งเตือน การตั้งค่าความเป็นส่วนตัว และภาษาได้ใน<strong>การตั้งค่า</strong> คุณสามารถปิดใช้งานหรือลบบัญชีของคุณได้ตลอดเวลาในส่วนบัญชี</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-credit-card"></i> การเรียกเก็บเงินและแพ็กเกจ</h2>
-<p>C:\Totilove มีทั้งแบบฟรีและแบบพรีเมียม ดูและจัดการการสมัครสมาชิกของคุณในส่วน<strong>การเรียกเก็บเงิน</strong>จากเมนูบัญชี ยกเลิกได้ตลอดเวลา — ไม่มีค่าใช้จ่ายแอบแฝง</p>
+<p>Totilove มีทั้งแบบฟรีและแบบพรีเมียม ดูและจัดการการสมัครสมาชิกของคุณในส่วน<strong>การเรียกเก็บเงิน</strong>จากเมนูบัญชี ยกเลิกได้ตลอดเวลา — ไม่มีค่าใช้จ่ายแอบแฝง</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-envelope"></i> ยังต้องการความช่วยเหลืออยู่ใช่ไหม?</h2>
 <p>ไม่พบคำตอบที่นี่ใช่ไหม? <a href="/pages/footer/contact.html">ติดต่อทีมสนับสนุนของเรา</a> แล้วเราจะตอบคุณภายใน 24 ชั่วโมง</p>`,
         },
         sitemap: {
-            metaDescription: 'แผนผังเว็บไซต์ C:\Totilove',
-            documentTitle: 'แผนผัง — C:\Totilove',
+            metaDescription: 'แผนผังเว็บไซต์ Totilove',
+            documentTitle: 'แผนผัง — Totilove',
             heroTitleHtml: 'แผนผังเว็บไซต์',
             heroSubtitle: 'ภาพรวมหน้า',
             cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> กลับหน้าแรก</a>
@@ -609,24 +609,24 @@ export default {
     ph: {
         privacy: {
             metaDescription:
-                'Patakaran sa Privacy ng C:\Totilove — kung paano namin kinokolekta, ginagamit, at pinoprotektahan ang iyong data.',
-            documentTitle: 'Patakaran sa Privacy — C:\Totilove',
+                'Patakaran sa Privacy ng Totilove — kung paano namin kinokolekta, ginagamit, at pinoprotektahan ang iyong data.',
+            documentTitle: 'Patakaran sa Privacy — Totilove',
             heroTitleHtml: 'Patakaran sa Privacy',
             heroSubtitle: '',
             cardInnerHtml: readPrivacyHtml('ph'),
         },
         terms: {
             metaDescription:
-                'Mga Tuntunin ng Serbisyo ng C:\Totilove — mga patakaran at kundisyon sa paggamit ng platform.',
-            documentTitle: 'Mga Tuntunin ng Serbisyo — C:\Totilove',
+                'Mga Tuntunin ng Serbisyo ng Totilove — mga patakaran at kundisyon sa paggamit ng platform.',
+            documentTitle: 'Mga Tuntunin ng Serbisyo — Totilove',
             heroTitleHtml: 'Mga Tuntunin ng Serbisyo',
             heroSubtitle: '',
             cardInnerHtml: readTermsHtml('ph'),
         },
         cookies: {
             metaDescription:
-                'Patakaran sa cookie ng C:\Totilove — mga kategorya, pahintulot, at pamamahala sa pahinang ito.',
-            documentTitle: 'Cookie — C:\Totilove',
+                'Patakaran sa cookie ng Totilove — mga kategorya, pahintulot, at pamamahala sa pahinang ito.',
+            documentTitle: 'Cookie — Totilove',
             heroTitleHtml: 'Cookie',
             heroSubtitle: 'Abril 2026.',
             cardTopHtml: readCookieTopHtml('ph'),
@@ -634,16 +634,16 @@ export default {
         },
         refund: {
             metaDescription:
-                'Patakaran sa Refund ng C:\Totilove — subscription, eligibility, at paano humiling ng refund.',
-            documentTitle: 'Patakaran sa Refund — C:\Totilove',
+                'Patakaran sa Refund ng Totilove — subscription, eligibility, at paano humiling ng refund.',
+            documentTitle: 'Patakaran sa Refund — Totilove',
             heroTitleHtml: 'Patakaran sa Refund',
             heroSubtitle: '',
             cardInnerHtml: readRefundHtml('ph'),
         },
         safety: {
             metaDescription:
-                'Mga tip sa kaligtasan ng C:\Totilove — manatiling ligtas online at sa personal na pagkikita.',
-            documentTitle: 'Mga tip sa kaligtasan — C:\Totilove',
+                'Mga tip sa kaligtasan ng Totilove — manatiling ligtas online at sa personal na pagkikita.',
+            documentTitle: 'Mga tip sa kaligtasan — Totilove',
             heroTitleHtml: 'Mga tip sa kaligtasan',
             heroSubtitle:
                 'Ang iyong kaligtasan ang aming pangunahing priyoridad. Sundin ang mga alituntuning ito para manatiling ligtas online at kapag nagkikita nang personal.',
@@ -707,8 +707,8 @@ export default {
 </ul>`,
         },
         contact: {
-            metaDescription: 'Makipag-ugnayan sa support team ng C:\Totilove.',
-            documentTitle: 'Makipag-ugnayan — C:\Totilove',
+            metaDescription: 'Makipag-ugnayan sa support team ng Totilove.',
+            documentTitle: 'Makipag-ugnayan — Totilove',
             heroTitleHtml: 'Makipag-ugnayan',
             heroSubtitle:
                 'Nandito kami para tumulong. Magpadala ng mensahe at karaniwang tumutugon kami sa loob ng 24 na oras.',
@@ -730,23 +730,23 @@ export default {
         },
         accessibility: {
             metaDescription:
-                'Pahayag ng accessibility ng C:\Totilove — WCAG 2.1 AA, suportadong feature, at contact.',
-            documentTitle: 'Accessibility — C:\Totilove',
+                'Pahayag ng accessibility ng Totilove — WCAG 2.1 AA, suportadong feature, at contact.',
+            documentTitle: 'Accessibility — Totilove',
             heroTitleHtml: 'Accessibility',
             heroSubtitle:
-                'Ang C:\Totilove ay nakatuon na gawing accessible ang pag-ibig sa lahat, anuman ang kanilang kakayahan.',
+                'Ang Totilove ay nakatuon na gawing accessible ang pag-ibig sa lahat, anuman ang kanilang kakayahan.',
             cardInnerHtml: readAccessibilityHtml('ph'),
         },
         help: {
             metaDescription:
-                'Sentro ng Tulong ng C:\Totilove — mga sagot sa madalas na tanong at kung paano sulitin ang C:\Totilove.',
-            documentTitle: 'Sentro ng Tulong — C:\Totilove',
+                'Sentro ng Tulong ng Totilove — mga sagot sa madalas na tanong at kung paano sulitin ang Totilove.',
+            documentTitle: 'Sentro ng Tulong — Totilove',
             heroTitleHtml: 'Sentro ng Tulong',
             heroSubtitle:
-                'Maghanap ng mga sagot sa madalas na tanong at sulitin ang C:\Totilove.',
+                'Maghanap ng mga sagot sa madalas na tanong at sulitin ang Totilove.',
             cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> Bumalik sa home</a>
 <h2><i class="fas fa-user-plus"></i> Pagsisimula</h2>
-<p>Libre ang gumawa ng account sa C:\Totilove. Bisitahin ang <a href="/pages/register.html">pahina ng Magrehistro</a> at punan ang iyong mga detalye. Kapag nakapagrehistro na, kumpletuhin ang iyong profile para mas makita ka sa mga match.</p>
+<p>Libre ang gumawa ng account sa Totilove. Bisitahin ang <a href="/pages/register.html">pahina ng Magrehistro</a> at punan ang iyong mga detalye. Kapag nakapagrehistro na, kumpletuhin ang iyong profile para mas makita ka sa mga match.</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-search-heart"></i> Paghahanap ng Matches</h2>
 <p>Gamitin ang <strong>Search</strong> para mag-filter ayon sa edad, lokasyon, wika, at interes. Ang aming smart matching engine ay awtomatikong nagmumungkahi ng mga compatible na profile batay sa iyong mga kagustuhan.</p>
@@ -758,14 +758,14 @@ export default {
 <p>Pamahalaan ang iyong mga notification preference, privacy setting, at wika sa <strong>Settings</strong>. Maaari mong i-deactivate o tanggalin ang iyong account anumang oras mula sa Account section.</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-credit-card"></i> Pagsingil at Mga Subscription</h2>
-<p>Nag-aalok ang C:\Totilove ng libreng tier pati na rin mga premium na plano. Tingnan at pamahalaan ang iyong subscription sa ilalim ng <strong>Billing</strong> sa menu ng iyong account. Mag-cancel anumang oras — walang hidden fees.</p>
+<p>Nag-aalok ang Totilove ng libreng tier pati na rin mga premium na plano. Tingnan at pamahalaan ang iyong subscription sa ilalim ng <strong>Billing</strong> sa menu ng iyong account. Mag-cancel anumang oras — walang hidden fees.</p>
 <hr class="fp-divider">
 <h2><i class="fas fa-envelope"></i> Kailangan Pa ng Tulong?</h2>
 <p>Hindi mo mahanap ang sagot dito? <a href="/pages/footer/contact.html">Makipag-ugnayan sa aming support team</a> at magre-response kami sa iyo sa loob ng 24 na oras.</p>`,
         },
         sitemap: {
-            metaDescription: 'Sitemap ng C:\Totilove.',
-            documentTitle: 'Sitemap — C:\Totilove',
+            metaDescription: 'Sitemap ng Totilove.',
+            documentTitle: 'Sitemap — Totilove',
             heroTitleHtml: 'Sitemap',
             heroSubtitle: 'Buod ng mga pahina.',
             cardInnerHtml: `<a href="/" class="fp-back"><i class="fas fa-arrow-left"></i> Bumalik sa home</a>
