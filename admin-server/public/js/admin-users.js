@@ -284,7 +284,9 @@ function applyFilters() {
         currentSort.order = nextSortOrder;
     }
 
+    const searchRaw = (document.getElementById('searchInput')?.value || '').trim();
     currentFilters = {
+        ...(searchRaw ? { search: searchRaw } : {}),
         status: document.getElementById('statusFilter').value,
         gender: document.getElementById('genderFilter').value,
         ageMin: document.getElementById('ageMin').value || null,
